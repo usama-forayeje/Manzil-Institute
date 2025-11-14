@@ -26,13 +26,7 @@ const config = defineConfig({
     // Optimize CSS
     cssMinify: true,
     // Reduce bundle size
-    minify: 'terser',
-    terserOptions: {
-      compress: {
-        drop_console: true,
-        drop_debugger: true,
-      },
-    },
+    minify: 'esbuild',
   },
 })
 

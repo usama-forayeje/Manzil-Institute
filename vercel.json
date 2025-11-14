@@ -1,19 +1,7 @@
 {
   "framework": null,
   "buildCommand": "pnpm build",
-  "outputDirectory": "dist",
   "installCommand": "pnpm install",
-  "functions": {
-    "dist/server/server.js": {
-      "runtime": "@vercel/node"
-    }
-  },
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/dist/server/server.js"
-    }
-  ],
   "headers": [
     {
       "source": "/assets/(.*)",

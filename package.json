@@ -10,6 +10,7 @@
     "dev": "vite dev --port 3000",
     "build": "vite build",
     "serve": "vite preview",
+    "vercel-build": "vite build",
     "test": "vitest run",
     "lint": "eslint",
     "format": "prettier",
@@ -39,5 +40,8 @@
     "vite": "^7.2.2",
     "vite-tsconfig-paths": "^5.1.4",
     "zustand": "^5.0.8"
+  },
+  "devDependencies": {
+    "@vercel/static-build": "^1.0.0"
   }
 }

@@ -14,10 +14,10 @@ const config = defineConfig({
     // Optimize chunks for better caching
     rollupOptions: {
       output: {
-        manualChunks: {
-          vendor: ['react', 'react-dom'],
-          router: ['@tanstack/react-router'],
-          ui: ['@radix-ui/react-slot', 'lucide-react'],
+        manualChunks: (id) => {
+          if (id.includes('node_modules')) {
+            return 'vendor';
+          }
         },
       },
     },

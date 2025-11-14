@@ -7,7 +7,6 @@ import '../styles.css'
 import { useLanguageStore } from '../lib/store'
 import { ThemeProvider } from '../components/themes/theme-provider'
 import LoadingSkeleton from '../components/LoadingSkeleton'
-import ErrorBoundary from '../components/ErrorBoundary'
 
 export const Route = createRootRoute({
   head: () => ({
@@ -41,19 +40,17 @@ function RootDocument({ children }) {
           <HeadContent />
         </head>
         <body>
-          <ErrorBoundary>
-            <div
-              lang={language}
-              dir={language === 'bn' ? 'rtl' : 'ltr'}
-              className={language === 'bn' ? 'bn-font' : ''}
-            >
-              <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-                <Suspense fallback={<LoadingSkeleton />}>
-                  <div>{children}</div>
-                </Suspense>
-              </ThemeProvider>
-            </div>
-          </ErrorBoundary>
+          <div
+            lang={language}
+            dir={language === 'bn' ? 'rtl' : 'ltr'}
+            className={language === 'bn' ? 'bn-font' : ''}
+          >
+            <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+              <Suspense fallback={<LoadingSkeleton />}>
+                <div>{children}</div>
+              </Suspense>
+            </ThemeProvider>
+          </div>
           <Scripts />
         </body>
       </html>

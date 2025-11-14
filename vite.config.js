@@ -1,18 +1,18 @@
-import { defineConfig } from 'vite'
-import { tanstackStart } from '@tanstack/react-start/plugin/vite'
-import viteReact from '@vitejs/plugin-react'
-import tailwindcss from '@tailwindcss/vite'
+import { defineConfig } from "vite";
+import { tanstackStart } from "@tanstack/react-start/plugin/vite";
+import viteReact from "@vitejs/plugin-react";
+import tailwindcss from "@tailwindcss/vite";
 
 const config = defineConfig({
-  plugins: [tailwindcss(), tanstackStart({ preset: 'vercel' }), viteReact()],
+  plugins: [tailwindcss(), tanstackStart({ preset: "vercel" }), viteReact()],
   resolve: {
     alias: {
-      '@': '/src',
+      "@": "/src",
     },
   },
   build: {
-    sourcemap: false,
+    outDir: "dist",
   },
-})
+});
 
-export default config
+export default config;

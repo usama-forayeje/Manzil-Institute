@@ -10,6 +10,30 @@ const config = defineConfig({
       '@': '/src',
     },
   },
+  build: {
+    // Optimize chunks for better caching
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          router: ['@tanstack/react-router'],
+          ui: ['@radix-ui/react-slot', 'lucide-react'],
+        },
+      },
+    },
+    // Generate source maps for better debugging in production
+    sourcemap: false,
+    // Optimize CSS
+    cssMinify: true,
+    // Reduce bundle size
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true,
+      },
+    },
+  },
 })
 
 export default config

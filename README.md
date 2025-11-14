@@ -321,27 +321,111 @@ pnpm test             # Run unit tests
 
 ## 🚀 Deployment
 
+### Prerequisites for Deployment
+
+Before deploying, ensure you have:
+
+- **Node.js 18.0.0+** installed
+- **Git repository** with your code
+- **Environment variables** configured (see below)
+- **Domain name** (optional, for custom domain)
+
+### Environment Variables
+
+Create the following environment files:
+
+#### `.env.local` (Development)
+```env
+# API Configuration
+VITE_API_URL=http://localhost:3001/api
+
+# Analytics (Optional)
+VITE_GA_TRACKING_ID=G-XXXXXXXXXX
+
+# Feature Flags
+VITE_ENABLE_ANALYTICS=false
+VITE_ENABLE_DEBUG=false
+```
+
+#### `.env.production` (Production)
+```env
+# API Configuration
+VITE_API_URL=https://api.manzilinstitute.com
+
+# Analytics
+VITE_GA_TRACKING_ID=G-XXXXXXXXXX
+
+# Feature Flags
+VITE_ENABLE_ANALYTICS=true
+VITE_ENABLE_DEBUG=false
+
+# Security (if using external services)
+VITE_RECAPTCHA_SITE_KEY=your_recaptcha_key
+```
+
 ### Build Process
 
-1. **Environment Variables**: Set production environment variables
-2. **Build Command**: `pnpm build`
-3. **Output**: `dist/` directory contains production assets
+1. **Install dependencies**: `pnpm install`
+2. **Build for production**: `pnpm build`
+3. **Preview build**: `pnpm serve`
+4. **Output location**: `dist/` directory
 
 ### Deployment Options
 
 #### Vercel (Recommended)
 
-1. Connect GitHub repository to Vercel
-2. Configure build settings:
-   - Build Command: `pnpm build`
-   - Output Directory: `dist`
-   - Install Command: `pnpm install`
+**Option 1: Vercel CLI**
+```bash
+# Install Vercel CLI
+npm i -g vercel
+
+# Deploy
+vercel
+
+# For production deployment
+vercel --prod
+```
+
+**Option 2: GitHub Integration**
+1. Connect your GitHub repository to Vercel
+2. Vercel will automatically detect the project settings
+3. Configure the following in Vercel dashboard:
+
+**Build Settings:**
+- **Framework Preset**: `Vite`
+- **Root Directory**: `./` (leave empty)
+- **Build Command**: `pnpm build`
+- **Output Directory**: `dist`
+- **Install Command**: `pnpm install`
+
+**Environment Variables:**
+Add all production environment variables from `.env.production`
+
+**Domain Configuration:**
+- Add custom domain in Vercel dashboard
+- Configure DNS records as instructed
+
+**Advanced Settings:**
+- **Node.js Version**: `18.x` or higher
+- **Build Image**: `Ubuntu Latest`
+- **Function Region**: `Washington D.C. (iad1)` or nearest
 
 #### Netlify
 
-1. Connect repository
-2. Set build command: `pnpm build`
-3. Set publish directory: `dist`
+1. Connect your Git repository to Netlify
+2. Configure build settings:
+   - **Build command**: `pnpm build`
+   - **Publish directory**: `dist`
+   - **Node version**: `18`
+3. Add environment variables in Netlify dashboard
+4. Deploy
+
+#### Railway
+
+1. Connect your Git repository
+2. Railway auto-detects Vite configuration
+3. Set environment variables in dashboard
+4. Deploy
 
 #### Manual Deployment
 
@@ -349,17 +433,55 @@ pnpm test             # Run unit tests
 # Build the project
 pnpm build
 
-# Serve with any static hosting
-# Example with serve
-npx serve dist
+# Deploy to any static hosting service
+# Examples:
+
+# Using Vercel CLI
+npx vercel --prod
+
+# Using Netlify CLI
+npx netlify deploy --prod --dir=dist
+
+# Using Surge
+npx surge dist
+
+# Using Firebase
+firebase deploy
 ```
 
-### Environment Configuration
+### Production Optimization
 
-Create environment files:
+#### Performance Tips
 
-- `.env.local` - Local development
-- `.env.production` - Production variables
+1. **Enable Compression**: Configure your hosting to serve gzip/brotli compressed files
+2. **CDN**: Use a CDN for global distribution (Vercel includes this by default)
+3. **Image Optimization**: All images are automatically optimized by Vite
+4. **Code Splitting**: Routes are automatically code-split by TanStack Router
+
+#### Monitoring
+
+- **Error Tracking**: Integrate Sentry or similar service
+- **Analytics**: Google Analytics 4 is configured
+- **Performance**: Use Vercel Analytics or similar
+
+#### Security Headers
+
+The `vercel.json` includes security headers:
+- `X-Frame-Options: DENY`
+- `X-Content-Type-Options: nosniff`
+- `Referrer-Policy: strict-origin-when-cross-origin`
+- Cache headers for static assets
+
+### Post-Deployment Checklist
+
+- [ ] Test all routes and navigation
+- [ ] Verify forms and interactive elements
+- [ ] Check responsive design on mobile
+- [ ] Test loading states and error boundaries
+- [ ] Verify analytics are working
+- [ ] Check SSL certificate
+- [ ] Test contact forms and external links
+- [ ] Verify SEO meta tags
 
 ## 🔒 Security Considerations
 
@@ -370,22 +492,67 @@ Create environment files:
 
 ## 📈 Performance Optimization
 
-### Code Splitting
+### Build Optimizations
 
-- Route-based code splitting with TanStack Router
-- Lazy loading for heavy components
+The project includes several production optimizations:
 
-### Image Optimization
+#### Code Splitting
+- **Route-based splitting**: TanStack Router automatically splits code by routes
+- **Dynamic imports**: Components are lazy-loaded as needed
+- **Vendor chunking**: Third-party libraries are bundled separately
 
-- Use WebP format for images
-- Implement lazy loading
-- Optimize image sizes
+#### Asset Optimization
+- **Image optimization**: Vite automatically converts images to WebP/AVIF when supported
+- **CSS minification**: Tailwind CSS is purged and minified
+- **JavaScript minification**: Terser is used for production builds
+- **Tree shaking**: Unused code is automatically removed
+
+#### Caching Strategy
+- **Static assets**: Cached for 1 year with immutable headers
+- **HTML**: Not cached to ensure updates are immediate
+- **Service worker**: Ready for PWA features (manifest.json included)
 
 ### Bundle Analysis
 
 ```bash
-pnpm build --analyze
+# Analyze bundle size
+pnpm build
+
+# Check dist/stats.html for detailed analysis
+# Or use online tools like bundle-analyzer
 ```
+
+### Runtime Performance
+
+#### React Optimizations
+- **Concurrent features**: React 19 concurrent rendering enabled
+- **Suspense boundaries**: Proper loading states for better UX
+- **Error boundaries**: Graceful error handling
+
+#### Router Optimizations
+- **Preloading**: Routes are preloaded on hover/link focus
+- **Scroll restoration**: Maintains scroll position on navigation
+- **Memory management**: Efficient route caching
+
+### Monitoring & Analytics
+
+#### Performance Monitoring
+```javascript
+// Add to your app for performance monitoring
+import { onCLS, onFID, onFCP, onLCP, onTTFB } from 'web-vitals'
+
+onCLS(console.log)
+onFID(console.log)
+onFCP(console.log)
+onLCP(console.log)
+onTTFB(console.log)
+```
+
+#### Error Tracking
+Consider integrating error tracking services:
+- **Sentry**: Comprehensive error monitoring
+- **LogRocket**: Session replay and error tracking
+- **Bugsnag**: Real-time error monitoring
 
 ## 🤝 Contributing
 

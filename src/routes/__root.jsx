@@ -1,6 +1,4 @@
 import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
-import { TanStackDevtools } from '@tanstack/react-devtools'
 import { Suspense, useEffect } from 'react'
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
@@ -9,6 +7,7 @@ import '../styles.css'
 import { useLanguageStore } from '../lib/store'
 import { ThemeProvider } from '../components/themes/theme-provider'
 import LoadingSkeleton from '../components/LoadingSkeleton'
+import ErrorBoundary from '../components/ErrorBoundary'
 
 export const Route = createRootRoute({
   head: () => ({
@@ -34,42 +33,35 @@ const queryClient = new QueryClient()
 
 function RootDocument({ children }) {
   const { language } = useLanguageStore()
-
-  // Diagnostic log for CSS loading (client-side only)
-  useEffect(() => {
-    console.log('CSS diagnostic: stylesheets loaded:', document.styleSheets.length)
-    console.log('CSS diagnostic: body classes:', document.body.className)
-  }, [])
+  const isDevelopment = import.meta.env.DEV
 
   return (
     <QueryClientProvider client={queryClient}>
-      <html lang="en" suppressHydrationWarning={true}>
+      <html lang="en">
         <head>
           <HeadContent />
         </head>
         <body>
-          <div
-            lang={language}
-            dir={language === 'bn' ? 'rtl' : 'ltr'}
-            className={language === 'bn' ? 'bn-font' : ''}
-          >
-            <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-              <Suspense fallback={<LoadingSkeleton />}>
-                <div>{children}</div>
-              </Suspense>
-            </ThemeProvider>
-          </div>
-          <TanStackDevtools
-            config={{
-              position: 'bottom-left',
-            }}
-            plugins={[
-              {
-                name: 'Tanstack Router',
-                render: <TanStackRouterDevtoolsPanel />,
-              },
-            ]}
-          />
+          <ErrorBoundary>
+            <div
+              lang={language}
+              dir={language === 'bn' ? 'rtl' : 'ltr'}
+              className={language === 'bn' ? 'bn-font' : ''}
+            >
+              <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+                <Suspense fallback={<LoadingSkeleton />}>
+                  <div>{children}</div>
+                </Suspense>
+              </ThemeProvider>
+            </div>
+          </ErrorBoundary>
+          {isDevelopment && (
+            <>
+              {import('./dev-tools.jsx').then(({ DevTools }) => (
+                <DevTools />
+              )).catch(() => null)}
+            </>
+          )}
           <Scripts />
         </body>
       </html>

@@ -1,7 +1,11 @@
 {
-  "name": "Manzil-International-Institute",
+  "name": "Manzil-Institute",
   "private": true,
   "type": "module",
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  },
   "scripts": {
     "dev": "vite dev --port 3000",
     "build": "vite build",

@@ -33,7 +33,6 @@ const queryClient = new QueryClient()
 
 function RootDocument({ children }) {
   const { language } = useLanguageStore()
-  const isDevelopment = import.meta.env.DEV
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -55,13 +54,6 @@ function RootDocument({ children }) {
               </ThemeProvider>
             </div>
           </ErrorBoundary>
-          {isDevelopment && (
-            <>
-              {import('../components/dev-tools.jsx').then(({ DevTools }) => (
-                <DevTools />
-              )).catch(() => null)}
-            </>
-          )}
           <Scripts />
         </body>
       </html>

@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as CurriculumRouteImport } from './routes/curriculum'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdmissionRouteImport } from './routes/admission'
+import { Route as CampusRouteImport } from './routes/campus'
 
 const AdmissionRoute = AdmissionRouteImport.update({
   id: '/admission',
@@ -24,6 +25,13 @@ const CurriculumRoute = CurriculumRouteImport.update({
   path: '/curriculum',
   getParentRoute: () => rootRouteImport,
 })
+
+const CampusRoute = CampusRouteImport.update({
+  id: '/campus',
+  path: '/campus',
+  getParentRoute: () => rootRouteImport,
+})
+
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -34,5 +42,6 @@ const rootRouteChildren = {
   IndexRoute: IndexRoute,
   CurriculumRoute: CurriculumRoute,
   AdmissionRoute: AdmissionRoute,
+  CampusRoute: CampusRoute,
 }
 export const routeTree = rootRouteImport._addFileChildren(rootRouteChildren)

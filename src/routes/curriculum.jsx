@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { Download, ArrowLeft, BookOpen, Users, Clock, Star, GraduationCap, Layers, Target, Zap, BookText, Award, Globe, Cpu, Heart } from 'lucide-react'
 import { Button } from '../components/ui/button'
-import { HeroHeader } from '../components/Header'
+import { HeroHeader } from '../components/header'
 import FooterSection from '../components/footer'
 import { useTranslation } from '../hooks/useTranslation'
 

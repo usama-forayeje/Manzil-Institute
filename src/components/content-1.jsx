@@ -9,9 +9,12 @@ import 'swiper/css/autoplay'
 import 'swiper/css/navigation'
 import 'swiper/css/pagination'
 import 'swiper/css/effect-coverflow'
+import { Button } from './ui/button'
+import { Link, useNavigate } from '@tanstack/react-router'
 
 export default function ContentSection() {
     const { language } = useLanguageStore()
+    const navigate = useNavigate()
 
     return (
         <section id="about" className="relative scroll-mt-[100px] py-6 xs:py-8 sm:py-12 lg:py-20 bg-gradient-to-b from-gray-50 via-white to-gray-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900" dir="ltr">
@@ -97,19 +100,19 @@ export default function ContentSection() {
 
                         {/* CTA Button with Glow Effect */}
                         <div className="pt-1 xs:pt-2">
-                            <button className={cn(
-                                "group relative px-3 xs:px-4 py-2 rounded-lg font-semibold text-white overflow-hidden transition-all duration-300 hover:scale-105 active:scale-95 focus:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 text-sm sm:text-base",
-                                language === 'bn' && "bengali-text"
-                            )}>
-                                <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-700 transition-transform duration-300 group-hover:scale-110 group-active:scale-110"></div>
-                                <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-purple-500 opacity-0 group-hover:opacity-100 group-active:opacity-100 transition-opacity duration-300 blur"></div>
-                                <span className="relative flex items-center justify-center">
+                            <Link to='/campus' className={cn(
+                                    "group px-3 xs:px-4 py-2 rounded-lg font-semibold text-blue-600 dark:text-blue-400 border-2 border-blue-600 dark:border-blue-400 bg-transparent hover:bg-blue-600 hover:text-white dark:hover:bg-blue-400 dark:hover:text-gray-900 transition-all duration-300 hover:scale-105 active:scale-95 focus:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 text-sm sm:text-base",
+                                    language === 'bn' && "bengali-text"
+                                )}
+                            >
+                                <span className="flex items-center justify-center">
+                                    {/* cspell:disable-next-line */}
                                     {language === 'bn' ? 'আমাদের কেম্পাস দেখুন' : 'See Our Campus'}
                                     <svg className="ml-1 w-3 h-3 group-hover:translate-x-1 group-active:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                                     </svg>
                                 </span>
-                            </button>
+                            </Link>
                         </div>
                     </div>
 
@@ -233,16 +236,6 @@ export default function ContentSection() {
 
             </div>
 
-            {/* Custom CSS for Animations */}
-            <style jsx>{`
-                @keyframes float {
-                    0%, 100% { transform: translateY(0px); }
-                    50% { transform: translateY(-5px); }
-                }
-                .animate-float {
-                    animation: float 3s ease-in-out infinite;
-                }
-            `}</style>
         </section>
     )
 }

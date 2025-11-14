@@ -103,7 +103,7 @@ export default function HeroSectionPremium() {
                   className={cn("border-2 border-blue-600 text-blue-600 hover:bg-blue-50 dark:border-blue-400 dark:text-blue-400 dark:hover:bg-blue-400/10 px-10 py-5 text-lg font-semibold transition-all duration-300 text-center", language === 'bn' && "bengali-text")}
                   asChild
                 >
-                  <Link href="/about">
+                  <Link href="#about">
                     <span className={cn("text-nowrap", language === 'bn' && "bengali-text text-center")}>
                       {language === 'bn' ? 'আমাদের সম্পর্কে' : 'About Us'}
                     </span>

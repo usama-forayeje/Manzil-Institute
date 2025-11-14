@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { HeroHeader } from '../components/Header'
+import { HeroHeader } from '../components/header'
 import HeroSection from '../components/hero-section'
 import ContentSection from '../components/content-1'
 import MICCurriculum from '../components/MICCurriculum'

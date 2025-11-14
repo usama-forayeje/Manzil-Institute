@@ -57,7 +57,7 @@ function RootDocument({ children }) {
           </ErrorBoundary>
           {isDevelopment && (
             <>
-              {import('./dev-tools.jsx').then(({ DevTools }) => (
+              {import('../components/dev-tools.jsx').then(({ DevTools }) => (
                 <DevTools />
               )).catch(() => null)}
             </>

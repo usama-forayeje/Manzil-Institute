@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 import { ArrowLeft, Upload, User, Phone, Calendar, CheckCircle2 } from 'lucide-react'
 import { useForm } from '@tanstack/react-form'
+import { useLanguageStore } from '../lib/store'
 
 export const Route = createFileRoute('/apply')({
   component: ApplicationPage,
@@ -37,8 +38,6 @@ const Label = ({ children, htmlFor, className = "" }) => (
   </label>
 )
 
-// Mock language store
-const useLanguageStore = () => ({ language: 'bn' })
 
 function ApplicationPage() {
   const { language } = useLanguageStore()

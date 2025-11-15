@@ -226,7 +226,7 @@ export default function FooterSection() {
                             </h3>
                             <div className="space-y-3">
                                 {contactInfo.map((info, index) => (
-                                    <div key={index} className={`flex items-center gap-3 ${info.icon === MapPin ? 'justify-start' : 'justify-center md:justify-start'}`}>
+                                    <div key={index} className="flex items-center gap-3 justify-start">
                                         <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
                                             <info.icon className="w-4 h-4 text-white" />
                                         </div>
@@ -262,7 +262,7 @@ export default function FooterSection() {
                     </div>
 
                     {/* Middle Column - Business Divisions */}
-                    <div>
+                    <div className="text-center md:text-left">
                         <h3 className="text-lg font-semibold mb-6 kalpurush-font bg-gradient-to-r from-blue-500 to-blue-600 bg-clip-text text-transparent">
                             {language === 'bn' ? 'ব্যবসায়িক বিভাগসমূহ' : 'Business Divisions'}
                         </h3>
@@ -282,7 +282,7 @@ export default function FooterSection() {
                     </div>
 
                     {/* Right Column - Company Links */}
-                    <div>
+                    <div className="text-center md:text-left">
                         <h3 className="text-lg font-semibold mb-6 kalpurush-font bg-gradient-to-r from-blue-500 to-blue-600 bg-clip-text text-transparent">
                             {language === 'bn' ? 'কোম্পানি' : 'Company'}
                         </h3>

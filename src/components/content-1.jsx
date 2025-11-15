@@ -17,7 +17,7 @@ export default function ContentSection() {
     const navigate = useNavigate()
 
     return (
-        <section id="about" className="relative scroll-mt-[100px] py-6 xs:py-8 sm:py-12 lg:py-20 bg-gradient-to-b from-gray-50 via-white to-gray-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900" dir="ltr">
+        <section id="about" className="relative scroll-mt-[100px] py-6 xs:py-8 sm:py-12 lg:py-20 bg-gradient-to-b from-gray-50 via-white to-gray-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 overflow-hidden" dir="ltr">
 
             <div className="relative mx-auto w-full max-w-7xl px-3 xs:px-4 sm:px-6 lg:px-8">
 

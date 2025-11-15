@@ -5,6 +5,7 @@ import ContentSection from '../components/content-1'
 import MICCurriculum from '../components/MICCurriculum'
 import Contact from '../components/contact'
 import FooterSection from '../components/footer'
+import Team from '../components/team'
 
 export const Route = createFileRoute('/')({ component: Home })
 
@@ -15,6 +16,7 @@ function Home() {
       <HeroSection />
       <ContentSection />
       <MICCurriculum />
+      {/* <Team /> */}
       <Contact />
       <FooterSection />
     </>

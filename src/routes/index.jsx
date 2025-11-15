@@ -16,7 +16,7 @@ function Home() {
       <HeroSection />
       <ContentSection />
       <MICCurriculum />
-      {/* <Team /> */}
+      <Team />
       <Contact />
       <FooterSection />
     </>

@@ -66,7 +66,7 @@ export default function HeroSectionPremium() {
 
               {/* NEW: Subheading - Next Level */}
               <div className="mb-8"> {/* Added mb-8 */}
-                <h2 className={cn("text-3xl md:text-4xl lg:text-5xl font-bold text-gray-800 dark:text-gray-100 leading-tight text-center", language === 'bn' && "bengali-text")}>
+                <h2 className={cn("text-4xl md:text-4xl lg:text-5xl font-bold text-gray-800 dark:text-gray-100 leading-tight text-center", language === 'bn' && "bengali-text")}>
                   {language === 'bn' ? 'গড়ে তুলছি আদর্শের নতুন প্রজন্ম' : 'Building the Next Generation of Ideals'}
                 </h2>
               </div>
@@ -89,7 +89,7 @@ export default function HeroSectionPremium() {
                   className={cn("bg-blue-600 hover:bg-blue-700 text-white px-10 py-5 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 text-center", language === 'bn' && "bengali-text")}
                   asChild
                 >
-                  <Link href="/admission">
+                  <Link href="/apply">
                     <BookOpen className="size-6 mr-2" />
                     <span className={cn("text-nowrap", language === 'bn' && "bengali-text text-center")}>
                       {language === 'bn' ? 'আজই Apply করুন' : 'Apply Now'}
@@ -103,9 +103,9 @@ export default function HeroSectionPremium() {
                   className={cn("border-2 border-blue-600 text-blue-600 hover:bg-blue-50 dark:border-blue-400 dark:text-blue-400 dark:hover:bg-blue-400/10 px-10 py-5 text-lg font-semibold transition-all duration-300 text-center", language === 'bn' && "bengali-text")}
                   asChild
                 >
-                  <Link href="#about">
+                  <Link href="/campus">
                     <span className={cn("text-nowrap", language === 'bn' && "bengali-text text-center")}>
-                      {language === 'bn' ? 'আমাদের সম্পর্কে' : 'About Us'}
+                      {language === 'bn' ? 'কেম্পাস দেখুন' : 'Explore Campus'}
                     </span>
                     <ArrowRight className="size-6 ml-2" />
                   </Link>

@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
+import { useEffect } from 'react'
 import { Download, ArrowLeft, BookOpen, Users, Clock, Star, GraduationCap, Layers, Target, Zap, BookText, Award, Globe, Cpu, Heart } from 'lucide-react'
 import { Button } from '../components/ui/button'
 import { HeroHeader } from '../components/header'
@@ -32,6 +33,11 @@ export const Route = createFileRoute('/curriculum')({
 
 function CurriculumPage() {
   const { language, t } = useTranslation()
+
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
 
   const getColorClasses = (color) => {
     const colorMap = {

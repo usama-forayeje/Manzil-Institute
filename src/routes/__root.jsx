@@ -43,7 +43,6 @@ function RootDocument({ children }) {
         <body>
           <div
             lang={language}
-            dir={language === 'bn' ? 'rtl' : 'ltr'}
             className={language === 'bn' ? 'bn-font' : ''}
           >
             <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">

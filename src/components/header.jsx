@@ -170,18 +170,18 @@ export const HeroHeader = () => {
                 size="sm"
                 className={cn(
                   "text-xs font-semibold whitespace-nowrap h-9",
-                  isScrolled ? "bg-blue-600 hover:bg-blue-700" : ""
+                  isScrolled ? "bg-blue-500 text-white hover:bg-blue-700" : ""
                 )}
               >
-                <a href="#">
+                <Link to="/apply">
                   {isScrolled
                     ? language === "en"
-                      ? "Register"
-                      : "রেজিস্টার"
+                      ? "Apply Now"
+                      : "এপ্লাই করুন"
                     : language === "en"
                     ? "Login"
                     : "লগইন"}
-                </a>
+                </Link>
               </Button>
             </div>
 
@@ -261,15 +261,15 @@ export const HeroHeader = () => {
                   isScrolled ? "bg-blue-600 hover:bg-blue-700 text-white" : ""
                 )}
               >
-                <a href="#">
+                <Link to="/apply">
                   {isScrolled
                     ? language === "en"
-                      ? "Register"
-                      : "রেজিস্টার"
+                      ? "Apply Now"
+                      : "এপ্লাই করুন"
                     : language === "en"
                     ? "Login"
                     : "লগইন"}
-                </a>
+                </Link>
               </Button>
             </div>
           </div>

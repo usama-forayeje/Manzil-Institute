@@ -11,15 +11,58 @@ import 'swiper/css/pagination'
 import 'swiper/css/effect-coverflow'
 import { Button } from './ui/button'
 import { Link, useNavigate } from '@tanstack/react-router'
+import { AnimatedGroup } from './ui/animated-group'
+
+const transitionVariants = {
+    item: {
+        hidden: {
+            opacity: 0,
+            filter: 'blur(12px)',
+            y: 12,
+        },
+        visible: {
+            opacity: 1,
+            filter: 'blur(0px)',
+            y: 0,
+            transition: {
+                type: 'spring',
+                bounce: 0.3,
+                duration: 1.5,
+            },
+        },
+    },
+}
 
 export default function ContentSection() {
     const { language } = useLanguageStore()
-    const navigate = useNavigate()
+
+    const classTranslations = {
+        "Computer Class": language === 'bn' ? "কম্পিউটার ক্লাস" : "Computer Class",
+        "Classroom": language === 'bn' ? "আরবি ক্লাসের একাংশ" : "A Section of Arabic Class",
+        "Category Class": language === 'bn' ? "কারিগরি ক্লাস" : "Technical Class",
+        "Arabic Class": language === 'bn' ? "আরবি ক্লাসরুম" : "Arabic Classroom",
+        "Robotics Class": language === 'bn' ? "রোবোটিক্স ক্লাস" : "Robotics Class",
+        "Language Class": language === 'bn' ? "ভাষা ক্লাসের একাংশ" : "Language Class Section",
+        "Arts Class": language === 'bn' ? "শিল্প ক্লাস " : "Arts Class"
+    }
 
     return (
         <section id="about" className="relative scroll-mt-[100px] py-6 xs:py-8 sm:py-12 lg:py-20 bg-gradient-to-b from-gray-50 via-white to-gray-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 overflow-hidden" dir="ltr">
 
-            <div className="relative mx-auto w-full max-w-7xl px-3 xs:px-4 sm:px-6 lg:px-8">
+            <AnimatedGroup
+                variants={{
+                    container: {
+                        visible: {
+                            transition: {
+                                staggerChildren: 0.05,
+                                delayChildren: 0.75,
+                            },
+                        },
+                    },
+                    ...transitionVariants,
+                }}
+                className="relative mx-auto w-full max-w-7xl px-3 xs:px-4 sm:px-6 lg:px-8"
+            >
 
                 {/* Main Heading with Animation */}
                 <div className="text-center mb-6 xs:mb-8 sm:mb-12 lg:mb-16">
@@ -50,10 +93,10 @@ export default function ContentSection() {
                                     {language === 'bn' ? 'আমাদের যাত্রা' : 'Our Journey'}
                                 </span>
                             </div>
-                            <h3 className={cn("text-lg xs:text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white leading-tight", language === 'bn' && "bengali-text")}>
+                            <h3 className={cn("text-xl xs:text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white leading-tight", language === 'bn' && "bengali-text")}>
                                 {language === 'bn' ? 'একটি মহৎ ভাবনা থেকে যাত্রা' : 'Journey from a Noble Thought'}
                             </h3>
-                            <p className={cn("text-sm sm:text-base text-gray-700 dark:text-gray-200 leading-relaxed", language === 'bn' && "bengali-text")}>
+                            <p className={cn("text-base sm:text-base text-gray-700 dark:text-gray-200 leading-relaxed", language === 'bn' && "bengali-text")}>
                                 {language === 'bn' ? (
                                     'মানযিল একটি নাম, একটি স্বপ্ন, একটি দিকনির্দেশনা। ইসলামী মূল্যবোধ, জ্ঞান, নৈতিকতা এবং উন্নয়নের সমন্বয়ে গড়ে তোলা এক আদর্শ সমাজ-ব্যবস্থার স্বপ্ন নিয়ে আমাদের যাত্রা শুরু।'
                                 ) : (
@@ -90,7 +133,7 @@ export default function ContentSection() {
                                                 <CheckCircle className="relative size-3 xs:size-3.5 sm:size-4 text-green-500" />
                                             </div>
                                         </div>
-                                        <span className={cn("text-sm sm:text-base text-gray-700 dark:text-gray-200 leading-snug", language === 'bn' && "bengali-text")}>
+                                        <span className={cn("text-base sm:text-base text-gray-700 dark:text-gray-200 leading-snug", language === 'bn' && "bengali-text")}>
                                             {language === 'bn' ? point.bn : point.en}
                                         </span>
                                     </div>
@@ -136,16 +179,20 @@ export default function ContentSection() {
                                 className="w-full [&_.swiper-pagination-bullet]:bg-gray-300 [&_.swiper-pagination-bullet-active]:bg-blue-600 [&_.swiper-pagination]:bottom-1 xs:[&_.swiper-pagination]:bottom-2 sm:[&_.swiper-pagination]:bottom-3"
                                 grabCursor={true}>
                                 {[
-                                    { src: "/computer-class.jpg", alt: "Classroom", fallback: "/computer-class.jpg" },
-                                    { src: "/classroom.jpg", alt: "Classroom", fallback: "/manzil institutte logo.jpg" },
-                                    { src: "/carigory-class.jpg", alt: "Carigory Class", fallback: "/manzil logo.jpg" },
+                                    { src: "/computer-class.jpg", alt: "Computer Class", fallback: "/computer-class.jpg" },
+                                    { src: "/childclass.jpg", alt: "Classroom", fallback: "/manzil institutte logo.jpg" },
+                                    { src: "/carigory-class.jpg", alt: "Category Class", fallback: "/manzil logo.jpg" },
                                     { src: "/arabic-class.jpg", alt: "Arabic Class", fallback: "/manzil institutte logo.jpg" },
+                                    { src: "/roboticsclass.jpg", alt: "Robotics Class", fallback: "/manzil institutte logo.jpg" },
+                                    { src: "/languageclass.jpg", alt: "Language Class", fallback: "/manzil institutte logo.jpg" },
+                                    { src: "/artsclass.jpg", alt: "Arts Class", fallback: "/manzil institutte logo.jpg" },
                                 ].map((image, idx) => (
                                     <SwiperSlide key={idx}>
-                                        <div className="w-full aspect-video xs:aspect-[4/3] sm:aspect-video md:aspect-[16/10] lg:aspect-[3/2] overflow-hidden bg-gray-100 dark:bg-gray-800">
+                                        <div className="relative w-full aspect-video xs:aspect-[4/3] sm:aspect-video md:aspect-[16/10] lg:aspect-[3/2] overflow-hidden bg-gray-100 dark:bg-gray-800">
                                             <img
                                                 src={image.src || "/placeholder.svg"}
                                                 alt={image.alt}
+                                                title={image.alt}
                                                 loading="lazy"
                                                 className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-700"
                                                 onError={(e) => {
@@ -154,6 +201,10 @@ export default function ContentSection() {
                                                 }}
                                             />
                                             <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                                            <div className="absolute top-1 text-start p-8 -right-14 w-1/2 bg-black/40 backdrop-blur-sm border border-white/20 text-white py-2 font-semibold text-sm sm:text-base rounded-md">
+
+                                                {classTranslations[image.alt]}
+                                            </div>
                                         </div>
                                     </SwiperSlide>
                                 ))}
@@ -230,7 +281,7 @@ export default function ContentSection() {
                 {/* Business Verticals */}
                 <LogoCloud />
 
-            </div>
+            </AnimatedGroup>
 
         </section>
     )

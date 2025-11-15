@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as CurriculumRouteImport } from './routes/curriculum'
 import { Route as CampusRouteImport } from './routes/campus'
 import { Route as AdmissionRouteImport } from './routes/admission'
+import { Route as ApplyRouteImport } from './routes/apply'
 import { Route as IndexRouteImport } from './routes/index'
 
 const CurriculumRoute = CurriculumRouteImport.update({
@@ -29,6 +30,11 @@ const AdmissionRoute = AdmissionRouteImport.update({
   path: '/admission',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApplyRoute = ApplyRouteImport.update({
+  id: '/apply',
+  path: '/apply',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -40,26 +46,23 @@ export interface FileRoutesByFullPath {
   '/admission': typeof AdmissionRoute
   '/campus': typeof CampusRoute
   '/curriculum': typeof CurriculumRoute
+  '/apply': typeof ApplyRoute
 }
-export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/admission': typeof AdmissionRoute
-  '/campus': typeof CampusRoute
-  '/curriculum': typeof CurriculumRoute
-}
+
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admission': typeof AdmissionRoute
   '/campus': typeof CampusRoute
   '/curriculum': typeof CurriculumRoute
+  '/apply': typeof ApplyRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/admission' | '/campus' | '/curriculum'
+  fullPaths: '/' | '/admission' | '/campus' | '/curriculum' | '/apply'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/admission' | '/campus' | '/curriculum'
-  id: '__root__' | '/' | '/admission' | '/campus' | '/curriculum'
+  to: '/' | '/admission' | '/campus' | '/curriculum' | '/apply'
+  id: '__root__' | '/' | '/admission' | '/campus' | '/curriculum' | '/apply'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -67,6 +70,7 @@ export interface RootRouteChildren {
   AdmissionRoute: typeof AdmissionRoute
   CampusRoute: typeof CampusRoute
   CurriculumRoute: typeof CurriculumRoute
+  ApplyRoute: typeof ApplyRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -92,6 +96,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdmissionRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/apply': {
+      id: '/apply'
+      path: '/apply'
+      fullPath: '/apply'
+      preLoaderRoute: typeof ApplyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -107,6 +118,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdmissionRoute: AdmissionRoute,
   CampusRoute: CampusRoute,
   CurriculumRoute: CurriculumRoute,
+  ApplyRoute: ApplyRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -247,7 +247,7 @@ export default function MICCurriculum() {
                                     <div className="flex items-center gap-2">
                                         <Users className="w-4 h-4 text-gray-400" />
                                         <span className={cn(
-                                            "text-sm text-gray-600 dark:text-gray-400",
+                                            "text-base text-gray-600 dark:text-gray-400",
                                             language === 'bn' && "bengali-text"
                                         )}>
                                             {item.age}
@@ -256,7 +256,7 @@ export default function MICCurriculum() {
                                     <div className="flex items-center gap-2">
                                         <Clock className="w-4 h-4 text-gray-400" />
                                         <span className={cn(
-                                            "text-sm text-gray-600 dark:text-gray-400",
+                                            "text-base text-gray-600 dark:text-gray-400",
                                             language === 'bn' && "bengali-text"
                                         )}>
                                             {item.duration}
@@ -278,7 +278,7 @@ export default function MICCurriculum() {
                                         <li key={featureIndex} className="flex items-center gap-2">
                                             <div className={cn("w-1.5 h-1.5 rounded-full", colorClasses.bg500)}></div>
                                             <span className={cn(
-                                                "text-sm text-gray-600 dark:text-gray-400",
+                                                "text-base text-gray-600 dark:text-gray-400",
                                                 language === 'bn' && "bengali-text"
                                             )}>
                                                 {feature}
@@ -310,7 +310,7 @@ export default function MICCurriculum() {
                     },
                     ...transitionVariants,
                   }}
-                  className="grid gap-8 lg:grid-cols-3 lg:gap-12"
+                  className="hidden sm:grid gap-8 lg:grid-cols-3 lg:gap-12"
                 >
                     {streams.map((stream, index) => {
                         const streamColorClasses = getColorClasses(stream.color)
@@ -336,7 +336,7 @@ export default function MICCurriculum() {
                                 </h3>
 
                                 <p className={cn(
-                                    "text-gray-600 dark:text-gray-400 mb-6 leading-relaxed",
+                                    "text-gray-600 dark:text-gray-400 mb-6 leading-relaxed text-base",
                                     language === 'bn' && "bengali-text"
                                 )}>
                                     {stream.description}
@@ -348,7 +348,7 @@ export default function MICCurriculum() {
                                         <li key={featureIndex} className="flex items-center gap-3">
                                             <div className={cn("w-2 h-2 rounded-full", streamColorClasses.bg500)}></div>
                                             <span className={cn(
-                                                "text-gray-700 dark:text-gray-300 text-sm font-medium",
+                                                "text-gray-700 dark:text-gray-300 text-base font-medium",
                                                 language === 'bn' && "bengali-text"
                                             )}>
                                                 {feature}
@@ -368,25 +368,15 @@ export default function MICCurriculum() {
                 </AnimatedGroup>
 
                 {/* Bottom CTA */}
-                <div className="text-center pt-8">
-                    <div className="inline-flex flex-col sm:flex-row items-center gap-4 bg-white dark:bg-gray-800 rounded-xl px-6 py-4 border border-gray-200 dark:border-gray-700 shadow-md">
-                        <div className="text-center">
-                            <p className={cn(
-                                "text-base font-semibold text-gray-900 dark:text-white mb-1",
-                                language === 'bn' && "bengali-text"
-                            )}>
-                                {language === 'bn' ? "সম্পূর্ণ কারিকুলাম দেখুন" : "View Complete Curriculum"}
-                            </p>
-                        </div>
+                <div className="text-center flex justify-center items-center pt-8">
                         <Link to="/curriculum">
-                            <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-5 py-2 transition-colors duration-300 flex items-center gap-2">
+                            <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 sm:px-5 py-3 sm:py-2 transition-colors duration-300 flex items-center justify-center gap-2 w-full sm:w-auto">
                                 <span className={cn("text-sm font-medium", language === 'bn' && "bengali-text")}>
-                                    {language === 'bn' ? "এখানে ক্লিক করুন" : "Click Here"}
+                                    {language === 'bn' ? "সম্পূর্ণ কারিকুলাম দেখুন" : "View Curriculum"}
                                 </span>
                                 <ArrowRight className="w-4 h-4" />
                             </Button>
                         </Link>
-                    </div>
                 </div>
                 </AnimatedGroup>
             </div>

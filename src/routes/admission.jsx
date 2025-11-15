@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { ArrowLeft, Download, Calendar, Clock, Phone, Mail, MapPin, CheckCircle, AlertCircle } from 'lucide-react'
 import { Button } from '../components/ui/button'
@@ -34,9 +34,13 @@ export const Route = createFileRoute('/admission')({
 })
 
 function AdmissionPage() {
-  const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState('process')
   const { language } = useLanguageStore()
+
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
 
   const getColorClasses = (color) => {
     const colorMap = {
@@ -320,7 +324,7 @@ function AdmissionPage() {
   }
 
   const handleApplyNow = () => {
-    alert(language === 'bn' ? 'ভর্তি ফরম খোলা হচ্ছে...' : 'Opening admission form...')
+    navigate({ to: '/apply' })
   }
 
   const handleDownloadForm = () => {
@@ -373,13 +377,13 @@ function AdmissionPage() {
         </section>
 
         {/* Navigation Tabs */}
-        <div className="flex overflow-x-auto gap-2 mb-6 sm:mb-8 pb-2 scrollbar-hide justify-center">
+        <div className="flex flex-wrap gap-2 mb-6 sm:mb-8 justify-center sm:justify-center">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={cn(
-                "px-4 sm:px-6 py-2 sm:py-3 rounded-xl font-medium whitespace-nowrap transition-colors border border-gray-200 dark:border-gray-700",
+                "px-3 sm:px-4 lg:px-6 py-2 sm:py-3 rounded-xl font-medium text-sm sm:text-base transition-colors border border-gray-200 dark:border-gray-700 flex-shrink-0",
                 activeTab === tab.id
                   ? 'bg-blue-600 text-white'
                   : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700',

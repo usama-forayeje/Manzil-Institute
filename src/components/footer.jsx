@@ -211,7 +211,7 @@ export default function FooterSection() {
                                     {language === 'bn' ? 'মানজিল ইনস্টিটিউট' : 'Manzil Institute'}
                                 </span>
                             </Link>
-                            <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed kalpurush-font">
+                            <p className="text-gray-600 dark:text-gray-300 text-base leading-relaxed kalpurush-font">
                                 {language === 'bn'
                                     ? 'মাদ্রাসা, জেনারেল ও কারিগরি শিক্ষার অনন্য সংমিশ্রণে গড়ে উঠছে এক আদর্শ প্রজন্ম।'
                                     : 'An ideal generation is being built through the unique combination of Madrasa, General and Technical education.'
@@ -231,7 +231,7 @@ export default function FooterSection() {
                                             <info.icon className="w-4 h-4 text-white" />
                                         </div>
                                         <div className="flex-1">
-                                            <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed kalpurush-font">
+                                            <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed kalpurush-font text-left">
                                                 {language === 'bn' ? info.details.bn : info.details.en}
                                             </p>
                                         </div>
@@ -292,13 +292,13 @@ export default function FooterSection() {
                                     {link.href.startsWith('#') ? (
                                         <a
                                             href={link.href}
-                                            className="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 text-sm kalpurush-font block py-1">
+                                            className="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 text-base kalpurush-font block py-1">
                                             {language === 'bn' ? link.title.bn : link.title.en}
                                         </a>
                                     ) : (
                                         <Link
                                             to={link.href}
-                                            className="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 text-sm kalpurush-font block py-1">
+                                            className="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 text-base kalpurush-font block py-1">
                                             {language === 'bn' ? link.title.bn : link.title.en}
                                         </Link>
                                     )}

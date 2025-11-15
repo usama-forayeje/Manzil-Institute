@@ -251,7 +251,7 @@ export const HeroHeader = () => {
               })}
             </div>
 
-            <div className="flex flex-col space-y-3 mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+            <div className="flex flex-col space-y-3 mb-6 mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
               <Button
                 asChild
                 variant={isScrolled ? "default" : "outline"}

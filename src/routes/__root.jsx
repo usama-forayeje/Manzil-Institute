@@ -7,6 +7,7 @@ import '../styles.css'
 import { useLanguageStore } from '../lib/store'
 import { ThemeProvider } from '../components/themes/theme-provider'
 import LoadingSkeleton from '../components/LoadingSkeleton'
+import FloatingActionButtons from '../components/FloatingActionButtons'
 
 export const Route = createRootRoute({
   head: () => ({
@@ -49,6 +50,7 @@ function RootDocument({ children }) {
               <Suspense fallback={<LoadingSkeleton />}>
                 <>{children}</>
               </Suspense>
+              <FloatingActionButtons />
             </ThemeProvider>
           </div>
           <Scripts />

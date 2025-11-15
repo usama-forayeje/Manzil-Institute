@@ -226,7 +226,7 @@ export default function MICCurriculum() {
                             <div
                                 key={index}
                                 className={cn(
-                                    "group relative bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-xl",
+                                    "group relative bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-xl min-h-[280px]",
                                     colorClasses.hoverBorder
                                 )}
                             >
@@ -317,7 +317,7 @@ export default function MICCurriculum() {
                         return (
                             <div
                                 key={index}
-                                className="group relative bg-white dark:bg-gray-800 rounded-2xl p-8 border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-xl"
+                                className="group relative bg-white dark:bg-gray-800 rounded-2xl p-8 border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-xl min-h-[320px]"
                             >
                                 {/* Icon */}
                                 <div className={cn(

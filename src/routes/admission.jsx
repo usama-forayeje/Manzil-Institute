@@ -7,6 +7,27 @@ import { HeroHeader } from '../components/header'
 import FooterSection from '../components/footer'
 import { useLanguageStore } from '@/lib/store'
 import { cn } from '@/lib/utils'
+import { AnimatedGroup } from '../components/ui/animated-group'
+
+const transitionVariants = {
+  item: {
+    hidden: {
+      opacity: 0,
+      filter: 'blur(12px)',
+      y: 12,
+    },
+    visible: {
+      opacity: 1,
+      filter: 'blur(0px)',
+      y: 0,
+      transition: {
+        type: 'spring',
+        bounce: 0.3,
+        duration: 1.5,
+      },
+    },
+  },
+}
 
 export const Route = createFileRoute('/admission')({
   component: AdmissionPage,
@@ -318,7 +339,21 @@ function AdmissionPage() {
     <div>
       <HeroHeader />
 
-      <main className="min-h-screen   bg-gray-50 dark:bg-gray-900 mx-auto max-w-7xl px-4 sm:px-6 pt-24 pb-12" dir="ltr">
+      <main className="min-h-screen bg-gray-50 dark:bg-gray-900 mx-auto max-w-7xl px-4 sm:px-6 pt-24 pb-12" dir="ltr">
+        <AnimatedGroup
+          variants={{
+            container: {
+              visible: {
+                transition: {
+                  staggerChildren: 0.05,
+                  delayChildren: 0.75,
+                },
+              },
+            },
+            ...transitionVariants,
+          }}
+          className="space-y-8"
+        >
         {/* Overview Stats */}
         <section className="bg-white dark:bg-gray-800 rounded-2xl p-6 sm:p-8 mb-6 sm:mb-8 border border-gray-200 dark:border-gray-700">
           <div className="text-center mb-6 sm:mb-8">
@@ -1077,6 +1112,7 @@ function AdmissionPage() {
             </div>
           )}
         </div>
+        </AnimatedGroup>
       </main>
       <FooterSection />
     </div>

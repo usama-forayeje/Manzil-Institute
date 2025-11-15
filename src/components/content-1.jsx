@@ -42,9 +42,9 @@ export default function ContentSection() {
                 {/* Image + Content Grid */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 xs:gap-5 sm:gap-6 lg:gap-8 items-start mb-6 xs:mb-8 sm:mb-12 lg:mb-16">
                     {/* Content Side */}
-                    <div className="space-y-2 xs:space-y-3 sm:space-y-4 order-2 lg:order-1">
-                        <div className="space-y-1.5 xs:space-y-2">
-                            <div className="inline-flex items-center px-2 py-1 bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 rounded-full">
+                    <div className="space-y-4 xs:space-y-3 flex flex-col justify-center sm:space-y-4 order-2 lg:order-1">
+                        <div className="space-y-1.5 xs:space-y-2 flex flex-col items-center justify-center">
+                            <div className="inline-flex items-center mb-2  px-2 py-1 bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 rounded-full">
                                 <BookOpen className="size-2.5 xs:size-3 text-blue-600 dark:text-blue-400 mr-1" />
                                 <span className={cn("text-xs font-semibold text-blue-600 dark:text-blue-400", language === 'bn' && "bengali-text")}>
                                     {language === 'bn' ? 'আমাদের যাত্রা' : 'Our Journey'}
@@ -99,19 +99,15 @@ export default function ContentSection() {
                         </div>
 
                         {/* CTA Button with Glow Effect */}
-                        <div className="pt-1 xs:pt-2">
+                        <div className="pt-1 flex items-center justify-center xs:pt-2">
                             <Link to='/campus' className={cn(
-                                    "group px-3 xs:px-4 py-2 rounded-lg font-semibold text-blue-600 dark:text-blue-400 border-2 border-blue-600 dark:border-blue-400 bg-transparent hover:bg-blue-600 hover:text-white dark:hover:bg-blue-400 dark:hover:text-gray-900 transition-all duration-300 hover:scale-105 active:scale-95 focus:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 text-sm sm:text-base",
-                                    language === 'bn' && "bengali-text"
-                                )}
+                                "group px-3 xs:px-4 py-2 text-center rounded-lg font-semibold text-blue-600 dark:text-blue-400 border-2 border-blue-600 dark:border-blue-400 bg-transparent hover:bg-blue-600 hover:text-white dark:hover:bg-blue-400 dark:hover:text-gray-900 transition-all duration-300 hover:scale-105 active:scale-95 focus:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 text-sm sm:text-base",
+                                language === 'bn' && "bengali-text"
+                            )}
                             >
-                                <span className="flex items-center justify-center">
-                                    {/* cspell:disable-next-line */}
-                                    {language === 'bn' ? 'আমাদের কেম্পাস দেখুন' : 'See Our Campus'}
-                                    <svg className="ml-1 w-3 h-3 group-hover:translate-x-1 group-active:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                                    </svg>
-                                </span>
+                                {/* cspell:disable-next-line */}
+                                {language === 'bn' ? 'আমাদের কেম্পাস দেখুন' : 'See Our Campus'}
+
                             </Link>
                         </div>
                     </div>
@@ -239,3 +235,4 @@ export default function ContentSection() {
         </section>
     )
 }
+

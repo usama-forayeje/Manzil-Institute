@@ -47,7 +47,7 @@ function RootDocument({ children }) {
           >
             <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
               <Suspense fallback={<LoadingSkeleton />}>
-                <div>{children}</div>
+                <>{children}</>
               </Suspense>
             </ThemeProvider>
           </div>

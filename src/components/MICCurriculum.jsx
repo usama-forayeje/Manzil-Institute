@@ -1,17 +1,32 @@
-import  { useState, useEffect } from 'react'
-import { Users, Star,  Clock, GraduationCap, BookText, Layers, ArrowRight } from 'lucide-react'
+import { Users, Star, Clock, GraduationCap, BookText, Layers, ArrowRight } from 'lucide-react'
 import { Link } from '@tanstack/react-router'
 import { Button } from './ui/button'
 import { useLanguageStore } from '@/lib/store'
 import { cn } from '@/lib/utils'
+import { AnimatedGroup } from './ui/animated-group'
+
+const transitionVariants = {
+  item: {
+    hidden: {
+      opacity: 0,
+      filter: 'blur(12px)',
+      y: 12,
+    },
+    visible: {
+      opacity: 1,
+      filter: 'blur(0px)',
+      y: 0,
+      transition: {
+        type: 'spring',
+        bounce: 0.3,
+        duration: 1.5,
+      },
+    },
+  },
+}
 
 export default function MICCurriculum() {
-    const [isVisible, setIsVisible] = useState(false)
     const { language } = useLanguageStore()
-
-    useEffect(() => {
-        setIsVisible(true)
-    }, [])
 
     const getColorClasses = (color) => {
         const colorMap = {
@@ -144,10 +159,21 @@ export default function MICCurriculum() {
 
     return (
         <section id="mic-curriculum" dir="ltr" className="relative py-6 md:py-32 overflow-hidden bg-gray-50 dark:bg-gray-900">
-            <div className={cn(
-                "relative mx-auto max-w-7xl space-y-16 px-6 transition-all duration-1000",
-                isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-            )}>
+            <div className="relative mx-auto max-w-7xl space-y-16 px-6">
+                <AnimatedGroup
+                  variants={{
+                    container: {
+                      visible: {
+                        transition: {
+                          staggerChildren: 0.05,
+                          delayChildren: 0.75,
+                        },
+                      },
+                    },
+                    ...transitionVariants,
+                  }}
+                  className="text-center space-y-8"
+                >
 
                 {/* Header Section */}
                 <div className="text-center space-y-6">
@@ -180,7 +206,20 @@ export default function MICCurriculum() {
                 </div>
 
                 {/* Curriculum Levels Grid */}
-                <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+                <AnimatedGroup
+                  variants={{
+                    container: {
+                      visible: {
+                        transition: {
+                          staggerChildren: 0.1,
+                          delayChildren: 0.75,
+                        },
+                      },
+                    },
+                    ...transitionVariants,
+                  }}
+                  className="grid gap-8 md:grid-cols-2 lg:grid-cols-4"
+                >
                     {levels.map((item, index) => {
                         const colorClasses = getColorClasses(item.color)
                         return (
@@ -256,10 +295,23 @@ export default function MICCurriculum() {
                             </div>
                         )
                     })}
-                </div>
+                </AnimatedGroup>
 
                 {/* Three Streams Section */}
-                <div className="grid gap-8 lg:grid-cols-3 lg:gap-12">
+                <AnimatedGroup
+                  variants={{
+                    container: {
+                      visible: {
+                        transition: {
+                          staggerChildren: 0.15,
+                          delayChildren: 0.75,
+                        },
+                      },
+                    },
+                    ...transitionVariants,
+                  }}
+                  className="grid gap-8 lg:grid-cols-3 lg:gap-12"
+                >
                     {streams.map((stream, index) => {
                         const streamColorClasses = getColorClasses(stream.color)
                         return (
@@ -313,7 +365,7 @@ export default function MICCurriculum() {
                             </div>
                         )
                     })}
-                </div>
+                </AnimatedGroup>
 
                 {/* Bottom CTA */}
                 <div className="text-center pt-8">
@@ -336,6 +388,7 @@ export default function MICCurriculum() {
                         </Link>
                     </div>
                 </div>
+                </AnimatedGroup>
             </div>
         </section>
     )

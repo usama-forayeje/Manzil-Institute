@@ -1,4 +1,25 @@
 import { MapPin, Phone, Mail, Clock } from 'lucide-react'
+import { AnimatedGroup } from './ui/animated-group'
+
+const transitionVariants = {
+  item: {
+    hidden: {
+      opacity: 0,
+      filter: 'blur(12px)',
+      y: 12,
+    },
+    visible: {
+      opacity: 1,
+      filter: 'blur(0px)',
+      y: 0,
+      transition: {
+        type: 'spring',
+        bounce: 0.3,
+        duration: 1.5,
+      },
+    },
+  },
+}
 
 export default function Contact() {
     const contactInfo = [
@@ -22,6 +43,20 @@ export default function Contact() {
     return (
         <section id="contact" dir="ltr" className="py-12 bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800">
             <div className="mx-auto max-w-6xl px-4">
+                <AnimatedGroup
+                  variants={{
+                    container: {
+                      visible: {
+                        transition: {
+                          staggerChildren: 0.05,
+                          delayChildren: 0.75,
+                        },
+                      },
+                    },
+                    ...transitionVariants,
+                  }}
+                  className="space-y-8"
+                >
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     {/* Map */}
                     <div className="rounded-lg overflow-hidden border-2 border-gray-300 dark:border-gray-600 shadow-xl p-4 bg-white dark:bg-gray-800">
@@ -56,6 +91,7 @@ export default function Contact() {
                         ))}
                     </div>
                 </div>
+                </AnimatedGroup>
             </div>
         </section>
     )

@@ -2,6 +2,27 @@ import { Link } from '@tanstack/react-router'
 import { MapPin, Phone, Mail, Facebook, Youtube } from 'lucide-react'
 import { useLanguageStore } from '@/lib/store'
 import { Code2Icon } from 'lucide-react'
+import { AnimatedGroup } from './ui/animated-group'
+
+const transitionVariants = {
+  item: {
+    hidden: {
+      opacity: 0,
+      filter: 'blur(12px)',
+      y: 12,
+    },
+    visible: {
+      opacity: 1,
+      filter: 'blur(0px)',
+      y: 0,
+      transition: {
+        type: 'spring',
+        bounce: 0.3,
+        duration: 1.5,
+      },
+    },
+  },
+}
 
 const contactInfo = [
     {
@@ -11,7 +32,7 @@ const contactInfo = [
             bn: 'ইমেইল'
         },
         details: {
-            en: 'info@manzilinstitute.edu.bd',
+            en: 'manzilinstitute24@gmail.com',
             bn: 'info@manzilinstitute.edu.bd'
         }
     },
@@ -158,6 +179,20 @@ export default function FooterSection() {
     return (
         <footer className="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-t border-gray-200 dark:border-gray-700" dir="ltr">
             <div className="mx-auto max-w-7xl px-6 py-16 md:py-24">
+                <AnimatedGroup
+                  variants={{
+                    container: {
+                      visible: {
+                        transition: {
+                          staggerChildren: 0.05,
+                          delayChildren: 0.75,
+                        },
+                      },
+                    },
+                    ...transitionVariants,
+                  }}
+                  className="space-y-8"
+                >
                 {/* Main Content Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12 mb-12">
                     {/* Left Column - Logo, Description, Contact, Social */}
@@ -304,6 +339,7 @@ export default function FooterSection() {
                         </p>
                     </div>
                 </div>
+                </AnimatedGroup>
             </div>
         </footer>
     )

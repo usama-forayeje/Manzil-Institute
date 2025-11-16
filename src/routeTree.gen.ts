@@ -11,8 +11,9 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as CurriculumRouteImport } from './routes/curriculum'
 import { Route as CampusRouteImport } from './routes/campus'
-import { Route as AdmissionRouteImport } from './routes/admission'
 import { Route as ApplyRouteImport } from './routes/apply'
+import { Route as AdmissionRouteImport } from './routes/admission'
+import { Route as AddmissionFormRouteImport } from './routes/addmissionForm'
 import { Route as IndexRouteImport } from './routes/index'
 
 const CurriculumRoute = CurriculumRouteImport.update({
@@ -25,14 +26,19 @@ const CampusRoute = CampusRouteImport.update({
   path: '/campus',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApplyRoute = ApplyRouteImport.update({
+  id: '/apply',
+  path: '/apply',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdmissionRoute = AdmissionRouteImport.update({
   id: '/admission',
   path: '/admission',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApplyRoute = ApplyRouteImport.update({
-  id: '/apply',
-  path: '/apply',
+const AddmissionFormRoute = AddmissionFormRouteImport.update({
+  id: '/addmissionForm',
+  path: '/addmissionForm',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -43,34 +49,63 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/addmissionForm': typeof AddmissionFormRoute
   '/admission': typeof AdmissionRoute
+  '/apply': typeof ApplyRoute
   '/campus': typeof CampusRoute
   '/curriculum': typeof CurriculumRoute
-  '/apply': typeof ApplyRoute
 }
-
+export interface FileRoutesByTo {
+  '/': typeof IndexRoute
+  '/addmissionForm': typeof AddmissionFormRoute
+  '/admission': typeof AdmissionRoute
+  '/apply': typeof ApplyRoute
+  '/campus': typeof CampusRoute
+  '/curriculum': typeof CurriculumRoute
+}
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/addmissionForm': typeof AddmissionFormRoute
   '/admission': typeof AdmissionRoute
+  '/apply': typeof ApplyRoute
   '/campus': typeof CampusRoute
   '/curriculum': typeof CurriculumRoute
-  '/apply': typeof ApplyRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/admission' | '/campus' | '/curriculum' | '/apply'
+  fullPaths:
+    | '/'
+    | '/addmissionForm'
+    | '/admission'
+    | '/apply'
+    | '/campus'
+    | '/curriculum'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/admission' | '/campus' | '/curriculum' | '/apply'
-  id: '__root__' | '/' | '/admission' | '/campus' | '/curriculum' | '/apply'
+  to:
+    | '/'
+    | '/addmissionForm'
+    | '/admission'
+    | '/apply'
+    | '/campus'
+    | '/curriculum'
+  id:
+    | '__root__'
+    | '/'
+    | '/addmissionForm'
+    | '/admission'
+    | '/apply'
+    | '/campus'
+    | '/curriculum'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AddmissionFormRoute: typeof AddmissionFormRoute
   AdmissionRoute: typeof AdmissionRoute
+  ApplyRoute: typeof ApplyRoute
   CampusRoute: typeof CampusRoute
   CurriculumRoute: typeof CurriculumRoute
-  ApplyRoute: typeof ApplyRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -89,6 +124,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CampusRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/apply': {
+      id: '/apply'
+      path: '/apply'
+      fullPath: '/apply'
+      preLoaderRoute: typeof ApplyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admission': {
       id: '/admission'
       path: '/admission'
@@ -96,11 +138,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdmissionRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/apply': {
-      id: '/apply'
-      path: '/apply'
-      fullPath: '/apply'
-      preLoaderRoute: typeof ApplyRouteImport
+    '/addmissionForm': {
+      id: '/addmissionForm'
+      path: '/addmissionForm'
+      fullPath: '/addmissionForm'
+      preLoaderRoute: typeof AddmissionFormRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -115,10 +157,11 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AddmissionFormRoute: AddmissionFormRoute,
   AdmissionRoute: AdmissionRoute,
+  ApplyRoute: ApplyRoute,
   CampusRoute: CampusRoute,
   CurriculumRoute: CurriculumRoute,
-  ApplyRoute: ApplyRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

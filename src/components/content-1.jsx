@@ -2,6 +2,7 @@ import { useLanguageStore } from '@/lib/store'
 import { cn } from '@/lib/utils'
 import { Target, Users, CheckCircle, Sparkles, Award, BookOpen } from 'lucide-react'
 import { LogoCloud } from './logo-cloud'
+import { LazyImage } from './ui/lazy-image'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Autoplay } from 'swiper/modules'
 import 'swiper/css'
@@ -9,7 +10,6 @@ import 'swiper/css/autoplay'
 import 'swiper/css/navigation'
 import 'swiper/css/pagination'
 import 'swiper/css/effect-coverflow'
-import { Button } from './ui/button'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { AnimatedGroup } from './ui/animated-group'
 
@@ -36,15 +36,15 @@ const transitionVariants = {
 export default function ContentSection() {
     const { language } = useLanguageStore()
 
-    const classTranslations = {
+     const classTranslations = {
         "Computer Class": language === 'bn' ? "কম্পিউটার ক্লাস" : "Computer Class",
         "Classroom": language === 'bn' ? "আরবি ক্লাসের একাংশ" : "A Section of Arabic Class",
-        "Category Class": language === 'bn' ? "কারিগরি ক্লাস" : "Technical Class",
+        "Category Class": language === 'bn' ? "প্রযুক্তি ক্লাস" : "Technical Class",
         "Arabic Class": language === 'bn' ? "আরবি ক্লাসরুম" : "Arabic Classroom",
         "Robotics Class": language === 'bn' ? "রোবোটিক্স ক্লাস" : "Robotics Class",
         "Language Class": language === 'bn' ? "ভাষা ক্লাসের একাংশ" : "Language Class Section",
         "Arts Class": language === 'bn' ? "শিল্প ক্লাস " : "Arts Class",
-        "Arabic Class": language === 'bn' ? "আরবি ক্লাসের একাংশ" : "A Section of Arabic Class"
+        "Arabic Class Section": language === 'bn' ? "আরবি ক্লাসের একাংশ" : "A Section of Arabic Class"
     }
 
     return (
@@ -67,9 +67,9 @@ export default function ContentSection() {
 
                 {/* Main Heading with Animation */}
                 <div className="text-center mb-6 xs:mb-8 sm:mb-12 lg:mb-16">
-                    <div className="inline-flex items-center justify-center px-2 xs:px-3 py-1 mb-2 xs:mb-3 bg-blue-100 dark:bg-blue-900/30 rounded-full">
-                        <Sparkles className="size-2.5 xs:size-3 sm:size-4 text-blue-600 dark:text-blue-400 mr-1 xs:mr-2" />
-                        <span className={cn("text-xs font-semibold text-blue-600 dark:text-blue-400", language === 'bn' && "bengali-text")}>
+                    <div className="inline-flex items-center justify-center px-2 xs:px-3 py-1 mb-2 xs:mb-3 bg-[#00AEEF]/20 dark:bg-[#00AEEF]/10 rounded-full">
+                        <Sparkles className="size-2.5 xs:size-3 sm:size-4 text-[#00AEEF] dark:text-[#00AEEF]/80 mr-1 xs:mr-2" />
+                        <span className={cn("text-xs font-semibold text-[#00AEEF] dark:text-[#00AEEF]/80", language === 'bn' && "bengali-text")}>
                             {language === 'bn' ? 'আমাদের পরিচয়' : 'About Us'}
                         </span>
                     </div>
@@ -77,9 +77,9 @@ export default function ContentSection() {
                         {language === 'bn' ? 'মানযিল সম্পর্কে' : 'About Manzil'}
                     </h2>
                     <div className="flex items-center justify-center gap-1 xs:gap-2">
-                        <div className="w-4 xs:w-6 sm:w-8 h-1 bg-gradient-to-r from-transparent to-blue-600 rounded-full"></div>
-                        <div className="w-6 xs:w-8 sm:w-12 h-1 bg-blue-600 rounded-full"></div>
-                        <div className="w-4 xs:w-6 sm:w-8 h-1 bg-gradient-to-l from-transparent to-blue-600 rounded-full"></div>
+                        <div className="w-4 xs:w-6 sm:w-8 h-1 bg-gradient-to-r from-transparent to-[#00AEEF] rounded-full"></div>
+                        <div className="w-6 xs:w-8 sm:w-12 h-1 bg-[#00AEEF] rounded-full"></div>
+                        <div className="w-4 xs:w-6 sm:w-8 h-1 bg-gradient-to-l from-transparent to-[#00AEEF] rounded-full"></div>
                     </div>
                 </div>
 
@@ -88,9 +88,9 @@ export default function ContentSection() {
                     {/* Content Side */}
                     <div className="space-y-4 xs:space-y-3 flex flex-col justify-center sm:space-y-4 order-2 lg:order-1">
                         <div className="space-y-1.5 xs:space-y-2 flex flex-col items-center justify-center">
-                            <div className="inline-flex items-center mb-2  px-2 py-1 bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 rounded-full">
-                                <BookOpen className="size-2.5 xs:size-3 text-blue-600 dark:text-blue-400 mr-1" />
-                                <span className={cn("text-xs font-semibold text-blue-600 dark:text-blue-400", language === 'bn' && "bengali-text")}>
+                            <div className="inline-flex items-center mb-2  px-2 py-1 bg-gradient-to-r from-[#00AEEF]/20 to-purple-100 dark:from-[#00AEEF]/10 dark:to-purple-900/30 rounded-full">
+                                <BookOpen className="size-2.5 xs:size-3 text-[#00AEEF] dark:text-[#00AEEF]/80 mr-1" />
+                                <span className={cn("text-xs font-semibold text-[#00AEEF] dark:text-[#00AEEF]/80", language === 'bn' && "bengali-text")}>
                                     {language === 'bn' ? 'আমাদের যাত্রা' : 'Our Journey'}
                                 </span>
                             </div>
@@ -108,7 +108,7 @@ export default function ContentSection() {
 
                         {/* Key Points with Enhanced Design */}
                         <div className="grid grid-cols-1 gap-1.5 xs:gap-2">
-                            {[
+                           {[
                                 {
                                     bn: 'মাদরাসা, জেনারেল ও কারিগরি শিক্ষার সমন্বয়',
                                     en: 'Integration of Madrasa, General & Technical Education'
@@ -142,16 +142,28 @@ export default function ContentSection() {
                             ))}
                         </div>
 
-                        {/* CTA Button with Glow Effect */}
-                        <div className="pt-1 flex items-center justify-center xs:pt-2">
-                            <Link to='/campus' className={cn(
-                                "group px-3 xs:px-4 py-2 text-center rounded-lg font-semibold text-blue-600 dark:text-blue-400 border-2 border-blue-600 dark:border-blue-400 bg-transparent hover:bg-blue-600 hover:text-white dark:hover:bg-blue-400 dark:hover:text-gray-900 transition-all duration-300 hover:scale-105 active:scale-95 focus:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 text-sm sm:text-base",
+                        {/* CTA Buttons with Glow Effect */}
+                        <div className="pt-1 flex flex-col sm:flex-row items-center justify-center gap-3 xs:pt-2">
+                            <Link to='/curriculum' className={cn(
+                                "group px-3 xs:px-4 py-2 text-center rounded-lg font-semibold text-[#00AEEF] dark:text-[#00AEEF]/80 border-2 border-[#00AEEF] dark:border-[#00AEEF]/80 bg-transparent hover:bg-[#00AEEF] hover:text-white dark:hover:bg-[#00AEEF]/80 dark:hover:text-gray-900 transition-all duration-300 hover:scale-105 active:scale-95 focus:scale-105 focus:outline-none focus:ring-2 focus:ring-[#00AEEF]/50 focus:ring-offset-2 text-sm sm:text-base",
                                 language === 'bn' && "bengali-text"
                             )}
                             >
-                                {/* cspell:disable-next-line */}
-                                {language === 'bn' ? 'আমাদের কেম্পাস দেখুন' : 'See Our Campus'}
-
+                                {language === 'bn' ? 'কারিকুলাম দেখুন' : 'View Curriculum'}
+                            </Link>
+                            <Link to='/admission' className={cn(
+                                "group px-3 hidden sm:block  xs:px-4 py-2 text-center rounded-lg font-semibold text-green-600 dark:text-green-400 border-2 border-green-600 dark:border-green-400 bg-transparent hover:bg-green-600 hover:text-white dark:hover:bg-green-400 dark:hover:text-gray-900 transition-all duration-300 hover:scale-105 active:scale-95 focus:scale-105 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 text-sm sm:text-base",
+                                language === 'bn' && "bengali-text"
+                            )}
+                            >
+                                {language === 'bn' ? 'ভর্তি তথ্য' : 'Admission Info'}
+                            </Link>
+                            <Link to='/campus' className={cn(
+                                "group px-3 hidden sm:block xs:px-4 py-2 text-center rounded-lg font-semibold text-purple-600 dark:text-purple-400 border-2 border-purple-600 dark:border-purple-400 bg-transparent hover:bg-purple-600 hover:text-white dark:hover:bg-purple-400 dark:hover:text-gray-900 transition-all duration-300 hover:scale-105 active:scale-95 focus:scale-105 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 text-sm sm:text-base",
+                                language === 'bn' && "bengali-text"
+                            )}
+                            >
+                                {language === 'bn' ? 'কেম্পাস দেখুন' : 'See Campus'}
                             </Link>
                         </div>
                     </div>
@@ -177,35 +189,33 @@ export default function ContentSection() {
                                 }}
                                 effect="slide"
                                 modules={[Autoplay]}
-                                className="w-full [&_.swiper-pagination-bullet]:bg-gray-300 [&_.swiper-pagination-bullet-active]:bg-blue-600 [&_.swiper-pagination]:bottom-1 xs:[&_.swiper-pagination]:bottom-2 sm:[&_.swiper-pagination]:bottom-3"
+                                className="w-full [&_.swiper-pagination-bullet]:bg-gray-300 [&_.swiper-pagination-bullet-active]:bg-[#00AEEF] [&_.swiper-pagination]:bottom-1 xs:[&_.swiper-pagination]:bottom-2 sm:[&_.swiper-pagination]:bottom-3"
                                 grabCursor={true}>
                                 {[
-                                    { src: "/computer-class.jpg", alt: "Computer Class", fallback: "/computer-class.jpg" },
-                                    { src: "/childclass.jpg", alt: "Classroom", fallback: "/manzil institutte logo.jpg" },
-                                    { src: "/carigory-class.jpg", alt: "Category Class", fallback: "/manzil logo.jpg" },
-                                    { src: "/arabic-class.jpg", alt: "Arabic Class", fallback: "/manzil institutte logo.jpg" },
-                                    { src: "/roboticsclass.jpg", alt: "Robotics Class", fallback: "/manzil institutte logo.jpg" },
-                                    { src: "/languageclass.jpg", alt: "Language Class", fallback: "/manzil institutte logo.jpg" },
-                                    { src: "/artsclass.jpg", alt: "Arts Class", fallback: "/manzil institutte logo.jpg" },
-                                    { src: "/class-1.jpg", alt: "Arabic Class", fallback: "/manzil institutte logo.jpg" },
+                                    { src: "/computer-class.webp", alt: "Computer Class", fallback: "/computer-class.jpg" },
+                                    { src: "/childclass.webp", alt: "Classroom", fallback: "/manzil institutte logo.jpg" },
+                                    { src: "/carigory-class.webp", alt: "Category Class", fallback: "/manzil logo.jpg" },
+                                    { src: "/arabic-class.webp", alt: "Arabic Class", fallback: "/manzil institutte logo.jpg" },
+                                    { src: "/roboticsclass.webp", alt: "Robotics Class", fallback: "/manzil institutte logo.jpg" },
+                                    { src: "/languageclass.webp", alt: "Language Class", fallback: "/manzil institutte logo.jpg" },
+                                    { src: "/artsclass.webp", alt: "Arts Class", fallback: "/manzil institutte logo.jpg" },
+                                    { src: "/class-1.webp", alt: "Arabic Class Section", fallback: "/manzil institutte logo.jpg" },
                                 ].map((image, idx) => (
                                     <SwiperSlide key={idx}>
                                         <div className="relative w-full aspect-video xs:aspect-[4/3] sm:aspect-video md:aspect-[16/10] lg:aspect-[3/2] overflow-hidden bg-gray-100 dark:bg-gray-800">
-                                            <img
+                                            <LazyImage
                                                 src={image.src || "/placeholder.svg"}
                                                 alt={image.alt}
                                                 title={image.alt}
-                                                loading="lazy"
+                                                fallback={image.fallback}
+                                                width={800}
+                                                height={450}
                                                 className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-700"
-                                                onError={(e) => {
-                                                    const target = e.target;
-                                                    target.src = image.fallback;
-                                                }}
                                             />
                                             <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
-                                            <div className="absolute top-1 text-start p-8 -right-14 w-1/2 bg-black/40 backdrop-blur-sm border border-white/20 text-white py-2 font-semibold text-sm sm:text-base rounded-md">
+                                            <div className="absolute top-1 text-white text-start p-8 -right-14 w-1/2 bg-black/40 backdrop-blur-sm border border-white/20  py-2 font-semibold text-sm sm:text-base rounded-md">
 
-                                                {classTranslations[image.alt]}
+                                                {classTranslations[image.alt]}     
                                             </div>
                                         </div>
                                     </SwiperSlide>
@@ -255,14 +265,14 @@ export default function ContentSection() {
                     </div>
 
                     {/* Mission */}
-                    <div className="group relative bg-gradient-to-br from-white to-blue-50 dark:from-gray-800 dark:to-blue-900/10 rounded-lg sm:rounded-lg lg:rounded-xl shadow-md hover:shadow-lg transition-all duration-500 p-3 xs:p-4 sm:p-5 border border-gray-200 dark:border-gray-700 hover:border-blue-400 dark:hover:border-blue-600 overflow-hidden">
-                        <div className="absolute top-0 right-0 w-12 h-12 xs:w-16 xs:h-16 sm:w-20 sm:h-20 bg-blue-400/10 rounded-full blur-xl group-hover:scale-150 transition-transform duration-500"></div>
+                    <div className="group relative bg-gradient-to-br from-white to-[#00AEEF]/10 dark:from-gray-800 dark:to-[#00AEEF]/5 rounded-lg sm:rounded-lg lg:rounded-xl shadow-md hover:shadow-lg transition-all duration-500 p-3 xs:p-4 sm:p-5 border border-gray-200 dark:border-gray-700 hover:border-[#00AEEF]/60 dark:hover:border-[#00AEEF]/40 overflow-hidden">
+                        <div className="absolute top-0 right-0 w-12 h-12 xs:w-16 xs:h-16 sm:w-20 sm:h-20 bg-[#00AEEF]/10 rounded-full blur-xl group-hover:scale-150 transition-transform duration-500"></div>
                         <div className="relative">
                             <div className="flex items-center mb-2 xs:mb-3">
                                 <div className="relative">
-                                    <div className="absolute inset-0 bg-blue-400 rounded-lg blur opacity-20"></div>
-                                    <div className="relative bg-blue-100 dark:bg-blue-900/30 p-2 xs:p-2.5 rounded-lg">
-                                        <Users className="size-3 xs:size-3.5 sm:size-4 text-blue-600 dark:text-blue-400" />
+                                    <div className="absolute inset-0 bg-[#00AEEF]/60 rounded-lg blur opacity-20"></div>
+                                    <div className="relative bg-[#00AEEF]/20 dark:bg-[#00AEEF]/10 p-2 xs:p-2.5 rounded-lg">
+                                        <Users className="size-3 xs:size-3.5 sm:size-4 text-[#00AEEF] dark:text-[#00AEEF]/80" />
                                     </div>
                                 </div>
                                 <h3 className={cn("ml-2 xs:ml-3 text-base xs:text-lg sm:text-xl font-bold text-gray-900 dark:text-white", language === 'bn' && "bengali-text")}>
@@ -270,7 +280,7 @@ export default function ContentSection() {
                                 </h3>
                             </div>
                             <p className={cn("text-sm sm:text-base text-gray-700 dark:text-gray-200 leading-relaxed", language === 'bn' && "bengali-text")}>
-                                {language === 'bn' ? (
+                                 {language === 'bn' ? (
                                     'ঐতিহ্যবাহী ও সমসাময়িক শিক্ষার সমন্বয়ে এমন এক অনন্য শিক্ষা কারিকুলাম ও পরিবেশ গড়ে তোলা, যেখানে শিক্ষার্থীরা দ্বীন ও দুনিয়া - উভয় জগতের উৎকৃষ্ট জ্ঞান ও অভিজ্ঞতা অর্জন করতে সক্ষম।'
                                 ) : (
                                     'To build a unique educational curriculum and environment through the integration of traditional and contemporary education, where students can acquire the best knowledge and experience of both religious and worldly affairs.'

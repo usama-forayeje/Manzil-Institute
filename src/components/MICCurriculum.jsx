@@ -31,15 +31,15 @@ export default function MICCurriculum() {
     const getColorClasses = (color) => {
         const colorMap = {
             blue: {
-                hoverBorder: 'hover:border-blue-300 dark:hover:border-blue-600',
-                bg50: 'bg-blue-50 dark:bg-blue-900/30',
-                border200: 'border-blue-200 dark:border-blue-800',
-                text600: 'text-blue-600 dark:text-blue-400',
-                text700: 'text-blue-700 dark:text-blue-300',
-                bg500: 'bg-blue-500',
-                border500: 'border-blue-500',
-                bg100: 'bg-blue-100 dark:bg-blue-900/30',
-                text400: 'text-blue-400'
+                hoverBorder: 'hover:border-[#00AEEF]/60 dark:hover:border-[#00AEEF]/40',
+                bg50: 'bg-[#00AEEF]/10 dark:bg-[#00AEEF]/5',
+                border200: 'border-[#00AEEF]/40 dark:border-[#00AEEF]/20',
+                text600: 'text-[#00AEEF] dark:text-[#00AEEF]/80',
+                text700: 'text-[#00AEEF]/90 dark:text-[#00AEEF]/70',
+                bg500: 'bg-[#00AEEF]',
+                border500: 'border-[#00AEEF]',
+                bg100: 'bg-[#00AEEF]/20 dark:bg-[#00AEEF]/10',
+                text400: 'text-[#00AEEF]/80'
             },
             green: {
                 hoverBorder: 'hover:border-green-300 dark:hover:border-green-600',
@@ -126,12 +126,12 @@ export default function MICCurriculum() {
             icon: BookText,
             title: language === 'bn' ? "মাদরাসা শিক্ষা" : "Madrasa Education",
             description: language === 'bn' ?
-                "হিফজ, তাফসীর, হাদীস, ফিকহ সহ সম্পূর্ণ দরসে নিজামী" :
-                "Complete Dars-e-Nizami including Hifz, Tafsir, Hadith, Fiqh",
+                "হিফজ, তাফসীর, হাদীস, ফিকহ সহ সম্পূর্ণ দরসে নিজামী - ইসলামিক শিক্ষার পূর্ণাঙ্গ ব্যবস্থা" :
+                "Complete Dars-e-Nizami including Hifz, Tafsir, Hadith, Fiqh - Comprehensive Islamic Education System",
             color: "blue",
             features: language === 'bn' ?
-                ["হিফজুল কুরআন", "তাজভিদ", "ইসলামিক স্টাডিজ"] :
-                ["Quran Memorization", "Tajweed", "Islamic Studies"]
+                ["হিফজুল কুরআন", "তাজভিদ শিক্ষা", "ইসলামিক স্টাডিজ", "আরবি সাহিত্য"] :
+                ["Quran Memorization", "Tajweed Education", "Islamic Studies", "Arabic Literature"]
         },
         {
             icon: GraduationCap,
@@ -177,10 +177,10 @@ export default function MICCurriculum() {
 
                 {/* Header Section */}
                 <div className="text-center space-y-6">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800">
-                        <Layers className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#00AEEF]/10 dark:bg-[#00AEEF]/5 border border-[#00AEEF]/40 dark:border-[#00AEEF]/20">
+                        <Layers className="w-4 h-4 text-[#00AEEF] dark:text-[#00AEEF]/80" />
                         <span className={cn(
-                            "text-sm font-medium text-blue-700 dark:text-blue-300",
+                            "text-sm font-medium text-[#00AEEF]/90 dark:text-[#00AEEF]/70",
                             language === 'bn' && "bengali-text"
                         )}>
                             {language === 'bn' ? "সমন্বিত শিক্ষা কারিকুলাম" : "Integrated Education Curriculum"}
@@ -192,7 +192,7 @@ export default function MICCurriculum() {
                         language === 'bn' && "bengali-text"
                     )}>
                         {language === 'bn' ? "মানযিল ইন্টারন্যাশনাল" : "Manzil International"}
-                        <span className="text-blue-600 dark:text-blue-400 mx-2">
+                        <span className="text-[#00AEEF] dark:text-[#00AEEF]/80 mx-2">
                             {language === 'bn' ? "কারিকুলাম (MIC-1)" : "Curriculum (MIC-1)"}
                         </span>
                     </h2>
@@ -310,14 +310,14 @@ export default function MICCurriculum() {
                     },
                     ...transitionVariants,
                   }}
-                  className="hidden sm:grid gap-8 lg:grid-cols-3 lg:gap-12"
+                  className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8"
                 >
                     {streams.map((stream, index) => {
                         const streamColorClasses = getColorClasses(stream.color)
                         return (
                             <div
                                 key={index}
-                                className="group relative bg-white dark:bg-gray-800 rounded-2xl p-8 border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-xl min-h-[320px]"
+                                className="group relative bg-white dark:bg-gray-800 rounded-2xl p-6 md:p-8 border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-xl h-full flex flex-col"
                             >
                                 {/* Icon */}
                                 <div className={cn(
@@ -328,34 +328,36 @@ export default function MICCurriculum() {
                                 </div>
 
                                 {/* Content */}
-                                <h3 className={cn(
-                                    "text-2xl font-bold text-gray-900 dark:text-white mb-4",
-                                    language === 'bn' && "bengali-text"
-                                )}>
-                                    {stream.title}
-                                </h3>
-
-                                <p className={cn(
-                                    "text-gray-600 dark:text-gray-400 mb-6 leading-relaxed text-base",
-                                    language === 'bn' && "bengali-text"
-                                )}>
-                                    {stream.description}
-                                </p>
-
-                                {/* Features */}
-                                <ul className="space-y-3">
-                                    {stream.features.map((feature, featureIndex) => (
-                                        <li key={featureIndex} className="flex items-center gap-3">
-                                            <div className={cn("w-2 h-2 rounded-full", streamColorClasses.bg500)}></div>
-                                            <span className={cn(
-                                                "text-gray-700 dark:text-gray-300 text-base font-medium",
-                                                language === 'bn' && "bengali-text"
-                                            )}>
-                                                {feature}
-                                            </span>
-                                        </li>
-                                    ))}
-                                </ul>
+                                <div className="flex-1 flex flex-col">
+                                    <h3 className={cn(
+                                        "text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-4",
+                                        language === 'bn' && "bengali-text"
+                                    )}>
+                                        {stream.title}
+                                    </h3>
+ 
+                                    <p className={cn(
+                                        "text-gray-600 dark:text-gray-400 mb-6 leading-relaxed text-sm md:text-base flex-1",
+                                        language === 'bn' && "bengali-text"
+                                    )}>
+                                        {stream.description}
+                                    </p>
+ 
+                                    {/* Features */}
+                                    <ul className="space-y-3">
+                                        {stream.features.map((feature, featureIndex) => (
+                                            <li key={featureIndex} className="flex items-center gap-3">
+                                                <div className={cn("w-2 h-2 rounded-full", streamColorClasses.bg500)}></div>
+                                                <span className={cn(
+                                                    "text-gray-700 dark:text-gray-300 text-sm md:text-base font-medium",
+                                                    language === 'bn' && "bengali-text"
+                                                )}>
+                                                    {feature}
+                                                </span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
 
                                 {/* Bottom Border Effect */}
                                 <div className={cn(
@@ -370,7 +372,7 @@ export default function MICCurriculum() {
                 {/* Bottom CTA */}
                 <div className="text-center flex justify-center items-center pt-8">
                         <Link to="/curriculum">
-                            <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 sm:px-5 py-3 sm:py-2 transition-colors duration-300 flex items-center justify-center gap-2 w-full sm:w-auto">
+                            <Button className="bg-[#00AEEF] hover:bg-[#00AEEF]/90 text-white rounded-lg px-4 sm:px-5 py-3 sm:py-2 transition-colors duration-300 flex items-center justify-center gap-2 w-full sm:w-auto">
                                 <span className={cn("text-sm font-medium", language === 'bn' && "bengali-text")}>
                                     {language === 'bn' ? "সম্পূর্ণ কারিকুলাম দেখুন" : "View Curriculum"}
                                 </span>

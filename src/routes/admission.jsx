@@ -31,11 +31,145 @@ const transitionVariants = {
 
 export const Route = createFileRoute('/admission')({
   component: AdmissionPage,
+  head: () => ({
+    meta: [
+      {
+        title: 'Manzil Institute Admission Process Bangladesh - Apply Online',
+      },
+      {
+        name: 'description',
+        content: 'Complete admission process for Manzil Institute. Online application, admission test, fee structure, and requirements for MIC Curriculum in Bangladesh.',
+      },
+      {
+        name: 'keywords',
+        content: 'Manzil Institute admission, admission process Bangladesh, MIC Curriculum admission, Islamic education admission, Manzil International Institute apply',
+      },
+      // Open Graph
+      {
+        property: 'og:title',
+        content: 'Manzil Institute Admission Process - Apply Online',
+      },
+      {
+        property: 'og:description',
+        content: 'Complete admission process for Manzil Institute. Online application, admission test, fee structure, and requirements for MIC Curriculum.',
+      },
+      {
+        property: 'og:url',
+        content: 'https://institute.manzilgroupbd.com/admission',
+      },
+      {
+        property: 'og:image',
+        content: 'https://institute.manzilgroupbd.com/manzil-institute-logo-dark.png',
+      },
+      {
+        property: 'og:image:width',
+        content: '1200',
+      },
+      {
+        property: 'og:image:height',
+        content: '630',
+      },
+      {
+        property: 'og:image:alt',
+        content: 'Manzil International Institute Admission Process Bangladesh',
+      },
+      {
+        property: 'og:type',
+        content: 'website',
+      },
+      // Twitter Cards
+      {
+        name: 'twitter:title',
+        content: 'Manzil International Institute Admission Process - Apply Online',
+      },
+      {
+        name: 'twitter:description',
+        content: 'Complete admission process for Manzil International Institute. Online application, admission test, fee structure, and requirements for MIC Curriculum.',
+      },
+    ],
+    links: [
+      {
+        rel: 'canonical',
+        href: 'https://institute.manzilgroupbd.com/admission',
+      },
+      // hreflang tags for English and Bangla versions
+      {
+        rel: 'alternate',
+        hreflang: 'en',
+        href: 'https://institute.manzilgroupbd.com/admission',
+      },
+      {
+        rel: 'alternate',
+        hreflang: 'bn',
+        href: 'https://institute.manzilgroupbd.com/admission',
+      },
+      {
+        rel: 'alternate',
+        hreflang: 'x-default',
+        href: 'https://institute.manzilgroupbd.com/admission',
+      },
+    ],
+  }),
 })
 
 function AdmissionPage() {
   const [activeTab, setActiveTab] = useState('process')
   const { language } = useLanguageStore()
+
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is the admission process for Manzil International Institute?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The admission process includes online application, admission test, nomination & selection, document submission & fee payment, and class commencement. Each step is designed to ensure quality education for deserving students."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What are the eligibility criteria for different levels?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Level 1: Below 6 years with basic alphabet recognition. Level 2: Below 9 years with simple reading/writing. Level 3: Below 12 years with reading/writing skills. Huffaz: Below 12 years and must be Hafiz with basic education."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What documents are required for admission?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Required documents include birth certificate, passport-size photos, previous report cards, medical certificates (for some levels), and house registration. Additional documents may be required based on the level."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the fee structure for Manzil Institute?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Fees include one-time admission charges (30,000 BDT), session fees (25,000 BDT), monthly tuition fees (2,000-3,000 BDT), residential fees (3,500-15,000 BDT), and food fees (9,000-15,000 BDT) depending on the program and level."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "When does the admission process start?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Admission applications are currently open. The admission test is scheduled for January 15, 2024, with classes beginning February 1, 2024. Please check our website for the latest updates."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does Manzil Institute offer residential facilities?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, Manzil Institute provides residential facilities for both boys and girls with 24/7 security, modern amenities, halal food service, and supervision by qualified staff."
+        }
+      }
+    ]
+  }
 
   // Scroll to top when component mounts
   useEffect(() => {
@@ -45,9 +179,9 @@ function AdmissionPage() {
   const getColorClasses = (color) => {
     const colorMap = {
       blue: {
-        bg100: 'bg-blue-100 dark:bg-blue-900/30',
-        bg500: 'bg-blue-500',
-        text500: 'text-blue-500'
+        bg100: 'bg-[#00AEEF]/20 dark:bg-[#00AEEF]/10',
+        bg500: 'bg-[#00AEEF]',
+        text500: 'text-[#00AEEF]'
       },
       green: {
         bg100: 'bg-green-100 dark:bg-green-900/30',
@@ -315,7 +449,7 @@ function AdmissionPage() {
       phone: ["০১৪০৭-০৪৬০০১", "০১৪০৭-০৪৬০০২", "০১৪০৭-০৪৬০০৩"],
       email: "admission@manzilinstitute.edu.bd",
       address: language === 'bn' 
-        ? "হারুনুর রশীদ টাওয়ার (১০ তলা ভবন), বাড়ি #৯১, রোড #২, উত্তর রায়েরবাগ বাস স্ট্যান্ড, যাত্রাবাড়ী, ঢাকা ১৩৬২"
+        ? "হারুনুর রশীদ টাওয়ার (১০ তলা ভবন), বাড়ি #৯১, রোড #২, উত্তর রায়েরবাগ বাস স্ট্যান্ড, যাত্রাবাড়ী, ঢাকা ১৩৬২"
         : "Harunur Rashid Tower (10 Storied Building), House #91, Road #2, North Rayarbagh Bus Stand, Jatrabari, Dhaka 1362",
       officeHours: language === 'bn' 
         ? "শনিবার - বৃহস্পতিবার: সকাল ৯:০০ - বিকাল ৫:০০"
@@ -339,8 +473,33 @@ function AdmissionPage() {
     { id: 'contact', label: language === 'bn' ? 'যোগাযোগ' : 'Contact' }
   ]
 
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://institute.manzilgroupbd.com"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Admission",
+        "item": "https://institute.manzilgroupbd.com/admission"
+      }
+    ]
+  }
+
   return (
     <div>
+      <script type="application/ld+json">
+        {JSON.stringify(faqSchema)}
+      </script>
+      <script type="application/ld+json">
+        {JSON.stringify(breadcrumbSchema)}
+      </script>
       <HeroHeader />
 
       <main className="min-h-screen bg-gray-50 dark:bg-gray-900 mx-auto max-w-7xl px-4 sm:px-6 pt-24 pb-12" dir="ltr">
@@ -358,6 +517,22 @@ function AdmissionPage() {
           }}
           className="space-y-8"
         >
+        {/* Main Heading Section */}
+        <section className="text-center mb-8 sm:mb-12">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-4 kalpurush-font">
+            {language === 'bn' ? 'মানযিল ইনস্টিটিউট ভর্তি প্রক্রিয়া' : 'Manzil Institute Admission Process'}
+          </h1>
+          <h2 className="text-lg md:text-xl text-[#00AEEF] dark:text-[#00AEEF]/80 mb-6 kalpurush-font">
+              {language === 'bn' ? 'বাংলাদেশে MIC কারিকুলাম ভর্তি - অনলাইন আবেদন এবং প্রয়োজনীয়তা' : 'MIC Curriculum Admission in Bangladesh - Online Application & Requirements'}
+          </h2>
+          <p className="text-base md:text-lg text-gray-600 dark:text-gray-400 max-w-3xl mx-auto kalpurush-font">
+            {language === 'bn'
+              ? 'মানযিল ইনস্টিটিউটে ভর্তির জন্য সম্পূর্ণ প্রক্রিয়া, যোগ্যতা, ফি কাঠামো এবং গুরুত্বপূর্ণ তারিখসমূহ জানুন। বাংলাদেশের প্রথম সমন্বিত শিক্ষা প্রতিষ্ঠানে আপনার সন্তানের ভবিষ্যত গড়ে তুলুন।'
+              : 'Learn about the complete admission process, eligibility, fee structure, and important dates for Manzil Institute. Build your child\'s future at Bangladesh\'s first integrated educational institution.'
+            }
+          </p>
+        </section>
+
         {/* Overview Stats */}
         <section className="bg-white dark:bg-gray-800 rounded-2xl p-6 sm:p-8 mb-6 sm:mb-8 border border-gray-200 dark:border-gray-700">
           <div className="text-center mb-6 sm:mb-8">
@@ -385,7 +560,7 @@ function AdmissionPage() {
               className={cn(
                 "px-3 sm:px-4 lg:px-6 py-2 sm:py-3 rounded-xl font-medium text-sm sm:text-base transition-colors border border-gray-200 dark:border-gray-700 flex-shrink-0",
                 activeTab === tab.id
-                  ? 'bg-blue-600 text-white'
+                  ? 'bg-[#00AEEF] text-white'
                   : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700',
                 language === 'bn' && "bengali-text"
               )}
@@ -474,11 +649,11 @@ function AdmissionPage() {
 
               <div className="grid md:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
                 {/* Level 1 */}
-                <div className="bg-blue-50 dark:bg-blue-900/20 rounded-2xl p-4 sm:p-6">
+                <div className="bg-[#00AEEF]/10 dark:bg-[#00AEEF]/5 rounded-2xl p-4 sm:p-6">
                   <div className="flex items-center gap-2 mb-3 sm:mb-4">
-                    <div className="w-2 h-2 sm:w-3 sm:h-3 bg-blue-500 rounded-full"></div>
+                    <div className="w-2 h-2 sm:w-3 sm:h-3 bg-[#00AEEF] rounded-full"></div>
                     <h4 className={cn(
-                      "font-semibold text-blue-700 dark:text-blue-300 text-sm sm:text-base",
+                      "font-semibold text-[#00AEEF]/90 dark:text-[#00AEEF]/70 text-sm sm:text-base",
                       language === 'bn' && "bengali-text"
                     )}>
                       {language === 'bn' ? 'লেভেল ১' : 'Level 1'}
@@ -779,191 +954,153 @@ function AdmissionPage() {
                 "text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6",
                 language === 'bn' && "bengali-text"
               )}>
-                {language === 'bn' ? 'ফি কাঠামো' : 'Fee Structure'}
+                {language === 'bn' ? 'ফি কাঠামো - বিস্তারিত তথ্য' : 'Fee Structure - Detailed Information'}
               </h3>
 
-              <div className="grid md:grid-cols-2 gap-6 sm:gap-8">
-                {/* One Time Fees */}
-                <div className="space-y-4 sm:space-y-6">
+              {/* One-time Fees */}
+              <div className="bg-gradient-to-r from-[#00AEEF]/10 to-purple-50 dark:from-[#00AEEF]/5 dark:to-purple-900/20 rounded-2xl p-4 sm:p-6">
+                <h4 className={cn(
+                  "text-base sm:text-lg md:text-xl font-semibold text-gray-900 dark:text-white mb-4",
+                  language === 'bn' && "bengali-text"
+                )}>
+                  {language === 'bn' ? 'এককালীন ফি (ভর্তির সময়)' : 'One-time Fees (At Admission)'}
+                </h4>
+                <div className="grid gap-3 sm:gap-4">
+                  {admissionData.feeStructure.oneTime.map((fee, index) => (
+                    <div key={index} className="flex justify-between items-center p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                      <span className={cn(
+                        "font-medium text-gray-900 dark:text-white text-sm sm:text-base",
+                        language === 'bn' && "bengali-text"
+                      )}>
+                        {fee.name}
+                      </span>
+                      <span className="font-bold text-[#00AEEF] text-sm sm:text-base">
+                        {fee.amount}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Monthly Fees */}
+              <div className="space-y-4">
+                {/* Tuition Fees */}
+                <div className="bg-green-50 dark:bg-green-900/20 rounded-2xl p-4 sm:p-6">
                   <h4 className={cn(
-                    "text-base sm:text-lg md:text-xl font-semibold text-gray-900 dark:text-white flex items-center gap-2",
+                    "text-base sm:text-lg md:text-xl font-semibold text-green-800 dark:text-green-200 mb-4",
                     language === 'bn' && "bengali-text"
                   )}>
-                    <div className="w-2 h-2 sm:w-3 sm:h-3 bg-blue-500 rounded-full"></div>
-                    {language === 'bn' ? 'এককালীন ফি' : 'One Time Fees'}
+                    {language === 'bn' ? 'টিউশন ফি (মাসিক)' : 'Tuition Fees (Monthly)'}
                   </h4>
-
-                  <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 sm:p-6 space-y-3 sm:space-y-4">
-                    {admissionData.feeStructure.oneTime.map((fee, index) => (
-                      <div key={index} className="flex justify-between items-center py-1 sm:py-2 border-b border-gray-200 dark:border-gray-600 last:border-0">
+                  <div className="grid gap-3 sm:gap-4">
+                    {admissionData.feeStructure.monthly.tuition.map((fee, index) => (
+                      <div key={index} className="flex justify-between items-center p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
                         <span className={cn(
-                          "text-xs sm:text-sm text-gray-700 dark:text-gray-300",
+                          "font-medium text-gray-900 dark:text-white text-sm sm:text-base",
                           language === 'bn' && "bengali-text"
                         )}>
                           {fee.name}
                         </span>
-                        <span className="font-semibold text-gray-900 dark:text-white text-xs sm:text-sm">
+                        <span className="font-bold text-green-600 text-sm sm:text-base">
                           {fee.amount}
                         </span>
                       </div>
                     ))}
-
-                    <div className="flex justify-between items-center pt-3 sm:pt-4 border-t border-gray-300 dark:border-gray-500">
-                      <span className={cn(
-                        "font-bold text-gray-900 dark:text-white text-sm sm:text-base",
-                        language === 'bn' && "bengali-text"
-                      )}>
-                        {language === 'bn' ? 'মোট এককালীন ফি' : 'Total One Time Fee'}
-                      </span>
-                      <span className="font-bold text-blue-600 dark:text-blue-400 text-sm sm:text-base">
-                        {language === 'bn' ? '৮৫,৫০০ টাকা' : '85,500 BDT'}
-                      </span>
-                    </div>
                   </div>
                 </div>
 
-                {/* Monthly Fees */}
-                <div className="space-y-4 sm:space-y-6">
+                {/* Residential Fees */}
+                <div className="bg-blue-50 dark:bg-blue-900/20 rounded-2xl p-4 sm:p-6">
                   <h4 className={cn(
-                    "text-base sm:text-lg md:text-xl font-semibold text-gray-900 dark:text-white flex items-center gap-2",
+                    "text-base sm:text-lg md:text-xl font-semibold text-blue-800 dark:text-blue-200 mb-4",
                     language === 'bn' && "bengali-text"
                   )}>
-                    <div className="w-2 h-2 sm:w-3 sm:h-3 bg-green-500 rounded-full"></div>
-                    {language === 'bn' ? 'মাসিক ফি' : 'Monthly Fees'}
+                    {language === 'bn' ? 'আবাসিক ফি (মাসিক)' : 'Residential Fees (Monthly)'}
                   </h4>
-
-                  <div className="space-y-4 sm:space-y-6">
-                    {/* Tuition Fees */}
-                    <div>
-                      <h5 className={cn(
-                        "font-medium text-gray-900 dark:text-white mb-2 sm:mb-3 text-sm sm:text-base",
-                        language === 'bn' && "bengali-text"
-                      )}>
-                        {language === 'bn' ? 'টিউশন ফি:' : 'Tuition Fees:'}
-                      </h5>
-                      <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-3 sm:p-4 space-y-2 sm:space-y-3">
-                        {admissionData.feeStructure.monthly.tuition.map((fee, index) => (
-                          <div key={index} className="flex justify-between items-center">
-                            <span className={cn(
-                              "text-xs sm:text-sm text-gray-700 dark:text-gray-300",
-                              language === 'bn' && "bengali-text"
-                            )}>
-                              {fee.name}
-                            </span>
-                            <span className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">
-                              {fee.amount}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Residential & Food */}
-                    <div className="grid gap-3 sm:gap-4">
-                      <div>
-                        <h5 className={cn(
-                          "font-medium text-gray-900 dark:text-white mb-1 sm:mb-2 text-sm sm:text-base",
+                  <div className="grid gap-3 sm:gap-4">
+                    {admissionData.feeStructure.monthly.residential.map((fee, index) => (
+                      <div key={index} className="flex justify-between items-center p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                        <span className={cn(
+                          "font-medium text-gray-900 dark:text-white text-sm sm:text-base",
                           language === 'bn' && "bengali-text"
                         )}>
-                          {language === 'bn' ? 'আবাসিক ফি:' : 'Residential Fees:'}
-                        </h5>
-                        <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-3 sm:p-4 space-y-1 sm:space-y-2">
-                          {admissionData.feeStructure.monthly.residential.map((fee, index) => (
-                            <div key={index} className="flex justify-between items-center">
-                              <span className={cn(
-                                "text-xs sm:text-sm text-gray-700 dark:text-gray-300",
-                                language === 'bn' && "bengali-text"
-                              )}>
-                                {fee.name}
-                              </span>
-                              <span className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">
-                                {fee.amount}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
+                          {fee.name}
+                        </span>
+                        <span className="font-bold text-blue-600 text-sm sm:text-base">
+                          {fee.amount}
+                        </span>
                       </div>
-
-                      <div>
-                        <h5 className={cn(
-                          "font-medium text-gray-900 dark:text-white mb-1 sm:mb-2 text-sm sm:text-base",
-                          language === 'bn' && "bengali-text"
-                        )}>
-                          {language === 'bn' ? 'খাবার ফি:' : 'Food Fees:'}
-                        </h5>
-                        <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-3 sm:p-4 space-y-1 sm:space-y-2">
-                          {admissionData.feeStructure.monthly.food.map((fee, index) => (
-                            <div key={index} className="flex justify-between items-center">
-                              <span className={cn(
-                                "text-xs sm:text-sm text-gray-700 dark:text-gray-300",
-                                language === 'bn' && "bengali-text"
-                              )}>
-                                {fee.name}
-                              </span>
-                              <span className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">
-                                {fee.amount}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
+                    ))}
                   </div>
                 </div>
-              </div>
 
-              {/* Note */}
-              <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-3 sm:p-4 border border-blue-200 dark:border-blue-800">
-                <p className={cn(
-                  "text-xs sm:text-sm text-blue-700 dark:text-blue-300 text-center",
-                  language === 'bn' && "bengali-text"
-                )}>
-                  {language === 'bn' 
-                    ? '💡 সকল ফি আগাম পরিশোধের ক্ষেত্রে বিশেষ ছাড় প্রদান করা হয়। বিস্তারিত জানতে অফিসে যোগাযোগ করুন।'
-                    : '💡 Special discounts are provided for advance payment of all fees. Contact the office for details.'
-                  }
-                </p>
+                {/* Food Fees */}
+                <div className="bg-orange-50 dark:bg-orange-900/20 rounded-2xl p-4 sm:p-6">
+                  <h4 className={cn(
+                    "text-base sm:text-lg md:text-xl font-semibold text-orange-800 dark:text-orange-200 mb-4",
+                    language === 'bn' && "bengali-text"
+                  )}>
+                    {language === 'bn' ? 'খাদ্য ফি (মাসিক)' : 'Food Fees (Monthly)'}
+                  </h4>
+                  <div className="grid gap-3 sm:gap-4">
+                    {admissionData.feeStructure.monthly.food.map((fee, index) => (
+                      <div key={index} className="flex justify-between items-center p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                        <span className={cn(
+                          "font-medium text-gray-900 dark:text-white text-sm sm:text-base",
+                          language === 'bn' && "bengali-text"
+                        )}>
+                          {fee.name}
+                        </span>
+                        <span className="font-bold text-orange-600 text-sm sm:text-base">
+                          {fee.amount}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
           )}
 
           {/* Important Dates */}
           {activeTab === 'dates' && (
-            <div className="space-y-4 sm:space-y-6">
+            <div className="space-y-6 sm:space-y-8">
               <h3 className={cn(
                 "text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6",
                 language === 'bn' && "bengali-text"
               )}>
-                {language === 'bn' ? 'গুরুত্বপূর্ণ তারিখ সমূহ' : 'Important Dates'}
+                {language === 'bn' ? 'গুরুত্বপূর্ণ তারিখসমূহ' : 'Important Dates'}
               </h3>
 
-              <div className="space-y-3 sm:space-y-4">
+              <div className="grid gap-4 sm:gap-6">
                 {admissionData.importantDates.map((date, index) => (
-                  <div key={index} className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-gray-50 dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600">
-                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center flex-shrink-0">
-                      <Calendar className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 dark:text-blue-400" />
+                  <div key={index} className="flex items-center justify-between p-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+                    <div className="flex items-center gap-3 sm:gap-4">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#00AEEF]/20 dark:bg-[#00AEEF]/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                        <Calendar className="w-5 h-5 sm:w-6 sm:h-6 text-[#00AEEF] dark:text-[#00AEEF]/80" />
+                      </div>
+                      <div>
+                        <h4 className={cn(
+                          "font-semibold text-gray-900 dark:text-white text-sm sm:text-base mb-1",
+                          language === 'bn' && "bengali-text"
+                        )}>
+                          {date.event}
+                        </h4>
+                        <p className={cn(
+                          "text-xs sm:text-sm text-gray-600 dark:text-gray-400",
+                          language === 'bn' && "bengali-text"
+                        )}>
+                          {date.date}
+                        </p>
+                      </div>
                     </div>
-
-                    <div className="flex-1">
-                      <h4 className={cn(
-                        "font-semibold text-gray-900 dark:text-white text-sm sm:text-base",
-                        language === 'bn' && "bengali-text"
-                      )}>
-                        {date.event}
-                      </h4>
-                      <p className={cn(
-                        "text-xs sm:text-sm text-gray-600 dark:text-gray-400",
-                        language === 'bn' && "bengali-text"
-                      )}>
-                        {date.date}
-                      </p>
-                    </div>
-
-                    <div className={`px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium ${date.status === 'open'
-                      ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
-                      : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300'
-                      }`}>
-                      {date.status === 'open' 
+                    <div className={cn(
+                      "px-3 py-1 rounded-full text-xs font-medium",
+                      date.status === 'open'
+                        ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
+                        : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300'
+                    )}>
+                      {date.status === 'open'
                         ? (language === 'bn' ? 'চলমান' : 'Ongoing')
                         : (language === 'bn' ? 'আসন্ন' : 'Upcoming')
                       }
@@ -988,8 +1125,8 @@ function AdmissionPage() {
                 {/* Contact Details */}
                 <div className="space-y-4 sm:space-y-6">
                   <div className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-gray-50 dark:bg-gray-700 rounded-xl">
-                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center flex-shrink-0">
-                      <Phone className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 dark:text-blue-400" />
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#00AEEF]/20 dark:bg-[#00AEEF]/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <Phone className="w-5 h-5 sm:w-6 sm:h-6 text-[#00AEEF] dark:text-[#00AEEF]/80" />
                     </div>
                     <div>
                       <h4 className={cn(
@@ -1073,7 +1210,7 @@ function AdmissionPage() {
                 </div>
 
                 {/* Quick Action Card */}
-                <div className="bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl p-4 sm:p-6 text-white">
+                <div className="bg-gradient-to-br from-[#00AEEF] to-purple-600 rounded-2xl p-4 sm:p-6 text-white">
                   <h4 className={cn(
                     "text-lg sm:text-xl md:text-2xl font-bold mb-3 sm:mb-4",
                     language === 'bn' && "bengali-text"
@@ -1084,32 +1221,33 @@ function AdmissionPage() {
                     "mb-4 sm:mb-6 opacity-90 text-xs sm:text-sm",
                     language === 'bn' && "bengali-text"
                   )}>
-                    {language === 'bn' 
+                    {language === 'bn'
                       ? 'এখনই অনলাইনে আবেদন করুন এবং আপনার সন্তানের ভবিষ্যত গড়ার যাত্রা শুরু করুন'
                       : 'Apply online now and start your child\'s future-building journey'
                     }
                   </p>
 
                   <div className="space-y-3 sm:space-y-4">
-                    <Button
-                      onClick={handleApplyNow}
-                      className="w-full bg-white text-blue-600 hover:bg-gray-100 text-sm sm:text-base py-2 sm:py-3"
-                    >
-                      <span className={cn(language === 'bn' && "bengali-text")}>
-                        {language === 'bn' ? 'অনলাইনে আবেদন করুন' : 'Apply Online'}
-                      </span>
-                    </Button>
+                    <Link to="/apply">
+                      <Button
+                        className="w-full bg-white text-[#00AEEF] hover:bg-gray-100 text-sm sm:text-base py-2 sm:py-3"
+                      >
+                        <span className={cn(language === 'bn' && "bengali-text")}>
+                          {language === 'bn' ? 'অনলাইনে আবেদন করুন' : 'Apply Online'}
+                        </span>
+                      </Button>
+                    </Link>
 
-                    <Button
-                      onClick={handleDownloadForm}
-                      variant="outline"
-                      className="w-full border-white text-white hover:bg-white hover:text-blue-600 text-sm sm:text-base py-2 sm:py-3"
-                    >
-                      <Download className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
-                      <span className={cn(language === 'bn' && "bengali-text")}>
-                        {language === 'bn' ? 'ভর্তি ফরম ডাউনলোড' : 'Download Admission Form'}
-                      </span>
-                    </Button>
+                    <Link to="/curriculum">
+                      <Button
+                        variant="outline"
+                        className="w-full border-white text-white hover:bg-white hover:text-blue-600 text-sm sm:text-base py-2 sm:py-3"
+                      >
+                        <span className={cn(language === 'bn' && "bengali-text")}>
+                          {language === 'bn' ? 'কারিকুলাম দেখুন' : 'View Curriculum'}
+                        </span>
+                      </Button>
+                    </Link>
                   </div>
                 </div>
               </div>

@@ -109,8 +109,10 @@ export const HeroHeader = () => {
             <div className="flex justify-start flex-shrink-0">
               <Link to="/" className="flex items-center">
                 <img
-                  src={theme === 'dark' ? '/manzil-logo/manzil-institute-logo-dark.png' : '/manzil-logo/manzil-institute-logo-light.png'}
+                  src={theme === 'dark' ? '/manzil-logo/manzil-institute-logo-dark.webp' : '/manzil-logo/manzil-institute-logo-light.webp'}
                   alt="Manzil Institute Logo"
+                  width="160"
+                  height="40"
                   className="h-10 w-auto object-contain"
                 />
               </Link>
@@ -129,7 +131,7 @@ export const HeroHeader = () => {
                       key={item.key}
                       to={href}
                       className={cn(
-                        "text-gray-700 dark:text-gray-300 hover:text-blue-600 text-sm font-medium transition-colors duration-150 whitespace-nowrap",
+                        "text-gray-700 dark:text-gray-300 hover:text-[#00AEEF] text-sm font-medium transition-colors duration-150 whitespace-nowrap",
                         language === "bn" && "bengali-text"
                       )}
                     >
@@ -164,7 +166,7 @@ export const HeroHeader = () => {
                 size="sm"
                 className={cn(
                   "text-xs font-semibold whitespace-nowrap h-9",
-                  isScrolled ? "bg-blue-500 text-white hover:bg-blue-700" : ""
+                  isScrolled ? "bg-[#00AEEF] text-white hover:bg-[#00AEEF]/90" : ""
                 )}
               >
                 <Link to="/apply">
@@ -201,6 +203,7 @@ export const HeroHeader = () => {
                 <Button
                   ref={buttonRef}
                   onClick={toggleMenu}
+                  aria-label={isMenuOpen ? "Close menu" : "Open menu"}
                   className="p-2 bg-transparent text-black dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
                 >
                   {isMenuOpen ? (
@@ -234,7 +237,7 @@ export const HeroHeader = () => {
                     key={item.key}
                     to={href}
                     className={cn(
-                      "block py-3 px-4 text-gray-700 dark:text-gray-300 text-center hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 rounded-lg transition-colors duration-150 font-medium",
+                      "block py-3 px-4 text-gray-700 dark:text-gray-300 text-center hover:bg-[#00AEEF]/10 dark:hover:bg-[#00AEEF]/5 hover:text-[#00AEEF] rounded-lg transition-colors duration-150 font-medium",
                       language === "bn" && "bengali-text"
                     )}
                     onClick={() => setIsMenuOpen(false)}
@@ -252,7 +255,7 @@ export const HeroHeader = () => {
                 size="sm"
                 className={cn(
                   "w-full text-sm font-semibold",
-                  isScrolled ? "bg-blue-600 hover:bg-blue-700 text-white" : ""
+                  isScrolled ? "bg-[#00AEEF] hover:bg-[#00AEEF]/90 text-white" : ""
                 )}
               >
                 <Link to="/apply">

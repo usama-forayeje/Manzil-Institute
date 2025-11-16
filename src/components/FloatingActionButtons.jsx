@@ -49,7 +49,7 @@ const FloatingActionButtons = () => {
       {/* Back to Top Button */}
       <button
         onClick={scrollToTop}
-        className={`bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full shadow-lg transition-all duration-600 transform hover:scale-110 relative overflow-hidden ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-full pointer-events-none'
+        className={`bg-[#00AEEF] hover:bg-[#00AEEF]/90 text-white p-3 rounded-full shadow-lg transition-all duration-600 transform hover:scale-110 relative overflow-hidden ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-full pointer-events-none'
           }`}
         style={{ transitionTimingFunction: 'cubic-bezier(0.68, -0.55, 0.265, 1.55)' }}
         aria-label="Back to top"

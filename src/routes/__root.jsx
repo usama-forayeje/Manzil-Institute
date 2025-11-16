@@ -1,60 +1,32 @@
-import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
-import { Suspense, useEffect } from 'react'
-
+import { createRootRoute, Outlet } from '@tanstack/react-router'
+import { Suspense } from 'react'
+import { HelmetProvider } from 'react-helmet-async'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 import '../styles.css'
 import { useLanguageStore } from '../lib/store'
 import { ThemeProvider } from '../components/themes/theme-provider'
-import LoadingSkeleton from '../components/LoadingSkeleton'
 import FloatingActionButtons from '../components/FloatingActionButtons'
 
 export const Route = createRootRoute({
-  head: () => ({
-    meta: [
-      {
-        charSet: 'utf-8',
-      },
-      {
-        name: 'viewport',
-        content: 'width=device-width, initial-scale=1',
-      },
-      {
-        title:
-          'Manzil International Institute - Quality Education for Future Leaders',
-      },
-    ],
-    links: [],
-  }),
-
-  shellComponent: RootDocument,
+  component: RootComponent,
 })
+
 const queryClient = new QueryClient()
 
-function RootDocument({ children }) {
+function RootComponent() {
   const { language } = useLanguageStore()
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <html lang="en">
-        <head>
-          <HeadContent />
-        </head>
-        <body>
-          <div
-            lang={language}
-            className={language === 'bn' ? 'bn-font' : ''}
-          >
-            <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-              <Suspense fallback={<LoadingSkeleton />}>
-                <>{children}</>
-              </Suspense>
-              <FloatingActionButtons />
-            </ThemeProvider>
-          </div>
-          <Scripts />
-        </body>
-      </html>
-    </QueryClientProvider>
+    <HelmetProvider>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider defaultTheme="light" storageKey="manzil-theme">
+          <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+            <Outlet />
+          </Suspense>
+          <FloatingActionButtons />
+        </ThemeProvider>
+      </QueryClientProvider>
+    </HelmetProvider>
   )
 }

@@ -10,23 +10,23 @@ import { Users, Award, Sparkles } from 'lucide-react';
 import { AnimatedGroup } from './ui/animated-group';
 
 const transitionVariants = {
-    item: {
-        hidden: {
-            opacity: 0,
-            filter: 'blur(12px)',
-            y: 12,
-        },
-        visible: {
-            opacity: 1,
-            filter: 'blur(0px)',
-            y: 0,
-            transition: {
-                type: 'spring',
-                bounce: 0.3,
-                duration: 1.5,
-            },
-        },
+  item: {
+    hidden: {
+      opacity: 0,
+      filter: 'blur(12px)',
+      y: 12,
     },
+    visible: {
+      opacity: 1,
+      filter: 'blur(0px)',
+      y: 0,
+      transition: {
+        type: 'spring',
+        bounce: 0.3,
+        duration: 1.5,
+      },
+    },
+  },
 }
 
 const Team1 = ({
@@ -64,7 +64,7 @@ const Team1 = ({
       name: "উসামা ফরায়েজী",
       role: "সফটওয়্যার এন্ড AI ইঞ্জিনিয়ার",
       bio: "জেনারেল এডুকেশন ও কারিকুলাম কো-অর্ডিনেটর",
-      avatar: "Usama Forayaje.jpg",
+      avatar: "Usama Forayaje.webp",
     },
     {
       id: "member-5",
@@ -128,9 +128,6 @@ const Team1 = ({
                     src={member.avatar}
                     alt={member.name}
                     className="relative mb-4 object-cover size-20 border-2 border-white dark:border-gray-700 md:mb-5 lg:size-24 rounded-full shadow-lg group-hover:scale-105 transition-transform duration-300"
-                    onError={(e) => {
-                      e.target.src = "/manzil institutte logo.jpg";
-                    }}
                   />
                 </div>
                 <p className="text-center font-semibold text-gray-900 dark:text-white mb-1">
@@ -179,8 +176,8 @@ const Team1 = ({
           ))}
         </Swiper>
       </div>
-  </section>
-);
+    </section>
+  );
 };
 
 const Team = () => {
@@ -201,27 +198,27 @@ const Team = () => {
     },
   ];
   return (
-      <section className="relative py-16 sm:py-12 lg:py-20 bg-gradient-to-b from-gray-50 via-white to-gray-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 overflow-hidden">
-          <AnimatedGroup
-              variants={{
-                  container: {
-                      visible: {
-                          transition: {
-                              staggerChildren: 0.05,
-                              delayChildren: 0.75,
-                          },
-                      },
-                  },
-                  ...transitionVariants,
-              }}
-              className="flex flex-col justify-center px-6 lg:px-8 max-w-(--breakpoint-xl) mx-auto"
-          >
+    <section className="relative py-16 sm:py-12 lg:py-20 bg-gradient-to-b from-gray-50 via-white to-gray-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 overflow-hidden">
+      <AnimatedGroup
+        variants={{
+          container: {
+            visible: {
+              transition: {
+                staggerChildren: 0.05,
+                delayChildren: 0.75,
+              },
+            },
+          },
+          ...transitionVariants,
+        }}
+        className="flex flex-col justify-center px-6 lg:px-8 max-w-(--breakpoint-xl) mx-auto"
+      >
 
         {/* Main Heading with Animation */}
         <div className="text-center mb-6 sm:mb-8 lg:mb-12">
-          <div className="inline-flex items-center justify-center px-3 py-1 mb-4 bg-blue-100 dark:bg-blue-900/30 rounded-full">
-            <Users className="size-4 text-blue-600 dark:text-blue-400 mr-2" />
-            <span className={cn("text-sm font-semibold text-blue-600 dark:text-blue-400", language === 'bn' && "bengali-text")}>
+          <div className="inline-flex items-center justify-center px-3 py-1 mb-4 bg-[#00AEEF]/20 dark:bg-[#00AEEF]/10 rounded-full">
+            <Users className="size-4 text-[#00AEEF] dark:text-[#00AEEF]/80 mr-2" />
+            <span className={cn("text-sm font-semibold text-[#00AEEF] dark:text-[#00AEEF]/80", language === 'bn' && "bengali-text")}>
               {language === 'bn' ? 'আমাদের নেতৃত্ব' : 'Our Leadership'}
             </span>
           </div>
@@ -229,12 +226,12 @@ const Team = () => {
             {language === 'bn' ? 'পরিচালনা পরিষদ' : 'Board of Directors'}
           </h2>
           <div className="flex items-center justify-center gap-2 mb-6">
-            <div className="w-6 h-1 bg-gradient-to-r from-transparent to-blue-600 rounded-full"></div>
-            <Award className="size-5 text-blue-600 dark:text-blue-400" />
-            <div className="w-6 h-1 bg-gradient-to-l from-transparent to-blue-600 rounded-full"></div>
+            <div className="w-6 h-1 bg-gradient-to-r from-transparent to-[#00AEEF] rounded-full"></div>
+            <Award className="size-5 text-[#00AEEF] dark:text-[#00AEEF]/80" />
+            <div className="w-6 h-1 bg-gradient-to-l from-transparent to-[#00AEEF] rounded-full"></div>
           </div>
           <p className={cn("text-base sm:text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed", language === 'bn' && "bengali-text")}>
-            {language === 'bn'
+           {language === 'bn'
               ? 'দক্ষ ও অভিজ্ঞ নেতৃত্বের মাধ্যমে আমরা গড়ে তুলছি একটি আদর্শ শিক্ষা ব্যবস্থা যা ভবিষ্যতের নেতাদের তৈরি করবে।'
               : 'Through skilled and experienced leadership, we are building an ideal education system that will create future leaders.'
             }
@@ -244,27 +241,22 @@ const Team = () => {
           {teamMembers.map((member, index) => (
             <div
               key={typeof member.name === 'object' ? member.name.bn : member.name}
-              className="group relative max-w-sm mx-auto text-center bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-500 p-6 border border-gray-100 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 overflow-hidden"
+              className="group relative max-w-sm mx-auto text-center bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-2xl hover:shadow-[#00AEEF]/10 transition-all duration-500 p-6 border border-gray-100 dark:border-gray-700 hover:border-[#00AEEF]/60 dark:hover:border-[#00AEEF]/40 overflow-hidden"
             >
               {/* Decorative background elements */}
-              <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-blue-400/10 to-purple-400/10 rounded-full blur-xl group-hover:scale-150 transition-transform duration-500"></div>
-              <div className="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-tr from-green-400/10 to-blue-400/10 rounded-full blur-lg group-hover:scale-125 transition-transform duration-500"></div>
+              <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-[#00AEEF]/10 to-purple-400/10 rounded-full blur-xl group-hover:scale-150 transition-transform duration-500"></div>
+              <div className="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-tr from-green-400/10 to-[#00AEEF]/10 rounded-full blur-lg group-hover:scale-125 transition-transform duration-500"></div>
 
               {/* Profile Image with enhanced styling */}
               <div className="relative mb-6">
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-purple-400 rounded-xl blur-lg opacity-20 group-hover:opacity-40 transition-opacity duration-300"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-[#00AEEF]/60 to-purple-400 rounded-xl blur-lg opacity-20 group-hover:opacity-40 transition-opacity duration-300"></div>
                 <img
                   src={member.imageUrl}
                   alt={typeof member.name === 'object' ? member.name[language] || member.name.bn : member.name}
-                  className="relative w-32 h-32 sm:w-36 sm:h-36 lg:w-40 lg:h-40 rounded-xl object-cover bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900/50 dark:to-blue-800/50 mx-auto shadow-xl group-hover:scale-105 transition-transform duration-300 border-4 border-white dark:border-gray-700"
-                  width={160}
-                  height={160}
-                  onError={(e) => {
-                    e.target.src = "/manzil institutte logo.jpg";
-                  }}
+                  className="relative w-32 h-32 sm:w-36 sm:h-36 lg:w-40 lg:h-40 rounded-xl object-cover bg-gradient-to-br from-[#00AEEF]/20 to-[#00AEEF]/30 dark:from-[#00AEEF]/10 dark:to-[#00AEEF]/20 mx-auto shadow-xl group-hover:scale-105 transition-transform duration-300 border-4 border-white dark:border-gray-700"
                 />
                 {/* Premium badge for main members */}
-                <div className="absolute -top-2 -right-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg animate-pulse">
+                <div className="absolute -top-2 -right-2 bg-gradient-to-r from-[#00AEEF] to-purple-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg animate-pulse">
                   <Sparkles className="inline w-3 h-3 mr-1" />
                   {language === 'bn'
                     ? (index === 0 ? "চেয়ারম্যান" : "পরিচালক")
@@ -274,10 +266,10 @@ const Team = () => {
               </div>
 
               {/* Name and Title */}
-              <h3 className={cn("text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300", language === 'bn' && "bengali-text")}>
+              <h3 className={cn("text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-[#00AEEF] dark:group-hover:text-[#00AEEF]/80 transition-colors duration-300", language === 'bn' && "bengali-text")}>
                 {typeof member.name === 'object' ? member.name[language] || member.name.bn : member.name}
               </h3>
-              <p className="text-blue-600 dark:text-blue-400 font-semibold text-sm mb-4 uppercase tracking-wide">
+              <p className="text-[#00AEEF] dark:text-[#00AEEF]/80 font-semibold text-sm mb-4 uppercase tracking-wide">
                 {typeof member.title === 'object' ? member.title[language] || member.title.bn : member.title}
               </p>
 
@@ -312,7 +304,7 @@ const Team = () => {
                   href="https://www.facebook.com/jamalmasrur/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-blue-100 hover:bg-blue-200 dark:bg-blue-900/30 dark:hover:bg-blue-800/50 text-blue-600 hover:text-blue-700 dark:text-blue-400 shadow-none transition-all duration-200 hover:scale-105 cursor-pointer rounded-md p-2 flex items-center justify-center"
+                  className="bg-[#00AEEF]/20 hover:bg-[#00AEEF]/30 dark:bg-[#00AEEF]/10 dark:hover:bg-[#00AEEF]/20 text-[#00AEEF] hover:text-[#00AEEF]/90 dark:text-[#00AEEF]/80 shadow-none transition-all duration-200 hover:scale-105 cursor-pointer rounded-md p-2 flex items-center justify-center"
                   onClick={(e) => e.stopPropagation()}
                   aria-label="Facebook"
                 >
@@ -336,7 +328,7 @@ const Team = () => {
                   href="#"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-blue-100 hover:bg-blue-200 dark:bg-blue-900/30 dark:hover:bg-blue-800/50 text-blue-700 hover:text-blue-800 dark:text-blue-300 shadow-none transition-all duration-200 hover:scale-105 cursor-pointer rounded-md p-2 flex items-center justify-center disabled:opacity-60"
+                  className="bg-[#00AEEF]/20 hover:bg-[#00AEEF]/30 dark:bg-[#00AEEF]/10 dark:hover:bg-[#00AEEF]/20 text-[#00AEEF]/90 hover:text-[#00AEEF] dark:text-[#00AEEF]/70 shadow-none transition-all duration-200 hover:scale-105 cursor-pointer rounded-md p-2 flex items-center justify-center disabled:opacity-60"
                   onClick={(e) => e.stopPropagation()}
                   aria-label="LinkedIn"
                 >
@@ -368,7 +360,7 @@ const Team = () => {
 
         {/* CTA buttons for desktop */}
         <div className="hidden sm:flex sm:flex-row-reverse sm:justify-center gap-3 mt-8 mb-12">
-          <Button size="lg" className="bg-blue-500 hover:bg-blue-600 text-white" asChild>
+          <Button size="lg" className="bg-[#00AEEF] hover:bg-[#00AEEF]/90 text-white" asChild>
             <Link to="/campus">{language === 'bn' ? 'ক্যাম্পাস দেখুন' : 'See Campus'}</Link>
           </Button>
           <Button size="lg" variant="outline" asChild>
@@ -380,7 +372,7 @@ const Team = () => {
 
         {/* CTA buttons at bottom for mobile */}
         <div className="flex flex-col sm:hidden justify-center gap-3 mt-12 px-6">
-          <Button size="lg" className="w-full bg-blue-500 hover:bg-blue-600 text-white" asChild>
+          <Button size="lg" className="w-full bg-[#00AEEF] hover:bg-[#00AEEF]/90 text-white" asChild>
             <Link to="/campus">{language === 'bn' ? 'ক্যাম্পাস দেখুন' : 'See Campus'}</Link>
           </Button>
           <Button size="lg" variant="outline" className="w-full" asChild>

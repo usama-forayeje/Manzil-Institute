@@ -59,7 +59,7 @@ export default function HeroSectionPremium() {
 
               {/* Main Institute Name - EXTRA LARGE */}
               <div className="mb-6"> {/* Added mb-6 */}
-                <h1 className={cn("text-5xl md:text-6xl lg:text-7xl font-black text-blue-600 dark:text-blue-400 leading-none text-center", language === 'bn' && "bengali-text")}>
+                <h1 className={cn("text-5xl md:text-6xl lg:text-7xl font-black text-[#00AEEF] dark:text-[#00AEEF] leading-none text-center", language === 'bn' && "bengali-text")}>
                   {language === 'bn' ? 'মানজিল ইনস্টিটিউট' : 'Manzil Institute'}
                 </h1>
               </div>
@@ -86,13 +86,13 @@ export default function HeroSectionPremium() {
               <div className="flex flex-col sm:flex-row gap-6 justify-center">
                 <Button
                   size="lg"
-                  className={cn("bg-blue-600 hover:bg-blue-700 text-white px-10 py-5 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 text-center", language === 'bn' && "bengali-text")}
+                  className={cn("bg-[#00AEEF] hover:bg-[#00AEEF]/90 text-white px-10 py-5 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 text-center", language === 'bn' && "bengali-text")}
                   asChild
                 >
-                  <Link href="/apply">
+                  <Link to="/apply">
                     <BookOpen className="size-6 mr-2" />
                     <span className={cn("text-nowrap", language === 'bn' && "bengali-text text-center")}>
-                      {language === 'bn' ? 'আজই Apply করুন' : 'Apply Now'}
+                      {language === 'bn' ? 'আজই ভর্তি আবেদন করুন' : 'Apply for Admission Now'}
                     </span>
                   </Link>
                 </Button>
@@ -100,12 +100,12 @@ export default function HeroSectionPremium() {
                 <Button
                   size="lg"
                   variant="outline"
-                  className={cn("border-2 border-blue-600 text-blue-600 hover:bg-blue-50 dark:border-blue-400 dark:text-blue-400 dark:hover:bg-blue-400/10 px-10 py-5 text-lg font-semibold transition-all duration-300 text-center", language === 'bn' && "bengali-text")}
+                  className={cn("border-2 border-[#00AEEF] text-[#00AEEF] hover:bg-[#00AEEF]/10 dark:border-[#00AEEF]/80 dark:text-[#00AEEF]/80 dark:hover:bg-[#00AEEF]/20 px-10 py-5 text-lg font-semibold transition-all duration-300 text-center", language === 'bn' && "bengali-text")}
                   asChild
                 >
-                  <Link href="/campus">
+                  <Link to="/campus">
                     <span className={cn("text-nowrap", language === 'bn' && "bengali-text text-center")}>
-                      {language === 'bn' ? 'কেম্পাস দেখুন' : 'Explore Campus'}
+                      {language === 'bn' ? 'কেম্পাস ভিজিট করুন' : 'Visit Our Campus'}
                     </span>
                     <ArrowRight className="size-6 ml-2" />
                   </Link>

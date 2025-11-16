@@ -1,5 +1,6 @@
 import { InfiniteSlider } from '@/components/ui/infinite-slider'
 import { ProgressiveBlur } from '@/components/ui/progressive-blur'
+import { LazyImage } from '@/components/ui/lazy-image'
 import { cn } from '../lib/utils'
 import { useLanguageStore } from '../lib/store'
 import { useTheme } from '@/components/themes/theme-provider'
@@ -42,12 +43,11 @@ export const LogoCloud = () => {
                             {logos.map((logo, index) => (
                                 <div key={index} className="flex">
                                     <a href={logo.href} target="_blank" rel="noopener noreferrer" className="cursor-pointer">
-                                        <img
+                                        <LazyImage
                                             className="mx-auto h-12 w-fit"
-                                            src={`/manzil-logo/${logo.name}${logo.hasVariants ? `-${theme}.png` : '.png'}`}
+                                            src={`/manzil-logo/${logo.name}${logo.hasVariants ? `-${theme}.webp` : '.webp'}`}
                                             alt={logo.alt}
-                                            height="48"
-                                            width="auto"
+                                            objectFit="none"
                                         />
                                     </a>
                                 </div>

@@ -29,6 +29,85 @@ const transitionVariants = {
 
 export const Route = createFileRoute('/curriculum')({
   component: CurriculumPage,
+  head: () => ({
+    meta: [
+      {
+        title: 'MIC Curriculum Details Bangladesh - Manzil International Institute Education System',
+      },
+      {
+        name: 'description',
+        content: 'Explore the comprehensive MIC Curriculum at Manzil International Institute. 6 levels, 22 years of integrated Madrasa, General, and Technical education in Bangladesh.',
+      },
+      {
+        name: 'keywords',
+        content: 'MIC Curriculum, Manzil Institute curriculum, Madrasa Education Bangladesh, General Education, Technical Education, Islamic Education curriculum',
+      },
+      // Open Graph
+      {
+        property: 'og:title',
+        content: 'MIC Curriculum Details - Manzil International Institute',
+      },
+      {
+        property: 'og:description',
+        content: 'Comprehensive 22-year education system with Madrasa, General, and Technical streams. MIC Curriculum Bangladesh.',
+      },
+      {
+        property: 'og:url',
+        content: 'https://institute.manzilgroupbd.com/curriculum',
+      },
+      {
+        property: 'og:image',
+        content: 'https://institute.manzilgroupbd.com/manzil-institute-logo-dark.png',
+      },
+      {
+        property: 'og:image:width',
+        content: '1200',
+      },
+      {
+        property: 'og:image:height',
+        content: '630',
+      },
+      {
+        property: 'og:image:alt',
+        content: 'MIC Curriculum Details - Manzil International Institute Education System',
+      },
+      {
+        property: 'og:type',
+        content: 'website',
+      },
+      // Twitter Cards
+      {
+        name: 'twitter:title',
+        content: 'MIC Curriculum Details - Manzil International Institute',
+      },
+      {
+        name: 'twitter:description',
+        content: 'Comprehensive 22-year education system with Madrasa, General, and Technical streams. MIC Curriculum Bangladesh.',
+      },
+    ],
+    links: [
+      {
+        rel: 'canonical',
+        href: 'https://institute.manzilgroupbd.com/curriculum',
+      },
+      // hreflang tags for English and Bangla versions
+      {
+        rel: 'alternate',
+        hreflang: 'en',
+        href: 'https://institute.manzilgroupbd.com/curriculum',
+      },
+      {
+        rel: 'alternate',
+        hreflang: 'bn',
+        href: 'https://institute.manzilgroupbd.com/curriculum',
+      },
+      {
+        rel: 'alternate',
+        hreflang: 'x-default',
+        href: 'https://institute.manzilgroupbd.com/curriculum',
+      },
+    ],
+  }),
 })
 
 function CurriculumPage() {
@@ -39,20 +118,39 @@ function CurriculumPage() {
     window.scrollTo(0, 0)
   }, [])
 
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://institute.manzilgroupbd.com"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Curriculum",
+        "item": "https://institute.manzilgroupbd.com/curriculum"
+      }
+    ]
+  }
+
   const getColorClasses = (color) => {
     const colorMap = {
       blue: {
-        border: 'border-blue-500',
-        bg50: 'bg-blue-50 dark:bg-blue-900/30',
-        border200: 'border-blue-200 dark:border-blue-800',
-        text600: 'text-blue-600 dark:text-blue-400',
-        text700: 'text-blue-700 dark:text-blue-300',
-        bg500: 'bg-blue-500',
-        borderProgram: 'border-blue-200 dark:border-blue-800',
-        bgProgram50: 'bg-blue-50 dark:bg-blue-900/30',
-        textProgram600: 'text-blue-600 dark:text-blue-400',
-        textProgram700: 'text-blue-700 dark:text-blue-300',
-        heart: 'text-blue-500'
+        border: 'border-[#00AEEF]',
+        bg50: 'bg-[#00AEEF]/10 dark:bg-[#00AEEF]/5',
+        border200: 'border-[#00AEEF]/40 dark:border-[#00AEEF]/20',
+        text600: 'text-[#00AEEF] dark:text-[#00AEEF]/80',
+        text700: 'text-[#00AEEF]/90 dark:text-[#00AEEF]/70',
+        bg500: 'bg-[#00AEEF]',
+        borderProgram: 'border-[#00AEEF]/40 dark:border-[#00AEEF]/20',
+        bgProgram50: 'bg-[#00AEEF]/10 dark:bg-[#00AEEF]/5',
+        textProgram600: 'text-[#00AEEF] dark:text-[#00AEEF]/80',
+        textProgram700: 'text-[#00AEEF]/90 dark:text-[#00AEEF]/70',
+        heart: 'text-[#00AEEF]'
       },
       green: {
         border: 'border-green-500',
@@ -158,7 +256,7 @@ function CurriculumPage() {
         description: language === "bn" ? "প্রাথমিক শিক্ষার ভিত্তি প্রস্তুত ও মূল্যবোধ গঠন" : "Preparation of basic education foundation and value building",
         subjects: {
           madrasa: language === "bn" 
-            ? ["কায়েদা ও নাযেরা", "বাংলা-ইংরেজি-আরবি বর্ণমালা", "প্রাথমিক দুআ ও সুরা"]
+            ? ["কায়েদা ও নাযেরা", "বাংলা-ইংরেজি-আরবি বর্ণমালা", "প্রাথমিক দুআ ও সুরা"]
             : ["Qaida & Nazira", "Bengali-English-Arabic Alphabets", "Basic Duas & Surahs"],
           general: language === "bn" 
             ? ["IPC কারিকুলাম", "বেসিক গণিত", "বাংলা ও ইংরেজি ভাষা"]
@@ -181,7 +279,7 @@ function CurriculumPage() {
         description: language === "bn" ? "হিফজুল কুরআন ও মৌলিক শিক্ষার সমন্বয়" : "Integration of Quran Memorization and Basic Education",
         subjects: {
           madrasa: language === "bn" 
-            ? ["হিফজুল কুরআন", "তাজভিদ শিক্ষা", "নুরানি কায়েদা"]
+            ? ["হিফজুল কুরআন", "তাজভিদ শিক্ষা", "নুরানি কায়েদা"]
             : ["Quran Memorization", "Tajweed Education", "Noorani Qaida"],
           general: language === "bn" 
             ? ["IMYC কারিকুলাম", "O-Level প্রস্তুতি", "বিজ্ঞান ও গণিত"]
@@ -325,6 +423,9 @@ function CurriculumPage() {
 
   return (
     <div>
+      <script type="application/ld+json">
+        {JSON.stringify(breadcrumbSchema)}
+      </script>
       <HeroHeader />
 
       <main className="min-h-screen bg-gray-50 dark:bg-gray-900 mx-auto max-w-7xl px-4 sm:px-6 pt-24 pb-18" dir="ltr">
@@ -342,14 +443,30 @@ function CurriculumPage() {
           }}
           className="space-y-8"
         >
+        {/* Main Heading Section */}
+        <section className="text-center mb-12">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white mb-4 kalpurush-font">
+            {language === "bn" ? "MIC কারিকুলাম - মানযিল ইন্টারন্যাশনাল ইনস্টিটিউট" : "MIC Curriculum - Manzil International Institute"}
+          </h1>
+          <h2 className="text-xl md:text-2xl text-[#00AEEF] dark:text-[#00AEEF]/80 mb-6 kalpurush-font">
+              {language === "bn" ? "মাদরাসা, জেনারেল এবং কারিগরি শিক্ষার সমন্বয়" : "Integration of Madrasa, General & Technical Education"}
+          </h2>
+          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-3xl mx-auto kalpurush-font">
+            {language === "bn"
+              ? "৬টি লেভেলে ২২ বছরের পূর্ণাঙ্গ শিক্ষা ব্যবস্থা - হিফজ, দরসে নিজামী, আন্তর্জাতিক কারিকুলাম এবং কারিগরি প্রশিক্ষণের সমন্বয়"
+              : "Complete 22-year education system in 6 levels - Integration of Hifz, Dars-e-Nizami, International Curriculum & Technical Training"
+            }
+          </p>
+        </section>
+
         {/* Overview Section */}
         <section className="bg-white dark:bg-gray-800 rounded-2xl p-8 mb-8 border border-gray-200 dark:border-gray-700">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             <div className="text-center">
-              <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center mx-auto mb-3">
-                <Layers className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+              <div className="w-16 h-16 bg-[#00AEEF]/20 dark:bg-[#00AEEF]/10 rounded-2xl flex items-center justify-center mx-auto mb-3">
+                <Layers className="w-8 h-8 text-[#00AEEF] dark:text-[#00AEEF]/80" />
               </div>
-              <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{curriculumData.overview.totalLevels}</div>
+              <div className="text-2xl font-bold text-[#00AEEF] dark:text-[#00AEEF]/80">{curriculumData.overview.totalLevels}</div>
               <div className="text-sm text-gray-600 dark:text-gray-400 kalpurush-font">{curriculumData.overview.levelsLabel}</div>
             </div>
             
@@ -421,15 +538,15 @@ function CurriculumPage() {
                 <div className="lg:w-3/4">
                   <div className="grid md:grid-cols-3 gap-4">
                     {/* Madrasa Subjects */}
-                    <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4">
+                    <div className="bg-[#00AEEF]/10 dark:bg-[#00AEEF]/5 rounded-xl p-4">
                       <div className="flex items-center gap-2 mb-3">
-                        <BookText className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                        <h4 className="font-semibold text-blue-700 dark:text-blue-300 kalpurush-font">{level.madrasaLabel}</h4>
+                        <BookText className="w-4 h-4 text-[#00AEEF] dark:text-[#00AEEF]/80" />
+                        <h4 className="font-semibold text-[#00AEEF]/90 dark:text-[#00AEEF]/70 kalpurush-font">{level.madrasaLabel}</h4>
                       </div>
                       <ul className="space-y-2">
                         {level.subjects.madrasa.map((subject, idx) => (
                           <li key={idx} className="flex items-center gap-2">
-                            <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
+                            <div className="w-1.5 h-1.5 bg-[#00AEEF] rounded-full"></div>
                             <span className="text-sm text-gray-700 dark:text-gray-300 kalpurush-font">{subject}</span>
                           </li>
                         ))}
@@ -471,7 +588,7 @@ function CurriculumPage() {
                 </div>
               </div>
             </div>
-           );
+            );
           })}
         </section>
 
@@ -514,7 +631,7 @@ function CurriculumPage() {
         </section>
 
         {/* Final CTA */}
-        <section className="text-center mt-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-white">
+        <section className="text-center mt-12 bg-gradient-to-r from-[#00AEEF] to-purple-600 rounded-2xl p-8 text-white">
           <h3 className="text-2xl font-bold mb-4 kalpurush-font">
             {curriculumData.sectionTitles.ctaTitle}
           </h3>
@@ -522,9 +639,11 @@ function CurriculumPage() {
             {curriculumData.sectionTitles.ctaDescription}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button className="bg-white text-blue-600 hover:bg-gray-100">
-              <span className="kalpurush-font">{curriculumData.sectionTitles.contactButton}</span>
-            </Button>
+            <Link to="/admission">
+              <Button className="bg-white text-[#00AEEF] hover:bg-gray-100">
+                <span className="kalpurush-font">{curriculumData.sectionTitles.contactButton}</span>
+              </Button>
+            </Link>
             <Button 
               variant="outline" 
               className="border-white text-white hover:bg-white hover:text-blue-600"

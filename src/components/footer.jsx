@@ -34,7 +34,7 @@ const contactInfo = [
         },
         details: {
             en: 'manzilinstitute24@gmail.com',
-            bn: 'info@manzilinstitute.edu.bd'
+            bn: 'manzilinstitute24@gmail.com'
         }
     },
     {
@@ -219,22 +219,32 @@ export default function FooterSection() {
                                     aria-label="go home"
                                     className="flex items-center justify-center md:justify-start space-x-2 mb-4">
                                     <img
-                                        src={theme === 'dark' ? '/manzil-logo/manzil-institute-logo-dark.png' : '/manzil-logo/manzil-institute-logo-light.png'}
+                                        src={theme === 'dark' ? '/manzil-logo/manzil-institute-logo-dark.webp' : '/manzil-logo/manzil-institute-logo-light.webp'}
                                         alt="Manzil International Institute Logo"
                                         className="h-8 w-auto object-contain"
                                     />
                                 </Link>
                             </div>
 
+                            {/* Institute Description */}
+                            <div className="mb-6">
+                                <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed kalpurush-font text-center md:text-left">
+                                    {language === 'bn'
+                                      ? 'মানযিল ইনস্টিটিউট - মাদরাসা, জেনারেল এবং কারিগরি শিক্ষার সমন্বয়ে ৬-লেভেল শিক্ষা ব্যবস্থা। ভর্তি তথ্য ও যোগাযোগের জন্য যোগাযোগ করুন।'
+                                      : 'Manzil Institute - 6-level education system integrating Madrasa, General & Technical education. Contact us for admission information and inquiries.'
+                                    }
+                                </p>
+                            </div>
+
                             {/* Contact Information */}
                             <div className="mb-6">
-                                <h3 className="text-lg font-semibold mb-4 kalpurush-font bg-gradient-to-r from-blue-500 to-blue-600 bg-clip-text text-transparent">
-                                    {language === 'bn' ? 'যোগাযোগের তথ্য' : 'Contact Information'}
+                                <h3 className="text-lg font-semibold mb-4 kalpurush-font bg-gradient-to-r from-[#00AEEF] to-[#00AEEF]/80 bg-clip-text text-transparent">
+                                    {language === 'bn' ? 'মানযিল ইনস্টিটিউট যোগাযোগ তথ্য' : 'Manzil Institute Contact Information'}
                                 </h3>
                                 <div className="space-y-3">
                                     {contactInfo.map((info, index) => (
                                         <div key={index} className="flex items-center gap-3 justify-start">
-                                            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                                            <div className="w-8 h-8 bg-gradient-to-br from-[#00AEEF] to-[#00AEEF]/80 rounded-lg flex items-center justify-center flex-shrink-0">
                                                 <info.icon className="w-4 h-4 text-white" />
                                             </div>
                                             <div className="flex-1">
@@ -249,7 +259,7 @@ export default function FooterSection() {
 
                             {/* Social Media */}
                             <div>
-                                <h3 className="text-lg font-semibold mb-4 kalpurush-font bg-gradient-to-r from-blue-500 to-blue-600 bg-clip-text text-transparent">
+                                <h3 className="text-lg font-semibold mb-4 kalpurush-font bg-gradient-to-r from-[#00AEEF] to-[#00AEEF]/80 bg-clip-text text-transparent">
                                     {language === 'bn' ? 'আমাদের সাথে যুক্ত থাকুন' : 'Connect With Us'}
                                 </h3>
                                 <div className="flex justify-center md:justify-start gap-3">
@@ -260,7 +270,7 @@ export default function FooterSection() {
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             aria-label={social.label}
-                                            className="w-10 h-10 bg-gradient-to-br from-gray-200 dark:from-gray-700 to-gray-300 dark:to-gray-600 hover:from-blue-500 hover:to-blue-600 rounded-lg flex items-center justify-center transition-all duration-200 hover:scale-110">
+                                            className="w-10 h-10 bg-gradient-to-br from-gray-200 dark:from-gray-700 to-gray-300 dark:to-gray-600 hover:from-[#00AEEF] hover:to-[#00AEEF]/80 rounded-lg flex items-center justify-center transition-all duration-200 hover:scale-110">
                                             <social.icon className="w-5 h-5 text-gray-600 dark:text-gray-300" />
                                         </a>
                                     ))}
@@ -270,7 +280,7 @@ export default function FooterSection() {
 
                         {/* Middle Column - Business Divisions */}
                         <div className="text-center md:text-left">
-                            <h3 className="text-lg font-semibold mb-6 kalpurush-font bg-gradient-to-r from-blue-500 to-blue-600 bg-clip-text text-transparent">
+                            <h3 className="text-lg font-semibold mb-6 kalpurush-font bg-gradient-to-r from-[#00AEEF] to-[#00AEEF]/80 bg-clip-text text-transparent">
                                 {language === 'bn' ? 'ব্যবসায়িক বিভাগসমূহ' : 'Business Divisions'}
                             </h3>
                             <ul className="space-y-2">
@@ -280,7 +290,7 @@ export default function FooterSection() {
                                             href={division.href}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 text-sm kalpurush-font block py-1">
+                                            className="text-gray-600 dark:text-gray-300 hover:text-[#00AEEF] dark:hover:text-[#00AEEF]/80 transition-colors duration-200 text-sm kalpurush-font block py-1">
                                             {language === 'bn' ? division.title.bn : division.title.en}
                                         </a>
                                     </li>
@@ -290,7 +300,7 @@ export default function FooterSection() {
 
                         {/* Right Column - Company Links */}
                         <div className="text-center md:text-left">
-                            <h3 className="text-lg font-semibold mb-6 kalpurush-font bg-gradient-to-r from-blue-500 to-blue-600 bg-clip-text text-transparent">
+                            <h3 className="text-lg font-semibold mb-6 kalpurush-font bg-gradient-to-r from-[#00AEEF] to-[#00AEEF]/80 bg-clip-text text-transparent">
                                 {language === 'bn' ? 'কোম্পানি' : 'Company'}
                             </h3>
                             <ul className="space-y-2">
@@ -299,13 +309,13 @@ export default function FooterSection() {
                                         {link.href.startsWith('#') ? (
                                             <a
                                                 href={link.href}
-                                                className="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 text-base kalpurush-font block py-1">
+                                                className="text-gray-600 dark:text-gray-300 hover:text-[#00AEEF] dark:hover:text-[#00AEEF]/80 transition-colors duration-200 text-base kalpurush-font block py-1">
                                                 {language === 'bn' ? link.title.bn : link.title.en}
                                             </a>
                                         ) : (
                                             <Link
                                                 to={link.href}
-                                                className="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 text-base kalpurush-font block py-1">
+                                                className="text-gray-600 dark:text-gray-300 hover:text-[#00AEEF] dark:hover:text-[#00AEEF]/80 transition-colors duration-200 text-base kalpurush-font block py-1">
                                                 {language === 'bn' ? link.title.bn : link.title.en}
                                             </Link>
                                         )}
@@ -322,13 +332,13 @@ export default function FooterSection() {
                                 © {new Date().getFullYear()} {language === 'bn' ? 'মানজিল ইনস্টিটিউট। সর্বস্বত্ব সংরক্ষিত।' : 'Manzil Institute. All rights reserved.'}
                             </p>
                             <div className="flex items-center gap-6">
-                                <a href="#investment" className="text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 text-sm transition-colors duration-200">
+                                <a href="#investment" className="text-gray-400 dark:text-gray-500 hover:text-[#00AEEF] dark:hover:text-[#00AEEF]/80 text-sm transition-colors duration-200">
                                     {language === 'bn' ? 'ইনভেস্টমেন্ট নীতি' : 'Investment Policy'}
                                 </a>
-                                <a href="#terms" className="text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 text-sm transition-colors duration-200">
+                                <a href="#terms" className="text-gray-400 dark:text-gray-500 hover:text-[#00AEEF] dark:hover:text-[#00AEEF]/80 text-sm transition-colors duration-200">
                                     {language === 'bn' ? 'শর্তাবলী' : 'Terms'}
                                 </a>
-                                <a href="#privacy" className="text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 text-sm transition-colors duration-200">
+                                <a href="#privacy" className="text-gray-400 dark:text-gray-500 hover:text-[#00AEEF] dark:hover:text-[#00AEEF]/80 text-sm transition-colors duration-200">
                                     {language === 'bn' ? 'গোপনীয়তা নীতি' : 'Privacy Policy'}
                                 </a>
                             </div>
@@ -339,7 +349,7 @@ export default function FooterSection() {
                                     href="https://www.linkedin.com/in/usama-forayaje"
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="text-blue-600 dark:text-blue-400 hover:underline"
+                                    className="text-[#00AEEF] dark:text-[#00AEEF]/80 hover:underline"
                                 >
                                     {language === 'bn' ? 'উসামা ফরায়েজী' : 'Usama Forayaje'}
                                 </a>

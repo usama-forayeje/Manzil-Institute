@@ -218,11 +218,11 @@ const Team = () => {
         <div className="text-center mb-6 sm:mb-8 lg:mb-12">
           <div className="inline-flex items-center justify-center px-3 py-1 mb-4 bg-[#00AEEF]/20 dark:bg-[#00AEEF]/10 rounded-full">
             <Users className="size-4 text-[#00AEEF] dark:text-[#00AEEF]/80 mr-2" />
-            <span className={cn("text-sm font-semibold text-[#00AEEF] dark:text-[#00AEEF]/80", language === 'bn' && "bengali-text")}>
+            <span className={cn("text-sm font-semibold text-[#00AEEF] dark:text-[#00AEEF]/80", language === 'bn' ? "bengali-text" : "")}>
               {language === 'bn' ? 'আমাদের নেতৃত্ব' : 'Our Leadership'}
             </span>
           </div>
-          <h2 className={cn("text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-4 leading-tight", language === 'bn' && "bengali-text")}>
+          <h2 className={cn("text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-4 leading-tight", language === 'bn' ? "bengali-text" : "")}>
             {language === 'bn' ? 'পরিচালনা পরিষদ' : 'Board of Directors'}
           </h2>
           <div className="flex items-center justify-center gap-2 mb-6">
@@ -230,11 +230,11 @@ const Team = () => {
             <Award className="size-5 text-[#00AEEF] dark:text-[#00AEEF]/80" />
             <div className="w-6 h-1 bg-gradient-to-l from-transparent to-[#00AEEF] rounded-full"></div>
           </div>
-          <p className={cn("text-base sm:text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed", language === 'bn' && "bengali-text")}>
+          <p className={cn("text-base sm:text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed", language === 'bn' ? "bengali-text" : "")}>
            {language === 'bn'
-              ? 'দক্ষ ও অভিজ্ঞ নেতৃত্বের মাধ্যমে আমরা গড়ে তুলছি একটি আদর্শ শিক্ষা ব্যবস্থা যা ভবিষ্যতের নেতাদের তৈরি করবে।'
-              : 'Through skilled and experienced leadership, we are building an ideal education system that will create future leaders.'
-            }
+             ? 'দক্ষ ও অভিজ্ঞ নেতৃত্বের মাধ্যমে আমরা গড়ে তুলছি একটি আদর্শ শিক্ষা ব্যবস্থা যা ভবিষ্যতের নেতাদের তৈরি করবে।'
+             : 'Through skilled and experienced leadership, we are building an ideal education system that will create future leaders.'
+           }
           </p>
         </div>
         <div className="w-full flex flex-col sm:flex-row justify-center gap-6 sm:gap-8 lg:gap-12 mb-12">
@@ -266,7 +266,7 @@ const Team = () => {
               </div>
 
               {/* Name and Title */}
-              <h3 className={cn("text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-[#00AEEF] dark:group-hover:text-[#00AEEF]/80 transition-colors duration-300", language === 'bn' && "bengali-text")}>
+              <h3 className={cn("text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-[#00AEEF] dark:group-hover:text-[#00AEEF]/80 transition-colors duration-300", language === 'bn' ? "bengali-text" : "")}>
                 {typeof member.name === 'object' ? member.name[language] || member.name.bn : member.name}
               </h3>
               <p className="text-[#00AEEF] dark:text-[#00AEEF]/80 font-semibold text-sm mb-4 uppercase tracking-wide">
@@ -274,7 +274,7 @@ const Team = () => {
               </p>
 
               {/* Bio with better styling */}
-              <p className={cn("text-gray-600 dark:text-gray-300 text-sm leading-relaxed mb-6 px-2", language === 'bn' && "bengali-text")}>
+              <p className={cn("text-gray-600 dark:text-gray-300 text-sm leading-relaxed mb-6 px-2", language === 'bn' ? "bengali-text" : "")}>
                 {typeof member.bio === 'object' ? member.bio[language] || member.bio.bn : member.bio}
               </p>
 

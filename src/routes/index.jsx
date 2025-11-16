@@ -1,12 +1,14 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { lazy, Suspense } from 'react'
-import { HeroHeader } from '../components/header'
-import HeroSection from '../components/hero-section'
+import { Skeleton } from '../components/ui/skeleton'
+
+const HeroHeader = lazy(() => import('../components/header').then(m => ({ default: m.HeroHeader })))
+const HeroSection = lazy(() => import('../components/hero-section'))
 const ContentSection = lazy(() => import('../components/content-1'))
-import MICCurriculum from '../components/MICCurriculum'
-import Contact from '../components/contact'
-import FooterSection from '../components/footer'
-import Team from '../components/team'
+const MICCurriculum = lazy(() => import('../components/MICCurriculum'))
+const Contact = lazy(() => import('../components/contact'))
+const FooterSection = lazy(() => import('../components/footer'))
+const Team = lazy(() => import('../components/team'))
 
 export const Route = createFileRoute('/')({
   component: Home,
@@ -237,15 +239,195 @@ function Home() {
       <script type="application/ld+json">
         {JSON.stringify(organizationSchema)}
       </script>
-      <HeroHeader />
-      <HeroSection />
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={
+        <div className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between items-center h-16">
+              <Skeleton className="h-8 w-32" />
+              <div className="flex items-center space-x-4">
+                <Skeleton className="h-8 w-20" />
+                <Skeleton className="h-8 w-20" />
+                <Skeleton className="h-8 w-20" />
+              </div>
+            </div>
+          </div>
+        </div>
+      }>
+        <HeroHeader />
+      </Suspense>
+      <Suspense fallback={
+        <section className="relative bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-20">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-16">
+              <Skeleton className="h-12 w-96 mx-auto mb-4" />
+              <Skeleton className="h-6 w-80 mx-auto mb-8" />
+              <Skeleton className="h-10 w-40 mx-auto" />
+            </div>
+            <div className="grid md:grid-cols-3 gap-8 mb-16">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="text-center">
+                  <Skeleton className="w-16 h-16 mx-auto mb-4 rounded-full" />
+                  <Skeleton className="h-6 w-32 mx-auto mb-2" />
+                  <Skeleton className="h-4 w-48 mx-auto" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      }>
+        <HeroSection />
+      </Suspense>
+      <Suspense fallback={
+        <section className="py-20 bg-white dark:bg-gray-900">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-16">
+              <Skeleton className="h-10 w-64 mx-auto mb-4" />
+              <Skeleton className="h-6 w-96 mx-auto" />
+            </div>
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="text-center">
+                  <Skeleton className="w-20 h-20 mx-auto mb-4 rounded-full" />
+                  <Skeleton className="h-6 w-24 mx-auto mb-2" />
+                  <Skeleton className="h-4 w-32 mx-auto mb-4" />
+                  <Skeleton className="h-4 w-40 mx-auto" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      }>
         <ContentSection />
       </Suspense>
-      <MICCurriculum />
-      <Team />
-      <Contact />
-      <FooterSection />
+      <Suspense fallback={
+        <section className="py-20 bg-gray-50 dark:bg-gray-800">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-16">
+              <Skeleton className="h-10 w-72 mx-auto mb-4" />
+              <Skeleton className="h-6 w-80 mx-auto" />
+            </div>
+            <div className="grid md:grid-cols-2 gap-12">
+              <div>
+                <Skeleton className="h-8 w-48 mb-6" />
+                <div className="space-y-4">
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <div key={i} className="flex items-start gap-4">
+                      <Skeleton className="w-6 h-6 rounded-full flex-shrink-0 mt-1" />
+                      <div>
+                        <Skeleton className="h-5 w-40 mb-2" />
+                        <Skeleton className="h-4 w-64" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <Skeleton className="w-full h-80 rounded-lg" />
+              </div>
+            </div>
+          </div>
+        </section>
+      }>
+        <MICCurriculum />
+      </Suspense>
+      <Suspense fallback={
+        <section className="py-20 bg-white dark:bg-gray-900">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-16">
+              <Skeleton className="h-10 w-56 mx-auto mb-4" />
+              <Skeleton className="h-6 w-72 mx-auto" />
+            </div>
+            <div className="grid md:grid-cols-3 gap-8">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="text-center">
+                  <Skeleton className="w-24 h-24 mx-auto mb-4 rounded-full" />
+                  <Skeleton className="h-6 w-32 mx-auto mb-2" />
+                  <Skeleton className="h-4 w-40 mx-auto mb-2" />
+                  <Skeleton className="h-4 w-36 mx-auto" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      }>
+        <Team />
+      </Suspense>
+      <Suspense fallback={
+        <section className="py-20 bg-gray-50 dark:bg-gray-800">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-16">
+              <Skeleton className="h-10 w-48 mx-auto mb-4" />
+              <Skeleton className="h-6 w-64 mx-auto" />
+            </div>
+            <div className="grid md:grid-cols-2 gap-12">
+              <div>
+                <Skeleton className="h-8 w-40 mb-6" />
+                <div className="space-y-4">
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-5/6" />
+                  <Skeleton className="h-4 w-4/6" />
+                  <Skeleton className="h-4 w-3/6" />
+                </div>
+                <div className="mt-8 space-y-4">
+                  <Skeleton className="h-6 w-32" />
+                  <div className="grid grid-cols-2 gap-4">
+                    {[1, 2, 3, 4].map((i) => (
+                      <Skeleton key={i} className="h-16 w-full rounded" />
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <div>
+                <Skeleton className="h-8 w-36 mb-6" />
+                <div className="space-y-4">
+                  <div>
+                    <Skeleton className="h-4 w-24 mb-2" />
+                    <Skeleton className="h-10 w-full rounded" />
+                  </div>
+                  <div>
+                    <Skeleton className="h-4 w-20 mb-2" />
+                    <Skeleton className="h-24 w-full rounded" />
+                  </div>
+                  <Skeleton className="h-12 w-full rounded" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      }>
+        <Contact />
+      </Suspense>
+      <Suspense fallback={
+        <footer className="bg-gray-900 text-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div className="grid md:grid-cols-4 gap-8">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="space-y-4">
+                  <Skeleton className="h-6 w-24 bg-gray-700" />
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-full bg-gray-700" />
+                    <Skeleton className="h-4 w-3/4 bg-gray-700" />
+                    <Skeleton className="h-4 w-5/6 bg-gray-700" />
+                    <Skeleton className="h-4 w-2/3 bg-gray-700" />
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="border-t border-gray-800 mt-8 pt-8">
+              <div className="flex flex-col md:flex-row justify-between items-center">
+                <Skeleton className="h-4 w-48 bg-gray-700" />
+                <div className="flex space-x-4 mt-4 md:mt-0">
+                  <Skeleton className="h-8 w-8 bg-gray-700 rounded" />
+                  <Skeleton className="h-8 w-8 bg-gray-700 rounded" />
+                  <Skeleton className="h-8 w-8 bg-gray-700 rounded" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </footer>
+      }>
+        <FooterSection />
+      </Suspense>
     </>
   )
 }

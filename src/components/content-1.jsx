@@ -69,11 +69,11 @@ export default function ContentSection() {
                 <div className="text-center mb-6 xs:mb-8 sm:mb-12 lg:mb-16">
                     <div className="inline-flex items-center justify-center px-2 xs:px-3 py-1 mb-2 xs:mb-3 bg-[#00AEEF]/20 dark:bg-[#00AEEF]/10 rounded-full">
                         <Sparkles className="size-2.5 xs:size-3 sm:size-4 text-[#00AEEF] dark:text-[#00AEEF]/80 mr-1 xs:mr-2" />
-                        <span className={cn("text-xs font-semibold text-[#00AEEF] dark:text-[#00AEEF]/80", language === 'bn' && "bengali-text")}>
+                        <span className={cn("text-xs font-semibold text-[#00AEEF] dark:text-[#00AEEF]/80", language === 'bn' ? "bengali-text" : "")}>
                             {language === 'bn' ? 'আমাদের পরিচয়' : 'About Us'}
                         </span>
                     </div>
-                    <h2 className={cn("text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-2 xs:mb-3 leading-tight", language === 'bn' && "bengali-text")}>
+                    <h2 className={cn("text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-2 xs:mb-3 leading-tight", language === 'bn' ? "bengali-text" : "")}>
                         {language === 'bn' ? 'মানযিল সম্পর্কে' : 'About Manzil'}
                     </h2>
                     <div className="flex items-center justify-center gap-1 xs:gap-2">
@@ -90,14 +90,14 @@ export default function ContentSection() {
                         <div className="space-y-1.5 xs:space-y-2 flex flex-col items-center justify-center">
                             <div className="inline-flex items-center mb-2  px-2 py-1 bg-gradient-to-r from-[#00AEEF]/20 to-purple-100 dark:from-[#00AEEF]/10 dark:to-purple-900/30 rounded-full">
                                 <BookOpen className="size-2.5 xs:size-3 text-[#00AEEF] dark:text-[#00AEEF]/80 mr-1" />
-                                <span className={cn("text-xs font-semibold text-[#00AEEF] dark:text-[#00AEEF]/80", language === 'bn' && "bengali-text")}>
+                                <span className={cn("text-xs font-semibold text-[#00AEEF] dark:text-[#00AEEF]/80", language === 'bn' ? "bengali-text" : "")}>
                                     {language === 'bn' ? 'আমাদের যাত্রা' : 'Our Journey'}
                                 </span>
                             </div>
-                            <h3 className={cn("text-xl xs:text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white leading-tight", language === 'bn' && "bengali-text")}>
+                            <h3 className={cn("text-xl xs:text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white leading-tight", language === 'bn' ? "bengali-text" : "")}>
                                 {language === 'bn' ? 'একটি মহৎ ভাবনা থেকে যাত্রা' : 'Journey from a Noble Thought'}
                             </h3>
-                            <p className={cn("text-base sm:text-base text-gray-700 dark:text-gray-200 leading-relaxed", language === 'bn' && "bengali-text")}>
+                            <p className={cn("text-base sm:text-base text-gray-700 dark:text-gray-200 leading-relaxed", language === 'bn' ? "bengali-text" : "")}>
                                 {language === 'bn' ? (
                                     'মানযিল একটি নাম, একটি স্বপ্ন, একটি দিকনির্দেশনা। ইসলামী মূল্যবোধ, জ্ঞান, নৈতিকতা এবং উন্নয়নের সমন্বয়ে গড়ে তোলা এক আদর্শ সমাজ-ব্যবস্থার স্বপ্ন নিয়ে আমাদের যাত্রা শুরু।'
                                 ) : (
@@ -134,7 +134,7 @@ export default function ContentSection() {
                                                 <CheckCircle className="relative size-3 xs:size-3.5 sm:size-4 text-green-500" />
                                             </div>
                                         </div>
-                                        <span className={cn("text-base sm:text-base text-gray-700 dark:text-gray-200 leading-snug", language === 'bn' && "bengali-text")}>
+                                        <span className={cn("text-base sm:text-base text-gray-700 dark:text-gray-200 leading-snug", language === 'bn' ? "bengali-text" : "")}>
                                             {language === 'bn' ? point.bn : point.en}
                                         </span>
                                     </div>
@@ -146,21 +146,21 @@ export default function ContentSection() {
                         <div className="pt-1 flex flex-col sm:flex-row items-center justify-center gap-3 xs:pt-2">
                             <Link to='/curriculum' className={cn(
                                 "group px-3 xs:px-4 py-2 text-center rounded-lg font-semibold text-[#00AEEF] dark:text-[#00AEEF]/80 border-2 border-[#00AEEF] dark:border-[#00AEEF]/80 bg-transparent hover:bg-[#00AEEF] hover:text-white dark:hover:bg-[#00AEEF]/80 dark:hover:text-gray-900 transition-all duration-300 hover:scale-105 active:scale-95 focus:scale-105 focus:outline-none focus:ring-2 focus:ring-[#00AEEF]/50 focus:ring-offset-2 text-sm sm:text-base",
-                                language === 'bn' && "bengali-text"
+                                language === 'bn' ? "bengali-text" : ""
                             )}
                             >
                                 {language === 'bn' ? 'কারিকুলাম দেখুন' : 'View Curriculum'}
                             </Link>
                             <Link to='/admission' className={cn(
                                 "group px-3 hidden sm:block  xs:px-4 py-2 text-center rounded-lg font-semibold text-green-600 dark:text-green-400 border-2 border-green-600 dark:border-green-400 bg-transparent hover:bg-green-600 hover:text-white dark:hover:bg-green-400 dark:hover:text-gray-900 transition-all duration-300 hover:scale-105 active:scale-95 focus:scale-105 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 text-sm sm:text-base",
-                                language === 'bn' && "bengali-text"
+                                language === 'bn' ? "bengali-text" : ""
                             )}
                             >
                                 {language === 'bn' ? 'ভর্তি তথ্য' : 'Admission Info'}
                             </Link>
                             <Link to='/campus' className={cn(
                                 "group px-3 hidden sm:block xs:px-4 py-2 text-center rounded-lg font-semibold text-purple-600 dark:text-purple-400 border-2 border-purple-600 dark:border-purple-400 bg-transparent hover:bg-purple-600 hover:text-white dark:hover:bg-purple-400 dark:hover:text-gray-900 transition-all duration-300 hover:scale-105 active:scale-95 focus:scale-105 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 text-sm sm:text-base",
-                                language === 'bn' && "bengali-text"
+                                language === 'bn' ? "bengali-text" : ""
                             )}
                             >
                                 {language === 'bn' ? 'কেম্পাস দেখুন' : 'See Campus'}
@@ -229,7 +229,7 @@ export default function ContentSection() {
                                 <div className="text-lg xs:text-xl sm:text-2xl font-bold text-gray-900 dark:text-white ">
                                     {language === 'bn' ? '৩ in ১' : '3 in 1'}
                                 </div>
-                                <div className={cn("text-xs xs:text-sm text-gray-600 dark:text-gray-400 mt-0.5 font-medium", language === 'bn' && "bengali-text")}>
+                                <div className={cn("text-xs xs:text-sm text-gray-600 dark:text-gray-400 mt-0.5 font-medium", language === 'bn' ? "bengali-text" : "")}>
                                     {language === 'bn' ? 'শিক্ষা পদ্ধতি' : 'Education System'}
                                 </div>
                             </div>
@@ -250,11 +250,11 @@ export default function ContentSection() {
                                         <Target className="size-3 xs:size-3.5 sm:size-4 text-green-600 dark:text-green-400" />
                                     </div>
                                 </div>
-                                <h3 className={cn("ml-2 xs:ml-3 text-base xs:text-lg sm:text-xl font-bold text-gray-900 dark:text-white", language === 'bn' && "bengali-text")}>
+                                <h3 className={cn("ml-2 xs:ml-3 text-base xs:text-lg sm:text-xl font-bold text-gray-900 dark:text-white", language === 'bn' ? "bengali-text" : "")}>
                                     {language === 'bn' ? 'আমাদের ভিশন' : 'Our Vision'}
                                 </h3>
                             </div>
-                            <p className={cn("text-sm sm:text-base text-gray-700 dark:text-gray-200 leading-relaxed", language === 'bn' && "bengali-text")}>
+                            <p className={cn("text-sm sm:text-base text-gray-700 dark:text-gray-200 leading-relaxed", language === 'bn' ? "bengali-text" : "")}>
                                 {language === 'bn' ? (
                                     'এমন নেতৃত্ব তৈরি করা, যারা মুসলিম উম্মাহ ও বিশ্ব মানবতার যে কোনো অমীমাংসিত চ্যালেঞ্জ মোকাবেলা করতে সক্ষম। একই সাথে তারা ইসলামী ঐতিহ্যের প্রতি বিশ্বস্ত থেকে ঐশ্বরিক, বুদ্ধিবৃত্তিক, নৈতিক ও বিশ্বাসভিত্তিক নেতৃত্ব প্রদান করবে।'
                                 ) : (
@@ -275,11 +275,11 @@ export default function ContentSection() {
                                         <Users className="size-3 xs:size-3.5 sm:size-4 text-[#00AEEF] dark:text-[#00AEEF]/80" />
                                     </div>
                                 </div>
-                                <h3 className={cn("ml-2 xs:ml-3 text-base xs:text-lg sm:text-xl font-bold text-gray-900 dark:text-white", language === 'bn' && "bengali-text")}>
+                                <h3 className={cn("ml-2 xs:ml-3 text-base xs:text-lg sm:text-xl font-bold text-gray-900 dark:text-white", language === 'bn' ? "bengali-text" : "")}>
                                     {language === 'bn' ? 'আমাদের মিশন' : 'Our Mission'}
                                 </h3>
                             </div>
-                            <p className={cn("text-sm sm:text-base text-gray-700 dark:text-gray-200 leading-relaxed", language === 'bn' && "bengali-text")}>
+                            <p className={cn("text-sm sm:text-base text-gray-700 dark:text-gray-200 leading-relaxed", language === 'bn' ? "bengali-text" : "")}>
                                  {language === 'bn' ? (
                                     'ঐতিহ্যবাহী ও সমসাময়িক শিক্ষার সমন্বয়ে এমন এক অনন্য শিক্ষা কারিকুলাম ও পরিবেশ গড়ে তোলা, যেখানে শিক্ষার্থীরা দ্বীন ও দুনিয়া - উভয় জগতের উৎকৃষ্ট জ্ঞান ও অভিজ্ঞতা অর্জন করতে সক্ষম।'
                                 ) : (

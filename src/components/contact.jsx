@@ -82,10 +82,10 @@ export default function Contact() {
                             <div key={index} className="flex items-start gap-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-md hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200">
                                 <info.icon className="w-6 h-6 text-[#00AEEF] dark:text-[#00AEEF]/80 mt-0.5 flex-shrink-0" />
                                 <div>
-                                    <h3 className={cn("font-semibold text-gray-900 dark:text-white text-sm mb-2 kalpurush-font", language === 'bn' && "bengali-text")}>
+                                    <h3 className={cn("font-semibold text-gray-900 dark:text-white text-sm mb-2 kalpurush-font", language === 'bn' ? "bengali-text" : "")}>
                                         {info.title}
                                     </h3>
-                                    <p className={cn("text-gray-600 dark:text-gray-300 text-xs kalpurush-font leading-relaxed", language === 'bn' && "bengali-text")}>
+                                    <p className={cn("text-gray-600 dark:text-gray-300 text-xs kalpurush-font leading-relaxed", language === 'bn' ? "bengali-text" : "")}>
                                         {info.details}
                                     </p>
                                 </div>

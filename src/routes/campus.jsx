@@ -1,12 +1,14 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { useEffect } from 'react'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { useEffect, lazy, Suspense } from 'react'
 import { MapPin, Phone, Mail, Clock, Users, Home, Wifi, Car, Shield, Utensils, BookOpen, GraduationCap, Award, Star, CheckCircle } from 'lucide-react'
 import { Button } from '../components/ui/button'
-import { HeroHeader } from '../components/header'
-import FooterSection from '../components/footer'
 import { useLanguageStore } from '@/lib/store'
 import { cn } from '@/lib/utils'
 import { AnimatedGroup } from '../components/ui/animated-group'
+import { ArrowLeft } from 'lucide-react'
+
+const HeroHeader = lazy(() => import('../components/header').then(m => ({ default: m.HeroHeader })))
+const FooterSection = lazy(() => import('../components/footer'))
 
 const transitionVariants = {
   item: {
@@ -113,6 +115,7 @@ export const Route = createFileRoute('/campus')({
 
 function CampusPage() {
   const { language } = useLanguageStore()
+  const navigate = useNavigate()
 
   // Scroll to top when component mounts
   useEffect(() => {
@@ -138,123 +141,135 @@ function CampusPage() {
     ]
   }
 
-  const campusData = {
-    overview: {
-      title: language === 'bn' ? "ক্যাম্পাস ও সুবিধাদি" : "Campus & Facilities",
-      description: language === 'bn'
-        ? "মানযিল ইনস্টিটিউটের আধুনিক ক্যাম্পাসে শিক্ষার্থীদের জন্য সর্বাধুনিক সুবিধাদি"
-        : "Modern campus facilities at Manzil Institute for comprehensive student development",
-      stats: [
-        { label: language === 'bn' ? "মোট এলাকা" : "Total Area", value: language === 'bn' ? "৫ একর" : "5 Acres" },
-        { label: language === 'bn' ? "শ্রেণীকক্ষ" : "Classrooms", value: language === 'bn' ? "৫০+" : "50+" },
-        { label: language === 'bn' ? "আবাসিক ধারণক্ষমতা" : "Residential Capacity", value: language === 'bn' ? "৫০০+" : "500+" },
-        { label: language === 'bn' ? "খেলার মাঠ" : "Sports Fields", value: language === 'bn' ? "৩টি" : "3 Fields" }
-      ]
-    },
-    facilities: [
-      {
-        category: language === 'bn' ? "একাডেমিক সুবিধা" : "Academic Facilities",
-        icon: GraduationCap,
-        items: [
-          {
-            name: language === 'bn' ? "আধুনিক শ্রেণীকক্ষ" : "Modern Classrooms",
-            description: language === 'bn' ? "প্রজেক্টর, স্মার্টবোর্ড এবং ইন্টারেক্টিভ লার্নিং টুলস সহ" : "Equipped with projectors, smart boards, and interactive learning tools",
-            features: language === 'bn'
-              ? ["এয়ার কন্ডিশনড", "ডিজিটাল প্রজেক্টর", "ইন্টারনেট কানেকশন", "অডিও সিস্টেম"]
-              : ["Air Conditioned", "Digital Projectors", "Internet Connection", "Audio System"]
-          },
-          {
-            name: language === 'bn' ? "লাইব্রেরি" : "Library",
-            description: language === 'bn' ? "বিশাল সংগ্রহের ইসলামিক এবং আধুনিক বই" : "Extensive collection of Islamic and modern books",
-            features: language === 'bn'
-              ? ["৫০,০০০+ বই", "ডিজিটাল ক্যাটালগ", "রিডিং জোন", "রিসার্চ ফ্যাসিলিটি"]
-              : ["50,000+ Books", "Digital Catalog", "Reading Zone", "Research Facility"]
-          },
-          {
-            name: language === 'bn' ? "কম্পিউটার ল্যাব" : "Computer Lab",
-            description: language === 'bn' ? "আধুনিক কম্পিউটার এবং সফটওয়্যার প্রশিক্ষণ" : "Modern computers and software training facilities",
-            features: language === 'bn'
-              ? ["১০০+ কম্পিউটার", "হাই-স্পিড ইন্টারনেট", "প্রোগ্রামিং টুলস", "ডিজাইন সফটওয়্যার"]
-              : ["100+ Computers", "High-Speed Internet", "Programming Tools", "Design Software"]
-          }
-        ]
-      },
-      {
-        category: language === 'bn' ? "আবাসিক সুবিধা" : "Residential Facilities",
-        icon: Home,
-        items: [
-          {
-            name: language === 'bn' ? "ছাত্র হোস্টেল" : "Boys Hostel",
-            description: language === 'bn' ? "নিরাপদ এবং আরামদায়ক আবাসন ব্যবস্থা" : "Safe and comfortable residential accommodation",
-            features: language === 'bn'
-              ? ["২৫০টি রুম", "২-৪ জন প্রতি রুম", "২৪/৭ সিকিউরিটি", "ক্লিনিং সার্ভিস"]
-              : ["250 Rooms", "2-4 per Room", "24/7 Security", "Cleaning Service"]
-          },
-          {
-            name: language === 'bn' ? "ছাত্রী হোস্টেল" : "Girls Hostel",
-            description: language === 'bn' ? "নারী শিক্ষিকা তত্ত্বাবধানে নিরাপদ পরিবেশ" : "Safe environment under female teacher supervision",
-            features: language === 'bn'
-              ? ["১৫০টি রুম", "২-৩ জন প্রতি রুম", "ফিমেল স্টাফ", "প্রাইভেট বাথরুম"]
-              : ["150 Rooms", "2-3 per Room", "Female Staff", "Private Bathrooms"]
-          },
-          {
-            name: language === 'bn' ? "ডাইনিং হল" : "Dining Hall",
-            description: language === 'bn' ? "হালাল এবং পুষ্টিকর খাবার পরিবেশন" : "Halal and nutritious food service",
-            features: language === 'bn'
-              ? ["হালাল খাবার", "পুষ্টিবিদ তত্ত্বাবধান", "৫০০+ ধারণক্ষমতা", "ক্লিন এনভায়রনমেন্ট"]
-              : ["Halal Food", "Nutritionist Supervision", "500+ Capacity", "Clean Environment"]
-          }
-        ]
-      },
-      {
-        category: language === 'bn' ? "খেলাধুলা ও বিনোদন" : "Sports & Recreation",
-        icon: Star,
-        items: [
-          {
-            name: language === 'bn' ? "খেলার মাঠ" : "Sports Fields",
-            description: language === 'bn' ? "ফুটবল, ক্রিকেট এবং অন্যান্য খেলার জন্য" : "For football, cricket, and other sports activities",
-            features: language === 'bn'
-              ? ["ফুটবল গ্রাউন্ড", "ক্রিকেট পিচ", "বাস্কেটবল কোর্ট", "ভলিবল কোর্ট"]
-              : ["Football Ground", "Cricket Pitch", "Basketball Court", "Volleyball Court"]
-          },
-          {
-            name: language === 'bn' ? "জিমনেসিয়াম" : "Gymnasium",
-            description: language === 'bn' ? "শারীরিক ফিটনেস এবং স্বাস্থ্য বজায় রাখার জন্য" : "For physical fitness and health maintenance",
-            features: language === 'bn'
-              ? ["মডার্ন ইকুইপমেন্ট", "ট্রেইনার তত্ত্বাবধান", "কার্ডিও জোন", "ওয়েট ট্রেনিং"]
-              : ["Modern Equipment", "Trainer Supervision", "Cardio Zone", "Weight Training"]
-          },
-          {
-            name: language === 'bn' ? "সুইমিং পুল" : "Swimming Pool",
-            description: language === 'bn' ? "নিরাপদ সুইমিং প্রশিক্ষণ এবং বিনোদন" : "Safe swimming training and recreation",
-            features: language === 'bn'
-              ? ["ওলিম্পিক সাইজ", "ট্রেইন্ড লাইফগার্ড", "চেঞ্জিং রুম", "হিটেড ওয়াটার"]
-              : ["Olympic Size", "Trained Lifeguard", "Changing Rooms", "Heated Water"]
-          }
-        ]
-      }
-    ],
-    location: {
-      address: language === 'bn'
-        ? "হারুনুর রশীদ টাওয়ার (১০ তলা ভবন), বাড়ি #৯১, রোড #২, উত্তর রায়েরবাগ বাস স্ট্যান্ড, যাত্রাবাড়ী, ঢাকা ১৩৬২"
-        : "Harunur Rashid Tower (10 Storied Building), House #91, Road #2, North Rayarbagh Bus Stand, Jatrabari, Dhaka 1362",
-      phone: ["০১৪০৭-০৪৬০০১", "০১৪০৭-০৪৬০০২"],
-      email: "info@manzilinstitute.edu.bd",
-      transport: language === 'bn'
-        ? ["বাস স্টেশন থেকে ৫ মিনিট", "রেলস্টেশন থেকে ১০ মিনিট", "এয়ারপোর্ট থেকে ৩০ মিনিট"]
-        : ["5 minutes from bus station", "10 minutes from railway station", "30 minutes from airport"]
-    }
+  // const campusData = {
+  //   overview: {
+  //     title: language === 'bn' ? "ক্যাম্পাস ও সুবিধাদি" : "Campus & Facilities",
+  //     description: language === 'bn'
+  //       ? "মানযিল ইনস্টিটিউটের আধুনিক ক্যাম্পাসে শিক্ষার্থীদের জন্য সর্বাধুনিক সুবিধাদি"
+  //       : "Modern campus facilities at Manzil Institute for comprehensive student development",
+  //     stats: [
+  //       { label: language === 'bn' ? "মোট এলাকা" : "Total Area", value: language === 'bn' ? "৫ একর" : "5 Acres" },
+  //       { label: language === 'bn' ? "শ্রেণীকক্ষ" : "Classrooms", value: language === 'bn' ? "৫০+" : "50+" },
+  //       { label: language === 'bn' ? "আবাসিক ধারণক্ষমতা" : "Residential Capacity", value: language === 'bn' ? "৫০০+" : "500+" },
+  //       { label: language === 'bn' ? "খেলার মাঠ" : "Sports Fields", value: language === 'bn' ? "৩টি" : "3 Fields" }
+  //     ]
+  //   },
+  //   facilities: [
+  //     {
+  //       category: language === 'bn' ? "একাডেমিক সুবিধা" : "Academic Facilities",
+  //       icon: GraduationCap,
+  //       items: [
+  //         {
+  //           name: language === 'bn' ? "আধুনিক শ্রেণীকক্ষ" : "Modern Classrooms",
+  //           description: language === 'bn' ? "প্রজেক্টর, স্মার্টবোর্ড এবং ইন্টারেক্টিভ লার্নিং টুলস সহ" : "Equipped with projectors, smart boards, and interactive learning tools",
+  //           features: language === 'bn'
+  //             ? ["এয়ার কন্ডিশনড", "ডিজিটাল প্রজেক্টর", "ইন্টারনেট কানেকশন", "অডিও সিস্টেম"]
+  //             : ["Air Conditioned", "Digital Projectors", "Internet Connection", "Audio System"]
+  //         },
+  //         {
+  //           name: language === 'bn' ? "লাইব্রেরি" : "Library",
+  //           description: language === 'bn' ? "বিশাল সংগ্রহের ইসলামিক এবং আধুনিক বই" : "Extensive collection of Islamic and modern books",
+  //           features: language === 'bn'
+  //             ? ["৫০,০০০+ বই", "ডিজিটাল ক্যাটালগ", "রিডিং জোন", "রিসার্চ ফ্যাসিলিটি"]
+  //             : ["50,000+ Books", "Digital Catalog", "Reading Zone", "Research Facility"]
+  //         },
+  //         {
+  //           name: language === 'bn' ? "কম্পিউটার ল্যাব" : "Computer Lab",
+  //           description: language === 'bn' ? "আধুনিক কম্পিউটার এবং সফটওয়্যার প্রশিক্ষণ" : "Modern computers and software training facilities",
+  //           features: language === 'bn'
+  //             ? ["১০০+ কম্পিউটার", "হাই-স্পিড ইন্টারনেট", "প্রোগ্রামিং টুলস", "ডিজাইন সফটওয়্যার"]
+  //             : ["100+ Computers", "High-Speed Internet", "Programming Tools", "Design Software"]
+  //         }
+  //       ]
+  //     },
+  //     {
+  //       category: language === 'bn' ? "আবাসিক সুবিধা" : "Residential Facilities",
+  //       icon: Home,
+  //       items: [
+  //         {
+  //           name: language === 'bn' ? "ছাত্র হোস্টেল" : "Boys Hostel",
+  //           description: language === 'bn' ? "নিরাপদ এবং আরামদায়ক আবাসন ব্যবস্থা" : "Safe and comfortable residential accommodation",
+  //           features: language === 'bn'
+  //             ? ["২৫০টি রুম", "২-৪ জন প্রতি রুম", "২৪/৭ সিকিউরিটি", "ক্লিনিং সার্ভিস"]
+  //             : ["250 Rooms", "2-4 per Room", "24/7 Security", "Cleaning Service"]
+  //         },
+  //         {
+  //           name: language === 'bn' ? "ছাত্রী হোস্টেল" : "Girls Hostel",
+  //           description: language === 'bn' ? "নারী শিক্ষিকা তত্ত্বাবধানে নিরাপদ পরিবেশ" : "Safe environment under female teacher supervision",
+  //           features: language === 'bn'
+  //             ? ["১৫০টি রুম", "২-৩ জন প্রতি রুম", "ফিমেল স্টাফ", "প্রাইভেট বাথরুম"]
+  //             : ["150 Rooms", "2-3 per Room", "Female Staff", "Private Bathrooms"]
+  //         },
+  //         {
+  //           name: language === 'bn' ? "ডাইনিং হল" : "Dining Hall",
+  //           description: language === 'bn' ? "হালাল এবং পুষ্টিকর খাবার পরিবেশন" : "Halal and nutritious food service",
+  //           features: language === 'bn'
+  //             ? ["হালাল খাবার", "পুষ্টিবিদ তত্ত্বাবধান", "৫০০+ ধারণক্ষমতা", "ক্লিন এনভায়রনমেন্ট"]
+  //             : ["Halal Food", "Nutritionist Supervision", "500+ Capacity", "Clean Environment"]
+  //         }
+  //       ]
+  //     },
+  //     {
+  //       category: language === 'bn' ? "খেলাধুলা ও বিনোদন" : "Sports & Recreation",
+  //       icon: Star,
+  //       items: [
+  //         {
+  //           name: language === 'bn' ? "খেলার মাঠ" : "Sports Fields",
+  //           description: language === 'bn' ? "ফুটবল, ক্রিকেট এবং অন্যান্য খেলার জন্য" : "For football, cricket, and other sports activities",
+  //           features: language === 'bn'
+  //             ? ["ফুটবল গ্রাউন্ড", "ক্রিকেট পিচ", "বাস্কেটবল কোর্ট", "ভলিবল কোর্ট"]
+  //             : ["Football Ground", "Cricket Pitch", "Basketball Court", "Volleyball Court"]
+  //         },
+  //         {
+  //           name: language === 'bn' ? "জিমনেসিয়াম" : "Gymnasium",
+  //           description: language === 'bn' ? "শারীরিক ফিটনেস এবং স্বাস্থ্য বজায় রাখার জন্য" : "For physical fitness and health maintenance",
+  //           features: language === 'bn'
+  //             ? ["মডার্ন ইকুইপমেন্ট", "ট্রেইনার তত্ত্বাবধান", "কার্ডিও জোন", "ওয়েট ট্রেনিং"]
+  //             : ["Modern Equipment", "Trainer Supervision", "Cardio Zone", "Weight Training"]
+  //         },
+  //         {
+  //           name: language === 'bn' ? "সুইমিং পুল" : "Swimming Pool",
+  //           description: language === 'bn' ? "নিরাপদ সুইমিং প্রশিক্ষণ এবং বিনোদন" : "Safe swimming training and recreation",
+  //           features: language === 'bn'
+  //             ? ["ওলিম্পিক সাইজ", "ট্রেইন্ড লাইফগার্ড", "চেঞ্জিং রুম", "হিটেড ওয়াটার"]
+  //             : ["Olympic Size", "Trained Lifeguard", "Changing Rooms", "Heated Water"]
+  //         }
+  //       ]
+  //     }
+  //   ],
+  //   location: {
+  //     address: language === 'bn'
+  //       ? "হারুনুর রশীদ টাওয়ার (১০ তলা ভবন), বাড়ি #৯১, রোড #২, উত্তর রায়েরবাগ বাস স্ট্যান্ড, যাত্রাবাড়ী, ঢাকা ১৩৬২"
+  //       : "Harunur Rashid Tower (10 Storied Building), House #91, Road #2, North Rayarbagh Bus Stand, Jatrabari, Dhaka 1362",
+  //     phone: ["০১৪০৭-০৪৬০০১", "০১৪০৭-০৪৬০০২"],
+  //     email: "info@manzilinstitute.edu.bd",
+  //     transport: language === 'bn'
+  //       ? ["বাস স্টেশন থেকে ৫ মিনিট", "রেলস্টেশন থেকে ১০ মিনিট", "এয়ারপোর্ট থেকে ৩০ মিনিট"]
+  //       : ["5 minutes from bus station", "10 minutes from railway station", "30 minutes from airport"]
+  //   }
+  // }
+  
+  const handleGoBack = () => {
+    navigate({ to: '/' })
   }
 
   return (
-    <div>
-      <script type="application/ld+json">
+    <div className='text-center flex flex-col items-center justify-center h-screen mx-auto px-4'>
+
+      <p className='text-lg mb-6'>{language === 'bn' ? 'আবেদন পৃষ্ঠা নির্মাণাধীন!' : 'Application Page is under construction!'}!</p>
+      <Button onClick={handleGoBack} className="flex items-center gap-2">
+        <ArrowLeft className="w-4 h-4" />
+        {language === 'bn' ? 'ফিরে যান' : 'Go Back'}
+      </Button>
+      {/* <script type="application/ld+json">
         {JSON.stringify(breadcrumbSchema)}
       </script>
-      <HeroHeader />
+      <Suspense fallback={<div>Loading...</div>}>
+        <HeroHeader />
+      </Suspense>
 
       <main className="min-h-screen bg-gray-50 dark:bg-gray-900 mx-auto max-w-7xl px-4 sm:px-6 pt-24 pb-12" dir="ltr">
-        <AnimatedGroup
+        {/* <AnimatedGroup
           variants={{
             container: {
               visible: {
@@ -269,7 +284,7 @@ function CampusPage() {
           className="space-y-8"
         >
         {/* Main Heading Section */}
-        <section className="text-center mb-8 sm:mb-12">
+      {/* <section className="text-center mb-8 sm:mb-12">
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-4 kalpurush-font">
             {language === 'bn' ? 'মানযিল ইনস্টিটিউট ক্যাম্পাস' : 'Manzil Institute Campus'}
           </h1>
@@ -282,20 +297,20 @@ function CampusPage() {
               : 'Manzil Institute campus provides state-of-the-art facilities, safe environment, and education infused with Islamic values for students.'
             }
           </p>
-        </section>
+        </section> */}
 
-        {/* Overview Stats */}
-        <section className="bg-white dark:bg-gray-800 rounded-2xl p-6 sm:p-8 mb-6 sm:mb-8 border border-gray-200 dark:border-gray-700">
+      {/* Overview Stats */}
+      {/* <section className="bg-white dark:bg-gray-800 rounded-2xl p-6 sm:p-8 mb-6 sm:mb-8 border border-gray-200 dark:border-gray-700">
           <div className="text-center mb-6 sm:mb-8">
             <h2 className={cn(
               "text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4",
-              language === 'bn' && "bengali-text"
+              language === 'bn' ? "bengali-text" : ""
             )}>
               {campusData.overview.title}
             </h2>
             <p className={cn(
               "text-sm sm:text-base text-gray-600 dark:text-gray-400 max-w-3xl mx-auto",
-              language === 'bn' && "bengali-text"
+              language === 'bn' ? "bengali-text" : ""
             )}>
               {campusData.overview.description}
             </p>
@@ -309,21 +324,21 @@ function CampusPage() {
                 </div>
                 <div className={cn(
                   "text-xs sm:text-sm text-gray-600 dark:text-gray-400",
-                  language === 'bn' && "bengali-text"
+                  language === 'bn' ? "bengali-text" : ""
                 )}>
                   {stat.label}
                 </div>
               </div>
             ))}
           </div>
-        </section>
+        </section> */}
 
-        {/* Facilities */}
-        {campusData.facilities.map((facilityCategory, categoryIndex) => (
+      {/* Facilities */}
+      {/* {campusData.facilities.map((facilityCategory, categoryIndex) => (
           <section key={categoryIndex} className="space-y-6">
             <h2 className={cn(
               "text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3",
-              language === 'bn' && "bengali-text"
+              language === 'bn' ? "bengali-text" : ""
             )}>
               <facilityCategory.icon className="w-6 h-6 sm:w-8 sm:h-8 text-[#00AEEF]" />
               {facilityCategory.category}
@@ -334,13 +349,13 @@ function CampusPage() {
                 <div key={index} className="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow">
                   <h3 className={cn(
                     "text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-3",
-                    language === 'bn' && "bengali-text"
+                    language === 'bn' ? "bengali-text" : ""
                   )}>
                     {facility.name}
                   </h3>
                   <p className={cn(
                     "text-sm text-gray-600 dark:text-gray-400 mb-4",
-                    language === 'bn' && "bengali-text"
+                    language === 'bn' ? "bengali-text" : ""
                   )}>
                     {facility.description}
                   </p>
@@ -351,7 +366,7 @@ function CampusPage() {
                         <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
                         <span className={cn(
                           "text-sm text-gray-700 dark:text-gray-300",
-                          language === 'bn' && "bengali-text"
+                          language === 'bn' ? "bengali-text" : ""
                         )}>
                           {feature}
                         </span>
@@ -362,13 +377,13 @@ function CampusPage() {
               ))}
             </div>
           </section>
-        ))}
+        ))} */}
 
-        {/* Location & Contact */}
-        <section className="bg-gradient-to-r from-[#00AEEF] to-purple-600 rounded-2xl p-6 sm:p-8 text-white">
+      {/* Location & Contact */}
+      {/* <section className="bg-gradient-to-r from-[#00AEEF] to-purple-600 rounded-2xl p-6 sm:p-8 text-white">
           <h2 className={cn(
             "text-2xl sm:text-3xl font-bold mb-6 sm:mb-8",
-            language === 'bn' && "bengali-text"
+            language === 'bn' ? "bengali-text" : ""
           )}>
             {language === 'bn' ? 'অবস্থান এবং যোগাযোগ' : 'Location & Contact'}
           </h2>
@@ -428,10 +443,12 @@ function CampusPage() {
               </div>
             </div>
           </div>
-        </section>
-        </AnimatedGroup>
-      </main>
-      <FooterSection />
+        </section> */}
+      {/* </AnimatedGroup> */}
+      {/* </main> */}
+      {/* // <Suspense fallback={<div>Loading...</div>}>
+      //   <FooterSection />
+      // </Suspense>  */}
     </div>
   )
 }

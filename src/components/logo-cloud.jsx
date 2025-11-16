@@ -31,7 +31,7 @@ export const LogoCloud = () => {
             <div className="group relative m-auto max-w-6xl px-6">
                 <div className="flex flex-col items-center md:flex-row">
                     <div className="w-full md:inline md:max-w-44 md:border-r md:pr-6 mb-4 md:mb-0">
-                        <h5 className={cn("text-center md:text-right text-gray-900 dark:text-white", language === 'bn' && "bengali-text")}>
+                        <h5 className={cn("text-center md:text-right text-gray-900 dark:text-white", language === 'bn' ? "bengali-text" : "")}>
                             {language === 'bn' ? 'মানযিল গ্রুপের কার্যক্রম' : 'Manzil Group Operations'}
                         </h5>
                     </div>

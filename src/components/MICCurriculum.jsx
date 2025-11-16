@@ -181,7 +181,7 @@ export default function MICCurriculum() {
                         <Layers className="w-4 h-4 text-[#00AEEF] dark:text-[#00AEEF]/80" />
                         <span className={cn(
                             "text-sm font-medium text-[#00AEEF]/90 dark:text-[#00AEEF]/70",
-                            language === 'bn' && "bengali-text"
+                            language === 'bn' ? "bengali-text" : ""
                         )}>
                             {language === 'bn' ? "সমন্বিত শিক্ষা কারিকুলাম" : "Integrated Education Curriculum"}
                         </span>
@@ -189,7 +189,7 @@ export default function MICCurriculum() {
 
                     <h2 className={cn(
                         "max-w-4xl mx-auto text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white leading-tight",
-                        language === 'bn' && "bengali-text"
+                        language === 'bn' ? "bengali-text" : ""
                     )}>
                         {language === 'bn' ? "মানযিল ইন্টারন্যাশনাল" : "Manzil International"}
                         <span className="text-[#00AEEF] dark:text-[#00AEEF]/80 mx-2">
@@ -199,7 +199,7 @@ export default function MICCurriculum() {
 
                     <p className={cn(
                         "max-w-3xl mx-auto text-xl text-gray-600 dark:text-gray-300 leading-relaxed",
-                        language === 'bn' && "bengali-text"
+                        language === 'bn' ? "bengali-text" : ""
                     )}>
                         {language === 'bn' ? "৬টি লেভেলে বিভক্ত ২২ বছরের একটি পূর্ণাঙ্গ শিক্ষা ব্যবস্থা" : "A complete 22-year education system divided into 6 levels"}
                     </p>
@@ -248,7 +248,7 @@ export default function MICCurriculum() {
                                         <Users className="w-4 h-4 text-gray-400" />
                                         <span className={cn(
                                             "text-base text-gray-600 dark:text-gray-400",
-                                            language === 'bn' && "bengali-text"
+                                            language === 'bn' ? "bengali-text" : ""
                                         )}>
                                             {item.age}
                                         </span>
@@ -257,7 +257,7 @@ export default function MICCurriculum() {
                                         <Clock className="w-4 h-4 text-gray-400" />
                                         <span className={cn(
                                             "text-base text-gray-600 dark:text-gray-400",
-                                            language === 'bn' && "bengali-text"
+                                            language === 'bn' ? "bengali-text" : ""
                                         )}>
                                             {item.duration}
                                         </span>
@@ -267,7 +267,7 @@ export default function MICCurriculum() {
                                 {/* Description */}
                                 <h3 className={cn(
                                     "text-lg font-semibold text-gray-900 dark:text-white mb-3",
-                                    language === 'bn' && "bengali-text"
+                                    language === 'bn' ? "bengali-text" : ""
                                 )}>
                                     {item.description}
                                 </h3>
@@ -279,7 +279,7 @@ export default function MICCurriculum() {
                                             <div className={cn("w-1.5 h-1.5 rounded-full", colorClasses.bg500)}></div>
                                             <span className={cn(
                                                 "text-base text-gray-600 dark:text-gray-400",
-                                                language === 'bn' && "bengali-text"
+                                                language === 'bn' ? "bengali-text" : ""
                                             )}>
                                                 {feature}
                                             </span>
@@ -331,14 +331,14 @@ export default function MICCurriculum() {
                                 <div className="flex-1 flex flex-col">
                                     <h3 className={cn(
                                         "text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-4",
-                                        language === 'bn' && "bengali-text"
+                                        language === 'bn' ? "bengali-text" : ""
                                     )}>
                                         {stream.title}
                                     </h3>
  
                                     <p className={cn(
                                         "text-gray-600 dark:text-gray-400 mb-6 leading-relaxed text-sm md:text-base flex-1",
-                                        language === 'bn' && "bengali-text"
+                                        language === 'bn' ? "bengali-text" : ""
                                     )}>
                                         {stream.description}
                                     </p>
@@ -350,7 +350,7 @@ export default function MICCurriculum() {
                                                 <div className={cn("w-2 h-2 rounded-full", streamColorClasses.bg500)}></div>
                                                 <span className={cn(
                                                     "text-gray-700 dark:text-gray-300 text-sm md:text-base font-medium",
-                                                    language === 'bn' && "bengali-text"
+                                                    language === 'bn' ? "bengali-text" : ""
                                                 )}>
                                                     {feature}
                                                 </span>
@@ -373,7 +373,7 @@ export default function MICCurriculum() {
                 <div className="text-center flex justify-center items-center pt-8">
                         <Link to="/curriculum">
                             <Button className="bg-[#00AEEF] hover:bg-[#00AEEF]/90 text-white rounded-lg px-4 sm:px-5 py-3 sm:py-2 transition-colors duration-300 flex items-center justify-center gap-2 w-full sm:w-auto">
-                                <span className={cn("text-sm font-medium", language === 'bn' && "bengali-text")}>
+                                <span className={cn("text-sm font-medium", language === 'bn' ? "bengali-text" : "")}>
                                     {language === 'bn' ? "সম্পূর্ণ কারিকুলাম দেখুন" : "View Curriculum"}
                                 </span>
                                 <ArrowRight className="w-4 h-4" />

@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from '@tanstack/react-router'
 import { ArrowLeft, Download, Calendar, Clock, Phone, Mail, MapPin, CheckCircle, AlertCircle } from 'lucide-react'
 import { Button } from '../components/ui/button'
 import { createFileRoute } from '@tanstack/react-router'

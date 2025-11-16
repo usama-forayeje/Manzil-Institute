@@ -52,28 +52,28 @@ export default function HeroSectionPremium() {
 
               {/* Badge */}
               <div className="rounded-full mx-auto flex flex-col items-center gap-2 border border-orange-200 bg-orange-50 px-6 py-2 w-fit dark:bg-orange-900/20 dark:border-orange-800 mb-8"> {/* Added mb-8 */}
-                <span className={cn("text-sm font-medium text-orange-700 dark:text-orange-300 text-center", language === 'bn' && "bengali-text")}>
+                <span className={cn("text-sm font-medium text-orange-700 dark:text-orange-300 text-center", language === 'bn' ? "bengali-text" : "")}>
                   {language === 'bn' ? 'মাদ্রাসা | জেনারেল | কারিগরি শিক্ষার সমন্বয়' : 'Integration of Madrasa | General | Technical Education'}
                 </span>
               </div>
 
               {/* Main Institute Name - EXTRA LARGE */}
               <div className="mb-6"> {/* Added mb-6 */}
-                <h1 className={cn("text-5xl md:text-6xl lg:text-7xl font-black text-[#00AEEF] dark:text-[#00AEEF] leading-none text-center", language === 'bn' && "bengali-text")}>
+                <h1 className={cn("text-5xl md:text-6xl lg:text-7xl font-black text-[#00AEEF] dark:text-[#00AEEF] leading-none text-center", language === 'bn' ? "bengali-text" : "")}>
                   {language === 'bn' ? 'মানজিল ইনস্টিটিউট' : 'Manzil Institute'}
                 </h1>
               </div>
 
               {/* NEW: Subheading - Next Level */}
               <div className="mb-8"> {/* Added mb-8 */}
-                <h2 className={cn("text-4xl md:text-4xl lg:text-5xl font-bold text-gray-800 dark:text-gray-100 leading-tight text-center", language === 'bn' && "bengali-text")}>
+                <h2 className={cn("text-4xl md:text-4xl lg:text-5xl font-bold text-gray-800 dark:text-gray-100 leading-tight text-center", language === 'bn' ? "bengali-text" : "")}>
                   {language === 'bn' ? 'গড়ে তুলছি আদর্শের নতুন প্রজন্ম' : 'Building the Next Generation of Ideals'}
                 </h2>
               </div>
 
               {/* Description - Updated styling */}
               <div className="max-w-4xl mx-auto mb-12"> {/* Added mb-12 and reduced text size */}
-                <p className={cn("text-xl md:text-2xl lg:text-2xl text-gray-600 dark:text-gray-300 leading-relaxed text-center", language === 'bn' && "bengali-text")}>
+                <p className={cn("text-xl md:text-2xl lg:text-2xl text-gray-600 dark:text-gray-300 leading-relaxed text-center", language === 'bn' ? "bengali-text" : "")}>
                   {language === 'bn' ? (
                     'দেশের প্রথম ব্যতিক্রমধর্মী শিক্ষা প্রতিষ্ঠান, যেখানে আপনার সন্তান কুরআন-হাদিসের জ্ঞান অর্জনের পাশাপাশি আন্তর্জাতিক মানের জেনারেল, কারিগরি ও প্রযুক্তিগত শিক্ষায় সমৃদ্ধ হবে।'
                   ) : (
@@ -86,7 +86,7 @@ export default function HeroSectionPremium() {
               <div className="flex flex-col sm:flex-row gap-6 justify-center">
                 <Button
                   size="lg"
-                  className={cn("bg-[#00AEEF] hover:bg-[#00AEEF]/90 text-white px-10 py-5 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 text-center", language === 'bn' && "bengali-text")}
+                  className={cn("bg-[#00AEEF] hover:bg-[#00AEEF]/90 text-white px-10 py-5 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 text-center", language === 'bn' ? "bengali-text" : "")}
                   asChild
                 >
                   <Link to="/apply">
@@ -100,7 +100,7 @@ export default function HeroSectionPremium() {
                 <Button
                   size="lg"
                   variant="outline"
-                  className={cn("border-2 border-[#00AEEF] text-[#00AEEF] hover:bg-[#00AEEF]/10 dark:border-[#00AEEF]/80 dark:text-[#00AEEF]/80 dark:hover:bg-[#00AEEF]/20 px-10 py-5 text-lg font-semibold transition-all duration-300 text-center", language === 'bn' && "bengali-text")}
+                  className={cn("border-2 border-[#00AEEF] text-[#00AEEF] hover:bg-[#00AEEF]/10 dark:border-[#00AEEF]/80 dark:text-[#00AEEF]/80 dark:hover:bg-[#00AEEF]/20 px-10 py-5 text-lg font-semibold transition-all duration-300 text-center", language === 'bn' ? "bengali-text" : "")}
                   asChild
                 >
                   <Link to="/campus">

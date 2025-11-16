@@ -1,11 +1,12 @@
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
-import { useEffect } from 'react'
+import { useEffect, lazy, Suspense } from 'react'
 import { Download, ArrowLeft, BookOpen, Users, Clock, Star, GraduationCap, Layers, Target, Zap, BookText, Award, Globe, Cpu, Heart } from 'lucide-react'
 import { Button } from '../components/ui/button'
-import { HeroHeader } from '../components/header'
-import FooterSection from '../components/footer'
 import { useTranslation } from '../hooks/useTranslation'
 import { AnimatedGroup } from '../components/ui/animated-group'
+
+const HeroHeader = lazy(() => import('../components/header').then(m => ({ default: m.HeroHeader })))
+const FooterSection = lazy(() => import('../components/footer'))
 
 const transitionVariants = {
   item: {
@@ -426,7 +427,9 @@ function CurriculumPage() {
       <script type="application/ld+json">
         {JSON.stringify(breadcrumbSchema)}
       </script>
-      <HeroHeader />
+      <Suspense fallback={<div>Loading...</div>}>
+        <HeroHeader />
+      </Suspense>
 
       <main className="min-h-screen bg-gray-50 dark:bg-gray-900 mx-auto max-w-7xl px-4 sm:px-6 pt-24 pb-18" dir="ltr">
         <AnimatedGroup
@@ -656,7 +659,9 @@ function CurriculumPage() {
         </section>
         </AnimatedGroup>
       </main>
-      <FooterSection />
+      <Suspense fallback={<div>Loading...</div>}>
+        <FooterSection />
+      </Suspense>
     </div>
   )
 }

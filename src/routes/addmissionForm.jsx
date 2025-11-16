@@ -1,14 +1,15 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, lazy, Suspense } from 'react'
 import { ArrowLeft, Upload, CheckCircle, AlertCircle, Loader2 } from 'lucide-react'
 import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
 import { Textarea } from '../components/ui/textarea'
-import { HeroHeader } from '../components/header'
-import FooterSection from '../components/footer'
 import { useLanguageStore } from '@/lib/store'
 import { cn } from '@/lib/utils'
 import { AnimatedGroup } from '../components/ui/animated-group'
+
+const HeroHeader = lazy(() => import('../components/header').then(m => ({ default: m.HeroHeader })))
+const FooterSection = lazy(() => import('../components/footer'))
 
 export const Route = createFileRoute('/addmissionForm')({
   component: AddmissionForm,
@@ -352,7 +353,9 @@ function AddmissionForm() {
 
   return (
     <div>
-      <HeroHeader />
+      <Suspense fallback={<div>Loading...</div>}>
+        <HeroHeader />
+      </Suspense>
 
       <main className="min-h-screen bg-gray-50 dark:bg-gray-900 mx-auto max-w-4xl px-3 sm:px-4 lg:px-6 pt-20 sm:pt-24 pb-8 sm:pb-12">
         <AnimatedGroup
@@ -685,7 +688,9 @@ function AddmissionForm() {
         </AnimatedGroup>
       </main>
 
-      <FooterSection />
+      <Suspense fallback={<div>Loading...</div>}>
+        <FooterSection />
+      </Suspense>
     </div>
   )
 }

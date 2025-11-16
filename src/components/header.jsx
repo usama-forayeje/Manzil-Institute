@@ -5,6 +5,7 @@ import { Link, useLocation } from "@tanstack/react-router";
 import { useLanguageStore } from "@/lib/store";
 import { ModeToggle } from "./themes/theme-toggle";
 import { cn } from "@/lib/utils";
+import { useTheme } from '@/components/themes/theme-provider';
 
 const menuItems = [
   {
@@ -56,6 +57,7 @@ export const HeroHeader = () => {
   const location = useLocation();
   const menuRef = React.useRef(null);
   const buttonRef = React.useRef(null);
+  const { theme } = useTheme();
 
   React.useEffect(() => {
     const handleScroll = () => {
@@ -105,20 +107,12 @@ export const HeroHeader = () => {
           <div className="flex items-center justify-between py-3 px-6">
             {/* Logo - Left */}
             <div className="flex justify-start flex-shrink-0">
-              <Link to="/" className="flex items-center space-x-2">
+              <Link to="/" className="flex items-center">
                 <img
-                  src="/manzil institutte logo.jpg"
-                  alt="Manzil International Institute Logo"
+                  src={theme === 'dark' ? '/manzil-logo/manzil-institute-logo-dark.png' : '/manzil-logo/manzil-institute-logo-light.png'}
+                  alt="Manzil Institute Logo"
                   className="h-10 w-auto object-contain"
                 />
-                <span
-                  className={cn(
-                    "font-bold text-blue-600 dark:text-blue-400 text-sm",
-                    language === "bn" && "bengali-text"
-                  )}
-                >
-                  {language === "bn" ? "মানজিল ইনস্টিটিউট" : "Manzil Institute"}
-                </span>
               </Link>
             </div>
 

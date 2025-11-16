@@ -43,7 +43,8 @@ export default function ContentSection() {
         "Arabic Class": language === 'bn' ? "আরবি ক্লাসরুম" : "Arabic Classroom",
         "Robotics Class": language === 'bn' ? "রোবোটিক্স ক্লাস" : "Robotics Class",
         "Language Class": language === 'bn' ? "ভাষা ক্লাসের একাংশ" : "Language Class Section",
-        "Arts Class": language === 'bn' ? "শিল্প ক্লাস " : "Arts Class"
+        "Arts Class": language === 'bn' ? "শিল্প ক্লাস " : "Arts Class",
+        "Arabic Class": language === 'bn' ? "আরবি ক্লাসের একাংশ" : "A Section of Arabic Class"
     }
 
     return (
@@ -186,6 +187,7 @@ export default function ContentSection() {
                                     { src: "/roboticsclass.jpg", alt: "Robotics Class", fallback: "/manzil institutte logo.jpg" },
                                     { src: "/languageclass.jpg", alt: "Language Class", fallback: "/manzil institutte logo.jpg" },
                                     { src: "/artsclass.jpg", alt: "Arts Class", fallback: "/manzil institutte logo.jpg" },
+                                    { src: "/class-1.jpg", alt: "Arabic Class", fallback: "/manzil institutte logo.jpg" },
                                 ].map((image, idx) => (
                                     <SwiperSlide key={idx}>
                                         <div className="relative w-full aspect-video xs:aspect-[4/3] sm:aspect-video md:aspect-[16/10] lg:aspect-[3/2] overflow-hidden bg-gray-100 dark:bg-gray-800">

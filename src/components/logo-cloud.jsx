@@ -2,11 +2,31 @@ import { InfiniteSlider } from '@/components/ui/infinite-slider'
 import { ProgressiveBlur } from '@/components/ui/progressive-blur'
 import { cn } from '../lib/utils'
 import { useLanguageStore } from '../lib/store'
+import { useTheme } from '@/components/themes/theme-provider'
 
 export const LogoCloud = () => {
     const { language } = useLanguageStore()
+    const { theme } = useTheme()
+
+    const logos = [
+        { name: 'manzil-agro-logo', hasVariants: true, alt: 'Manzil Agro Logo', href: 'https://agropark.manzilgroupbd.com' },
+        { name: 'manzil-city-logo', hasVariants: false, alt: 'Manzil City Logo', href: 'https://city.manzilgroupbd.com' },
+        { name: 'manzil-foundation-logo', hasVariants: false, alt: 'Manzil Foundation Logo', href: 'https://foundation.manzilgroupbd.com' },
+        { name: 'manzil-gorup-logo', hasVariants: true, alt: 'Manzil Group Logo', href: 'https://manzilgroupbd.com' },
+        { name: 'manzil-housing-logo', hasVariants: true, alt: 'Manzil Housing Logo', href: 'https://housing.manzilgroupbd.com' },
+        { name: 'manzil-institute-logo', hasVariants: true, alt: 'Manzil Institute Logo', href: 'https://institute.manzilgroupbd.com' },
+        { name: 'manzil-properti-logo', hasVariants: true, alt: 'Manzil Properties Logo', href: 'https://properties.manzilgroupbd.com' },
+        { name: 'manzil-shop-logo', hasVariants: true, alt: 'Manzil Shop Logo', href: 'https://shop.manzilgroupbd.com' },
+        { name: 'manzil-sports-logo', hasVariants: false, alt: 'Manzil Sports Logo', href: 'https://sports.manzilgroupbd.com' },
+        { name: 'manzil-trading-logo', hasVariants: true, alt: 'Manzil Trading Logo', href: 'https://trading.manzilgroupbd.com' },
+        { name: 'mic-logo', hasVariants: true, alt: 'MIC Logo', href: 'https://institute.manzilgroupbd.com' },
+        { name: 'msd-logo', hasVariants: true, alt: 'MSD Logo', href: 'https://institute.manzilgroupbd.com' },
+        { name: 'progoti-logo', hasVariants: true, alt: 'Progoti Logo', href: 'https://progoti.manzilgroupbd.com' },
+        { name: 'success-logo', hasVariants: true, alt: 'Success Logo', href: 'https://success.manzilgroupbd.com' },
+    ]
+
     return (
-        <section className=" py-10 ">
+        <section className=" py-24 ">
             <div className="group relative m-auto max-w-6xl px-6">
                 <div className="flex flex-col items-center md:flex-row">
                     <div className="w-full md:inline md:max-w-44 md:border-r md:pr-6 mb-4 md:mb-0">
@@ -14,86 +34,24 @@ export const LogoCloud = () => {
                             {language === 'bn' ? 'মানযিল গ্রুপের কার্যক্রম' : 'Manzil Group Operations'}
                         </h5>
                     </div>
-                    <div className="relative py-6 w-full md:w-[calc(100%-11rem)]">
+                    <div className="relative py-8 w-full md:w-[calc(100%-11rem)]">
                         <InfiniteSlider
                             speedOnHover={20}
                             speed={40}
                             gap={60}>
-                            <div className="flex">
-                                <img
-                                    className="mx-auto h-5 w-fit "
-                                    src="manzil logo.jpg"
-                                    alt="Nvidia Logo"
-                                    height="20"
-                                    width="auto"
-                                />
-                            </div>
-
-
-                            <div className="flex">
-                                <img
-                                    className="mx-auto h-4 w-fit dark:invert"
-                                    src="https://html.tailus.io/blocks/customers/github.svg"
-                                    alt="GitHub Logo"
-                                    height="16"
-                                    width="auto"
-                                />
-                            </div>
-                            <div className="flex">
-                                <img
-                                    className="mx-auto h-5 w-fit dark:invert"
-                                    src="https://html.tailus.io/blocks/customers/nike.svg"
-                                    alt="Nike Logo"
-                                    height="20"
-                                    width="auto"
-                                />
-                            </div>
-                            <div className="flex">
-                                <img
-                                    className="mx-auto h-5 w-fit dark:invert"
-                                    src="https://html.tailus.io/blocks/customers/lemonsqueezy.svg"
-                                    alt="Lemon Squeezy Logo"
-                                    height="20"
-                                    width="auto"
-                                />
-                            </div>
-                            <div className="flex">
-                                <img
-                                    className="mx-auto h-4 w-fit"
-                                    src="lightlogo.webp"
-                                    alt="Column Logo"
-                                    height="20"
-                                    width="auto"
-                                />
-                            </div>
-                            <div className="flex">
-                                <img
-                                    className="mx-auto h-4 w-fit dark:invert"
-                                    src="https://html.tailus.io/blocks/customers/laravel.svg"
-                                    alt="Laravel Logo"
-                                    height="16"
-                                    width="auto"
-                                />
-                            </div>
-                            <div className="flex">
-                                <img
-                                    className="mx-auto h-7 w-fit dark:invert"
-                                    src="https://html.tailus.io/blocks/customers/lilly.svg"
-                                    alt="Lilly Logo"
-                                    height="28"
-                                    width="auto"
-                                />
-                            </div>
-
-                            <div className="flex">
-                                <img
-                                    className="mx-auto h-6 w-fit dark:invert"
-                                    src="https://html.tailus.io/blocks/customers/openai.svg"
-                                    alt="OpenAI Logo"
-                                    height="24"
-                                    width="auto"
-                                />
-                            </div>
+                            {logos.map((logo, index) => (
+                                <div key={index} className="flex">
+                                    <a href={logo.href} target="_blank" rel="noopener noreferrer" className="cursor-pointer">
+                                        <img
+                                            className="mx-auto h-12 w-fit"
+                                            src={`/manzil-logo/${logo.name}${logo.hasVariants ? `-${theme}.png` : '.png'}`}
+                                            alt={logo.alt}
+                                            height="48"
+                                            width="auto"
+                                        />
+                                    </a>
+                                </div>
+                            ))}
                         </InfiniteSlider>
 
                         <div className="bg-gradient-to-r from-gray-50 via-gray-50 to-transparent dark:from-gray-900/50 dark:via-gray-900/60  dark:to-transparent absolute inset-y-0 left-0 w-12 md:w-20"></div>

@@ -64,7 +64,7 @@ export default function Contact() {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     {/* Map */}
                     <div className="rounded-lg overflow-hidden border-2 border-gray-300 dark:border-gray-600 shadow-xl p-4 bg-white dark:bg-gray-800">
-                        <div className="h-80 relative">
+                        <div className="h-40 md:h-80 relative">
                             <iframe
                                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3653.3078306005827!2d90.45665079999999!3d23.700698799999998!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3755b7258e642213%3A0x93f208507e674b1c!2zTWFuemlsIEluc3RpdHV0ZSB8IOCmruCmvuCmqOCmr-Cmv-CmsiDgpofgpqjgprjgp43gpp_gpr_gpp_gpr_gpongpp8gKOCmleCnjeCmr-CmvuCmruCnjeCmquCmvuCmuCDgppPgp5_gpr7gpqgp!5e0!3m2!1sen!2sbd!4v1763021707262!5m2!1sen!2sbd"
                                 className="w-full h-full border-0"

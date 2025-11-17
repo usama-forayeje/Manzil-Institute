@@ -3,13 +3,13 @@ import { lazy, Suspense } from 'react'
 import { Skeleton } from '../components/ui/skeleton'
 import { MetaTags, StructuredData } from '../components/seo'
 
-const HeroHeader = lazy(() => import('../components/header').then(m => ({ default: m.HeroHeader })))
-const HeroSection = lazy(() => import('../components/hero-section'))
-const ContentSection = lazy(() => import('../components/content-1'))
-const MICCurriculum = lazy(() => import('../components/MICCurriculum'))
-const Contact = lazy(() => import('../components/contact'))
-const FooterSection = lazy(() => import('../components/footer'))
-const Team = lazy(() => import('../components/team'))
+const HeroHeader = lazy(() => import('../components/header.jsx').then(m => ({ default: m.HeroHeader })))
+const HeroSection = lazy(() => import('../components/hero-section.jsx'))
+const ContentSection = lazy(() => import('../components/content-1.jsx'))
+const MICCurriculum = lazy(() => import('../components/MICCurriculum.jsx'))
+const Contact = lazy(() => import('../components/contact.jsx'))
+const FooterSection = lazy(() => import('../components/footer.jsx'))
+const Team = lazy(() => import('../components/team.jsx'))
 
 export const Route = createFileRoute('/')({
   component: Home,

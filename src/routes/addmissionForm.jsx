@@ -10,8 +10,8 @@ import { cn } from '@/lib/utils'
 import { AnimatedGroup } from '../components/ui/animated-group'
 import { useSubmitAdmissionForm } from '../hooks/useData'
 
-const HeroHeader = lazy(() => import('../components/header').then(m => ({ default: m.HeroHeader })))
-const FooterSection = lazy(() => import('../components/footer'))
+const HeroHeader = lazy(() => import('../components/header.jsx').then(m => ({ default: m.HeroHeader })))
+const FooterSection = lazy(() => import('../components/footer.jsx'))
 
 export const Route = createFileRoute('/addmissionForm')({
   component: AddmissionForm,

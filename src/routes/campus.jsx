@@ -7,8 +7,8 @@ import { cn } from '@/lib/utils'
 import { AnimatedGroup } from '../components/ui/animated-group'
 import { ArrowLeft } from 'lucide-react'
 
-const HeroHeader = lazy(() => import('../components/header').then(m => ({ default: m.HeroHeader })))
-const FooterSection = lazy(() => import('../components/footer'))
+const HeroHeader = lazy(() => import('../components/header.jsx').then(m => ({ default: m.HeroHeader })))
+const FooterSection = lazy(() => import('../components/footer.jsx'))
 
 const transitionVariants = {
   item: {

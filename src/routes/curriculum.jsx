@@ -7,8 +7,8 @@ import { AnimatedGroup } from '../components/ui/animated-group'
 import { useCurriculumData } from '../hooks/useData'
 import LoadingSkeleton from '../components/LoadingSkeleton'
 
-const HeroHeader = lazy(() => import('../components/header').then(({ HeroHeader }) => HeroHeader))
-const FooterSection = lazy(() => import('../components/footer'))
+const HeroHeader = lazy(() => import('../components/header.jsx').then(({ HeroHeader }) => HeroHeader))
+const FooterSection = lazy(() => import('../components/footer.jsx'))
 
 const transitionVariants = {
   item: {

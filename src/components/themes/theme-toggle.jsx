@@ -1,6 +1,5 @@
 import { useTheme } from '@/components/themes/theme-provider'
 import * as React from 'react'
-import { useOptimistic } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Sun } from 'lucide-react'
@@ -8,7 +7,11 @@ import { Moon } from 'lucide-react'
 
 export function ModeToggle() {
   const { setTheme, resolvedTheme } = useTheme()
-  const [optimisticTheme, setOptimisticTheme] = useOptimistic(resolvedTheme)
+  const [optimisticTheme, setOptimisticTheme] = React.useState(resolvedTheme)
+
+  React.useEffect(() => {
+    setOptimisticTheme(resolvedTheme)
+  }, [resolvedTheme])
 
   const handleThemeToggle = React.useCallback(
     (e) => {

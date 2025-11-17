@@ -1,3 +1,4 @@
+import React from 'react'
 import { Users, Star, Clock, GraduationCap, BookText, Layers, ArrowRight } from 'lucide-react'
 import { Link } from '@tanstack/react-router'
 import { Button } from './ui/button'
@@ -177,10 +178,10 @@ export default function MICCurriculum() {
 
                 {/* Header Section */}
                 <div className="text-center space-y-6">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#00AEEF]/10 dark:bg-[#00AEEF]/5 border border-[#00AEEF]/40 dark:border-[#00AEEF]/20">
-                        <Layers className="w-4 h-4 text-[#00AEEF] dark:text-[#00AEEF]/80" />
+                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#00AEEF] dark:bg-[#00AEEF]/5 border border-[#00AEEF]/40 dark:border-[#00AEEF]/20">
+                        <Layers className="w-4 h-4 text-[#00AEEF] dark:text-[#00AEEF]" />
                         <span className={cn(
-                            "text-sm font-medium text-[#00AEEF]/90 dark:text-[#00AEEF]/70",
+                            "text-sm font-medium text-[#00AEEF] dark:text-[#00AEEF]",
                             language === 'bn' ? "bengali-text" : ""
                         )}>
                             {language === 'bn' ? "সমন্বিত শিক্ষা কারিকুলাম" : "Integrated Education Curriculum"}
@@ -192,7 +193,7 @@ export default function MICCurriculum() {
                         language === 'bn' ? "bengali-text" : ""
                     )}>
                         {language === 'bn' ? "মানযিল ইন্টারন্যাশনাল" : "Manzil International"}
-                        <span className="text-[#00AEEF] dark:text-[#00AEEF]/80 mx-2">
+                        <span className="text-[#00AEEF] dark:text-[#00AEEF] mx-2">
                             {language === 'bn' ? "কারিকুলাম (MIC-1)" : "Curriculum (MIC-1)"}
                         </span>
                     </h2>

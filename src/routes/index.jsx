@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { lazy, Suspense } from 'react'
 import { Skeleton } from '../components/ui/skeleton'
+import { MetaTags, StructuredData } from '../components/seo'
 
 const HeroHeader = lazy(() => import('../components/header').then(m => ({ default: m.HeroHeader })))
 const HeroSection = lazy(() => import('../components/hero-section'))
@@ -12,209 +13,166 @@ const Team = lazy(() => import('../components/team'))
 
 export const Route = createFileRoute('/')({
   component: Home,
-  head: () => ({
-    meta: [
-      {
-        charset: 'UTF-8',
-      },
-      {
-        title: 'Manzil Institute - Quality Islamic Education | MIC Curriculum Bangladesh | Future Leaders',
-      },
-      {
-        name: 'description',
-        content: 'Manzil International Institute offers integrated MIC Curriculum, Madrasa Education, General Education & Technical Education in Bangladesh. Comprehensive Islamic education for building future leaders with Quran, Hadith, modern academics & technical skills.',
-      },
-      {
-        name: 'keywords',
-        content: 'Manzil Institute, MIC Curriculum Bangladesh, Madrasa Education, General Education, Technical Education, Islamic Education Bangladesh, Manzil International Institute admission, Quran education, Hadith studies, Islamic values, Character development, Future leader training, Bangladesh Islamic school, Integrated education Bangladesh, Religious education Bangladesh, Modern Islamic curriculum',
-      },
-      // Open Graph
-      {
-        property: 'og:title',
-        content: 'Manzil Institute - Quality Islamic Education for Future Leaders | MIC Curriculum Bangladesh',
-      },
-      {
-        property: 'og:description',
-        content: 'Comprehensive Islamic education with integrated MIC Curriculum, Madrasa, General, and Technical Education in Bangladesh. Building future leaders with Islamic values and modern skills.',
-      },
-      {
-        property: 'og:url',
-        content: 'https://institute.manzilgroupbd.com',
-      },
-      {
-        property: 'og:image',
-        content: 'https://institute.manzilgroupbd.com/manzil-institute-logo-dark.png',
-      },
-      {
-        property: 'og:image:width',
-        content: '1200',
-      },
-      {
-        property: 'og:image:height',
-        content: '630',
-      },
-      {
-        property: 'og:image:alt',
-        content: 'Manzil International Institute - Quality Islamic Education for Future Leaders',
-      },
-      {
-        property: 'og:type',
-        content: 'website',
-      },
-      // Twitter Cards
-      {
-        name: 'twitter:title',
-        content: 'Manzil International Institute - Quality Islamic Education | MIC Curriculum Bangladesh',
-      },
-      {
-        name: 'twitter:description',
-        content: 'Integrated Islamic education with MIC Curriculum, Madrasa, General & Technical Education in Bangladesh. Developing future leaders with Islamic values and modern academics.',
-      },
-    ],
-    links: [
-      {
-        rel: 'canonical',
-        href: 'https://institute.manzilgroupbd.com',
-      },
-      // hreflang tags for English and Bangla versions
-      {
-        rel: 'alternate',
-        hreflang: 'en',
-        href: 'https://institute.manzilgroupbd.com',
-      },
-      {
-        rel: 'alternate',
-        hreflang: 'bn',
-        href: 'https://institute.manzilgroupbd.com',
-      },
-      {
-        rel: 'alternate',
-        hreflang: 'x-default',
-        href: 'https://institute.manzilgroupbd.com',
-      },
-    ],
-  }),
 })
 
 function Home() {
-  const coursesSchema = [
+  // English SEO data for the homepage
+  const seoDataEn = {
+    title: 'Manzil Institute - Quality Islamic Education | MIC Curriculum Bangladesh | Future Leaders',
+    description: 'Manzil Institute offers integrated MIC Curriculum, Madrasa Education, General Education & Technical Education in Bangladesh. Comprehensive Islamic education for building future leaders with Quran, Hadith, modern academics & technical skills.',
+    keywords: [
+      'Manzil Institute', 'MIC Curriculum Bangladesh', 'Madrasa Education', 'General Education',
+      'Technical Education', 'Islamic Education Bangladesh', 'Manzil International Institute admission',
+      'Quran education', 'Hadith studies', 'Islamic values', 'Character development',
+      'Future leader training', 'Bangladesh Islamic school', 'Integrated education Bangladesh',
+      'Religious education Bangladesh', 'Modern Islamic curriculum'
+    ],
+    url: 'https://institute.manzilgroupbd.com',
+    image: 'https://institute.manzilgroupbd.com/manzil-institute-logo-dark.png'
+  }
+
+  // Bengali SEO data for the homepage
+  const seoDataBn = {
+    title: 'মানজিল ইনস্টিটিউট - মানসম্পন্ন ইসলামিক শিক্ষা | এমআইসি কারিকুলাম বাংলাদেশ | ভবিষ্যত নেতৃত্ব',
+    description: 'মানজিল ইনস্টিটিউট বাংলাদেশে একীভূত এমআইসি কারিকুলাম, মাদ্রাসা শিক্ষা, সাধারণ শিক্ষা এবং কারিগরি শিক্ষা প্রদান করে। কুরআন, হাদিস, আধুনিক একাডেমিক এবং কারিগরি দক্ষতার সাথে ভবিষ্যত নেতৃত্ব গঠনের জন্য ব্যাপক ইসলামিক শিক্ষা।',
+    keywords: [
+      'মানজিল ইনস্টিটিউট', 'এমআইসি কারিকুলাম বাংলাদেশ', 'মাদ্রাসা শিক্ষা', 'সাধারণ শিক্ষা',
+      'কারিগরি শিক্ষা', 'ইসলামিক শিক্ষা বাংলাদেশ', 'মানজিল ইন্টারন্যাশনাল ইনস্টিটিউট ভর্তি',
+      'কুরআন শিক্ষা', 'হাদিস অধ্যয়ন', 'ইসলামিক মূল্যবোধ', 'চরিত্র উন্নয়ন',
+      'ভবিষ্যত নেতা প্রশিক্ষণ', 'বাংলাদেশ ইসলামিক স্কুল', 'একীভূত শিক্ষা বাংলাদেশ',
+      'ধর্মীয় শিক্ষা বাংলাদেশ', 'আধুনিক ইসলামিক কারিকুলাম'
+    ],
+    url: 'https://institute.manzilgroupbd.com',
+    image: 'https://institute.manzilgroupbd.com/manzil-institute-logo-dark.png'
+  }
+
+
+  // English structured data for courses
+  const coursesDataEn = [
     {
-      "@context": "https://schema.org",
-      "@type": "Course",
-      "name": "MIC Curriculum",
-      "description": "Comprehensive Islamic education curriculum combining traditional Islamic knowledge with modern educational standards",
-      "provider": {
-        "@type": "EducationalOrganization",
-        "name": "Manzil International Institute"
-      },
-      "educationalLevel": "Primary to Secondary",
-      "teaches": ["Quran Studies", "Hadith Studies", "Islamic Jurisprudence", "Arabic Language", "Modern Subjects"],
-      "educationalUse": "Islamic Education",
-      "timeRequired": "P12Y"
+      name: "MIC Curriculum",
+      description: "Comprehensive Islamic education curriculum combining traditional Islamic knowledge with modern educational standards",
+      educationalLevel: "Primary to Secondary",
+      teaches: ["Quran Studies", "Hadith Studies", "Islamic Jurisprudence", "Arabic Language", "Modern Subjects"],
+      educationalUse: "Islamic Education",
+      timeRequired: "P12Y"
     },
     {
-      "@context": "https://schema.org",
-      "@type": "Course",
-      "name": "Madrasa Education",
-      "description": "Traditional Islamic religious education focusing on Quran, Hadith, and Islamic sciences",
-      "provider": {
-        "@type": "EducationalOrganization",
-        "name": "Manzil International Institute"
-      },
-      "educationalLevel": "Primary to Higher Secondary",
-      "teaches": ["Quran Memorization", "Tafsir", "Hadith", "Fiqh", "Islamic History"],
-      "educationalUse": "Religious Education",
-      "timeRequired": "P12Y"
+      name: "Madrasa Education",
+      description: "Traditional Islamic religious education focusing on Quran, Hadith, and Islamic sciences",
+      educationalLevel: "Primary to Higher Secondary",
+      teaches: ["Quran Memorization", "Tafsir", "Hadith", "Fiqh", "Islamic History"],
+      educationalUse: "Religious Education",
+      timeRequired: "P12Y"
     },
     {
-      "@context": "https://schema.org",
-      "@type": "Course",
-      "name": "General Education",
-      "description": "Standard academic curriculum following national education standards with Islamic values integration",
-      "provider": {
-        "@type": "EducationalOrganization",
-        "name": "Manzil International Institute"
-      },
-      "educationalLevel": "Primary to Secondary",
-      "teaches": ["Mathematics", "Science", "English", "Bangla", "Social Studies"],
-      "educationalUse": "Academic Education",
-      "timeRequired": "P12Y"
+      name: "General Education",
+      description: "Standard academic curriculum following national education standards with Islamic values integration",
+      educationalLevel: "Primary to Secondary",
+      teaches: ["Mathematics", "Science", "English", "Bangla", "Social Studies"],
+      educationalUse: "Academic Education",
+      timeRequired: "P12Y"
     },
     {
-      "@context": "https://schema.org",
-      "@type": "Course",
-      "name": "Technical Education",
-      "description": "Vocational and technical skills training combined with Islamic character development",
-      "provider": {
-        "@type": "EducationalOrganization",
-        "name": "Manzil International Institute"
-      },
-      "educationalLevel": "Secondary",
-      "teaches": ["Computer Science", "Robotics", "Technical Drawing", "Vocational Skills"],
-      "educationalUse": "Technical Education",
-      "timeRequired": "P4Y"
+      name: "Technical Education",
+      description: "Vocational and technical skills training combined with Islamic character development",
+      educationalLevel: "Secondary",
+      teaches: ["Computer Science", "Robotics", "Technical Drawing", "Vocational Skills"],
+      educationalUse: "Technical Education",
+      timeRequired: "P4Y"
     }
   ]
 
-  const organizationSchema = {
-    "@context": "https://schema.org",
-    "@type": "EducationalOrganization",
-    "name": "Manzil International Institute",
-    "alternateName": "MIC Institute",
-    "description": "Manzil International Institute offers integrated MIC Curriculum, Madrasa Education, General Education & Technical Education in Bangladesh. Comprehensive Islamic education for building future leaders with Quran, Hadith, modern academics & technical skills.",
-    "url": "https://institute.manzilgroupbd.com",
-    "logo": "https://institute.manzilgroupbd.com/manzil-institute-logo-dark.png",
-    "sameAs": [
+  // Bengali structured data for courses
+  const coursesDataBn = [
+    {
+      name: "এমআইসি কারিকুলাম",
+      description: "প্রথাগত ইসলামিক জ্ঞান এবং আধুনিক শিক্ষা মানদণ্ডের সাথে ব্যাপক ইসলামিক শিক্ষা কারিকুলাম",
+      educationalLevel: "প্রাথমিক থেকে মাধ্যমিক",
+      teaches: ["কুরআন অধ্যয়ন", "হাদিস অধ্যয়ন", "ইসলামিক আইনশাস্ত্র", "আরবি ভাষা", "আধুনিক বিষয়সমূহ"],
+      educationalUse: "ইসলামিক শিক্ষা",
+      timeRequired: "P12Y"
+    },
+    {
+      name: "মাদ্রাসা শিক্ষা",
+      description: "কুরআন, হাদিস এবং ইসলামিক বিজ্ঞানে ফোকাস করে প্রথাগত ইসলামিক ধর্মীয় শিক্ষা",
+      educationalLevel: "প্রাথমিক থেকে উচ্চ মাধ্যমিক",
+      teaches: ["কুরআন মুখস্থকরণ", "তাফসির", "হাদিস", "ফিকহ", "ইসলামিক ইতিহাস"],
+      educationalUse: "ধর্মীয় শিক্ষা",
+      timeRequired: "P12Y"
+    },
+    {
+      name: "সাধারণ শিক্ষা",
+      description: "ইসলামিক মূল্যবোধের সাথে জাতীয় শিক্ষা মানদণ্ড অনুসরণ করে স্ট্যান্ডার্ড একাডেমিক কারিকুলাম",
+      educationalLevel: "প্রাথমিক থেকে মাধ্যমিক",
+      teaches: ["গণিত", "বিজ্ঞান", "ইংরেজি", "বাংলা", "সামাজিক বিজ্ঞান"],
+      educationalUse: "একাডেমিক শিক্ষা",
+      timeRequired: "P12Y"
+    },
+    {
+      name: "কারিগরি শিক্ষা",
+      description: "ইসলামিক চরিত্র উন্নয়নের সাথে বৃত্তিমূলক এবং কারিগরি দক্ষতা প্রশিক্ষণ",
+      educationalLevel: "মাধ্যমিক",
+      teaches: ["কম্পিউটার বিজ্ঞান", "রোবোটিক্স", "কারিগরি অঙ্কন", "বৃত্তিমূলক দক্ষতা"],
+      educationalUse: "কারিগরি শিক্ষা",
+      timeRequired: "P4Y"
+    }
+  ]
+
+  // English organization structured data
+  const organizationDataEn = {
+    name: "Manzil International Institute",
+    alternateName: "MIC Institute",
+    description: "Manzil International Institute offers integrated MIC Curriculum, Madrasa Education, General Education & Technical Education in Bangladesh. Comprehensive Islamic education for building future leaders with Quran, Hadith, modern academics & technical skills.",
+    url: "https://institute.manzilgroupbd.com",
+    logo: "https://institute.manzilgroupbd.com/manzil-institute-logo-dark.png",
+    sameAs: [
       "https://www.facebook.com/manzilinstitute",
       "https://www.instagram.com/manzilinstitute",
       "https://www.linkedin.com/company/manzil-institute"
     ],
-    "address": {
-      "@type": "PostalAddress",
-      "streetAddress": "Harunur Rashid Tower (10 Storied Building), House #91, Road #2",
-      "addressLocality": "North Rayarbagh Bus Stand, Jatrabari",
-      "addressRegion": "Dhaka",
-      "postalCode": "1362",
-      "addressCountry": "BD"
+    address: {
+      streetAddress: "Harunur Rashid Tower (10 Storied Building), House #91, Road #2",
+      addressLocality: "North Rayarbagh Bus Stand, Jatrabari",
+      addressRegion: "Dhaka",
+      postalCode: "1362",
+      addressCountry: "BD"
     },
-    "contactPoint": [
+    contactPoint: [
       {
-        "@type": "ContactPoint",
-        "telephone": "+8801407046001",
-        "contactType": "admissions",
-        "areaServed": "BD",
-        "availableLanguage": ["en", "bn"]
+        telephone: "+8801407046001",
+        contactType: "admissions",
+        areaServed: "BD",
+        availableLanguage: ["en", "bn"]
       },
       {
-        "@type": "ContactPoint",
-        "telephone": "+8801407046002",
-        "contactType": "general",
-        "areaServed": "BD",
-        "availableLanguage": ["en", "bn"]
+        telephone: "+8801407046002",
+        contactType: "general",
+        areaServed: "BD",
+        availableLanguage: ["en", "bn"]
       },
       {
-        "@type": "ContactPoint",
-        "telephone": "+8801407046003",
-        "contactType": "technical support",
-        "areaServed": "BD",
-        "availableLanguage": ["en", "bn"]
+        telephone: "+8801407046003",
+        contactType: "technical support",
+        areaServed: "BD",
+        availableLanguage: ["en", "bn"]
       }
     ],
-    "email": "info@manzilinstitute.edu.bd",
-    "foundingDate": "2020",
-    "educationalCredentialAwarded": [
+    email: "info@manzilinstitute.edu.bd",
+    foundingDate: "2020",
+    educationalCredentialAwarded: [
       "MIC Certificate",
       "Madrasa Certificate",
       "General Education Certificate",
       "Technical Education Certificate"
     ],
-    "hasEducationalUse": [
+    hasEducationalUse: [
       "Islamic Education",
       "Character Development",
       "Modern Academic Education",
       "Technical Skills Training"
     ],
-    "knowsAbout": [
+    knowsAbout: [
       "Quran Education",
       "Hadith Studies",
       "Islamic Jurisprudence",
@@ -224,21 +182,109 @@ function Home() {
       "Robotics",
       "Sports Training"
     ],
-    "areaServed": {
-      "@type": "Country",
-      "name": "Bangladesh"
+    areaServed: "Bangladesh",
+    priceRange: "$$"
+  }
+
+  // Bengali organization structured data
+  const organizationDataBn = {
+    name: "মানজিল ইন্টারন্যাশনাল ইনস্টিটিউট",
+    alternateName: "এমআইসি ইনস্টিটিউট",
+    description: "মানজিল ইন্টারন্যাশনাল ইনস্টিটিউট বাংলাদেশে একীভূত এমআইসি কারিকুলাম, মাদ্রাসা শিক্ষা, সাধারণ শিক্ষা এবং কারিগরি শিক্ষা প্রদান করে। কুরআন, হাদিস, আধুনিক একাডেমিক এবং কারিগরি দক্ষতার সাথে ভবিষ্যত নেতৃত্ব গঠনের জন্য ব্যাপক ইসলামিক শিক্ষা।",
+    url: "https://institute.manzilgroupbd.com",
+    logo: "https://institute.manzilgroupbd.com/manzil-institute-logo-dark.png",
+    sameAs: [
+      "https://www.facebook.com/manzilinstitute",
+      "https://www.instagram.com/manzilinstitute",
+      "https://www.linkedin.com/company/manzil-institute"
+    ],
+    address: {
+      streetAddress: "হারুনুর রশিদ টাওয়ার (১০ তলা ভবন), বাড়ি #৯১, রোড #২",
+      addressLocality: "উত্তর রায়েরবাগ বাস স্ট্যান্ড, যাত্রাবাড়ী",
+      addressRegion: "ঢাকা",
+      postalCode: "১৩৬২",
+      addressCountry: "BD"
     },
-    "priceRange": "$$"
+    contactPoint: [
+      {
+        telephone: "+8801407046001",
+        contactType: "admissions",
+        areaServed: "BD",
+        availableLanguage: ["en", "bn"]
+      },
+      {
+        telephone: "+8801407046002",
+        contactType: "general",
+        areaServed: "BD",
+        availableLanguage: ["en", "bn"]
+      },
+      {
+        telephone: "+8801407046003",
+        contactType: "technical support",
+        areaServed: "BD",
+        availableLanguage: ["en", "bn"]
+      }
+    ],
+    email: "info@manzilinstitute.edu.bd",
+    foundingDate: "2020",
+    educationalCredentialAwarded: [
+      "এমআইসি সার্টিফিকেট",
+      "মাদ্রাসা সার্টিফিকেট",
+      "সাধারণ শিক্ষা সার্টিফিকেট",
+      "কারিগরি শিক্ষা সার্টিফিকেট"
+    ],
+    hasEducationalUse: [
+      "ইসলামিক শিক্ষা",
+      "চরিত্র উন্নয়ন",
+      "আধুনিক একাডেমিক শিক্ষা",
+      "কারিগরি দক্ষতা প্রশিক্ষণ"
+    ],
+    knowsAbout: [
+      "কুরআন শিক্ষা",
+      "হাদিস অধ্যয়ন",
+      "ইসলামিক আইনশাস্ত্র",
+      "আরবি ভাষা",
+      "আধুনিক বিষয়সমূহ",
+      "কম্পিউটার বিজ্ঞান",
+      "রোবোটিক্স",
+      "খেলাধুলা প্রশিক্ষণ"
+    ],
+    areaServed: "বাংলাদেশ",
+    priceRange: "$$"
   }
 
   return (
     <>
-      <script type="application/ld+json">
-        {JSON.stringify(coursesSchema)}
-      </script>
-      <script type="application/ld+json">
-        {JSON.stringify(organizationSchema)}
-      </script>
+      {/* English SEO Meta Tags */}
+      <MetaTags
+        title={seoDataEn.title}
+        description={seoDataEn.description}
+        keywords={seoDataEn.keywords}
+        url={seoDataEn.url}
+        image={seoDataEn.image}
+      />
+
+      {/* Bengali SEO Meta Tags */}
+      <MetaTags
+        title={seoDataBn.title}
+        description={seoDataBn.description}
+        keywords={seoDataBn.keywords}
+        url={seoDataBn.url}
+        image={seoDataBn.image}
+      />
+
+      {/* English Structured Data */}
+      {coursesDataEn.map((course, index) => (
+        <StructuredData key={`course-en-${index}`} type="course" data={course} />
+      ))}
+      <StructuredData type="organization" data={organizationDataEn} />
+
+      {/* Bengali Structured Data */}
+      {coursesDataBn.map((course, index) => (
+        <StructuredData key={`course-bn-${index}`} type="course" data={course} />
+      ))}
+      <StructuredData type="organization" data={organizationDataBn} />
+
       <Suspense fallback={
         <div className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

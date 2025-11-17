@@ -1,11 +1,13 @@
-import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { useEffect, lazy, Suspense } from 'react'
-import { Download, ArrowLeft, BookOpen, Users, Clock, Star, GraduationCap, Layers, Target, Zap, BookText, Award, Globe, Cpu, Heart } from 'lucide-react'
+import { Download, Users, Clock, Star, GraduationCap, Layers, Zap, BookText, Cpu, Heart, AlertCircle } from 'lucide-react'
 import { Button } from '../components/ui/button'
 import { useTranslation } from '../hooks/useTranslation'
 import { AnimatedGroup } from '../components/ui/animated-group'
+import { useCurriculumData } from '../hooks/useData'
+import LoadingSkeleton from '../components/LoadingSkeleton'
 
-const HeroHeader = lazy(() => import('../components/header').then(m => ({ default: m.HeroHeader })))
+const HeroHeader = lazy(() => import('../components/header').then(({ HeroHeader }) => HeroHeader))
 const FooterSection = lazy(() => import('../components/footer'))
 
 const transitionVariants = {
@@ -30,6 +32,18 @@ const transitionVariants = {
 
 export const Route = createFileRoute('/curriculum')({
   component: CurriculumPage,
+  loader: async ({ context }) => {
+    // Prefetch curriculum data on the server for SSR
+    if (context?.queryClient) {
+      const { getStaticCurriculumData } = await import('../hooks/useData')
+      await context.queryClient.prefetchQuery({
+        queryKey: ['curriculum', 'en'], // Default to English
+        queryFn: () => getStaticCurriculumData('en'),
+        staleTime: 10 * 60 * 1000,
+      })
+    }
+    return {}
+  },
   head: () => ({
     meta: [
       {
@@ -113,11 +127,74 @@ export const Route = createFileRoute('/curriculum')({
 
 function CurriculumPage() {
   const { language, t } = useTranslation()
+  const { data: curriculumData, isLoading, error, refetch } = useCurriculumData(language)
 
   // Scroll to top when component mounts
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [])
+
+  // Handle loading state
+  if (isLoading) {
+    return (
+      <div>
+        <Suspense fallback={<div>Loading...</div>}>
+          <HeroHeader />
+        </Suspense>
+        <main className="min-h-screen bg-gray-50 dark:bg-gray-900 mx-auto max-w-7xl px-4 sm:px-6 pt-24 pb-18">
+          <LoadingSkeleton />
+        </main>
+        <Suspense fallback={<div>Loading...</div>}>
+          <FooterSection />
+        </Suspense>
+      </div>
+    )
+  }
+
+  // Handle error state
+  if (error) {
+    return (
+      <div>
+        <Suspense fallback={<div>Loading...</div>}>
+          <HeroHeader />
+        </Suspense>
+        <main className="min-h-screen bg-gray-50 dark:bg-gray-900 mx-auto max-w-7xl px-4 sm:px-6 pt-24 pb-18">
+          <div className="text-center py-12">
+            <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+              {language === "bn" ? 'তথ্য লোড করতে সমস্যা হয়েছে' : 'Failed to Load Curriculum Data'}
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400 mb-6">
+              {error.message || (language === "bn" ? 'অনুগ্রহ করে পুনরায় চেষ্টা করুন' : 'Please try again later')}
+            </p>
+            <Button onClick={() => refetch()} className="bg-[#00AEEF] hover:bg-[#00AEEF]/90">
+              {language === "bn" ? 'পুনরায় চেষ্টা করুন' : 'Try Again'}
+            </Button>
+          </div>
+        </main>
+        <Suspense fallback={<div>Loading...</div>}>
+          <FooterSection />
+        </Suspense>
+      </div>
+    )
+  }
+
+  // If no data, show loading (shouldn't happen with prefetching)
+  if (!curriculumData) {
+    return (
+      <div>
+        <Suspense fallback={<div>Loading...</div>}>
+          <HeroHeader />
+        </Suspense>
+        <main className="min-h-screen bg-gray-50 dark:bg-gray-900 mx-auto max-w-7xl px-4 sm:px-6 pt-24 pb-18">
+          <LoadingSkeleton />
+        </main>
+        <Suspense fallback={<div>Loading...</div>}>
+          <FooterSection />
+        </Suspense>
+      </div>
+    )
+  }
 
   const breadcrumbSchema = {
     "@context": "https://schema.org",
@@ -235,186 +312,6 @@ function CurriculumPage() {
     return colorMap[color] || colorMap.blue
   }
 
-  const curriculumData = {
-    overview: {
-      totalLevels: language === "bn" ? "৬ লেভেল" : 6,
-      totalYears: language === "bn" ? "২২ বছর" : 22,
-      ageRange: language === "bn" ? "৪-২৫ বছর" : "4-25 Years",
-      streams: language === "bn" ? ["মাদরাসা", "জেনারেল", "কারিগরি"] : ["Madrasa", "General", "Technical"],
-      levelsLabel: language === "bn" ? "লেভেল" : "Levels",
-      yearsLabel: language === "bn" ? "বছর" : "Years",
-      ageRangeLabel: language === "bn" ? "বয়সসীমা" : "Age Range",
-      streamsLabel: language === "bn" ? "শিক্ষা ধারা" : "Education Streams"
-    },
-    levels: [
-      {
-        level: language === "bn" ? "লেভেল ১" : "Level 1",
-        title: language === "bn" ? "মৌলিক শিক্ষার ভিত্তি" : "Foundation of Basic Education",
-        age: language === "bn" ? "৪-৮ বছর" : "4-8 Years",
-        duration: language === "bn" ? "৫ বছর" : "5 Years",
-        color: "blue",
-        icon: BookOpen,
-        description: language === "bn" ? "প্রাথমিক শিক্ষার ভিত্তি প্রস্তুত ও মূল্যবোধ গঠন" : "Preparation of basic education foundation and value building",
-        subjects: {
-          madrasa: language === "bn" 
-            ? ["কায়েদা ও নাযেরা", "বাংলা-ইংরেজি-আরবি বর্ণমালা", "প্রাথমিক দুআ ও সুরা"]
-            : ["Qaida & Nazira", "Bengali-English-Arabic Alphabets", "Basic Duas & Surahs"],
-          general: language === "bn" 
-            ? ["IPC কারিকুলাম", "বেসিক গণিত", "বাংলা ও ইংরেজি ভাষা"]
-            : ["IPC Curriculum", "Basic Mathematics", "Bengali & English Language"],
-          technical: language === "bn" 
-            ? ["কম্পিউটার পরিচিতি", "হাতের লেখা", "অঙ্কন"]
-            : ["Computer Basics", "Handwriting", "Drawing"]
-        },
-        madrasaLabel: language === "bn" ? "মাদরাসা শিক্ষা" : "Madrasa Education",
-        generalLabel: language === "bn" ? "জেনারেল শিক্ষা" : "General Education",
-        technicalLabel: language === "bn" ? "কারিগরি শিক্ষা" : "Technical Education"
-      },
-      {
-        level: language === "bn" ? "লেভেল ২" : "Level 2",
-        title: language === "bn" ? "হিফজ ও মৌলিক শিক্ষা" : "Hifz & Basic Education",
-        age: language === "bn" ? "৯-১৩ বছর" : "9-13 Years",
-        duration: language === "bn" ? "৫ বছর" : "5 Years", 
-        color: "orange",
-        icon: BookText,
-        description: language === "bn" ? "হিফজুল কুরআন ও মৌলিক শিক্ষার সমন্বয়" : "Integration of Quran Memorization and Basic Education",
-        subjects: {
-          madrasa: language === "bn" 
-            ? ["হিফজুল কুরআন", "তাজভিদ শিক্ষা", "নুরানি কায়েদা"]
-            : ["Quran Memorization", "Tajweed Education", "Noorani Qaida"],
-          general: language === "bn" 
-            ? ["IMYC কারিকুলাম", "O-Level প্রস্তুতি", "বিজ্ঞান ও গণিত"]
-            : ["IMYC Curriculum", "O-Level Preparation", "Science & Mathematics"],
-          technical: language === "bn" 
-            ? ["গ্রাফিক্স ডিজাইন", "রান্না প্রশিক্ষণ", "সেলাই প্রশিক্ষণ"]
-            : ["Graphics Design", "Cooking Training", "Sewing Training"]
-        },
-        madrasaLabel: language === "bn" ? "মাদরাসা শিক্ষা" : "Madrasa Education",
-        generalLabel: language === "bn" ? "জেনারেল শিক্ষা" : "General Education",
-        technicalLabel: language === "bn" ? "কারিগরি শিক্ষা" : "Technical Education"
-      },
-      {
-        level: language === "bn" ? "লেভেল ৩" : "Level 3",
-        title: language === "bn" ? "বিশেষায়িত শিক্ষার সূচনা" : "Beginning of Specialized Education", 
-        age: language === "bn" ? "১৪-১৫ বছর" : "14-15 Years",
-        duration: language === "bn" ? "২ বছর" : "2 Years",
-        color: "purple",
-        icon: GraduationCap,
-        description: language === "bn" ? "দরসে নিজামী ও আন্তর্জাতিক শিক্ষার সমন্বয়" : "Integration of Dars-e-Nizami and International Education",
-        subjects: {
-          madrasa: language === "bn" 
-            ? ["দরসে নিজামী", "উর্দু ও ফার্সি ভাষা", "ইসলামিক জ্যোতির্বিদ্যা"]
-            : ["Dars-e-Nizami", "Urdu & Persian Language", "Islamic Astronomy"],
-          general: language === "bn" 
-            ? ["O-Level সম্পূর্ণ", "SSC প্রস্তুতি", "বিজ্ঞান বিভাগ"]
-            : ["O-Level Completion", "SSC Preparation", "Science Division"],
-          technical: language === "bn" 
-            ? ["রোবোটিক্স", "ড্রোন টেকনোলজি", "৩D প্রিন্টিং"]
-            : ["Robotics", "Drone Technology", "3D Printing"]
-        },
-        madrasaLabel: language === "bn" ? "মাদরাসা শিক্ষা" : "Madrasa Education",
-        generalLabel: language === "bn" ? "জেনারেল শিক্ষা" : "General Education",
-        technicalLabel: language === "bn" ? "কারিগরি শিক্ষা" : "Technical Education"
-      },
-      {
-        level: language === "bn" ? "লেভেল ৪" : "Level 4",
-        title: language === "bn" ? "উচ্চ মাধ্যমিক শিক্ষা" : "Higher Secondary Education",
-        age: language === "bn" ? "১৬-১৯ বছর" : "16-19 Years", 
-        duration: language === "bn" ? "৪ বছর" : "4 Years",
-        color: "orange",
-        icon: Target,
-        description: language === "bn" ? "উচ্চতর শিক্ষা ও পেশাগত দিকনির্দেশনা" : "Higher Education and Career Guidance",
-        subjects: {
-          madrasa: language === "bn" 
-            ? ["তাফসীর ও হাদীস", "ফিকহ শিক্ষা", "আরবি সাহিত্য"]
-            : ["Tafsir & Hadith", "Fiqh Education", "Arabic Literature"],
-          general: language === "bn" 
-            ? ["A-Level/এইচএসসি", "বিশ্ববিদ্যালয় প্রস্তুতি", "বিসিএস গাইডলাইন"]
-            : ["A-Level/HSC", "University Preparation", "BCS Guidance"],
-          technical: language === "bn" 
-            ? ["ভিডিও এডিটিং", "ওয়েব ডেভেলপমেন্ট", "সাইবার সিকিউরিটি"]
-            : ["Video Editing", "Web Development", "Cyber Security"]
-        },
-        madrasaLabel: language === "bn" ? "মাদরাসা শিক্ষা" : "Madrasa Education",
-        generalLabel: language === "bn" ? "জেনারেল শিক্ষা" : "General Education",
-        technicalLabel: language === "bn" ? "কারিগরি শিক্ষা" : "Technical Education"
-      },
-      {
-        level: language === "bn" ? "লেভেল ৫" : "Level 5",
-        title: language === "bn" ? "স্নাতক পর্যায়" : "Undergraduate Level",
-        age: language === "bn" ? "২০-২৩ বছর" : "20-23 Years",
-        duration: language === "bn" ? "৪ বছর" : "4 Years", 
-        color: "red",
-        icon: Award,
-        description: language === "bn" ? "স্নাতক ও স্নাতকোত্তর শিক্ষা সমন্বয়" : "Integration of Undergraduate and Postgraduate Education",
-        subjects: {
-          madrasa: language === "bn" 
-            ? ["মুফতি কোর্স", "তাকমিল পর্যায়", "ইসলামিক রিসার্চ"]
-            : ["Mufti Course", "Takmeel Level", "Islamic Research"],
-          general: language === "bn" 
-            ? ["স্নাতক ডিগ্রী", "পিএইচডি প্রস্তুতি", "পেশাগত প্রশিক্ষণ"]
-            : ["Undergraduate Degree", "PhD Preparation", "Professional Training"],
-          technical: language === "bn" 
-            ? ["সফটওয়্যার ইঞ্জিনিয়ারিং", "ডাটা সাইন্স", "AI & ML"]
-            : ["Software Engineering", "Data Science", "AI & ML"]
-        },
-        madrasaLabel: language === "bn" ? "মাদরাসা শিক্ষা" : "Madrasa Education",
-        generalLabel: language === "bn" ? "জেনারেল শিক্ষা" : "General Education",
-        technicalLabel: language === "bn" ? "কারিগরি শিক্ষা" : "Technical Education"
-      },
-      {
-        level: language === "bn" ? "লেভেল ৬" : "Level 6",
-        title: language === "bn" ? "ডক্টরেট ও বিশেষায়িত গবেষণা" : "Doctorate & Specialized Research",
-        age: language === "bn" ? "২৪-২৫ বছর" : "24-25 Years",
-        duration: language === "bn" ? "২ বছর" : "2 Years",
-        color: "indigo",
-        icon: Globe,
-        description: language === "bn" ? "গবেষণা ও বিশেষায়িত উচ্চতর শিক্ষা" : "Research and Specialized Higher Education",
-        subjects: {
-          madrasa: language === "bn" 
-            ? ["ইসলামিক রিসার্চ", "আন্তর্জাতিক বক্তা", "লেখালেখি"]
-            : ["Islamic Research", "International Speaker", "Writing"],
-          general: language === "bn" 
-            ? ["পিএইচডি সম্পূর্ণ", "পোস্ট-ডক্টরাল", "একাডেমিক ক্যারিয়ার"]
-            : ["PhD Completion", "Post-Doctoral", "Academic Career"],
-          technical: language === "bn" 
-            ? ["রিসার্চ এন্ড ডেভেলপমেন্ট", "টেক উদ্যোক্তা", "ইনোভেশন"]
-            : ["Research & Development", "Tech Entrepreneurship", "Innovation"]
-        },
-        madrasaLabel: language === "bn" ? "মাদরাসা শিক্ষা" : "Madrasa Education",
-        generalLabel: language === "bn" ? "জেনারেল শিক্ষা" : "General Education",
-        technicalLabel: language === "bn" ? "কারিগরি শিক্ষা" : "Technical Education"
-      }
-    ],
-    specialPrograms: [
-      {
-        title: language === "bn" ? "হুফ্ফাজ এডুকেশন সিস্টেম" : "Huffaz Education System",
-        description: language === "bn" ? "হাফেজ শিক্ষার্থীদের জন্য বিশেষায়িত কারিকুলাম" : "Specialized curriculum for Hafiz students",
-        duration: language === "bn" ? "১৪ বছর" : "14 Years",
-        features: language === "bn" 
-          ? ["হিফজ রিভিশন", "দরসে নিজামী", "আন্তর্জাতিক শিক্ষা", "কারিগরি প্রশিক্ষণ"]
-          : ["Hifz Revision", "Dars-e-Nizami", "International Education", "Technical Training"],
-        color: "orange"
-      },
-      {
-        title: language === "bn" ? "মহিলা শাখা" : "Women's Section",
-        description: language === "bn" ? "নারী শিক্ষার্থীদের জন্য বিশেষ ব্যবস্থা" : "Special arrangements for female students",
-        duration: language === "bn" ? "শীঘ্রই আসছে" : "Coming Soon",
-        features: language === "bn" 
-          ? ["পরিবেশ উপযোগী শিক্ষা", "নারী শিক্ষিকার তত্ত্বাবধান", "আধুনিক সুযোগ-সুবিধা"]
-          : ["Environment-friendly Education", "Female Teacher Supervision", "Modern Facilities"],
-        color: "pink"
-      }
-    ],
-    sectionTitles: {
-      curriculumLevels: language === "bn" ? "কারিকুলাম লেভেল সমূহ" : "Curriculum Levels",
-      specialPrograms: language === "bn" ? "বিশেষ কার্যক্রম" : "Special Programs",
-      ctaTitle: language === "bn" ? "আপনার সন্তানের ভবিষ্যত গড়তে আজই যোগাযোগ করুন" : "Contact today to build your child's future",
-      ctaDescription: language === "bn" ? "আমাদের কারিকুলাম সম্পর্কে বিস্তারিত জানতে এবং ভর্তি প্রক্রিয়া শুরু করতে" : "To learn more about our curriculum and start the admission process",
-      contactButton: language === "bn" ? "ভর্তির জন্য যোগাযোগ" : "Contact for Admission",
-      downloadButton: language === "bn" ? "ব্রোশার ডাউনলোড" : "Download Brochure"
-    }
-  }
 
   const handleDownloadBrochure = () => {
     const message = language === "bn" ? 'ব্রোশার ডাউনলোড শুরু হচ্ছে...' : 'Brochure download starting...'

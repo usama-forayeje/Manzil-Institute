@@ -1,5 +1,6 @@
-import { createContext, useContext, useEffect, useState, useTransition } from 'react'
+import React, { createContext, useContext, useEffect, useState } from 'react'
 
+// Theme provider context
 const ThemeProviderContext = createContext()
 
 export function ThemeProvider({
@@ -9,7 +10,6 @@ export function ThemeProvider({
     ...props
 }) {
     const [theme, setThemeState] = useState(defaultTheme)
-    const [isPending, startTransition] = useTransition()
 
     useEffect(() => {
         const storedTheme = localStorage.getItem(storageKey)
@@ -28,17 +28,14 @@ export function ThemeProvider({
     }, [theme])
 
     const setTheme = (newTheme) => {
-        startTransition(() => {
-            setThemeState(newTheme)
-            localStorage.setItem(storageKey, newTheme)
-        })
+        setThemeState(newTheme)
+        localStorage.setItem(storageKey, newTheme)
     }
 
     const value = {
         theme,
         setTheme,
-        resolvedTheme: theme,
-        isPending
+        resolvedTheme: theme
     }
 
     return (

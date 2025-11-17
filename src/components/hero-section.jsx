@@ -1,3 +1,4 @@
+import React from 'react'
 import { Link } from "@tanstack/react-router"
 import { useLanguageStore } from "../lib/store"
 import { Button } from "./ui/button"
@@ -53,14 +54,14 @@ export default function HeroSectionPremium() {
               {/* Badge */}
               <div className="rounded-full mx-auto flex flex-col items-center gap-2 border border-orange-200 bg-orange-50 px-6 py-2 w-fit dark:bg-orange-900/20 dark:border-orange-800 mb-8"> {/* Added mb-8 */}
                 <span className={cn("text-sm font-medium text-orange-700 dark:text-orange-300 text-center", language === 'bn' ? "bengali-text" : "")}>
-                  {language === 'bn' ? 'মাদ্রাসা | জেনারেল | কারিগরি শিক্ষার সমন্বয়' : 'Integration of Madrasa | General | Technical Education'}
+                  {language === 'bn' ? 'মাদরাসা | জেনারেল | কারিগরি শিক্ষার সমন্বয়' : 'Integration of Madrasa | General | Technical Education'}
                 </span>
               </div>
 
               {/* Main Institute Name - EXTRA LARGE */}
               <div className="mb-6"> {/* Added mb-6 */}
                 <h1 className={cn("text-5xl md:text-6xl lg:text-7xl font-black text-[#00AEEF] dark:text-[#00AEEF] leading-none text-center", language === 'bn' ? "bengali-text" : "")}>
-                  {language === 'bn' ? 'মানজিল ইনস্টিটিউট' : 'Manzil Institute'}
+                  {language === 'bn' ? 'মানযিল ইনস্টিটিউট' : 'Manzil Institute'}
                 </h1>
               </div>
 
@@ -105,7 +106,7 @@ export default function HeroSectionPremium() {
                 >
                   <Link to="/campus">
                     <span className={cn("text-nowrap", language === 'bn' && "bengali-text text-center")}>
-                      {language === 'bn' ? 'কেম্পাস ভিজিট করুন' : 'Visit Our Campus'}
+                      {language === 'bn' ? 'ক্যাম্পাস ভিজিট করুন' : 'Visit Our Campus'}
                     </span>
                     <ArrowRight className="size-6 ml-2" />
                   </Link>

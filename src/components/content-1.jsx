@@ -1,3 +1,4 @@
+import React from 'react'
 import { useLanguageStore } from '@/lib/store'
 import { cn } from '@/lib/utils'
 import { Target, Users, CheckCircle, Sparkles, Award, BookOpen } from 'lucide-react'

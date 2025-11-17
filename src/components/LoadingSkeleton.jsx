@@ -1,6 +1,9 @@
+import React from 'react'
 import { Skeleton } from "@/components/ui/skeleton"
+import { withErrorBoundary } from "./ErrorBoundary"
+import FallbackComponent from "./FallbackComponent"
 
-export default function LoadingSkeleton() {
+function LoadingSkeleton() {
   return (
     <div className="min-h-screen">
       {/* Header Skeleton */}
@@ -74,3 +77,7 @@ export default function LoadingSkeleton() {
     </div>
   )
 }
+
+export default withErrorBoundary(LoadingSkeleton, {
+  fallback: <FallbackComponent componentName="Loading Skeleton" />
+})

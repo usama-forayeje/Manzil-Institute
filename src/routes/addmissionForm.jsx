@@ -1,3 +1,4 @@
+import React from 'react'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useState, useEffect, lazy, Suspense } from 'react'
 import { ArrowLeft, Upload, CheckCircle, AlertCircle, Loader2 } from 'lucide-react'
@@ -7,6 +8,7 @@ import { Textarea } from '../components/ui/textarea'
 import { useLanguageStore } from '@/lib/store'
 import { cn } from '@/lib/utils'
 import { AnimatedGroup } from '../components/ui/animated-group'
+import { useSubmitAdmissionForm } from '../hooks/useData'
 
 const HeroHeader = lazy(() => import('../components/header').then(m => ({ default: m.HeroHeader })))
 const FooterSection = lazy(() => import('../components/footer'))
@@ -61,7 +63,7 @@ export const Route = createFileRoute('/addmissionForm')({
 function AddmissionForm() {
   const navigate = useNavigate()
   const { language } = useLanguageStore()
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const submitMutation = useSubmitAdmissionForm()
 
   // Scroll to top when component mounts
   useEffect(() => {
@@ -308,23 +310,21 @@ function AddmissionForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    setIsSubmitting(true)
+
+    if (!validateStep(currentStep)) {
+      return
+    }
 
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000))
+      await submitMutation.mutateAsync(formData)
 
-      if (validateStep(currentStep)) {
-        // Here you would typically send the data to your backend
-        /* eslint-disable */console.log(...oo_oo(`3162510953_318_8_318_48_4`,'Form submitted:', formData))
-        alert(language === 'bn' ? 'আবেদন সফলভাবে জমা দেওয়া হয়েছে!' : 'Application submitted successfully!')
-        navigate('/')
-      }
+      // On success, show success message and navigate
+      alert(language === 'bn' ? 'আবেদন সফলভাবে জমা দেওয়া হয়েছে!' : 'Application submitted successfully!')
+      navigate('/')
     } catch (error) {
-      /* eslint-disable */console.error(...oo_tx(`3162510953_323_6_323_47_11`,'Submission error:', error))
+      // Error handling is done by the mutation hook
+      console.error('Submission error:', error)
       alert(language === 'bn' ? 'আবেদন জমা দিতে সমস্যা হয়েছে। আবার চেষ্টা করুন।' : 'There was an error submitting your application. Please try again.')
-    } finally {
-      setIsSubmitting(false)
     }
   }
 
@@ -350,6 +350,8 @@ function AddmissionForm() {
         return true
     }
   }
+
+  const isSubmitting = submitMutation.isPending
 
   return (
     <div>

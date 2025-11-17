@@ -4,14 +4,14 @@ A modern, responsive educational institution website built with React, TanStack 
 
 ## 🌟 Features
 
-- **Modern React Architecture**: Built with React 19 and TypeScript for type safety
+- **Modern React Architecture**: Built with React 19 for modern development
 - **File-Based Routing**: TanStack Router for efficient client-side routing
 - **Responsive Design**: Mobile-first approach with Tailwind CSS
 - **Smooth Animations**: Framer Motion for engaging user interactions
 - **Component Library**: Shadcn UI components for consistent design
 - **State Management**: TanStack Query for server state management
 - **Developer Experience**: Hot reload, ESLint, Prettier, and comprehensive tooling
-- **SEO Optimized**: Server-side rendering capabilities with TanStack Start
+- **SEO Optimized**: Client-side rendering with SEO optimizations
 - **PWA Ready**: Progressive Web App features with service worker support
 
 ## 🛠️ Tech Stack
@@ -19,9 +19,7 @@ A modern, responsive educational institution website built with React, TanStack 
 ### Core Framework
 
 - **React 19** - Latest React with concurrent features
-- **TypeScript** - Type-safe JavaScript development
-- **TanStack Router** - File-based routing with SSR support
-- **TanStack Start** - Full-stack React framework
+- **TanStack Router** - File-based routing for client-side navigation
 
 ### Styling & UI
 
@@ -113,40 +111,33 @@ manzil-international-institute/
 │   └── robots.txt
 ├── src/
 │   ├── components/                  # Reusable components
-│   │   ├── Header.tsx              # Main navigation header
+│   │   ├── Header.jsx               # Main navigation header
 │   │   └── ui/                     # Shadcn UI components
-│   │       ├── badge.tsx
-│   │       ├── button.tsx
-│   │       ├── card.tsx
-│   │       ├── input.tsx
-│   │       └── textarea.tsx
-│   ├── data/                       # Static data files
+│   │       ├── badge.jsx
+│   │       ├── button.jsx
+│   │       ├── card.jsx
+│   │       ├── input.jsx
+│   │       └── textarea.jsx
+│   ├── hooks/                      # Custom hooks
 │   ├── lib/                        # Utility functions
-│   │   └── utils.ts                # Class name utility
+│   │   └── utils.js                # Class name utility
 │   ├── routes/                     # File-based routes
-│   │   ├── __root.tsx              # Root layout
-│   │   ├── index.tsx               # Home page
-│   │   ├── about.tsx               # About page
-│   │   ├── curriculum.tsx          # Curriculum page
-│   │   ├── admission.tsx           # Admission page
-│   │   ├── fees.tsx                # Fees page
-│   │   ├── rules.tsx               # Rules page
-│   │   ├── facilities.tsx          # Facilities page
-│   │   ├── workshops.tsx           # Workshops page
-│   │   ├── location.tsx            # Location page
-│   │   ├── founders.tsx            # Founders page
-│   │   └── demo/                   # Demo routes (can be removed)
-│   ├── router.tsx                  # Router configuration
-│   ├── routeTree.gen.ts            # Auto-generated route tree
+│   │   ├── __root.jsx              # Root layout
+│   │   ├── index.jsx               # Home page
+│   │   ├── admission.jsx           # Admission page
+│   │   ├── campus.jsx              # Campus page
+│   │   ├── curriculum.jsx          # Curriculum page
+│   │   └── sitemap.xml.js          # Sitemap XML
+│   ├── router.jsx                  # Router configuration
+│   ├── routeTree.gen.js            # Auto-generated route tree
 │   ├── styles.css                  # Global styles
-│   └── logo.svg                    # Logo asset
+│   └── main.jsx                    # Application entry point
 ├── .vscode/                        # VS Code settings
 ├── components.json                 # Shadcn configuration
 ├── eslint.config.js                # ESLint configuration
 ├── package.json                    # Dependencies and scripts
 ├── prettier.config.js              # Prettier configuration
-├── tsconfig.json                   # TypeScript configuration
-├── vite.config.ts                  # Vite configuration
+├── vite.config.js                  # Vite configuration
 └── README.md                       # This file
 ```
 
@@ -157,14 +148,14 @@ manzil-international-institute/
 The application uses **TanStack Router** with file-based routing:
 
 - Routes are defined as files in `src/routes/`
-- File names correspond to URL paths (e.g., `about.tsx` → `/about`)
-- `__root.tsx` provides the layout wrapper
-- Auto-generated `routeTree.gen.ts` for type safety
+- File names correspond to URL paths (e.g., `admission.jsx` → `/admission`)
+- `__root.jsx` provides the layout wrapper
+- Auto-generated `routeTree.gen.js` for route management
 
 ### Component Architecture
 
-- **Header Component**: Responsive navigation with mobile menu
-- **UI Components**: Shadcn-based reusable components
+- **Header Component** (`src/components/header.jsx`): Responsive navigation with mobile menu
+- **UI Components**: Shadcn-based reusable components in `/ui`
 - **Page Components**: Route-specific components in `/routes`
 - **Layout Components**: Root layout with providers
 
@@ -218,7 +209,7 @@ Located in `src/components/ui/`:
 
 Each route file exports a `Route` component using `createFileRoute`:
 
-```tsx
+```jsx
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/about')({
@@ -565,7 +556,7 @@ Consider integrating error tracking services:
 ### Code Standards
 
 - Follow ESLint and Prettier configurations
-- Use TypeScript for type safety
+- Write clean, maintainable JavaScript code
 - Write meaningful commit messages
 - Test your changes
 

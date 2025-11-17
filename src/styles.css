@@ -115,7 +115,7 @@ h6 {
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
+  --primary: #00AEEF;
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
@@ -136,14 +136,14 @@ h6 {
   --radius: 0.625rem;
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary: #00AEEF;
   --sidebar-primary-foreground: oklch(0.985 0 0);
   --sidebar-accent: oklch(0.97 0 0);
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
   --scrollbar-track: oklch(0.967 0.001 286.375);
-  --scrollbar-thumb: var(--primary);
+  --scrollbar-thumb: #00AEEF;
 }
 
 .dark {
@@ -153,7 +153,7 @@ h6 {
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
+  --primary: #00AEEF;
   --primary-foreground: oklch(0.205 0 0);
   --secondary: oklch(0.269 0 0);
   --secondary-foreground: oklch(0.985 0 0);
@@ -173,14 +173,14 @@ h6 {
   --chart-5: oklch(0.645 0.246 16.439);
   --sidebar: oklch(0.205 0 0);
   --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary: #00AEEF;
   --sidebar-primary-foreground: oklch(0.985 0 0);
   --sidebar-accent: oklch(0.269 0 0);
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
   --scrollbar-track: var(--muted);
-  --scrollbar-thumb: var(--primary);
+  --scrollbar-thumb: #00AEEF;
 }
 
 @theme inline {
@@ -251,7 +251,7 @@ h6 {
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 4px;
 }
 
 ::-webkit-scrollbar-track {
@@ -259,13 +259,66 @@ h6 {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--scrollbar-thumb);
-  border-radius: 3px;
+  background: #00AEEF;
+  border-radius: 2px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--primary);
+  background: #00AEEF;
   opacity: 0.8;
+}
+
+/* Custom text selection color */
+::selection {
+  background-color: #00AEEF;
+  color: white;
+}
+
+::-moz-selection {
+  background-color: #00AEEF;
+  color: white;
+}
+
+/* Ensure sufficient contrast for colored text */
+.text-primary {
+  color: #00AEEF;
+}
+
+.dark .text-primary {
+  color: #60CDFF;
+}
+
+/* Improve contrast for specific colored elements */
+.text-blue-600 {
+  color: #2563eb;
+}
+
+.dark .text-blue-600 {
+  color: #60a5fa;
+}
+
+.text-green-600 {
+  color: #16a34a;
+}
+
+.dark .text-green-600 {
+  color: #4ade80;
+}
+
+.text-purple-600 {
+  color: #9333ea;
+}
+
+.dark .text-purple-600 {
+  color: #c084fc;
+}
+
+.text-orange-600 {
+  color: #ea580c;
+}
+
+.dark .text-orange-600 {
+  color: #fb923c;
 }
 
 /* Brand name consistent font for spacing */

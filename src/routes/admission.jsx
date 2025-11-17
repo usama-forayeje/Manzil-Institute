@@ -1,12 +1,15 @@
 import { useState, useEffect } from 'react'
 import { ArrowLeft, Download, Calendar, Clock, Phone, Mail, MapPin, CheckCircle, AlertCircle } from 'lucide-react'
 import { Button } from '../components/ui/button'
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { HeroHeader } from '../components/header'
 import FooterSection from '../components/footer'
 import { useLanguageStore } from '@/lib/store'
 import { cn } from '@/lib/utils'
 import { AnimatedGroup } from '../components/ui/animated-group'
+import { useAdmissionData, usePrefetchAdmissionData } from '../hooks/useData'
+import ErrorBoundary from '../components/ErrorBoundary'
+import LoadingSkeleton from '../components/LoadingSkeleton'
 
 const transitionVariants = {
   item: {
@@ -30,6 +33,18 @@ const transitionVariants = {
 
 export const Route = createFileRoute('/admission')({
   component: AdmissionPage,
+  loader: async ({ context }) => {
+    // Prefetch admission data on the server for SSR
+    if (context?.queryClient) {
+      const { getStaticAdmissionData } = await import('../hooks/useData')
+      await context.queryClient.prefetchQuery({
+        queryKey: ['admission', 'en'], // Default to English
+        queryFn: () => getStaticAdmissionData('en'),
+        staleTime: 5 * 60 * 1000,
+      })
+    }
+    return {}
+  },
   head: () => ({
     meta: [
       {
@@ -114,6 +129,8 @@ export const Route = createFileRoute('/admission')({
 function AdmissionPage() {
   const [activeTab, setActiveTab] = useState('process')
   const { language } = useLanguageStore()
+  const { data: admissionData, isLoading, error, refetch } = useAdmissionData()
+  const navigate = useNavigate()
 
   const faqSchema = {
     "@context": "https://schema.org",
@@ -206,256 +223,6 @@ function AdmissionPage() {
     return colorMap[color] || colorMap.blue
   }
 
-  const admissionData = {
-    overview: {
-      title: language === 'bn' ? "ভর্তি প্রক্রিয়া" : "Admission Process",
-      description: language === 'bn' 
-        ? "মানযিল ইনস্টিটিউটে ভর্তি সম্পর্কিত সম্পূর্ণ তথ্য" 
-        : "Complete information about admission at Manzil Institute",
-    },
-    process: [
-      {
-        step: 1,
-        title: language === 'bn' ? "অনলাইন আবেদন" : "Online Application",
-        description: language === 'bn' 
-          ? "আমাদের ওয়েবসাইট থেকে ভর্তি ফরম পূরণ করুন" 
-          : "Fill out the admission form from our website",
-        duration: language === 'bn' ? "২৪ ঘন্টা" : "24 Hours",
-        requirements: language === 'bn' 
-          ? ["অনলাইন ফরম পূরণ", "প্রয়োজনীয় ডকুমেন্ট আপলোড"]
-          : ["Fill online form", "Upload required documents"],
-        color: "blue"
-      },
-      {
-        step: 2,
-        title: language === 'bn' ? "ভর্তি পরীক্ষা" : "Admission Test",
-        description: language === 'bn' 
-          ? "লেভেল অনুযায়ী ভর্তি পরীক্ষায় অংশগ্রহণ" 
-          : "Participate in admission test according to level",
-        duration: language === 'bn' ? "৩ ঘন্টা" : "3 Hours",
-        requirements: language === 'bn' 
-          ? ["লিখিত পরীক্ষা", "মৌখিক পরীক্ষা", "সাক্ষাৎকার"]
-          : ["Written test", "Oral test", "Interview"],
-        color: "orange"
-      },
-      {
-        step: 3,
-        title: language === 'bn' ? "মনোনয়ন ও নির্বাচন" : "Nomination & Selection",
-        description: language === 'bn' 
-          ? "পরীক্ষার ফলাফল অনুযায়ী নির্বাচন প্রক্রিয়া" 
-          : "Selection process based on test results",
-        duration: language === 'bn' ? "৪৮ ঘন্টা" : "48 Hours",
-        requirements: language === 'bn' 
-          ? ["রেজাল্ট প্রকাশ", "মনোনয়ন লিস্ট", "সিলেকশন লেটার"]
-          : ["Result publication", "Nomination list", "Selection letter"],
-        color: "purple"
-      },
-      {
-        step: 4,
-        title: language === 'bn' ? "কাগজপত্র জমা ও ফি প্রদান" : "Document Submission & Fee Payment",
-        description: language === 'bn' 
-          ? "সমস্ত প্রয়োজনীয় ডকুমেন্ট ও ফি জমাদান" 
-          : "Submit all required documents and fees",
-        duration: language === 'bn' ? "৭ দিন" : "7 Days",
-        requirements: language === 'bn' 
-          ? ["মূল ডকুমেন্ট verification", "ফি প্রদান", "আবাসিক সিট কনফার্ম"]
-          : ["Original document verification", "Fee payment", "Hostel seat confirmation"],
-        color: "green"
-      },
-      {
-        step: 5,
-        title: language === 'bn' ? "ক্লাস শুরু" : "Class Begins",
-        description: language === 'bn' 
-          ? "নিয়মিত ক্লাস ও অ্যাকাডেমিক কার্যক্রম শুরু" 
-          : "Regular classes and academic activities begin",
-        duration: language === 'bn' ? "পরবর্তী সেশন" : "Next Session",
-        requirements: language === 'bn' 
-          ? ["ক্লাস রুটিন", "বই ও ইউনিফর্ম", "হোস্টেল বরাদ্দ"]
-          : ["Class routine", "Books & uniform", "Hostel allocation"],
-        color: "red"
-      }
-    ],
-    requirements: {
-      level1: {
-        age: language === 'bn' ? "৬ বছর নিচে" : "Below 6 years",
-        academic: language === 'bn' 
-          ? ["বর্ণমালা চিনতে পারা", "১-২০ পর্যন্ত সংখ্যা", "মৌলিক যোগ-বিয়োগ"]
-          : ["Recognize alphabet", "Numbers 1-20", "Basic addition-subtraction"],
-        documents: language === 'bn' 
-          ? ["জন্ম নিবন্ধন সনদ", "পাসপোর্ট সাইজ ছবি", "পূর্ববর্তী রিপোর্ট কার্ড"]
-          : ["Birth certificate", "Passport size photo", "Previous report card"]
-      },
-      level2: {
-        age: language === 'bn' ? "৯ বছর নিচে" : "Below 9 years",
-        academic: language === 'bn' 
-          ? ["সহজ পড়া ও লেখা", "১-১২ পর্যন্ত নামতা", "যোগ-বিয়োগ-পূরণ"]
-          : ["Simple reading & writing", "Multiplication table 1-12", "Addition-subtraction-fill"],
-        documents: language === 'bn' 
-          ? ["জন্ম নিবন্ধন সনদ", "পাসপোর্ট সাইজ ছবি", "পূর্ববর্তী রিপোর্ট কার্ড", "মেডিকেল সার্টিফিকেট"]
-          : ["Birth certificate", "Passport size photo", "Previous report card", "Medical certificate"]
-      },
-      level3: {
-        age: language === 'bn' ? "১২ বছর নিচে" : "Below 12 years",
-        academic: language === 'bn' 
-          ? ["রিডিং ও রাইটিং দক্ষতা", "ভাগ ও সরল অংক", "৮ম/৫ম শ্রেণীর যোগ্যতা"]
-          : ["Reading & writing skills", "Division & simple math", "8th/5th grade qualification"],
-        documents: language === 'bn' 
-          ? ["জন্ম নিবন্ধন সনদ", "পাসপোর্ট সাইজ ছবি", "সকল একাডেমিক সনদ", "মেডিকেল সার্টিফিকেট", "বাসার নিবন্ধন"]
-          : ["Birth certificate", "Passport size photo", "All academic certificates", "Medical certificate", "House registration"]
-      },
-      huffaz: {
-        age: language === 'bn' ? "১২ বছর নিচে" : "Below 12 years",
-        academic: language === 'bn' 
-          ? ["হাফেজ হতে হবে", "৩য় শ্রেণীর যোগ্যতা", "মৌলিক পড়া-লেখা"]
-          : ["Must be Hafiz", "3rd grade qualification", "Basic reading-writing"],
-        documents: language === 'bn' 
-          ? ["হিফজ সনদ", "জন্ম নিবন্ধন সনদ", "পাসপোর্ট সাইজ ছবি", "সকল একাডেমিক সনদ"]
-          : ["Hifz certificate", "Birth certificate", "Passport size photo", "All academic certificates"]
-      }
-    },
-    feeStructure: {
-      oneTime: [
-        { 
-          name: language === 'bn' ? "ভর্তি ফরম" : "Admission Form", 
-          amount: language === 'bn' ? "৫০০ টাকা" : "500 BDT" 
-        },
-        { 
-          name: language === 'bn' ? "নতুন ভর্তি ফি" : "New Admission Fee", 
-          amount: language === 'bn' ? "৩০,০০০ টাকা" : "30,000 BDT" 
-        },
-        { 
-          name: language === 'bn' ? "সেশন ফি" : "Session Fee", 
-          amount: language === 'bn' ? "২৫,০০০ টাকা" : "25,000 BDT" 
-        },
-        { 
-          name: language === 'bn' ? "ইনস্টলেশন ফি" : "Installation Fee", 
-          amount: language === 'bn' ? "১০,০০০ টাকা" : "10,000 BDT" 
-        },
-        { 
-          name: language === 'bn' ? "একুমেন্ডেশন ফি" : "Accommodation Fee", 
-          amount: language === 'bn' ? "১০,০০০ টাকা" : "10,000 BDT" 
-        },
-        { 
-          name: language === 'bn' ? "কার্ড, লকার, ড্রেস" : "Card, Locker, Dress", 
-          amount: language === 'bn' ? "৫,০০০ টাকা" : "5,000 BDT" 
-        },
-        { 
-          name: language === 'bn' ? "বই ও স্টেশনারী" : "Books & Stationery", 
-          amount: language === 'bn' ? "৫,০০০ টাকা" : "5,000 BDT" 
-        }
-      ],
-      monthly: {
-        tuition: [
-          { 
-            name: language === 'bn' ? "দরসে নিজামী" : "Dars-e-Nizami", 
-            amount: language === 'bn' ? "২,০০০ টাকা" : "2,000 BDT" 
-          },
-          { 
-            name: language === 'bn' ? "ন্যাশনাল কারিকুলাম" : "National Curriculum", 
-            amount: language === 'bn' ? "২,০০০ টাকা" : "2,000 BDT" 
-          },
-          { 
-            name: language === 'bn' ? "ক্যামব্রীজ ইন্টারন্যাশনাল" : "Cambridge International", 
-            amount: language === 'bn' ? "৩,০০০ টাকা" : "3,000 BDT" 
-          },
-          { 
-            name: language === 'bn' ? "নূরানি ও বেফাক কারিকুলাম" : "Noorani & Befaq Curriculum", 
-            amount: language === 'bn' ? "৩,০০০ টাকা" : "3,000 BDT" 
-          },
-          { 
-            name: language === 'bn' ? "কর্মমুখী কার্যক্রম" : "Vocational Activities", 
-            amount: language === 'bn' ? "২,০০০ টাকা" : "2,000 BDT" 
-          },
-          { 
-            name: language === 'bn' ? "বাস্তবমুখী কার্যক্রম" : "Practical Activities", 
-            amount: language === 'bn' ? "২,০০০ টাকা" : "2,000 BDT" 
-          },
-          { 
-            name: language === 'bn' ? "কারিগরি শিক্ষা" : "Technical Education", 
-            amount: language === 'bn' ? "২,০০০ টাকা" : "2,000 BDT" 
-          },
-          { 
-            name: language === 'bn' ? "কম্পিউটার শিক্ষা" : "Computer Education", 
-            amount: language === 'bn' ? "২,০০০ টাকা" : "2,000 BDT" 
-          },
-          { 
-            name: language === 'bn' ? "ল্যাঙ্গুয়েজ কোর্স" : "Language Course", 
-            amount: language === 'bn' ? "২,০০০ টাকা" : "2,000 BDT" 
-          },
-          { 
-            name: language === 'bn' ? "খেলাধুলা প্রশিক্ষণ" : "Sports Training", 
-            amount: language === 'bn' ? "২,০০০ টাকা" : "2,000 BDT" 
-          }
-        ],
-        residential: [
-          { 
-            name: language === 'bn' ? "ফ্লোর ভাড়া" : "Floor Rent", 
-            amount: language === 'bn' ? "৩,৫০০ টাকা" : "3,500 BDT" 
-          },
-          { 
-            name: language === 'bn' ? "বিদ্যুৎ ও পানির বিল" : "Electricity & Water Bill", 
-            amount: language === 'bn' ? "১,৫০০ টাকা" : "1,500 BDT" 
-          }
-        ],
-        food: [
-          { 
-            name: language === 'bn' ? "লেভেল-১ (নাস্তা ও খাবার)" : "Level-1 (Breakfast & Meal)", 
-            amount: language === 'bn' ? "৯,০০০ টাকা" : "9,000 BDT" 
-          },
-          { 
-            name: language === 'bn' ? "লেভেল-২ (নাস্তা ও খাবার)" : "Level-2 (Breakfast & Meal)", 
-            amount: language === 'bn' ? "১২,০০০ টাকা" : "12,000 BDT" 
-          },
-          { 
-            name: language === 'bn' ? "লেভেল-৩ (নাস্তা ও খাবার)" : "Level-3 (Breakfast & Meal)", 
-            amount: language === 'bn' ? "১৫,০০০ টাকা" : "15,000 BDT" 
-          },
-          { 
-            name: language === 'bn' ? "হুফ্ফাজ সিস্টেম (নাস্তা ও খাবার)" : "Huffaz System (Breakfast & Meal)", 
-            amount: language === 'bn' ? "১৫,০০০ টাকা" : "15,000 BDT" 
-          }
-        ]
-      }
-    },
-    importantDates: [
-      { 
-        event: language === 'bn' ? "ভর্তি আবেদন শুরু" : "Admission Application Starts", 
-        date: language === 'bn' ? "১লা জানুয়ারি ২০২৪" : "January 1, 2024", 
-        status: "open" 
-      },
-      { 
-        event: language === 'bn' ? "ভর্তি পরীক্ষা" : "Admission Test", 
-        date: language === 'bn' ? "১৫ই জানুয়ারি ২০২৪" : "January 15, 2024", 
-        status: "upcoming" 
-      },
-      { 
-        event: language === 'bn' ? "মনোনয়ন লিস্ট প্রকাশ" : "Nomination List Published", 
-        date: language === 'bn' ? "২০শে জানুয়ারি ২০২৪" : "January 20, 2024", 
-        status: "upcoming" 
-      },
-      { 
-        event: language === 'bn' ? "কাগজপত্র জমার শেষ তারিখ" : "Last Date for Document Submission", 
-        date: language === 'bn' ? "৩১শে জানুয়ারি ২০২৪" : "January 31, 2024", 
-        status: "upcoming" 
-      },
-      { 
-        event: language === 'bn' ? "ক্লাস শুরু" : "Classes Begin", 
-        date: language === 'bn' ? "১লা ফেব্রুয়ারি ২০২৪" : "February 1, 2024", 
-        status: "upcoming" 
-      }
-    ],
-    contact: {
-      phone: ["০১৪০৭-০৪৬০০১", "০১৪০৭-০৪৬০০২", "০১৪০৭-০৪৬০০৩"],
-      email: "admission@manzilinstitute.edu.bd",
-      address: language === 'bn' 
-        ? "হারুনুর রশীদ টাওয়ার (১০ তলা ভবন), বাড়ি #৯১, রোড #২, উত্তর রায়েরবাগ বাস স্ট্যান্ড, যাত্রাবাড়ী, ঢাকা ১৩৬২"
-        : "Harunur Rashid Tower (10 Storied Building), House #91, Road #2, North Rayarbagh Bus Stand, Jatrabari, Dhaka 1362",
-      officeHours: language === 'bn' 
-        ? "শনিবার - বৃহস্পতিবার: সকাল ৯:০০ - বিকাল ৫:০০"
-        : "Saturday - Thursday: 9:00 AM - 5:00 PM"
-    }
-  }
-
   const handleApplyNow = () => {
     navigate({ to: '/apply' })
   }
@@ -491,31 +258,73 @@ function AdmissionPage() {
     ]
   }
 
-  return (
-    <div>
-      <script type="application/ld+json">
-        {JSON.stringify(faqSchema)}
-      </script>
-      <script type="application/ld+json">
-        {JSON.stringify(breadcrumbSchema)}
-      </script>
-      <HeroHeader />
+  // Handle loading state
+  if (isLoading) {
+    return (
+      <ErrorBoundary>
+        <div>
+          <HeroHeader />
+          <main className="min-h-screen bg-gray-50 dark:bg-gray-900 mx-auto max-w-7xl px-4 sm:px-6 pt-24 pb-12">
+            <LoadingSkeleton />
+          </main>
+          <FooterSection />
+        </div>
+      </ErrorBoundary>
+    )
+  }
 
-      <main className="min-h-screen bg-gray-50 dark:bg-gray-900 mx-auto max-w-7xl px-4 sm:px-6 pt-24 pb-12" dir="ltr">
-        <AnimatedGroup
-          variants={{
-            container: {
-              visible: {
-                transition: {
-                  staggerChildren: 0.05,
-                  delayChildren: 0.75,
+  // Handle error state
+  if (error) {
+    return (
+      <ErrorBoundary>
+        <div>
+          <HeroHeader />
+          <main className="min-h-screen bg-gray-50 dark:bg-gray-900 mx-auto max-w-7xl px-4 sm:px-6 pt-24 pb-12">
+            <div className="text-center py-12">
+              <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+                {language === 'bn' ? 'তথ্য লোড করতে সমস্যা হয়েছে' : 'Failed to Load Admission Data'}
+              </h2>
+              <p className="text-gray-600 dark:text-gray-400 mb-6">
+                {error.message || (language === 'bn' ? 'অনুগ্রহ করে পুনরায় চেষ্টা করুন' : 'Please try again later')}
+              </p>
+              <Button onClick={() => refetch()} className="bg-[#00AEEF] hover:bg-[#00AEEF]/90">
+                {language === 'bn' ? 'পুনরায় চেষ্টা করুন' : 'Try Again'}
+              </Button>
+            </div>
+          </main>
+          <FooterSection />
+        </div>
+      </ErrorBoundary>
+    )
+  }
+
+  return (
+    <ErrorBoundary>
+      <div>
+        <script type="application/ld+json">
+          {JSON.stringify(faqSchema)}
+        </script>
+        <script type="application/ld+json">
+          {JSON.stringify(breadcrumbSchema)}
+        </script>
+        <HeroHeader />
+
+        <main className="min-h-screen bg-gray-50 dark:bg-gray-900 mx-auto max-w-7xl px-4 sm:px-6 pt-24 pb-12" dir="ltr">
+          <AnimatedGroup
+            variants={{
+              container: {
+                visible: {
+                  transition: {
+                    staggerChildren: 0.05,
+                    delayChildren: 0.75,
+                  },
                 },
               },
-            },
-            ...transitionVariants,
-          }}
-          className="space-y-8"
-        >
+              ...transitionVariants,
+            }}
+            className="space-y-8"
+          >
         {/* Main Heading Section */}
         <section className="text-center mb-8 sm:mb-12">
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-4 kalpurush-font">
@@ -1257,5 +1066,6 @@ function AdmissionPage() {
       </main>
       <FooterSection />
     </div>
+    </ErrorBoundary>
   )
 }

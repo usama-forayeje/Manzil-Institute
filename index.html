@@ -21,7 +21,6 @@
 
     <!-- Preload critical resources -->
     <link rel="modulepreload" href="/src/main.jsx">
-    <link rel="modulepreload" href="/src/router.jsx">
 
     <!-- Resource hints for external assets -->
     <link rel="preconnect" href="https://deifkwefumgah.cloudfront.net">
@@ -31,6 +30,12 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
+
+    <!-- Performance optimizations -->
+    <meta name="format-detection" content="telephone=no">
+    <meta name="msapplication-tap-highlight" content="no">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="dns-prefetch" href="//fonts.gstatic.com">
   </head>
   <body>
     <div id="root"></div>

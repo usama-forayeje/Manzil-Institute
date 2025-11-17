@@ -1,3 +1,4 @@
+import React from 'react'
 import { Button } from "@/components/ui/button";
 import { Link } from "@tanstack/react-router";
 import { TwitterIcon, Facebook, Linkedin } from "lucide-react";
@@ -282,7 +283,7 @@ const Team = () => {
               <div className="flex items-center justify-center gap-3">
                 {/* WhatsApp Button */}
                 <a
-                  href="https://wa.me/8801822478883?text=%E0%A6%86%E0%A6%AE%E0%A6%BF%20%E0%A6%86%E0%A6%AA%E0%A6%A8%E0%A6%BE%E0%A6%A6%E0%A7%87%E0%A6%B0%20%E0%A6%87%E0%A6%A8%E0%A7%8D%E0%A6%B8%E0%A6%9F%E0%A6%BF%E0%A6%9F%E0%A6%BF%E0%A6%89%E0%A6%9F%20%E0%A6%B8%E0%A6%AE%E0%A7%8D%E0%A6%AA%E0%A6%B0%E0%A7%8D%E0%A6%95%E0%A7%87%20%E0%A6%9C%E0%A6%BE%E0%A6%A8%E0%A6%A4%E0%A7%87%20%E0%A6%9A%E0%A6%BE%E0%A6%87"
+                  href="https://wa.me/8801822478883?text=%E0%A6%86%E0%A6%AE%E0%A6%BF%20%E0%A6%86%E0%A6%AA%E0%A6%A8%E0%A6%BE%E0%A6%A6%E0%A7%87%E0%A6%B0%20%E0%A6%87%E0%A6%A8%E0%A6%B8%E0%A7%8D%E0%A6%9F%E0%A6%BF%E0%A6%9F%E0%A6%BF%E0%A6%89%E0%A6%9F%20%E0%A6%B8%E0%A6%AE%E0%A7%8D%E0%A6%AA%E0%A6%B0%E0%A7%8D%E0%A6%95%E0%A7%87%20%E0%A6%9C%E0%A6%BE%E0%A6%A8%E0%A6%A4%E0%A7%87%20%E0%A6%9A%E0%A6%BE%E0%A6%87"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="bg-green-100 hover:bg-green-200 dark:bg-green-900/30 dark:hover:bg-green-800/50 text-green-600 hover:text-green-700 dark:text-green-400 shadow-none transition-all duration-200 hover:scale-105 cursor-pointer rounded-md p-2 flex items-center justify-center"

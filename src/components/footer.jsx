@@ -1,3 +1,4 @@
+import React from 'react'
 import { Link } from '@tanstack/react-router'
 import { MapPin, Phone, Mail, Facebook, Youtube } from 'lucide-react'
 import { useLanguageStore } from '@/lib/store'

@@ -1,37 +1,43 @@
-import { useState, useEffect } from 'react'
+import React from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { ArrowUp } from 'lucide-react'
 
 const FloatingActionButtons = () => {
   const [isVisible, setIsVisible] = useState(false)
   const [progress, setProgress] = useState(0)
+  const rafRef = useRef(null)
 
   // Show button when page is scrolled up to given distance
-  const toggleVisibility = () => {
+  const toggleVisibility = useCallback(() => {
     const scrolled = window.pageYOffset
-    if (scrolled > 200) {
-      setIsVisible(true)
-    } else {
-      setIsVisible(false)
-    }
-  }
+    setIsVisible(scrolled > 200)
+  }, [])
 
-  // Calculate scroll progress
-  const calculateProgress = () => {
-    const scrolled = window.pageYOffset
-    const maxHeight = document.body.scrollHeight - window.innerHeight
-    const progress = maxHeight > 0 ? (scrolled / maxHeight) * 100 : 0
-    setProgress(progress)
-  }
+  // Calculate scroll progress with throttling
+  const calculateProgress = useCallback(() => {
+    if (rafRef.current) return
+
+    rafRef.current = requestAnimationFrame(() => {
+      const scrolled = window.pageYOffset
+      const maxHeight = document.body.scrollHeight - window.innerHeight
+      const newProgress = maxHeight > 0 ? (scrolled / maxHeight) * 100 : 0
+      setProgress(newProgress)
+      rafRef.current = null
+    })
+  }, [])
 
   // Set the scroll event listeners
   useEffect(() => {
-    window.addEventListener('scroll', toggleVisibility)
-    window.addEventListener('scroll', calculateProgress)
+    window.addEventListener('scroll', toggleVisibility, { passive: true })
+    window.addEventListener('scroll', calculateProgress, { passive: true })
     return () => {
       window.removeEventListener('scroll', toggleVisibility)
       window.removeEventListener('scroll', calculateProgress)
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current)
+      }
     }
-  }, [])
+  }, [toggleVisibility, calculateProgress])
 
   // Scroll to top smoothly
   const scrollToTop = () => {
@@ -42,7 +48,7 @@ const FloatingActionButtons = () => {
   }
 
   // WhatsApp link with predefined message
-  const whatsappUrl = 'https://wa.me/8801822478883?text=%E0%A6%86%E0%A6%AE%E0%A6%BF%20%E0%A6%86%E0%A6%AA%E0%A6%A8%E0%A6%BE%E0%A6%A6%E0%A7%87%E0%A6%B0%20%E0%A6%87%E0%A6%A8%E0%A7%8D%E0%A6%B8%E0%A6%9F%E0%A6%BF%E0%A6%9F%E0%A6%BF%E0%A6%89%E0%A6%9F%20%E0%A6%B8%E0%A6%AE%E0%A7%8D%E0%A6%AA%E0%A6%B0%E0%A7%8D%E0%A6%95%E0%A7%87%20%E0%A6%9C%E0%A6%BE%E0%A6%A8%E0%A6%A4%E0%A7%87%20%E0%A6%9A%E0%A6%BE%E0%A6%87'
+  const whatsappUrl = 'https://wa.me/8801822478883?text=%E0%A6%86%E0%A6%AE%E0%A6%BF%20%E0%A6%86%E0%A6%AA%E0%A6%A8%E0%A6%BE%E0%A6%A6%E0%A7%87%E0%A6%B0%20%E0%A6%87%E0%A6%A8%E0%A6%B8%E0%A7%8D%E0%A6%9F%E0%A6%BF%E0%A6%9F%E0%A6%BF%E0%A6%89%E0%A6%9F%20%E0%A6%B8%E0%A6%AE%E0%A7%8D%E0%A6%AA%E0%A6%B0%E0%A7%8D%E0%A6%95%E0%A7%87%20%E0%A6%9C%E0%A6%BE%E0%A6%A8%E0%A6%A4%E0%A7%87%20%E0%A6%9A%E0%A6%BE%E0%A6%87'
 
   return (
     <div className="fixed bottom-2 right-5 z-50 flex flex-col-reverse gap-0">

@@ -111,7 +111,7 @@ export const HeroHeader = () => {
                 <img
                   src={theme === 'dark' ? '/manzil-logo/manzil-institute-logo-dark.webp' : '/manzil-logo/manzil-institute-logo-light.webp'}
                   alt="Manzil Institute Logo"
-                  width="160"
+                  width="170"
                   height="40"
                   className="h-10 w-auto object-contain"
                 />
@@ -220,7 +220,7 @@ export const HeroHeader = () => {
           <div
             ref={menuRef}
             className={cn(
-              "lg:hidden md:hidden bg-background/95 backdrop-blur-lg border-t border-gray-200 dark:border-gray-700 pt-1  px-6 rounded-b-2xl transition-all duration-300 ease-in-out overflow-hidden",
+              "lg:hidden  bg-background/95 backdrop-blur-lg border-t border-gray-200 dark:border-gray-700 pt-1  px-6 rounded-b-2xl transition-all duration-300 ease-in-out overflow-hidden",
               isMenuOpen
                 ? "max-h-96 opacity-100 translate-y-0"
                 : "max-h-0 opacity-0 -translate-y-4 pointer-events-none"

@@ -7,7 +7,7 @@ import { Sun } from 'lucide-react'
 import { Moon } from 'lucide-react'
 
 export function ModeToggle() {
-  const { setTheme, resolvedTheme, isPending } = useTheme()
+  const { setTheme, resolvedTheme } = useTheme()
   const [optimisticTheme, setOptimisticTheme] = useOptimistic(resolvedTheme)
 
   const handleThemeToggle = React.useCallback(
@@ -42,7 +42,6 @@ export function ModeToggle() {
       size="sm"
       onClick={handleThemeToggle}
       className="relative"
-      disabled={isPending}
     >
       <Sun className={`h-4 w-4 rotate-0 scale-100 transition-all ${optimisticTheme === 'dark' ? '-rotate-90 scale-0' : ''}`} />
       <Moon className={`absolute h-4 w-4 rotate-90 scale-0 transition-all ${optimisticTheme === 'dark' ? 'rotate-0 scale-100' : ''}`} />

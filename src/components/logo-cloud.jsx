@@ -1,3 +1,4 @@
+import React from 'react'
 import { InfiniteSlider } from '@/components/ui/infinite-slider'
 import { ProgressiveBlur } from '@/components/ui/progressive-blur'
 import { LazyImage } from '@/components/ui/lazy-image'
@@ -22,8 +23,7 @@ export const LogoCloud = () => {
         { name: 'manzil-trading-logo', hasVariants: true, alt: 'Manzil Trading Logo', href: 'https://trading.manzilgroupbd.com' },
         { name: 'mic-logo', hasVariants: true, alt: 'MIC Logo', href: 'https://institute.manzilgroupbd.com' },
         { name: 'msd-logo', hasVariants: true, alt: 'MSD Logo', href: 'https://institute.manzilgroupbd.com' },
-        { name: 'progoti-logo', hasVariants: true, alt: 'Progoti Logo', href: 'https://progoti.manzilgroupbd.com' },
-        { name: 'success-logo', hasVariants: true, alt: 'Success Logo', href: 'https://success.manzilgroupbd.com' },
+        { name: 'success-logo', hasVariants: true, alt: 'Success Logo', href: 'https://successunitybuilders.com' },
     ]
 
     return (

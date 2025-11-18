@@ -44,7 +44,7 @@ export function Providers({ children }) {
 
   return (
     <QueryClientProvider client={client}>
-      <ThemeProvider defaultTheme="light" storageKey="manzil-theme">
+      <ThemeProvider defaultTheme="dark" storageKey="manzil-theme">
         {children}
       </ThemeProvider>
     </QueryClientProvider>

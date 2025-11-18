@@ -7,7 +7,7 @@ const ThemeProviderContext = createContext()
 
 export function ThemeProvider({
     children,
-    defaultTheme = 'light',
+    defaultTheme = 'dark',
     storageKey = 'manzil-theme',
     ...props
 }) {

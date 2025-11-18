@@ -109,18 +109,18 @@ manzil-international-institute/
 │   ├── logo512.png
 │   ├── manifest.json
 │   └── robots.txt
+├── components/                      # Reusable components
+│   ├── Header.jsx                   # Main navigation header
+│   └── ui/                         # Shadcn UI components
+│       ├── badge.jsx
+│       ├── button.jsx
+│       ├── card.jsx
+│       ├── input.jsx
+│       └── textarea.jsx
+├── hooks/                          # Custom hooks
+├── lib/                            # Utility functions
+│   └── utils.js                    # Class name utility
 ├── src/
-│   ├── components/                  # Reusable components
-│   │   ├── Header.jsx               # Main navigation header
-│   │   └── ui/                     # Shadcn UI components
-│   │       ├── badge.jsx
-│   │       ├── button.jsx
-│   │       ├── card.jsx
-│   │       ├── input.jsx
-│   │       └── textarea.jsx
-│   ├── hooks/                      # Custom hooks
-│   ├── lib/                        # Utility functions
-│   │   └── utils.js                # Class name utility
 │   ├── routes/                     # File-based routes
 │   │   ├── __root.jsx              # Root layout
 │   │   ├── index.jsx               # Home page
@@ -130,8 +130,8 @@ manzil-international-institute/
 │   │   └── sitemap.xml.js          # Sitemap XML
 │   ├── router.jsx                  # Router configuration
 │   ├── routeTree.gen.js            # Auto-generated route tree
-│   ├── styles.css                  # Global styles
 │   └── main.jsx                    # Application entry point
+├── styles.css                      # Global styles
 ├── .vscode/                        # VS Code settings
 ├── components.json                 # Shadcn configuration
 ├── eslint.config.js                # ESLint configuration
@@ -154,7 +154,7 @@ The application uses **TanStack Router** with file-based routing:
 
 ### Component Architecture
 
-- **Header Component** (`src/components/header.jsx`): Responsive navigation with mobile menu
+- **Header Component** (`components/header.jsx`): Responsive navigation with mobile menu
 - **UI Components**: Shadcn-based reusable components in `/ui`
 - **Page Components**: Route-specific components in `/routes`
 - **Layout Components**: Root layout with providers
@@ -167,7 +167,7 @@ The application uses **TanStack Router** with file-based routing:
 
 ## 🧩 Components
 
-### Header Component (`src/components/Header.tsx`)
+### Header Component (`components/Header.tsx`)
 
 - Responsive navigation bar
 - Mobile-friendly slide-out menu
@@ -183,7 +183,7 @@ The application uses **TanStack Router** with file-based routing:
 
 ### UI Components (Shadcn)
 
-Located in `src/components/ui/`:
+Located in `components/ui/`:
 
 - **Button**: Customizable button variants
 - **Card**: Content containers
@@ -235,7 +235,7 @@ export const Route = createFileRoute('/about')({
 
 ### CSS Variables
 
-Defined in `src/styles.css`:
+Defined in `styles.css`:
 
 ```css
 :root {

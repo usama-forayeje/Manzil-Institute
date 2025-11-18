@@ -1,0 +1,1001 @@
+'use client'
+
+import { useState, useEffect } from 'react'
+import { ArrowLeft, Download, Calendar, Clock, Phone, Mail, MapPin, CheckCircle, AlertCircle } from 'lucide-react'
+import { Button } from '../../components/ui/button'
+import { useLanguageStore } from '../../lib/store'
+import { cn } from '../../lib/utils'
+import { AnimatedGroup } from '../../components/ui/animated-group'
+import { useAdmissionData, usePrefetchAdmissionData } from '../../hooks/useData'
+import ErrorBoundary from '../../components/ErrorBoundary'
+import LoadingSkeleton from '../../components/LoadingSkeleton'
+import FooterSection from '../../components/footer'
+import HeroHeader from '@/components/header'
+
+const transitionVariants = {
+  item: {
+    hidden: {
+      opacity: 0,
+      filter: 'blur(12px)',
+      y: 12,
+    },
+    visible: {
+      opacity: 1,
+      filter: 'blur(0px)',
+      y: 0,
+      transition: {
+        type: 'spring',
+        bounce: 0.3,
+        duration: 1.5,
+      },
+    },
+  },
+}
+
+export default function AdmissionPage() {
+  const [activeTab, setActiveTab] = useState('process')
+  const { language } = useLanguageStore()
+
+  const { data: admissionData, isLoading, error, refetch } = useAdmissionData(language)
+
+  // Fallback data in case the hook fails
+  const fallbackData = {
+    overview: {
+      title: "Admission Overview",
+      description: "Comprehensive admission information for Manzil International Institute"
+    },
+    process: [],
+    requirements: { level1: {}, level2: {}, level3: {}, huffaz: {} },
+    feeStructure: { oneTime: [], monthly: { tuition: [], residential: [], food: [] } },
+    importantDates: [],
+    contact: { phone: [], email: "", address: "", officeHours: "" }
+  }
+
+  const safeAdmissionData = admissionData || fallbackData
+
+  // Ensure all required properties exist
+  const safeData = {
+    overview: safeAdmissionData.overview || fallbackData.overview,
+    process: Array.isArray(safeAdmissionData.process) ? safeAdmissionData.process : fallbackData.process,
+    requirements: safeAdmissionData.requirements || fallbackData.requirements,
+    feeStructure: safeAdmissionData.feeStructure || fallbackData.feeStructure,
+    importantDates: Array.isArray(safeAdmissionData.importantDates) ? safeAdmissionData.importantDates : fallbackData.importantDates,
+    contact: safeAdmissionData.contact || fallbackData.contact
+  }
+
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is the admission process for Manzil International Institute?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The admission process includes online application, admission test, nomination & selection, document submission & fee payment, and class commencement. Each step is designed to ensure quality education for deserving students."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What are the eligibility criteria for different levels?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Level 1: Below 6 years with basic alphabet recognition. Level 2: Below 9 years with simple reading/writing. Level 3: Below 12 years with reading/writing skills. Huffaz: Below 12 years and must be Hafiz with basic education."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What documents are required for admission?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Required documents include birth certificate, passport-size photos, previous report cards, medical certificates (for some levels), and house registration. Additional documents may be required based on the level."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the fee structure for Manzil Institute?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Fees include one-time admission charges (30,000 BDT), session fees (25,000 BDT), monthly tuition fees (2,000-3,000 BDT), residential fees (3,500-15,000 BDT), and food fees (9,000-15,000 BDT) depending on the program and level."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "When does the admission process start?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Admission applications are currently open. The admission test is scheduled for January 15, 2024, with classes beginning February 1, 2024. Please check our website for the latest updates."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does Manzil Institute offer residential facilities?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, Manzil Institute provides residential facilities for both boys and girls with 24/7 security, modern amenities, halal food service, and supervision by qualified staff."
+        }
+      }
+    ]
+  }
+
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
+
+  const getColorClasses = (color) => {
+    const colorMap = {
+      blue: {
+        bg100: 'bg-[#00AEEF]/20 dark:bg-[#00AEEF]/10',
+        bg500: 'bg-[#00AEEF]',
+        text500: 'text-[#00AEEF]'
+      },
+      green: {
+        bg100: 'bg-green-100 dark:bg-green-900/30',
+        bg500: 'bg-green-500',
+        text500: 'text-green-500'
+      },
+      purple: {
+        bg100: 'bg-purple-100 dark:bg-purple-900/30',
+        bg500: 'bg-purple-500',
+        text500: 'text-purple-500'
+      },
+      orange: {
+        bg100: 'bg-orange-100 dark:bg-orange-900/30',
+        bg500: 'bg-orange-500',
+        text500: 'text-orange-500'
+      },
+      red: {
+        bg100: 'bg-red-100 dark:bg-red-900/30',
+        bg500: 'bg-red-500',
+        text500: 'text-red-500'
+      }
+    }
+    return colorMap[color] || colorMap.blue
+  }
+
+  const handleApplyNow = () => {
+    window.location.href = '/apply'
+  }
+
+  const handleDownloadForm = () => {
+    alert(language === 'bn' ? 'ভর্তি ফরম ডাউনলোড শুরু হচ্ছে...' : 'Downloading admission form...')
+  }
+
+  // Make tabs reactive to language changes
+  const tabs = [
+    { id: 'process', label: language === 'bn' ? 'ভর্তি প্রক্রিয়া' : 'Admission Process' },
+    { id: 'requirements', label: language === 'bn' ? 'যোগ্যতা ও ডকুমেন্ট' : 'Eligibility & Documents' },
+    { id: 'fees', label: language === 'bn' ? 'ফি কাঠামো' : 'Fee Structure' },
+    { id: 'dates', label: language === 'bn' ? 'গুরুত্বপূর্ণ তারিখ' : 'Important Dates' },
+    { id: 'contact', label: language === 'bn' ? 'যোগাযোগ' : 'Contact' }
+  ]
+
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://institute.manzilgroupbd.com"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Admission",
+        "item": "https://institute.manzilgroupbd.com/admission"
+      }
+    ]
+  }
+
+  // Handle loading state
+  if (isLoading) {
+    return (
+      <ErrorBoundary>
+        <div>
+          <HeroHeader />
+          <main className="min-h-screen bg-gray-50 dark:bg-gray-900 mx-auto max-w-7xl px-4 sm:px-6 pt-24 pb-12">
+            <LoadingSkeleton />
+          </main>
+          <FooterSection />
+        </div>
+      </ErrorBoundary>
+    )
+  }
+
+  // Handle error state
+  if (error) {
+    return (
+      <ErrorBoundary>
+        <div>
+          <HeroHeader />
+          <main className="min-h-screen bg-gray-50 dark:bg-gray-900 mx-auto max-w-7xl px-4 sm:px-6 pt-24 pb-12">
+            <div className="text-center py-12">
+              <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+                {language === 'bn' ? 'তথ্য লোড করতে সমস্যা হয়েছে' : 'Failed to Load Admission Data'}
+              </h2>
+              <p className="text-gray-600 dark:text-gray-400 mb-6">
+                {error.message || (language === 'bn' ? 'অনুগ্রহ করে পুনরায় চেষ্টা করুন' : 'Please try again later')}
+              </p>
+              <Button onClick={() => refetch()} className="bg-[#00AEEF] hover:bg-[#00AEEF]/90">
+                {language === 'bn' ? 'পুনরায় চেষ্টা করুন' : 'Try Again'}
+              </Button>
+            </div>
+          </main>
+          <FooterSection />
+        </div>
+      </ErrorBoundary>
+    )
+  }
+
+  return (
+    <ErrorBoundary>
+      <div>
+        <script type="application/ld+json">
+          {JSON.stringify(faqSchema)}
+        </script>
+        <script type="application/ld+json">
+          {JSON.stringify(breadcrumbSchema)}
+        </script>
+        <HeroHeader />
+
+        <main className="min-h-screen bg-gray-50 dark:bg-gray-900 mx-auto max-w-7xl px-4 sm:px-6 pt-24 pb-12" dir="ltr">
+          <AnimatedGroup
+            variants={{
+              container: {
+                visible: {
+                  transition: {
+                    staggerChildren: 0.05,
+                    delayChildren: 0.75,
+                  },
+                },
+              },
+              ...transitionVariants,
+            }}
+            className="space-y-8"
+          >
+        {/* Main Heading Section */}
+        <section className="text-center mb-8 sm:mb-12">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-4 kalpurush-font">
+            {language === 'bn' ? 'মানযিল ইনস্টিটিউট ভর্তি প্রক্রিয়া' : 'Manzil Institute Admission Process'}
+          </h1>
+          <h2 className="text-lg md:text-xl text-[#00AEEF] dark:text-[#00AEEF]/80 mb-6 kalpurush-font">
+              {language === 'bn' ? 'বাংলাদেশে MIC কারিকুলাম ভর্তি - অনলাইন আবেদন এবং প্রয়োজনীয়তা' : 'MIC Curriculum Admission in Bangladesh - Online Application & Requirements'}
+          </h2>
+          <p className="text-base md:text-lg text-gray-600 dark:text-gray-400 max-w-3xl mx-auto kalpurush-font">
+            {language === 'bn'
+              ? 'মানযিল ইনস্টিটিউটে ভর্তির জন্য সম্পূর্ণ প্রক্রিয়া, যোগ্যতা, ফি কাঠামো এবং গুরুত্বপূর্ণ তারিখসমূহ জানুন। বাংলাদেশের প্রথম সমন্বিত শিক্ষা প্রতিষ্ঠানে আপনার সন্তানের ভবিষ্যত গড়ে তুলুন।'
+              : 'Learn about the complete admission process, eligibility, fee structure, and important dates for Manzil Institute. Build your child\'s future at Bangladesh\'s first integrated educational institution.'
+            }
+          </p>
+        </section>
+
+        {/* Overview Stats */}
+        <section className="bg-white dark:bg-gray-800 rounded-2xl p-6 sm:p-8 mb-6 sm:mb-8 border border-gray-200 dark:border-gray-700">
+          <div className="text-center mb-6 sm:mb-8">
+            <h2 className={cn(
+              "text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4",
+              language === 'bn' && "bengali-text"
+            )}>
+              {safeData.overview.title}
+            </h2>
+            <p className={cn(
+              "text-sm sm:text-base text-gray-600 dark:text-gray-400 max-w-3xl mx-auto",
+              language === 'bn' && "bengali-text"
+            )}>
+              {safeData.overview.description}
+            </p>
+          </div>
+        </section>
+
+        {/* Navigation Tabs */}
+        <div className="flex flex-wrap gap-2 mb-6 sm:mb-8 justify-center sm:justify-center">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={cn(
+                "px-3 sm:px-4 lg:px-6 py-2 sm:py-3 rounded-xl font-medium text-sm sm:text-base transition-colors border border-gray-200 dark:border-gray-700 flex-shrink-0",
+                activeTab === tab.id
+                  ? 'bg-[#00AEEF] text-white'
+                  : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700',
+                language === 'bn' && "bengali-text"
+              )}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Tab Content */}
+        <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 sm:p-6 lg:p-8 border border-gray-200 dark:border-gray-700">
+          {/* Admission Process */}
+          {activeTab === 'process' && (
+            <div className="space-y-6 sm:space-y-8">
+              <h3 className={cn(
+                "text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6",
+                language === 'bn' && "bengali-text"
+              )}>
+                {language === 'bn' ? 'ভর্তি প্রক্রিয়া - ধাপ সমূহ' : 'Admission Process - Steps'}
+              </h3>
+
+              {safeData.process.map((step, index) => {
+                const colorClasses = getColorClasses(step.color)
+                return (
+                  <div key={index} className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-start">
+                    {/* Step Number */}
+                    <div className={`w-12 h-12 sm:w-16 sm:h-16 ${colorClasses.bg100} rounded-2xl flex items-center justify-center flex-shrink-0`}>
+                      <div className={`w-10 h-10 sm:w-12 sm:h-12 ${colorClasses.bg500} rounded-xl flex items-center justify-center text-white font-bold text-base sm:text-lg`}>
+                        {step.step}
+                      </div>
+                    </div>
+
+                    {/* Step Content */}
+                    <div className="flex-1">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2 sm:mb-3">
+                        <h4 className={cn(
+                          "text-base sm:text-lg md:text-xl font-semibold text-gray-900 dark:text-white mb-1 sm:mb-0",
+                          language === 'bn' && "bengali-text"
+                        )}>
+                          {step.title}
+                        </h4>
+                        <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
+                          <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
+                          <span className={cn("text-xs sm:text-sm", language === 'bn' && "bengali-text")}>
+                            {step.duration}
+                          </span>
+                        </div>
+                      </div>
+
+                      <p className={cn(
+                        "text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-3 sm:mb-4",
+                        language === 'bn' && "bengali-text"
+                      )}>
+                        {step.description}
+                      </p>
+
+                      <div className="grid gap-1 sm:gap-2">
+                        {step.requirements.map((requirement, reqIndex) => (
+                          <div key={reqIndex} className="flex items-center gap-2">
+                            <CheckCircle className={`w-3 h-3 sm:w-4 sm:h-4 ${colorClasses.text500}`} />
+                            <span className={cn(
+                              "text-xs sm:text-sm text-gray-700 dark:text-gray-300",
+                              language === 'bn' && "bengali-text"
+                            )}>
+                              {requirement}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+
+          {/* Requirements & Documents */}
+          {activeTab === 'requirements' && (
+            <div className="space-y-6 sm:space-y-8">
+              <h3 className={cn(
+                "text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6",
+                language === 'bn' && "bengali-text"
+              )}>
+                {language === 'bn' ? 'লেভেল অনুযায়ী যোগ্যতা ও প্রয়োজনীয় ডকুমেন্ট' : 'Level-wise Eligibility & Required Documents'}
+              </h3>
+
+              <div className="grid md:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
+                {/* Level 1 */}
+                <div className="bg-[#00AEEF]/10 dark:bg-[#00AEEF]/5 rounded-2xl p-4 sm:p-6">
+                  <div className="flex items-center gap-2 mb-3 sm:mb-4">
+                    <div className="w-2 h-2 sm:w-3 sm:h-3 bg-[#00AEEF] rounded-full"></div>
+                    <h4 className={cn(
+                      "font-semibold text-[#00AEEF]/90 dark:text-[#00AEEF]/70 text-sm sm:text-base",
+                      language === 'bn' && "bengali-text"
+                    )}>
+                      {language === 'bn' ? 'লেভেল ১' : 'Level 1'}
+                    </h4>
+                  </div>
+
+                  <div className="space-y-3 sm:space-y-4">
+                    <div>
+                      <h5 className={cn(
+                        "font-medium text-gray-900 dark:text-white mb-1 sm:mb-2 text-sm sm:text-base",
+                        language === 'bn' && "bengali-text"
+                      )}>
+                        {language === 'bn' ? 'বয়স:' : 'Age:'}
+                      </h5>
+                      <p className={cn(
+                        "text-xs sm:text-sm text-gray-600 dark:text-gray-400",
+                        language === 'bn' && "bengali-text"
+                      )}>
+                        {safeData.requirements.level1.age}
+                      </p>
+                    </div>
+
+                    <div>
+                      <h5 className={cn(
+                        "font-medium text-gray-900 dark:text-white mb-1 sm:mb-2 text-sm sm:text-base",
+                        language === 'bn' && "bengali-text"
+                      )}>
+                        {language === 'bn' ? 'একাডেমিক যোগ্যতা:' : 'Academic Qualification:'}
+                      </h5>
+                      <ul className="space-y-1">
+                        {safeData.requirements.level1.academic.map((item, idx) => (
+                          <li key={idx} className="flex items-center gap-2">
+                            <CheckCircle className="w-3 h-3 text-green-500" />
+                            <span className={cn(
+                              "text-xs sm:text-sm text-gray-700 dark:text-gray-300",
+                              language === 'bn' && "bengali-text"
+                            )}>
+                              {item}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    <div>
+                      <h5 className={cn(
+                        "font-medium text-gray-900 dark:text-white mb-1 sm:mb-2 text-sm sm:text-base",
+                        language === 'bn' && "bengali-text"
+                      )}>
+                        {language === 'bn' ? 'প্রয়োজনীয় ডকুমেন্ট:' : 'Required Documents:'}
+                      </h5>
+                      <ul className="space-y-1">
+                        {safeData.requirements.level1.documents.map((doc, idx) => (
+                          <li key={idx} className="flex items-center gap-2">
+                            <AlertCircle className="w-3 h-3 text-orange-500" />
+                            <span className={cn(
+                              "text-xs sm:text-sm text-gray-700 dark:text-gray-300",
+                              language === 'bn' && "bengali-text"
+                            )}>
+                              {doc}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Level 2 */}
+                <div className="bg-green-50 dark:bg-green-900/20 rounded-2xl p-4 sm:p-6">
+                  <div className="flex items-center gap-2 mb-3 sm:mb-4">
+                    <div className="w-2 h-2 sm:w-3 sm:h-3 bg-green-500 rounded-full"></div>
+                    <h4 className={cn(
+                      "font-semibold text-green-700 dark:text-green-300 text-sm sm:text-base",
+                      language === 'bn' && "bengali-text"
+                    )}>
+                      {language === 'bn' ? 'লেভেল ২' : 'Level 2'}
+                    </h4>
+                  </div>
+
+                  <div className="space-y-3 sm:space-y-4">
+                    <div>
+                      <h5 className={cn(
+                        "font-medium text-gray-900 dark:text-white mb-1 sm:mb-2 text-sm sm:text-base",
+                        language === 'bn' && "bengali-text"
+                      )}>
+                        {language === 'bn' ? 'বয়স:' : 'Age:'}
+                      </h5>
+                      <p className={cn(
+                        "text-xs sm:text-sm text-gray-600 dark:text-gray-400",
+                        language === 'bn' && "bengali-text"
+                      )}>
+                        {safeData.requirements.level2.age}
+                      </p>
+                    </div>
+
+                    <div>
+                      <h5 className={cn(
+                        "font-medium text-gray-900 dark:text-white mb-1 sm:mb-2 text-sm sm:text-base",
+                        language === 'bn' && "bengali-text"
+                      )}>
+                        {language === 'bn' ? 'একাডেমিক যোগ্যতা:' : 'Academic Qualification:'}
+                      </h5>
+                      <ul className="space-y-1">
+                        {safeData.requirements.level2.academic.map((item, idx) => (
+                          <li key={idx} className="flex items-center gap-2">
+                            <CheckCircle className="w-3 h-3 text-green-500" />
+                            <span className={cn(
+                              "text-xs sm:text-sm text-gray-700 dark:text-gray-300",
+                              language === 'bn' && "bengali-text"
+                            )}>
+                              {item}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    <div>
+                      <h5 className={cn(
+                        "font-medium text-gray-900 dark:text-white mb-1 sm:mb-2 text-sm sm:text-base",
+                        language === 'bn' && "bengali-text"
+                      )}>
+                        {language === 'bn' ? 'প্রয়োজনীয় ডকুমেন্ট:' : 'Required Documents:'}
+                      </h5>
+                      <ul className="space-y-1">
+                        {safeData.requirements.level2.documents.map((doc, idx) => (
+                          <li key={idx} className="flex items-center gap-2">
+                            <AlertCircle className="w-3 h-3 text-orange-500" />
+                            <span className={cn(
+                              "text-xs sm:text-sm text-gray-700 dark:text-gray-300",
+                              language === 'bn' && "bengali-text"
+                            )}>
+                              {doc}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Level 3 */}
+                <div className="bg-purple-50 dark:bg-purple-900/20 rounded-2xl p-4 sm:p-6">
+                  <div className="flex items-center gap-2 mb-3 sm:mb-4">
+                    <div className="w-2 h-2 sm:w-3 sm:h-3 bg-purple-500 rounded-full"></div>
+                    <h4 className={cn(
+                      "font-semibold text-purple-700 dark:text-purple-300 text-sm sm:text-base",
+                      language === 'bn' && "bengali-text"
+                    )}>
+                      {language === 'bn' ? 'লেভেল ৩' : 'Level 3'}
+                    </h4>
+                  </div>
+
+                  <div className="space-y-3 sm:space-y-4">
+                    <div>
+                      <h5 className={cn(
+                        "font-medium text-gray-900 dark:text-white mb-1 sm:mb-2 text-sm sm:text-base",
+                        language === 'bn' && "bengali-text"
+                      )}>
+                        {language === 'bn' ? 'বয়স:' : 'Age:'}
+                      </h5>
+                      <p className={cn(
+                        "text-xs sm:text-sm text-gray-600 dark:text-gray-400",
+                        language === 'bn' && "bengali-text"
+                      )}>
+                        {safeData.requirements.level3.age}
+                      </p>
+                    </div>
+
+                    <div>
+                      <h5 className={cn(
+                        "font-medium text-gray-900 dark:text-white mb-1 sm:mb-2 text-sm sm:text-base",
+                        language === 'bn' && "bengali-text"
+                      )}>
+                        {language === 'bn' ? 'একাডেমিক যোগ্যতা:' : 'Academic Qualification:'}
+                      </h5>
+                      <ul className="space-y-1">
+                        {safeData.requirements.level3.academic.map((item, idx) => (
+                          <li key={idx} className="flex items-center gap-2">
+                            <CheckCircle className="w-3 h-3 text-green-500" />
+                            <span className={cn(
+                              "text-xs sm:text-sm text-gray-700 dark:text-gray-300",
+                              language === 'bn' && "bengali-text"
+                            )}>
+                              {item}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    <div>
+                      <h5 className={cn(
+                        "font-medium text-gray-900 dark:text-white mb-1 sm:mb-2 text-sm sm:text-base",
+                        language === 'bn' && "bengali-text"
+                      )}>
+                        {language === 'bn' ? 'প্রয়োজনীয় ডকুমেন্ট:' : 'Required Documents:'}
+                      </h5>
+                      <ul className="space-y-1">
+                        {safeData.requirements.level3.documents.map((doc, idx) => (
+                          <li key={idx} className="flex items-center gap-2">
+                            <AlertCircle className="w-3 h-3 text-orange-500" />
+                            <span className={cn(
+                              "text-xs sm:text-sm text-gray-700 dark:text-gray-300",
+                              language === 'bn' && "bengali-text"
+                            )}>
+                              {doc}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Huffaz System */}
+                <div className="bg-orange-50 dark:bg-orange-900/20 rounded-2xl p-4 sm:p-6">
+                  <div className="flex items-center gap-2 mb-3 sm:mb-4">
+                    <div className="w-2 h-2 sm:w-3 sm:h-3 bg-orange-500 rounded-full"></div>
+                    <h4 className={cn(
+                      "font-semibold text-orange-700 dark:text-orange-300 text-sm sm:text-base",
+                      language === 'bn' && "bengali-text"
+                    )}>
+                      {language === 'bn' ? 'হুফ্ফাজ সিস্টেম' : 'Huffaz System'}
+                    </h4>
+                  </div>
+
+                  <div className="space-y-3 sm:space-y-4">
+                    <div>
+                      <h5 className={cn(
+                        "font-medium text-gray-900 dark:text-white mb-1 sm:mb-2 text-sm sm:text-base",
+                        language === 'bn' && "bengali-text"
+                      )}>
+                        {language === 'bn' ? 'বয়স:' : 'Age:'}
+                      </h5>
+                      <p className={cn(
+                        "text-xs sm:text-sm text-gray-600 dark:text-gray-400",
+                        language === 'bn' && "bengali-text"
+                      )}>
+                        {safeData.requirements.huffaz.age}
+                      </p>
+                    </div>
+
+                    <div>
+                      <h5 className={cn(
+                        "font-medium text-gray-900 dark:text-white mb-1 sm:mb-2 text-sm sm:text-base",
+                        language === 'bn' && "bengali-text"
+                      )}>
+                        {language === 'bn' ? 'একাডেমিক যোগ্যতা:' : 'Academic Qualification:'}
+                      </h5>
+                      <ul className="space-y-1">
+                        {safeData.requirements.huffaz.academic.map((item, idx) => (
+                          <li key={idx} className="flex items-center gap-2">
+                            <CheckCircle className="w-3 h-3 text-green-500" />
+                            <span className={cn(
+                              "text-xs sm:text-sm text-gray-700 dark:text-gray-300",
+                              language === 'bn' && "bengali-text"
+                            )}>
+                              {item}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    <div>
+                      <h5 className={cn(
+                        "font-medium text-gray-900 dark:text-white mb-1 sm:mb-2 text-sm sm:text-base",
+                        language === 'bn' && "bengali-text"
+                      )}>
+                        {language === 'bn' ? 'প্রয়োজনীয় ডকুমেন্ট:' : 'Required Documents:'}
+                      </h5>
+                      <ul className="space-y-1">
+                        {safeData.requirements.huffaz.documents.map((doc, idx) => (
+                          <li key={idx} className="flex items-center gap-2">
+                            <AlertCircle className="w-3 h-3 text-orange-500" />
+                            <span className={cn(
+                              "text-xs sm:text-sm text-gray-700 dark:text-gray-300",
+                              language === 'bn' && "bengali-text"
+                            )}>
+                              {doc}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Fee Structure */}
+          {activeTab === 'fees' && (
+            <div className="space-y-6 sm:space-y-8">
+              <h3 className={cn(
+                "text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6",
+                language === 'bn' && "bengali-text"
+              )}>
+                {language === 'bn' ? 'ফি কাঠামো - বিস্তারিত তথ্য' : 'Fee Structure - Detailed Information'}
+              </h3>
+
+              {/* One-time Fees */}
+              <div className="bg-gradient-to-r from-[#00AEEF]/10 to-purple-50 dark:from-[#00AEEF]/5 dark:to-purple-900/20 rounded-2xl p-4 sm:p-6">
+                <h4 className={cn(
+                  "text-base sm:text-lg md:text-xl font-semibold text-gray-900 dark:text-white mb-4",
+                  language === 'bn' && "bengali-text"
+                )}>
+                  {language === 'bn' ? 'এককালীন ফি (ভর্তির সময়)' : 'One-time Fees (At Admission)'}
+                </h4>
+                <div className="grid gap-3 sm:gap-4">
+                  {safeData.feeStructure.oneTime.map((fee, index) => (
+                    <div key={index} className="flex justify-between items-center p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                      <span className={cn(
+                        "font-medium text-gray-900 dark:text-white text-sm sm:text-base",
+                        language === 'bn' && "bengali-text"
+                      )}>
+                        {fee.name}
+                      </span>
+                      <span className="font-bold text-[#00AEEF] text-sm sm:text-base">
+                        {fee.amount}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Monthly Fees */}
+              <div className="space-y-4">
+                {/* Tuition Fees */}
+                <div className="bg-green-50 dark:bg-green-900/20 rounded-2xl p-4 sm:p-6">
+                  <h4 className={cn(
+                    "text-base sm:text-lg md:text-xl font-semibold text-green-800 dark:text-green-200 mb-4",
+                    language === 'bn' && "bengali-text"
+                  )}>
+                    {language === 'bn' ? 'টিউশন ফি (মাসিক)' : 'Tuition Fees (Monthly)'}
+                  </h4>
+                  <div className="grid gap-3 sm:gap-4">
+                    {safeData.feeStructure.monthly.tuition.map((fee, index) => (
+                      <div key={index} className="flex justify-between items-center p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                        <span className={cn(
+                          "font-medium text-gray-900 dark:text-white text-sm sm:text-base",
+                          language === 'bn' && "bengali-text"
+                        )}>
+                          {fee.name}
+                        </span>
+                        <span className="font-bold text-green-600 text-sm sm:text-base">
+                          {fee.amount}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Residential Fees */}
+                <div className="bg-blue-50 dark:bg-blue-900/20 rounded-2xl p-4 sm:p-6">
+                  <h4 className={cn(
+                    "text-base sm:text-lg md:text-xl font-semibold text-blue-800 dark:text-blue-200 mb-4",
+                    language === 'bn' && "bengali-text"
+                  )}>
+                    {language === 'bn' ? 'আবাসিক ফি (মাসিক)' : 'Residential Fees (Monthly)'}
+                  </h4>
+                  <div className="grid gap-3 sm:gap-4">
+                    {safeData.feeStructure.monthly.residential.map((fee, index) => (
+                      <div key={index} className="flex justify-between items-center p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                        <span className={cn(
+                          "font-medium text-gray-900 dark:text-white text-sm sm:text-base",
+                          language === 'bn' && "bengali-text"
+                        )}>
+                          {fee.name}
+                        </span>
+                        <span className="font-bold text-blue-600 text-sm sm:text-base">
+                          {fee.amount}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Food Fees */}
+                <div className="bg-orange-50 dark:bg-orange-900/20 rounded-2xl p-4 sm:p-6">
+                  <h4 className={cn(
+                    "text-base sm:text-lg md:text-xl font-semibold text-orange-800 dark:text-orange-200 mb-4",
+                    language === 'bn' && "bengali-text"
+                  )}>
+                    {language === 'bn' ? 'খাদ্য ফি (মাসিক)' : 'Food Fees (Monthly)'}
+                  </h4>
+                  <div className="grid gap-3 sm:gap-4">
+                    {safeData.feeStructure.monthly.food.map((fee, index) => (
+                      <div key={index} className="flex justify-between items-center p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                        <span className={cn(
+                          "font-medium text-gray-900 dark:text-white text-sm sm:text-base",
+                          language === 'bn' && "bengali-text"
+                        )}>
+                          {fee.name}
+                        </span>
+                        <span className="font-bold text-orange-600 text-sm sm:text-base">
+                          {fee.amount}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Important Dates */}
+          {activeTab === 'dates' && (
+            <div className="space-y-6 sm:space-y-8">
+              <h3 className={cn(
+                "text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6",
+                language === 'bn' && "bengali-text"
+              )}>
+                {language === 'bn' ? 'গুরুত্বপূর্ণ তারিখসমূহ' : 'Important Dates'}
+              </h3>
+
+              <div className="grid gap-4 sm:gap-6">
+                {safeData.importantDates.map((date, index) => (
+                  <div key={index} className="flex items-center justify-between p-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+                    <div className="flex items-center gap-3 sm:gap-4">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#00AEEF]/20 dark:bg-[#00AEEF]/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                        <Calendar className="w-5 h-5 sm:w-6 sm:h-6 text-[#00AEEF] dark:text-[#00AEEF]/80" />
+                      </div>
+                      <div>
+                        <h4 className={cn(
+                          "font-semibold text-gray-900 dark:text-white text-sm sm:text-base mb-1",
+                          language === 'bn' && "bengali-text"
+                        )}>
+                          {date.event}
+                        </h4>
+                        <p className={cn(
+                          "text-xs sm:text-sm text-gray-600 dark:text-gray-400",
+                          language === 'bn' && "bengali-text"
+                        )}>
+                          {date.date}
+                        </p>
+                      </div>
+                    </div>
+                    <div className={cn(
+                      "px-3 py-1 rounded-full text-xs font-medium",
+                      date.status === 'open'
+                        ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
+                        : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300'
+                    )}>
+                      {date.status === 'open'
+                        ? (language === 'bn' ? 'চলমান' : 'Ongoing')
+                        : (language === 'bn' ? 'আসন্ন' : 'Upcoming')
+                      }
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Contact Information */}
+          {activeTab === 'contact' && (
+            <div className="space-y-6 sm:space-y-8">
+              <h3 className={cn(
+                "text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6",
+                language === 'bn' && "bengali-text"
+              )}>
+                {language === 'bn' ? 'ভর্তি সম্পর্কিত যোগাযোগ' : 'Admission Contact Information'}
+              </h3>
+
+              <div className="grid md:grid-cols-2 gap-6 sm:gap-8">
+                {/* Contact Details */}
+                <div className="space-y-4 sm:space-y-6">
+                  <div className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-gray-50 dark:bg-gray-700 rounded-xl">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#00AEEF]/20 dark:bg-[#00AEEF]/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <Phone className="w-5 h-5 sm:w-6 sm:h-6 text-[#00AEEF] dark:text-[#00AEEF]/80" />
+                    </div>
+                    <div>
+                      <h4 className={cn(
+                        "font-semibold text-gray-900 dark:text-white mb-1 sm:mb-2 text-sm sm:text-base",
+                        language === 'bn' && "bengali-text"
+                      )}>
+                        {language === 'bn' ? 'ফোন নম্বর' : 'Phone Numbers'}
+                      </h4>
+                      <div className="space-y-1">
+                        {safeData.contact.phone.map((number, idx) => (
+                          <p key={idx} className={cn(
+                            "text-xs sm:text-sm text-gray-600 dark:text-gray-400",
+                            language === 'bn' && "bengali-text"
+                          )}>
+                            {number}
+                          </p>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-gray-50 dark:bg-gray-700 rounded-xl">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 dark:bg-green-900/30 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <Mail className="w-5 h-5 sm:w-6 sm:h-6 text-green-600 dark:text-green-400" />
+                    </div>
+                    <div>
+                      <h4 className={cn(
+                        "font-semibold text-gray-900 dark:text-white mb-1 sm:mb-2 text-sm sm:text-base",
+                        language === 'bn' && "bengali-text"
+                      )}>
+                        {language === 'bn' ? 'ইমেইল' : 'Email'}
+                      </h4>
+                      <p className={cn(
+                        "text-xs sm:text-sm text-gray-600 dark:text-gray-400",
+                        language === 'bn' && "bengali-text"
+                      )}>
+                        {safeData.contact.email}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-gray-50 dark:bg-gray-700 rounded-xl">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-purple-100 dark:bg-purple-900/30 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <MapPin className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600 dark:text-purple-400" />
+                    </div>
+                    <div>
+                      <h4 className={cn(
+                        "font-semibold text-gray-900 dark:text-white mb-1 sm:mb-2 text-sm sm:text-base",
+                        language === 'bn' && "bengali-text"
+                      )}>
+                        {language === 'bn' ? 'ঠিকানা' : 'Address'}
+                      </h4>
+                      <p className={cn(
+                        "text-xs sm:text-sm text-gray-600 dark:text-gray-400",
+                        language === 'bn' && "bengali-text"
+                      )}>
+                        {safeData.contact.address}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-gray-50 dark:bg-gray-700 rounded-xl">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-orange-100 dark:bg-orange-900/30 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-orange-600 dark:text-orange-400" />
+                    </div>
+                    <div>
+                      <h4 className={cn(
+                        "font-semibold text-gray-900 dark:text-white mb-1 sm:mb-2 text-sm sm:text-base",
+                        language === 'bn' && "bengali-text"
+                      )}>
+                        {language === 'bn' ? 'অফিস সময়' : 'Office Hours'}
+                      </h4>
+                      <p className={cn(
+                        "text-xs sm:text-sm text-gray-600 dark:text-gray-400",
+                        language === 'bn' && "bengali-text"
+                      )}>
+                        {safeData.contact.officeHours}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Quick Action Card */}
+                <div className="bg-gradient-to-br from-[#00AEEF] to-purple-600 rounded-2xl p-4 sm:p-6 text-white">
+                  <h4 className={cn(
+                    "text-lg sm:text-xl md:text-2xl font-bold mb-3 sm:mb-4",
+                    language === 'bn' && "bengali-text"
+                  )}>
+                    {language === 'bn' ? 'দ্রুত ভর্তি প্রক্রিয়া শুরু করুন' : 'Start Admission Process Quickly'}
+                  </h4>
+                  <p className={cn(
+                    "mb-4 sm:mb-6 opacity-90 text-xs sm:text-sm",
+                    language === 'bn' && "bengali-text"
+                  )}>
+                    {language === 'bn'
+                      ? 'এখনই অনলাইনে আবেদন করুন এবং আপনার সন্তানের ভবিষ্যত গড়ার যাত্রা শুরু করুন'
+                      : 'Apply online now and start your child\'s future-building journey'
+                    }
+                  </p>
+
+                  <div className="space-y-3 sm:space-y-4">
+                    <Button
+                      onClick={handleApplyNow}
+                      className="w-full bg-white text-[#00AEEF] hover:bg-gray-100 text-sm sm:text-base py-2 sm:py-3"
+                    >
+                      <span className={cn(language === 'bn' && "bengali-text")}>
+                        {language === 'bn' ? 'অনলাইনে আবেদন করুন' : 'Apply Online'}
+                      </span>
+                    </Button>
+
+                    <Button
+                      onClick={() => window.location.href = '/curriculum'}
+                      variant="outline"
+                      className="w-full border-white text-white hover:bg-white hover:text-blue-600 text-sm sm:text-base py-2 sm:py-3"
+                    >
+                      <span className={cn(language === 'bn' && "bengali-text")}>
+                        {language === 'bn' ? 'কারিকুলাম দেখুন' : 'View Curriculum'}
+                      </span>
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+        </AnimatedGroup>
+      </main>
+      <FooterSection />
+    </div>
+    </ErrorBoundary>
+  )
+}

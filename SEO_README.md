@@ -14,7 +14,7 @@ This document outlines the comprehensive SEO enhancements implemented for the Ma
   - Cached responses for performance
 
 ### 2. SEO Utility Functions
-- **Location**: `src/lib/seo-utils.js`
+- **Location**: `lib/seo-utils.js`
 - **Features**:
   - `generateMetaTags()`: Comprehensive meta tag generation
   - `generateOpenGraphTags()`: Dynamic Open Graph tags
@@ -25,7 +25,7 @@ This document outlines the comprehensive SEO enhancements implemented for the Ma
   - `discoverUrls()`: Automatic URL discovery for sitemaps
 
 ### 3. Reusable SEO Components
-- **Location**: `src/components/seo/`
+- **Location**: `components/seo/`
 - **Components**:
   - `MetaTags`: Complete meta tag management
   - `OpenGraph`: Dynamic Open Graph tags
@@ -107,7 +107,7 @@ function MyPage() {
 ## Configuration
 
 ### SEO Constants
-Located in `src/lib/seo-utils.js`:
+Located in `lib/seo-utils.js`:
 - `SEO_CONFIG.siteName`: Site name for titles
 - `SEO_CONFIG.siteUrl`: Base URL for canonical links
 - `SEO_CONFIG.defaultImage`: Default social media image

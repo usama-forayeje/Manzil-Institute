@@ -1,93 +1,29 @@
 'use client';
 
-import { Menu, X, ChevronDown } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import React from 'react';
+import React, { Suspense } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import { useLanguageStore } from '@/lib/store';
 import { ModeToggle } from './themes/theme-toggle';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/components/themes/theme-provider';
 import Image from 'next/image';
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from '@/components/ui/dropdown-menu';
 
-const menuItems = [
-  {
-    key: 'home',
-    href: '/',
-    label: {
-      en: 'Home',
-      bn: 'হোম',
-    },
-  },
-  {
-    key: 'about',
-    href: '#about',
-    label: {
-      en: 'About',
-      bn: 'আমাদের সম্পর্কে',
-    },
-  },
-  {
-    key: 'curriculum',
-    href: '#curriculum',
-    label: {
-      en: 'Curriculum',
-      bn: 'কারিকুলাম',
-    },
-  },
-  {
-    key: 'admission',
-    href: '/admission',
-    label: {
-      en: 'Admission',
-      bn: 'ভর্তি',
-    },
-  },
-  {
-    key: 'campus',
-    href: '/campus',
-    label: {
-      en: 'Campus',
-      bn: 'ক্যাম্পাস',
-    },
-  },
-];
+// Dynamic imports for better code splitting
+const DesktopMenu = React.lazy(() => import('./header/desktop-menu'));
+const MobileMenu = React.lazy(() => import('./header/mobile-menu'));
 
-const courseItems = [
-  {
-    href: '/admission/mic',
-    label: {
-      en: 'MIC Admission Info',
-      bn: 'MIC ভর্তি তথ্য',
-    },
-  },
-  {
-    href: '/admission/mnc',
-    label: {
-      en: 'MNC Admission Info',
-      bn: 'MNC ভর্তি তথ্য',
-    },
-  },
-];
 
 const HeroHeader = () => {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const [isScrolled, setIsScrolled] = React.useState(false);
   const [mounted, setMounted] = React.useState(false);
   const { language, setLanguage } = useLanguageStore();
-  const pathname = usePathname();
   const menuRef = React.useRef(null);
   const buttonRef = React.useRef(null);
   const { theme } = useTheme();
   const [admissionOpen, setAdmissionOpen] = React.useState(false);
-  const [mobileAdmissionOpen, setMobileAdmissionOpen] = React.useState(false);
 
   React.useEffect(() => {
     setMounted(true);
@@ -112,7 +48,6 @@ const HeroHeader = () => {
         !buttonRef.current.contains(event.target)
       ) {
         setIsMenuOpen(false);
-        setMobileAdmissionOpen(false);
       }
     };
     if (isMenuOpen) {
@@ -126,9 +61,6 @@ const HeroHeader = () => {
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
-    if (isMenuOpen) {
-      setMobileAdmissionOpen(false);
-    }
   };
   const toggleLanguage = () => setLanguage(language === 'en' ? 'bn' : 'en');
 
@@ -167,79 +99,13 @@ const HeroHeader = () => {
             </div>
 
             {/* Desktop Navigation - Center (Only on 1024px+) */}
-            <div className="hidden lg:flex justify-center flex-grow">
-              <div className="flex items-center space-x-8">
-                {menuItems.map(item => {
-                  const href =
-                    item.href.startsWith('#') && pathname !== '/'
-                      ? `/${item.href}`
-                      : item.href;
-                  if (item.key === 'admission') {
-                    return (
-                      <DropdownMenu
-                        key={item.key}
-                        open={admissionOpen}
-                        onOpenChange={setAdmissionOpen}
-                      >
-                        <DropdownMenuTrigger
-                          asChild
-                          onMouseEnter={() => setAdmissionOpen(true)}
-                          onClick={() => setAdmissionOpen(true)}
-                        >
-                          <button
-                            className={cn(
-                              'text-gray-700 dark:text-gray-300 hover:text-[#00AEEF] text-sm font-medium transition-colors duration-150 whitespace-nowrap',
-                              language === 'bn' && 'bengali-text'
-                            )}
-                            aria-expanded={admissionOpen}
-                            aria-haspopup="menu"
-                          >
-                            {item.label[language]}
-                          </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent
-                          onMouseLeave={() => setAdmissionOpen(false)}
-                        >
-                          {courseItems.map(course => (
-                            <DropdownMenuItem key={course.href} asChild>
-                              <Link
-                                href={course.href}
-                                className={cn(
-                                  'hover:text-[#00AEEF] hover:bg-[#00AEEF]/10',
-                                  language === 'bn' && 'bengali-text'
-                                )}
-                                onClick={() => {}}
-                              >
-                                {course.label[language]}
-                              </Link>
-                            </DropdownMenuItem>
-                          ))}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    );
-                  } else {
-                    return (
-                      <Link
-                        key={item.key}
-                        href={href}
-                        className={cn(
-                          'text-gray-700 dark:text-gray-300 hover:text-[#00AEEF] text-sm font-medium transition-colors duration-150 whitespace-nowrap',
-                          language === 'bn' && 'bengali-text'
-                        )}
-                        onClick={e => {
-                          if (item.href.startsWith('#') && pathname !== '/') {
-                            // Navigate to home page with hash
-                            window.location.href = item.href;
-                          }
-                        }}
-                      >
-                        {item.label[language]}
-                      </Link>
-                    );
-                  }
-                })}
-              </div>
-            </div>
+            <Suspense fallback={<div className="hidden lg:flex justify-center flex-grow w-64 h-6 bg-gray-200 dark:bg-gray-700 animate-pulse rounded" />}>
+              <DesktopMenu
+                admissionOpen={admissionOpen}
+                setAdmissionOpen={setAdmissionOpen}
+                language={language}
+              />
+            </Suspense>
 
             {/* Desktop Action Buttons - Right (Only on 1024px+) */}
             <div className="hidden lg:flex justify-end items-center space-x-3 flex-shrink-0">
@@ -321,114 +187,14 @@ const HeroHeader = () => {
           </div>
 
           {/* Mobile Menu with Animation */}
-          <div
-            ref={menuRef}
-            className={cn(
-              'lg:hidden  bg-background/95 backdrop-blur-lg border-t border-gray-200 dark:border-gray-700 pt-1  px-6 rounded-b-2xl transition-all duration-300 ease-in-out overflow-hidden',
-              isMenuOpen
-                ? 'max-h-96 opacity-100 translate-y-0'
-                : 'max-h-0 opacity-0 -translate-y-4 pointer-events-none'
-            )}
-          >
-            <div className="space-y-2">
-              {menuItems.map(item => {
-                if (item.key === 'admission') {
-                  return (
-                    <div key={item.key}>
-                      <button
-                        onClick={() =>
-                          setMobileAdmissionOpen(!mobileAdmissionOpen)
-                        }
-                        className={cn(
-                          'flex items-center justify-start w-full py-3 px-4 text-gray-700 dark:text-gray-300 text-left hover:bg-[#00AEEF]/10 dark:hover:bg-[#00AEEF]/5 hover:text-[#00AEEF] rounded-lg transition-colors duration-150 font-medium',
-                          language === 'bn' ? 'bengali-text' : 'english-text'
-                        )}
-                      >
-                        {item.label[language]}
-                        <ChevronDown
-                          className={cn(
-                            'ml-2 h-4 w-4 transition-transform',
-                            mobileAdmissionOpen ? 'rotate-180' : ''
-                          )}
-                        />
-                      </button>
-                      {mobileAdmissionOpen && (
-                        <div className="ml-4 mt-2 space-y-2">
-                          {courseItems.map(course => (
-                            <Link
-                              key={course.href}
-                              href={course.href}
-                              className={cn(
-                                'block py-2 px-4 text-left text-gray-600 dark:text-gray-400  hover:bg-[#00AEEF]/10 dark:hover:bg-[#00AEEF]/5 hover:text-[#00AEEF] rounded-lg transition-colors duration-150',
-                                language === 'bn'
-                                  ? 'bengali-text'
-                                  : 'english-text'
-                              )}
-                              onClick={() => {
-                                setIsMenuOpen(false);
-                                setMobileAdmissionOpen(false);
-                              }}
-                            >
-                              {course.label[language]}
-                            </Link>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  );
-                } else {
-                  return (
-                    <Link
-                      key={item.key}
-                      href={item.href}
-                      className={cn(
-                        'block py-3 px-4 text-gray-700 dark:text-gray-300 text-left hover:bg-[#00AEEF]/10 dark:hover:bg-[#00AEEF]/5 hover:text-[#00AEEF] rounded-lg transition-colors duration-150 font-medium',
-                        language === 'bn' ? 'bengali-text' : 'english-text'
-                      )}
-                      onClick={e => {
-                        setIsMenuOpen(false);
-                        if (item.href.startsWith('#') && pathname !== '/') {
-                          // Navigate to home page with hash
-                          window.location.href = item.href;
-                        }
-                      }}
-                    >
-                      {item.label[language]}
-                    </Link>
-                  );
-                }
-              })}
-            </div>
-
-            <div className="flex flex-col pt-6 mt-6 mb-6 space-y-3 border-t border-gray-200 dark:border-gray-700">
-              <Button
-                asChild
-                variant={isScrolled ? 'default' : 'outline'}
-                size="sm"
-                className={cn(
-                  'w-full justify-start text-left text-sm font-semibold',
-                  isScrolled
-                    ? 'bg-[#00AEEF] hover:bg-[#00AEEF]/90 text-white'
-                    : ''
-                )}
-              >
-                <Link
-                  href="/apply"
-                  className={
-                    language === 'bn' ? 'kalpurush-font' : 'english-text'
-                  }
-                >
-                  {isScrolled
-                    ? language === 'en'
-                      ? 'Apply Now'
-                      : 'এপ্লাই করুন'
-                    : language === 'en'
-                      ? 'Login'
-                      : 'লগইন'}
-                </Link>
-              </Button>
-            </div>
-          </div>
+          <Suspense fallback={<div className="lg:hidden h-32 bg-background/95 backdrop-blur-lg border-t border-gray-200 dark:border-gray-700 px-6 rounded-b-2xl animate-pulse" />}>
+            <MobileMenu
+              isMenuOpen={isMenuOpen}
+              setIsMenuOpen={setIsMenuOpen}
+              isScrolled={isScrolled}
+              language={language}
+            />
+          </Suspense>
         </div>
       </nav>
     </header>

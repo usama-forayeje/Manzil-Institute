@@ -570,6 +570,225 @@ const periodNames = {
   evening: { bn: 'সন্ধ্যা', en: 'Evening' },
   night: { bn: 'রাত', en: 'Night' },
 };
+
+const rulesData = {
+  briefRules: {
+    title: { bn: 'সংক্ষিপ্ত কানুন', en: 'Brief Rules' },
+    rules: [
+      {
+        bn: 'প্রত্যেক শিক্ষার্থীকে প্রতিষ্ঠানের সকল নিয়ম কানুন মেনে চলতে হবে।',
+        en: 'Every student must follow all the rules and regulations of the institution.',
+      },
+      {
+        bn: 'প্রতিদিন নির্ধারিত রুটিন অনুসরণ করতে হবে।',
+        en: 'The daily routine must be followed every day.',
+      },
+      {
+        bn: 'শালীন, মার্জিত ও বিশুদ্ধ ভাষায় কথা কণা অপরিহার্য।',
+        en: 'Speaking in decent, polite and pure language is essential.',
+      },
+      {
+        bn: 'শিক্ষার্থীকে যথাসময়ে প্রতিষ্ঠানে উপস্থিত হতে হবে।',
+        en: 'Students must be present at the institution on time.',
+      },
+      {
+        bn: 'শার্ট-প্যান্ট ও আঁটসাঁট পোশাক পরিধান করা যাবে না।',
+        en: 'Shirt-pant and tight clothing cannot be worn.',
+      },
+      {
+        bn: 'কর্তৃপক্ষের অনুমতি ছাড়া প্রতিষ্ঠানের বাহিরে যাওয়া যাবে না।',
+        en: 'Going outside the institution without permission from the authorities is not allowed.',
+      },
+      {
+        bn: 'প্রতিষ্ঠানের শিক্ষক, কর্মচারী, অভিভাবকসহ সকলের সাথে শিক্ষার্থীর আচরণ হতে হবে মার্জিত, ভদ্র এবং শোভনীয়।',
+        en: 'The behavior of students towards teachers, staff, guardians and everyone at the institution must be polite, decent and appropriate.',
+      },
+      {
+        bn: 'প্রত্যেক শিক্ষার্থীকে প্রতিষ্ঠান কর্তৃক নির্ধারিত পরিচয়পত্র সাথে রাখতে হবে।',
+        en: 'Every student must carry the identity card issued by the institution.',
+      },
+      {
+        bn: 'নূন্যতম ৯০ শতাংশ ক্লাসের উপস্থিতি বাধ্যতামূলক।',
+        en: 'Minimum 90% class attendance is mandatory.',
+      },
+      {
+        bn: 'কোন শিক্ষার্থীর আচরণ প্রতিষ্ঠানের শৃঙ্খলা ও স্বার্থের পরিপন্থী বিবেচিত হলে কর্তৃপক্ষ শিক্ষার্থীকে বহিষ্কার করতে পারবে।',
+        en: 'If any student\'s behavior is considered contrary to the discipline and interests of the institution, the authorities may expel the student.',
+      },
+      {
+        bn: 'কোন শিক্ষার্থী প্রতিষ্ঠান পরিবর্তন করতে চাইলে লিখিত আবেদন করতে হবে।',
+        en: 'If any student wants to change institution, a written application must be submitted.',
+      },
+      {
+        bn: 'পাঁচ ওয়াক্ত সালাত জামাতের সাথে পড়তে হবে।',
+        en: 'Five daily prayers must be performed with congregation.',
+      },
+      {
+        bn: 'নিজের রুম, জামা, সিট, কাপড় গুছিয়ে পরিচ্ছন্ন রাখতে হবে।',
+        en: 'One\'s room, clothes, seat, and clothes must be kept clean and organized.',
+      },
+      {
+        bn: 'পড়ালেখা, ঘুম, খাওয়া ইত্যাদির সময় শৃঙ্খলা বজায় রাখতে হবে। ছাত্রাবাসে শৃঙ্খলাবদ্ধ জীবন যাপনে অভ্যন্ত হতে হবে।',
+        en: 'Discipline must be maintained during study, sleep, eating, etc. One must get accustomed to disciplined life in the dormitory.',
+      },
+      {
+        bn: 'কোনো সমস্যা হলে দায়িত্বশীল উত্তাদ বা কর্তৃপক্ষকে অবহিত করতে হবে।',
+        en: 'In case of any problem, the responsible teacher or authorities must be informed.',
+      },
+      {
+        bn: 'শিক্ষার্থীর কাছে টাকা রাখা যাবে না। খরচের টাকা অফিসে এবং নির্দিষ্ট জিম্মাদারের কাছে জমা রাখার ব্যবস্থা রয়েছে।',
+        en: 'Students cannot keep money with them. Arrangements are made to deposit spending money in the office and with specific custodians.',
+      },
+      {
+        bn: 'অফিস এবং শিক্ষকদের রুমে প্রবেশের সময় অনুমতি নিতে হবে।',
+        en: 'Permission must be taken before entering the office and teachers\' rooms.',
+      },
+      {
+        bn: 'যথাসময়ে খাবার খেতে করতে হবে।',
+        en: 'Food must be eaten on time.',
+      },
+      {
+        bn: 'মাদরাসা ত্যাগ এবং মাদরাসায় প্রবেশের সময় অফিসে দেখা করতে হবে এবং রেজিষ্ট্রি খাতায় সময় উল্লেখসহ স্বাক্ষর করতে হবে।',
+        en: 'When leaving and entering the madrasa, one must visit the office and sign the register with time mentioned.',
+      },
+      {
+        bn: 'মাদরাসায় আসা যাওয়া এবং ক্লাস চলাকালিন আইডি কার্ড পরিহিত থাকা বাধ্যতামূলক।',
+        en: 'Wearing ID card is mandatory while coming to and from madrasa and during class hours.',
+      },
+      {
+        bn: 'আবাসিক ছাত্রদের সিট বিন্যাস কর্তৃপক্ষ করবেন। এ ক্ষেত্রে অভিভাবকের কোন হস্তক্ষেপ গ্রহণযোগ্য নয়।',
+        en: 'The authorities will arrange the seats for residential students. No intervention from guardians is acceptable in this regard.',
+      },
+      {
+        bn: 'কোনো ছাত্রের নৈতিক চরিত্রের অবনতি হলে তাকে বহিষ্কার করা হবে।',
+        en: 'If any student\'s moral character deteriorates, he will be expelled.',
+      },
+    ],
+  },
+  nonResidentialRules: {
+    title: { bn: 'অনাবাসিক শিক্ষার্থীদের ক্ষেত্রে', en: 'For Non-residential Students' },
+    rules: [
+      {
+        bn: 'অভিভাবকগণ যথাসময়ে মাদরাসায় শিক্ষার্থীর আসা-যাওয়া নিশ্চিত করবেন।',
+        en: 'Guardians will ensure timely arrival and departure of students to/from the madrasa.',
+      },
+      {
+        bn: 'শিক্ষার্থীকে মাদরাসা কর্তৃক নির্ধারিত ইউনিফর্ম পরিধান করে আসতে হবে।',
+        en: 'Students must come wearing the uniform prescribed by the madrasa.',
+      },
+      {
+        bn: 'মাদরাসা ছুটিকালীন অভিভাবক নিজ দায়িত্বে বাসায় পড়ালেখার ব্যবস্থা করবেন এবং নামাযের প্রতি বিশেষ যত্ন নিবেন।',
+        en: 'During madrasa holidays, guardians will arrange for studies at home and pay special attention to prayers.',
+      },
+      {
+        bn: 'কোনো সমস্যা হলে এম.আই.সি কর্তৃপক্ষকে অবহিত করবেন।',
+        en: 'In case of any problem, inform the MIC authorities.',
+      },
+      {
+        bn: 'কোনো কারণে অনুপস্থিত থাকলে লিখিতভাবে আবেদন করতে হবে।',
+        en: 'If absent for any reason, a written application must be submitted.',
+      },
+      {
+        bn: 'বাসায় শিক্ষার্থীর জন্য দ্বীনি পরিবেশের ব্যবস্থা করবেন।',
+        en: 'Arrange for a religious environment for the student at home.',
+      },
+      {
+        bn: 'শিক্ষার্থীকে শুধুমাত্র নির্দিষ্ট অভিভাবকগণই মাদরাসায় আনা নেওয়া করবেন।',
+        en: 'Only specific guardians will bring and take the students to/from the madrasa.',
+      },
+      {
+        bn: 'অভিভাবকগণ মাদরাসার অনুষ্ঠান এবং সমাবেশে উপস্থিত থেকে গুরুত্বপূর্ণ মতামত দেওয়ার চেষ্টা করবেন।',
+        en: 'Guardians will try to attend madrasa events and gatherings and give important opinions.',
+      },
+      {
+        bn: 'অভিভাবক নিজেও কুরআন ও দ্বীনি শিক্ষার সাথে সম্পৃক্ত থাকবেন।',
+        en: 'Guardians themselves will remain associated with Quran and religious education.',
+      },
+    ],
+  },
+  guardiansResponsibilities: {
+    title: { bn: 'অভিভাবকদের করণীয়ঃ', en: 'Guardians\' Responsibilities:' },
+    rules: [
+      {
+        bn: 'অভিভাবকগণ প্রতিষ্ঠানের নিয়ম কানুন সম্পর্কে অবহিত থাকবেন।',
+        en: 'Guardians will be aware of the rules and regulations of the institution.',
+      },
+      {
+        bn: 'দ্বীনি শিক্ষার জ্ঞান অর্জনে সচেষ্ট থাকবেন।',
+        en: 'They will be diligent in acquiring knowledge of religious education.',
+      },
+      {
+        bn: 'কোন সমস্যা দেখলে সরাসরি এম.আই.সি কর্তৃপক্ষকে অবহিত করবেন।',
+        en: 'If they see any problem, they will directly inform the MIC authorities.',
+      },
+      {
+        bn: 'শিক্ষার্থীকে প্রতিষ্ঠানের সকল নিয়ম কানুন মেনে চলতে সহযোগিতা করবেন।',
+        en: 'They will help the student follow all the rules and regulations of the institution.',
+      },
+      {
+        bn: 'প্রতিষ্ঠানের নিয়ম কানুন ভঙ্গ করলে কর্তৃপক্ষের সিদ্ধান্তই চূড়ান্ত বলে বিবেচিত হবে।',
+        en: 'If the rules and regulations of the institution are violated, the decision of the authorities will be considered final.',
+      },
+      {
+        bn: 'মহিলা অভিভাবকগণ অবশ্যই শরয়ী পর্দা সহকারে প্রতিষ্ঠানে আসবেন।',
+        en: 'Female guardians must come to the institution with proper Islamic hijab.',
+      },
+      {
+        bn: 'বাসায় শিক্ষার্থীর জন্য ধর্মীয় পরিবেশের ব্যবস্থা রাখবেন।',
+        en: 'They will arrange a religious environment for the student at home.',
+      },
+      {
+        bn: 'সন্তানের পড়ার অগ্রগতির জন্য শিক্ষক ও প্রতিষ্ঠান প্রধানের সাথে পরামর্শ করবেন।',
+        en: 'They will consult with teachers and the head of the institution regarding their child\'s academic progress.',
+      },
+      {
+        bn: 'সানকে নির্ধারিত সময়ে প্রতিষ্ঠানে পৌঁছাবেন এবং নিয়ে যাবেন।',
+        en: 'They will bring and take their children to the institution at the specified time.',
+      },
+      {
+        bn: 'ইনস্টিটিউটের বিভিন্ন প্রোগ্রামে উপস্থিত থাকবেন।',
+        en: 'They will be present at various programs of the institute.',
+      },
+      {
+        bn: 'নির্দিষ্ট সময়ে যাবতীয় ফি পরিশোধ করবেন।',
+        en: 'They will pay all fees at the specified time.',
+      },
+      {
+        bn: 'প্রতিষ্ঠানের নিয়ম-শৃঙ্খলা বজায় রাখবেন।',
+        en: 'They will maintain the rules and discipline of the institution.',
+      },
+      {
+        bn: 'প্রতিষ্ঠানের কর্মকর্তা ও শিক্ষকদের সাথে সম্মানজনক আচরণ করবেন।',
+        en: 'They will behave respectfully with the officers and teachers of the institution.',
+      },
+      {
+        bn: 'প্রতিষ্ঠানের কল্যাণে ভূমিকা রাখবেন।',
+        en: 'They will play a role in the welfare of the institution.',
+      },
+      {
+        bn: 'অভিভাবক নিজেও কুরআন ও দ্বীনি শিক্ষার সাথে সম্পৃক্ত থাকবেন।',
+        en: 'Guardians themselves will remain associated with Quran and religious education.',
+      },
+    ],
+  },
+  importantNotes: {
+    title: { bn: 'জ্ঞাতব্যঃ', en: 'Important Note:' },
+    notes: [
+      {
+        bn: 'আমাদের সার্বিক ব্যবস্থাপনার পরও যদি কোন শিক্ষার্থী মাদরাসা থেকে যথাযথ অনুমতি না নিয়ে প্রতিষ্ঠান ত্যাগ করে তবে এর কোন দায় দায়িত্ব প্রতিষ্ঠানের উপর বর্তাবে না।',
+        en: 'Even after our overall management, if any student leaves the institution without proper permission from the madrasa, the institution will not bear any responsibility for it.',
+      },
+      {
+        bn: '১. হায়াত-মওতের মালিক আল্লাহ তা\'য়ালা। তাই কোন শিক্ষার্থীর এক্সিডেন্ট বা আকস্মিক মৃত্যুর দায়-দায়িত্ব প্রতিষ্ঠান বহন করবে না। তবে ঘটনার সঠিক তদন্তের ব্যাপারে প্রতিষ্ঠান আন্তরিক ও সচেষ্ট থাকবে।',
+        en: '1. Allah Ta\'ala is the owner of life and death. Therefore, the institution will not bear the responsibility for any accident or sudden death of any student. However, the institution will be sincere and diligent in investigating the incident.',
+      },
+      {
+        bn: '৩. রাজনৈতিক কোন দল বা নিষিদ্ধ কোন সংস্থা অথবা কোন জঙ্গি সংগঠনের সাথে সম্পর্ক রাখা ইনস্টিটিউটের কানুন বহির্ভূত হওয়ায় এর পরিপূর্ণ দায়-দায়িত্ব শিক্ষার্থী নিজে এবং তার অভিভাবক বহন করিবে। এক্ষেত্রে প্রতিষ্ঠানের কোন দায়বদ্ধতা থাকবে না।',
+        en: '3. Keeping relations with any political party or any banned organization or any terrorist organization is against the law of the institute, so the student himself and his guardian will bear the full responsibility for it. In this case, the institution will have no liability.',
+      },
+    ],
+  },
+};
 // --- Utility Functions ---
 const bengaliNumerals = {
   0: '০',
@@ -669,6 +888,11 @@ export default function MICAdmissionPage() {
       id: '24hour',
       label: language === 'bn' ? 'রুটিন' : 'Daily Routine',
       icon: Clock,
+    },
+    {
+      id: 'rules',
+      label: language === 'bn' ? 'কানুন' : 'Rules',
+      icon: AlertCircle,
     },
     {
       id: 'contact',
@@ -1557,7 +1781,7 @@ export default function MICAdmissionPage() {
                                   >
                                     {
                                       activity.name[
-                                        language === 'bn' ? 'bn' : 'en'
+                                      language === 'bn' ? 'bn' : 'en'
                                       ]
                                     }
                                   </h4>
@@ -1569,7 +1793,7 @@ export default function MICAdmissionPage() {
                                   >
                                     {
                                       activity.description[
-                                        language === 'bn' ? 'bn' : 'en'
+                                      language === 'bn' ? 'bn' : 'en'
                                       ]
                                     }
                                   </p>
@@ -1581,6 +1805,138 @@ export default function MICAdmissionPage() {
                       </div>
                     )
                   )}
+                </div>
+              )}
+
+              {/* === Rules Section === */}
+              {activeTab === 'rules' && (
+                <div className="space-y-8">
+                  <SectionHeader
+                    title={
+                      language === 'bn'
+                        ? 'কানুন ও নীতিমালা'
+                        : 'Rules and Regulations'
+                    }
+                    subtitle={
+                      language === 'bn'
+                        ? 'MIC-এর নিয়ম কানুন এবং শৃঙ্খলা'
+                        : 'MIC Rules, Regulations and Discipline'
+                    }
+                  />
+
+                  {/* Brief Rules Section */}
+                  <div className="bg-purple-50 dark:bg-purple-900/20 p-8 rounded-3xl border border-purple-200 dark:border-purple-800">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-xl flex items-center justify-center">
+                        <Book className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+                      </div>
+                      <h3 className={cn(
+                        'text-2xl font-bold text-purple-800 dark:text-purple-200',
+                        language === 'bn' && 'bengali-text'
+                      )}>
+                        {rulesData.briefRules.title[language === 'bn' ? 'bn' : 'en']}
+                      </h3>
+                    </div>
+                    <ul className="space-y-3">
+                      {rulesData.briefRules.rules.map((rule, idx) => (
+                        <li key={idx} className="flex items-start gap-3">
+                          <CheckCircle className="w-5 h-5 text-purple-600 mt-0.5 shrink-0" />
+                          <span className={cn(
+                            'text-purple-700 dark:text-purple-300 leading-relaxed',
+                            language === 'bn' && 'bengali-text'
+                          )}>
+                            {rule[language === 'bn' ? 'bn' : 'en']}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* Non-residential Students Section */}
+                  <div className="bg-white dark:bg-gray-800 p-8 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-lg">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center">
+                        <BookOpen className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                      </div>
+                      <h3 className={cn(
+                        'text-2xl font-bold text-gray-900 dark:text-white',
+                        language === 'bn' && 'bengali-text'
+                      )}>
+                        {rulesData.nonResidentialRules.title[language === 'bn' ? 'bn' : 'en']}
+                      </h3>
+                    </div>
+                    <ul className="space-y-4">
+                      {rulesData.nonResidentialRules.rules.map((rule, idx) => (
+                        <li key={idx} className="flex items-start gap-3">
+                          <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 shrink-0" />
+                          <span className={cn(
+                            'text-gray-700 dark:text-gray-300 leading-relaxed',
+                            language === 'bn' && 'bengali-text'
+                          )}>
+                            {rule[language === 'bn' ? 'bn' : 'en']}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* Guardians' Responsibilities Section */}
+                  <div className="bg-green-50 dark:bg-green-900/20 p-8 rounded-3xl border border-green-200 dark:border-green-800">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-xl flex items-center justify-center">
+                        <Star className="w-6 h-6 text-green-600 dark:text-green-400" />
+                      </div>
+                      <h3 className={cn(
+                        'text-2xl font-bold text-green-800 dark:text-green-200',
+                        language === 'bn' && 'bengali-text'
+                      )}>
+                        {rulesData.guardiansResponsibilities.title[language === 'bn' ? 'bn' : 'en']}
+                      </h3>
+                    </div>
+                    <ul className="space-y-3">
+                      {rulesData.guardiansResponsibilities.rules.map((rule, idx) => (
+                        <li key={idx} className="flex items-start gap-3">
+                          <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 shrink-0" />
+                          <span className={cn(
+                            'text-green-700 dark:text-green-300 leading-relaxed',
+                            language === 'bn' && 'bengali-text'
+                          )}>
+                            {rule[language === 'bn' ? 'bn' : 'en']}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* Important Note Section */}
+                  <div className="bg-red-50 dark:bg-red-900/20 p-8 rounded-3xl border border-red-200 dark:border-red-800">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-xl flex items-center justify-center">
+                        <AlertCircle className="w-6 h-6 text-red-600 dark:text-red-400" />
+                      </div>
+                      <h3 className={cn(
+                        'text-2xl font-bold text-red-800 dark:text-red-200',
+                        language === 'bn' && 'bengali-text'
+                      )}>
+                        {rulesData.importantNotes.title[language === 'bn' ? 'bn' : 'en']}
+                      </h3>
+                    </div>
+                    <div className="space-y-4">
+                      {rulesData.importantNotes.notes.map((note, idx) => (
+                        <div key={idx} className={cn(
+                          idx > 0 && 'bg-white/50 dark:bg-gray-800/50 p-4 rounded-xl border border-red-300 dark:border-red-700'
+                        )}>
+                          <p className={cn(
+                            'text-red-700 dark:text-red-300 leading-relaxed font-medium',
+                            language === 'bn' && 'bengali-text'
+                          )}>
+                            {note[language === 'bn' ? 'bn' : 'en']}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
                 </div>
               )}
 

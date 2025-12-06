@@ -23,24 +23,6 @@ export const LogoCloud = () => {
       href: 'https://agropark.manzilgroupbd.com',
     },
     {
-      name: 'manzil-city-logo',
-      hasVariants: false,
-      alt: 'Manzil City Logo',
-      href: 'https://city.manzilgroupbd.com',
-    },
-    {
-      name: 'manzil-foundation-logo',
-      hasVariants: false,
-      alt: 'Manzil Foundation Logo',
-      href: 'https://foundation.manzilgroupbd.com',
-    },
-    {
-      name: 'manzil-gorup-logo',
-      hasVariants: true,
-      alt: 'Manzil Group Logo',
-      href: 'https://manzilgroupbd.com',
-    },
-    {
       name: 'manzil-housing-logo',
       hasVariants: true,
       alt: 'Manzil Housing Logo',
@@ -51,12 +33,6 @@ export const LogoCloud = () => {
       hasVariants: true,
       alt: 'Manzil Institute Logo',
       href: 'https://institute.manzilgroupbd.com',
-    },
-    {
-      name: 'manzil-properti-logo',
-      hasVariants: true,
-      alt: 'Manzil Properties Logo',
-      href: 'https://properties.manzilgroupbd.com',
     },
     {
       name: 'manzil-shop-logo',
@@ -75,6 +51,54 @@ export const LogoCloud = () => {
       hasVariants: true,
       alt: 'Manzil Trading Logo',
       href: 'https://trading.manzilgroupbd.com',
+    },
+    {
+      name: 'manzil-blood-bank-logo',
+      hasVariants: true,
+      alt: 'Manzil Blood Bank Logo',
+      href: 'https://bloodbank.manzilgroupbd.com',
+    },
+    {
+      name: 'manzil-care-foundation-logo',
+      hasVariants: true,
+      alt: 'Manzil Care Foundation Logo',
+      href: 'https://carefoundation.manzilgroupbd.com',
+    },
+    {
+      name: 'manzil-dried-fruits-logo',
+      hasVariants: true,
+      alt: 'Manzil Dried Fruits Logo',
+      href: 'https://driedfruits.manzilgroupbd.com',
+    },
+    {
+      name: 'manzil-green-city-dhaka-logo',
+      hasVariants: true,
+      alt: 'Manzil Green City Dhaka Logo',
+      href: 'https://greencitydhaka.manzilgroupbd.com',
+    },
+    {
+      name: 'manzil-green-city-feni-logo',
+      hasVariants: true,
+      alt: 'Manzil Green City Feni Logo',
+      href: 'https://greencityfeni.manzilgroupbd.com',
+    },
+    {
+      name: 'manzil-hospital-logo',
+      hasVariants: true,
+      alt: 'Manzil Hospital Logo',
+      href: 'https://hospital.manzilgroupbd.com',
+    },
+    {
+      name: 'manzil-international-logo',
+      hasVariants: true,
+      alt: 'Manzil International Logo',
+      href: 'https://international.manzilgroupbd.com',
+    },
+    {
+      name: 'manzil-tv-logo',
+      hasVariants: true,
+      alt: 'Manzil TV Logo',
+      href: 'https://tv.manzilgroupbd.com',
     },
     {
       name: 'mic-logo',
@@ -129,6 +153,7 @@ export const LogoCloud = () => {
                         alt={logo.alt}
                         width={120}
                         height={120}
+                        quality={70}
                       />
                     </a>
                   </div>

@@ -6,6 +6,7 @@ import { Providers } from '@/components/providers';
 import FloatingActionButtons from '@/components/FloatingActionButtons';
 import { Skeleton } from '@/components/ui/skeleton';
 import StructuredData from '@/components/seo/StructuredData';
+import ServiceWorkerRegister from '@/components/service-worker-register';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -231,6 +232,8 @@ export default function RootLayout({ children }) {
           type="font/ttf"
           crossOrigin="anonymous"
         />
+
+        {/* DNS prefetch for external resources */}
         <link
           rel="dns-prefetch"
           href="//fonts.googleapis.com"
@@ -239,12 +242,64 @@ export default function RootLayout({ children }) {
           rel="dns-prefetch"
           href="//fonts.gstatic.com"
         />
+        <link
+          rel="dns-prefetch"
+          href="//www.facebook.com"
+        />
+        <link
+          rel="dns-prefetch"
+          href="//www.instagram.com"
+        />
+        <link
+          rel="dns-prefetch"
+          href="//www.linkedin.com"
+        />
+
+        {/* Preconnect for faster connections */}
+        <link
+          rel="preconnect"
+          href="https://fonts.googleapis.com"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
+
+        {/* Prefetch likely next pages */}
+        <link
+          rel="prefetch"
+          href="/admission"
+        />
+        <link
+          rel="prefetch"
+          href="/curriculum"
+        />
+        <link
+          rel="prefetch"
+          href="/campus"
+        />
+
+        {/* Preload critical CSS */}
+        <link
+          rel="preload"
+          href="/globals.css"
+          as="style"
+        />
+
+        {/* Module preload for critical JS */}
+        <link
+          rel="modulepreload"
+          href="/_next/static/chunks/webpack.js"
+        />
       </head>
       <body className={`${inter.variable} font-sans`}>
         <StructuredData
           type="EducationalOrganization"
           data={organizationData}
         />
+        <ServiceWorkerRegister />
         <Providers>
           <Suspense fallback={<RootLoadingSkeleton />}>{children}</Suspense>
           <FloatingActionButtons />

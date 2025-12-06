@@ -298,7 +298,7 @@ export default function CampusPage() {
   return (
     <ErrorBoundary>
       <div
-        className={`min-h-screen bg-[#030712] text-white selection:bg-[#00AEEF] selection:text-white ${bgPattern}`}
+        className={`min-h-screen bg-white dark:bg-[#030712] text-black dark:text-white selection:bg-[#00AEEF] selection:text-white ${bgPattern}`}
       >
         <HeroHeader />
 
@@ -307,7 +307,7 @@ export default function CampusPage() {
           <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
             {/* Background Effects */}
             <div className="absolute inset-0 z-0">
-              <div className="absolute inset-0 bg-gradient-to-b from-blue-900/10 via-[#030712] to-[#030712]" />
+              <div className="absolute inset-0 bg-gradient-to-b from-blue-900/10 via-white dark:via-[#030712] to-white dark:to-[#030712]" />
               <div
                 className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#00AEEF]/20 rounded-full blur-[120px] animate-pulse"
                 style={{ animationDuration: '6s' }}
@@ -320,7 +320,7 @@ export default function CampusPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1, type: 'spring' }}
               >
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-md mb-8 hover:bg-[#00AEEF]/20 transition-colors cursor-default">
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 backdrop-blur-md mb-8 hover:bg-[#00AEEF]/20 transition-colors cursor-default">
                   <span className="relative flex h-3 w-3">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00AEEF] opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-3 w-3 bg-[#00AEEF]"></span>
@@ -334,7 +334,7 @@ export default function CampusPage() {
 
                 <h1
                   className={cn(
-                    'text-5xl md:text-7xl lg:text-9xl font-bold mb-6 tracking-tighter leading-none bg-clip-text text-transparent bg-gradient-to-b from-white to-white/40',
+                    'text-5xl md:text-7xl lg:text-9xl font-bold mb-6 tracking-tighter leading-none bg-clip-text text-transparent bg-gradient-to-b from-black to-black dark:from-white dark:to-white',
                     language === 'bn' && 'kalpurush-font leading-normal'
                   )}
                 >
@@ -343,7 +343,7 @@ export default function CampusPage() {
 
                 <p
                   className={cn(
-                    'text-lg md:text-2xl text-gray-400 max-w-2xl mx-auto mb-10 leading-relaxed',
+                    'text-lg md:text-2xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-10 leading-relaxed',
                     language === 'bn' && 'kalpurush-font'
                   )}
                 >
@@ -370,7 +370,7 @@ export default function CampusPage() {
                   <Button
                     variant="outline"
                     className={cn(
-                      'group h-14 px-8 rounded-full border-white/20 hover:border-[#00AEEF]/50 text-white hover:text-[#00AEEF] hover:bg-[#00AEEF]/10 text-lg backdrop-blur-md transition-all duration-300 hover:scale-105',
+                      'group h-14 px-8 rounded-full border-black/20 dark:border-white/20 hover:border-[#00AEEF]/50 text-black dark:text-white hover:text-[#00AEEF] hover:bg-[#00AEEF]/10 text-lg backdrop-blur-md transition-all duration-300 hover:scale-105',
                       language === 'bn' && 'kalpurush-font'
                     )}
                     onClick={() =>
@@ -387,15 +387,15 @@ export default function CampusPage() {
             </div>
 
             {/* 3D Floor Effect at bottom */}
-            <div className="absolute bottom-0 w-full h-32 bg-gradient-to-t from-[#00AEEF]/10 to-transparent transform perspective-[500px] rotate-x-60 origin-bottom" />
+            <div className="absolute bottom-0 w-full h-32 bg-gradient-to-t from-[#00AEEF]/10 to-transparent dark:from-[#00AEEF]/20 transform perspective-[500px] rotate-x-60 origin-bottom" />
           </section>
 
           {/* ==================== 2. NEXT LEVEL STICKY SCROLL TOUR (MOBILE RESPONSIVE FIXED) ==================== */}
-          <section id="tour" className="relative bg-[#030712] py-24">
+          <section id="tour" className="relative bg-white dark:bg-[#030712] py-24">
             <div className="max-w-7xl mx-auto px-4 mb-16 md:mb-24">
               <h2
                 className={cn(
-                  'text-4xl md:text-6xl font-bold text-white mb-4',
+                  'text-4xl md:text-6xl font-bold text-black dark:text-white mb-4',
                   language === 'bn' && 'kalpurush-font'
                 )}
               >
@@ -410,20 +410,20 @@ export default function CampusPage() {
           {/* ==================== 3. TIKTOK STYLE VIDEO SECTION (AUTO-SCROLL & NO SCROLLBAR) ==================== */}
           <section
             id="gallery"
-            className="py-8 relative overflow-hidden border-t border-white/5"
+            className="py-8 relative overflow-hidden border-t border-black/5 dark:border-white/5"
           >
             <div className="max-w-[1400px] mx-auto px-4 relative z-10">
               <div className="flex items-end justify-between mb-12">
                 <div>
                   <h2
                     className={cn(
-                      'text-3xl md:text-5xl font-bold text-white mb-2',
+                      'text-3xl md:text-5xl font-bold text-black dark:text-white mb-2',
                       language === 'bn' && 'kalpurush-font'
                     )}
                   >
                     {language === 'bn' ? 'ক্যাম্পাস রিলস' : 'Campus Reels'}
                   </h2>
-                  <p className="text-gray-400">
+                  <p className="text-gray-600 dark:text-gray-400">
                     {language === 'bn'
                       ? 'শিক্ষার্থীদের জীবনের খন্ডচিত্র'
                       : 'Glimpses of student life'}
@@ -445,12 +445,12 @@ export default function CampusPage() {
           </section>
 
           {/* ==================== 4. BENTO GRID AMENITIES (PREMIUM WITH SUB-TEXT) ==================== */}
-          <section className="py-24 px-4 relative z-10 bg-[#030712] border-t border-white/5">
+          <section className="py-24 px-4 relative z-10 bg-white dark:bg-[#030712] border-t border-black/5 dark:border-white/5">
             <div className="max-w-7xl mx-auto">
               <div className="text-center mb-16">
                 <h2
                   className={cn(
-                    'text-3xl md:text-5xl font-bold text-white mb-4',
+                    'text-3xl md:text-5xl font-bold text-black dark:text-white mb-4',
                     language === 'bn' && 'kalpurush-font'
                   )}
                 >
@@ -458,7 +458,7 @@ export default function CampusPage() {
                     ? 'প্রিমিয়াম সুবিধাসমূহ'
                     : 'Premium Amenities'}
                 </h2>
-                <p className="text-gray-400 max-w-2xl mx-auto">
+                <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
                   {language === 'bn'
                     ? 'আন্তর্জাতিক মানের শিক্ষার জন্য আন্তর্জাতিক মানের সুবিধা'
                     : 'International standard facilities for international standard education'}
@@ -516,7 +516,7 @@ export default function CampusPage() {
                   </Button>
                   <Button
                     variant="outline"
-                    className="h-14 px-10 rounded-full border-white text-white hover:bg-white/10 text-lg w-full sm:w-auto"
+                    className="h-14 px-10 rounded-full border-white text-white hover:bg-white/10 dark:hover:bg-black/10 text-lg w-full sm:w-auto"
                   >
                     <Phone className="mr-2 h-5 w-5" /> 01407-046001
                   </Button>
@@ -576,7 +576,7 @@ const MobileFirstStickyScroll = ({ steps, lang }) => {
               <div className="absolute bottom-4 left-4 right-4">
                 <h3
                   className={cn(
-                    'text-xl font-bold text-white',
+                    'text-xl font-bold text-black dark:text-white',
                     lang === 'bn' && 'kalpurush-font'
                   )}
                 >
@@ -596,7 +596,7 @@ const MobileFirstStickyScroll = ({ steps, lang }) => {
                 <span
                   className={cn(
                     'text-5xl font-mono',
-                    i === activeIndex ? 'text-[#00AEEF]' : 'text-white/10'
+                    i === activeIndex ? 'text-[#00AEEF]' : 'text-black/10 dark:text-white/10'
                   )}
                 >
                   {i + 1 < 10 ? `0${i + 1}` : i + 1}
@@ -604,14 +604,14 @@ const MobileFirstStickyScroll = ({ steps, lang }) => {
                 <div
                   className={cn(
                     'h-[2px] w-20',
-                    i === activeIndex ? 'bg-[#00AEEF]' : 'bg-white/20'
+                    i === activeIndex ? 'bg-[#00AEEF]' : 'bg-black/20 dark:bg-white/20'
                   )}
                 />
               </div>
 
               <h3
                 className={cn(
-                  'text-2xl font-bold mb-4',
+                  'text-2xl font-bold mb-4 text-black dark:text-white',
                   lang === 'bn' && 'kalpurush-font'
                 )}
               >
@@ -620,7 +620,7 @@ const MobileFirstStickyScroll = ({ steps, lang }) => {
 
               <p
                 className={cn(
-                  'text-gray-400',
+                  'text-gray-600 dark:text-gray-400',
                   lang === 'bn' && 'kalpurush-font'
                 )}
               >
@@ -646,7 +646,7 @@ const MobileFirstStickyScroll = ({ steps, lang }) => {
               }}
               transition={{ duration: 0.4, ease: 'easeInOut' }}
             >
-              <div className="w-full h-full relative rounded-3xl overflow-hidden shadow-2xl border border-white/10 group">
+              <div className="w-full h-full relative rounded-3xl overflow-hidden shadow-2xl border border-black/10 dark:border-white/10 group">
                 <LazyImage
                   src={step.image}
                   alt={step.title[lang === 'bn' ? 'bn' : 'en']}
@@ -713,7 +713,7 @@ const ScrollTextItem = ({ data, index, lang, isActive }) => {
           <span
             className={cn(
               'text-7xl font-mono transition-colors duration-500',
-              isActive ? 'text-[#00AEEF]' : 'text-white/10'
+              isActive ? 'text-[#00AEEF]' : 'text-black/10 dark:text-white/10'
             )}
           >
             {index + 1 < 10 ? `0${index + 1}` : index + 1}
@@ -721,14 +721,14 @@ const ScrollTextItem = ({ data, index, lang, isActive }) => {
           <div
             className={cn(
               'h-[2px] w-20 transition-colors duration-500',
-              isActive ? 'bg-[#00AEEF]' : 'bg-white/20'
+              isActive ? 'bg-[#00AEEF]' : 'bg-black/20 dark:bg-white/20'
             )}
           />
         </div>
 
         <h3
           className={cn(
-            'text-3xl md:text-5xl font-bold leading-tight mb-4',
+            'text-3xl md:text-5xl font-bold leading-tight mb-4 text-black dark:text-white',
             lang === 'bn' && 'kalpurush-font'
           )}
         >
@@ -737,7 +737,7 @@ const ScrollTextItem = ({ data, index, lang, isActive }) => {
 
         <p
           className={cn(
-            'text-lg md:text-xl text-gray-400 leading-relaxed max-w-lg',
+            'text-lg md:text-xl text-gray-600 dark:text-gray-400 leading-relaxed max-w-lg',
             lang === 'bn' && 'kalpurush-font'
           )}
         >
@@ -773,7 +773,7 @@ const BentoCard = ({
     <motion.div
       whileHover={{ y: -5 }}
       className={cn(
-        'relative p-6 rounded-3xl bg-white/5 border border-white/10 overflow-hidden group hover:bg-white/10 transition-colors duration-300',
+        'relative p-6 rounded-3xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 overflow-hidden group hover:bg-black/10 dark:hover:bg-white/10 transition-colors duration-300',
         colSpan
       )}
     >
@@ -782,7 +782,7 @@ const BentoCard = ({
       <div className="relative z-10 flex flex-col h-full justify-between gap-4">
         <div
           className={cn(
-            'w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center backdrop-blur-sm',
+            'w-12 h-12 rounded-2xl bg-black/10 dark:bg-white/10 flex items-center justify-center backdrop-blur-sm',
             colorMap[color]
           )}
         >
@@ -791,7 +791,7 @@ const BentoCard = ({
         <div className="space-y-1">
           <h3
             className={cn(
-              'text-xl font-bold text-white',
+              'text-xl font-bold text-black dark:text-white',
               lang === 'bn' && 'kalpurush-font'
             )}
           >
@@ -799,7 +799,7 @@ const BentoCard = ({
           </h3>
           <p
             className={cn(
-              'text-sm text-gray-400',
+              'text-sm text-gray-600 dark:text-gray-400',
               lang === 'bn' && 'kalpurush-font'
             )}
           >
@@ -875,7 +875,7 @@ const VideoSwiper = ({ videos, lang }) => {
       {videos.map((video, idx) => (
         <motion.div
           key={idx}
-          className="snap-center shrink-0 w-[240px] sm:w-[280px] md:w-[320px] h-[240px] sm:h-[350px] md:h-[450px] rounded-[32px] overflow-hidden relative group border border-white/10 bg-gray-900 shadow-2xl cursor-pointer"
+          className="snap-center shrink-0 w-[240px] sm:w-[280px] md:w-[320px] h-[240px] sm:h-[350px] md:h-[450px] rounded-[32px] overflow-hidden relative group border border-black/10 dark:border-white/10 bg-gray-900 shadow-2xl cursor-pointer"
           initial={{ opacity: 0, x: 50 }}
           whileInView={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5, delay: idx * 0.1 }}

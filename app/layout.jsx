@@ -225,6 +225,13 @@ export default function RootLayout({ children }) {
           as="image"
           type="image/webp"
         />
+        {/* Preload LCP image */}
+        <link
+          rel="preload"
+          href="/computer-class.webp"
+          as="image"
+          type="image/webp"
+        />
         <link
           rel="preload"
           href="/fonts/kalpurush.ttf"
@@ -266,6 +273,32 @@ export default function RootLayout({ children }) {
           href="https://fonts.gstatic.com"
           crossOrigin="anonymous"
         />
+
+        {/* Preload Google Fonts */}
+        <link
+          rel="preload"
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+          as="style"
+          onload="this.onload=null;this.rel='stylesheet'"
+        />
+        <noscript>
+          <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+          />
+        </noscript>
+        <link
+          rel="preload"
+          href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap"
+          as="style"
+          onload="this.onload=null;this.rel='stylesheet'"
+        />
+        <noscript>
+          <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap"
+          />
+        </noscript>
 
         {/* Prefetch likely next pages */}
         <link

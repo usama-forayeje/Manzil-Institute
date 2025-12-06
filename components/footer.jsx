@@ -307,7 +307,7 @@ export default function FooterSection() {
                       <div className="flex-1">
                         <p
                           className={cn(
-                            'text-sm leading-relaxed text-left text-gray-500 dark:text-gray-400',
+                            'text-sm leading-relaxed text-left text-gray-600 dark:text-gray-400',
                             language === 'bn' ? 'bengali-text' : ''
                           )}
                         >
@@ -470,7 +470,7 @@ export default function FooterSection() {
               </div>
               <p
                 className={cn(
-                  'text-sm text-gray-400 dark:text-gray-500',
+                  'text-sm text-gray-600 dark:text-gray-500',
                   language === 'bn' ? 'bengali-text' : ''
                 )}
               >

@@ -279,7 +279,6 @@ export default function RootLayout({ children }) {
           rel="preload"
           href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
           as="style"
-          onload="this.onload=null;this.rel='stylesheet'"
         />
         <noscript>
           <link
@@ -291,7 +290,6 @@ export default function RootLayout({ children }) {
           rel="preload"
           href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap"
           as="style"
-          onload="this.onload=null;this.rel='stylesheet'"
         />
         <noscript>
           <link
@@ -325,6 +323,12 @@ export default function RootLayout({ children }) {
         <link
           rel="modulepreload"
           href="/_next/static/chunks/webpack.js"
+        />
+
+        {/* Content Security Policy */}
+        <meta
+          httpEquiv="Content-Security-Policy"
+          content="default-src 'self'; script-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://www.google.com https://www.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com https://www.google.com https://www.googleapis.com; img-src 'self' data: https:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://www.google.com https://www.googleapis.com; frame-src 'self' https://www.google.com; object-src 'none'; base-uri 'self'; form-action 'self';"
         />
       </head>
       <body className={`${inter.variable} font-sans`}>

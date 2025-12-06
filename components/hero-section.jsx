@@ -1,6 +1,6 @@
 'use client';
 
-import React, { Suspense } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import { useLanguageStore } from '../lib/store';
 import { Button } from './ui/button';
@@ -8,11 +8,8 @@ import { BookOpen, ArrowRight } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { AnimatedGroup } from './ui/animated-group';
 import { LazyImage } from '@/components/ui/lazy-image';
+import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, EffectFade } from 'swiper/modules';
-
-// Lazy load Swiper components
-const SwiperComponent = React.lazy(() => import('swiper/react').then(mod => ({ default: mod.Swiper })));
-const SwiperSlideComponent = React.lazy(() => import('swiper/react').then(mod => ({ default: mod.SwiperSlide })));
 
 const transitionVariants = {
   item: {
@@ -42,6 +39,10 @@ export default function HeroSectionPremium() {
     { src: '/childclass.webp', alt: 'Classroom' },
     { src: '/roboticsclass.webp', alt: 'Robotics Lab' },
     { src: '/arabic-class.webp', alt: 'Arabic Class' },
+    { src: '/artsclass.webp', alt: 'Arts Class' },
+    { src: '/carigory-class.webp', alt: 'Crafts Class' },
+    { src: '/classroom.webp', alt: 'Modern Classroom' },
+    { src: '/languageclass.webp', alt: 'Language Class' },
   ];
 
   return (
@@ -49,31 +50,29 @@ export default function HeroSectionPremium() {
       <section id="hero" className="relative min-h-[90vh] flex items-center">
         {/* Background Swiper */}
         <div className="absolute inset-0 z-0">
-          <Suspense fallback={<div className="w-full h-full bg-gray-200 animate-pulse" />}>
-            <SwiperComponent
-              modules={[Autoplay, EffectFade]}
-              effect="fade"
-              autoplay={{ delay: 5000, disableOnInteraction: false }}
-              loop={true}
-              className="h-full w-full"
-            >
-              {heroImages.map((img, idx) => (
-                <SwiperSlideComponent key={idx}>
-                  <div className="relative w-full h-full">
-                    <LazyImage
-                      src={img.src}
-                      alt={img.alt}
-                      width={1920}
-                      height={1080}
-                      className="object-cover w-full h-full"
-                    />
-                    {/* Gradient Overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-white/90 via-white/70 to-white/30 dark:from-gray-950/95 dark:via-gray-950/80 dark:to-gray-950/40" />
-                  </div>
-                </SwiperSlideComponent>
-              ))}
-            </SwiperComponent>
-          </Suspense>
+          <Swiper
+            modules={[Autoplay, EffectFade]}
+            effect="fade"
+            autoplay={{ delay: 5000, disableOnInteraction: false }}
+            loop={true}
+            className="h-full w-full"
+          >
+            {heroImages.map((img, idx) => (
+              <SwiperSlide key={idx}>
+                <div className="relative w-full h-full">
+                  <LazyImage
+                    src={img.src}
+                    alt={img.alt}
+                    width={1920}
+                    height={1080}
+                    className="object-cover w-full h-full"
+                  />
+                  {/* Gradient Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-white/90 via-white/70 to-white/30 dark:from-gray-950/95 dark:via-gray-950/80 dark:to-gray-950/40" />
+                </div>
+              </SwiperSlide>
+            ))}
+          </Swiper>
         </div>
 
         {/* Content */}
@@ -196,7 +195,7 @@ export default function HeroSectionPremium() {
                     </p>
                     <p
                       className={cn(
-                        'text-sm text-gray-500 dark:text-gray-400',
+                        'text-sm text-gray-600 dark:text-gray-400',
                         language === 'bn' ? 'bengali-text' : ''
                       )}
                     >
@@ -209,7 +208,7 @@ export default function HeroSectionPremium() {
                     </p>
                     <p
                       className={cn(
-                        'text-sm text-gray-500 dark:text-gray-400',
+                        'text-sm text-gray-600 dark:text-gray-400',
                         language === 'bn' ? 'bengali-text' : ''
                       )}
                     >
@@ -222,7 +221,7 @@ export default function HeroSectionPremium() {
                     </p>
                     <p
                       className={cn(
-                        'text-sm text-gray-500 dark:text-gray-400',
+                        'text-sm text-gray-600 dark:text-gray-400',
                         language === 'bn' ? 'bengali-text' : ''
                       )}
                     >

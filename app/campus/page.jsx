@@ -46,19 +46,19 @@ import HeroHeader from '@/components/header';
 // --- Image Assets (Replace with real paths) ---
 const images = {
   bridge:
-    'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?q=80&w=2613&auto=format&fit=crop',
+    'https://ik.imagekit.io/lgd2hue3i/Manzil-Institute/building.jpg',
   building:
-    'https://images.unsplash.com/photo-1554469384-e58fac16e23a?q=80&w=2574&auto=format&fit=crop',
+    'https://ik.imagekit.io/lgd2hue3i/Manzil-Institute/building-2.jpg',
   corridor:
-    'https://images.unsplash.com/photo-1562774053-701939374585?q=80&w=2586&auto=format&fit=crop',
+    'https://ik.imagekit.io/lgd2hue3i/Manzil-Institute/coridor.jpg',
   reception:
-    'https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=2301&auto=format&fit=crop',
+    'https://ik.imagekit.io/lgd2hue3i/Manzil-Institute/office.jpg',
   arabicClass:
-    'https://images.unsplash.com/photo-1580582932707-520aed937b7b?q=80&w=2664&auto=format&fit=crop',
+    'https://ik.imagekit.io/lgd2hue3i/Manzil-Institute/arabicClass-1.jpg',
   generalClass:
-    'https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=2604&auto=format&fit=crop',
+    'https://ik.imagekit.io/lgd2hue3i/Manzil-Institute/generalClass.jpg',
   languageLab:
-    'https://images.unsplash.com/photo-1543269865-cbf427effbad?q=80&w=2670&auto=format&fit=crop',
+    '/languageclass.webp',
   computerLab:
     'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=2670&auto=format&fit=crop',
   engineering:

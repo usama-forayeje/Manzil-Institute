@@ -1,14 +1,13 @@
 'use client';
 
-import Link from 'next/link';
-import { MapPin, Phone, Mail, Facebook, Youtube } from 'lucide-react';
+import { MapPin, Phone, Mail, Facebook, Youtube,Code2Icon } from 'lucide-react';
 import { useLanguageStore } from '@/lib/store';
-import { Code2Icon } from 'lucide-react';
-import { AnimatedGroup } from '@/components/ui/animated-group';
 import { useLayoutEffect, useState } from 'react';
 import { useTheme } from '@/components/themes/theme-provider';
 import { cn } from '@/lib/utils';
-import { LazyImage } from '@/components/ui/lazy-image';
+import { AnimatedGroup } from './ui/animated-group';
+import Link from 'next/link';
+import { LazyImage } from './ui/lazy-image';
 
 // Theme-aware logo component for footer
 function FooterLogo({ className, ...props }) {
@@ -16,7 +15,6 @@ function FooterLogo({ className, ...props }) {
   const [mounted, setMounted] = useState(false);
 
   useLayoutEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 

@@ -137,7 +137,7 @@ export default function FooterSection() {
         en: 'Manzil Group',
         bn: 'মানজিল গ্রুপ',
       },
-      href: 'https://manzilgorupbd.com',
+      href: 'https://manzilgroupbd.com',
     },
     {
       title: {

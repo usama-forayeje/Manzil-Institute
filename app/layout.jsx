@@ -132,7 +132,7 @@ export const metadata = {
     siteName: 'Manzil Institute',
     images: [
       {
-        url: 'https://institute.manzilgroupbd.com/manzil-institute-logo-dark.webp',
+        url: 'https://institute.manzilgroupbd.com/manzil-logo/manzil-institute-logo-dark.webp',
         width: 1200,
         height: 630,
         alt: 'Manzil Institute - Quality Islamic Education',
@@ -147,7 +147,7 @@ export const metadata = {
     description:
       'Manzil Institute offers integrated MIC Curriculum, Madrasa Education, General Education & Technical Education in Bangladesh.',
     images: [
-      'https://institute.manzilgroupbd.com/manzil-institute-logo-dark.webp',
+      'https://institute.manzilgroupbd.com/manzil-logo/manzil-institute-logo-dark.webp',
     ],
     creator: '@manzilinstitute',
   },
@@ -221,7 +221,7 @@ export default function RootLayout({ children }) {
         {/* Preload critical resources */}
         <link
           rel="preload"
-          href="/manzil-institute-logo-dark.webp"
+          href="/manzil-logo/manzil-institute-logo-dark.webp"
           as="image"
           type="image/webp"
         />
@@ -341,7 +341,7 @@ export default function RootLayout({ children }) {
         {/* Content Security Policy */}
         <meta
           httpEquiv="Content-Security-Policy"
-          content="default-src 'self'; script-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://www.google.com https://www.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com https://www.google.com https://www.googleapis.com; img-src 'self' data: https:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://www.google.com https://www.googleapis.com; frame-src 'self' https://www.google.com; object-src 'none'; base-uri 'self'; form-action 'self';"
+          content="default-src 'self'; script-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://www.google.com https://www.googleapis.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com https://www.google.com https://www.googleapis.com; img-src 'self' data: https:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://www.google.com https://www.googleapis.com https://www.google-analytics.com https://www.googletagmanager.com; frame-src 'self' https://www.google.com; object-src 'none'; base-uri 'self'; form-action 'self';"
         />
       </head>
       <body className={`${inter.variable} font-sans`}>

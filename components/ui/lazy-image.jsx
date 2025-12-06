@@ -11,7 +11,7 @@ export function LazyImage({
   height,
   fill,
   className,
-  quality = 85,
+  quality = 75,
   ...props
 }) {
   const [imgSrc, setImgSrc] = useState(src);

@@ -1,17 +1,17 @@
-"use client";
+'use client';
 
-import React from 'react'
-import { Button } from "./ui/button";
-import Link from "next/link";
-import { TwitterIcon, Facebook, Linkedin } from "lucide-react";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Autoplay } from "swiper/modules";
-import "swiper/css";
+import React from 'react';
+import { Button } from './ui/button';
+import Link from 'next/link';
+import { TwitterIcon, Facebook, Linkedin } from 'lucide-react';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Autoplay } from 'swiper/modules';
+import 'swiper/css';
 import { useLanguageStore } from '../lib/store';
 import { cn } from '../lib/utils';
 import { Users, Award, Sparkles } from 'lucide-react';
 import { AnimatedGroup } from './ui/animated-group';
-import Image from 'next/image';
+import { LazyImage } from './ui/lazy-image';
 
 const transitionVariants = {
   item: {
@@ -31,60 +31,60 @@ const transitionVariants = {
       },
     },
   },
-}
+};
 
 const Team1 = ({
   members = [
     {
-      id: "member-1",
-      name: "মাওলানা জামাল মাসরুর",
-      role: "প্রতিষ্ঠাতা প্রিন্সিপাল",
-      bio: "মানযিল ইনস্টিটিউটের প্রতিষ্ঠাতা ও চেয়ারম্যান, মানযিল গ্রুপ",
+      id: 'member-1',
+      name: 'মাওলানা জামাল মাসরুর',
+      role: 'প্রতিষ্ঠাতা প্রিন্সিপাল',
+      bio: 'মানযিল ইনস্টিটিউটের প্রতিষ্ঠাতা ও চেয়ারম্যান, মানযিল গ্রুপ',
       avatar:
-        "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/avatar-1.webp",
-      twittorLink: "https://twitter.com/",
-      facebookLink: "https://facebook.com/",
-      linkedinLink: "https://linkedin.com/",
-      whatsappNumber: "https://wa.me/",
+        'https://deifkwefumgah.cloudfront.net/shadcnblocks/block/avatar-1.webp',
+      twittorLink: 'https://twitter.com/',
+      facebookLink: 'https://facebook.com/',
+      linkedinLink: 'https://linkedin.com/',
+      whatsappNumber: 'https://wa.me/',
     },
     {
-      id: "member-2",
-      name: "মাওলানা ইমরান হোসাইন",
-      role: "প্রতিষ্ঠাতা পরিচালক",
-      bio: "মানযিল ইন্টারন্যাশনাল কারিকুলাম (M.I.C) এর প্রতিষ্ঠাতা পরিচালক",
+      id: 'member-2',
+      name: 'মাওলানা ইমরান হোসাইন',
+      role: 'প্রতিষ্ঠাতা পরিচালক',
+      bio: 'মানযিল ইন্টারন্যাশনাল কারিকুলাম (M.I.C) এর প্রতিষ্ঠাতা পরিচালক',
       avatar:
-        "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/avatar-2.webp",
+        'https://deifkwefumgah.cloudfront.net/shadcnblocks/block/avatar-2.webp',
     },
     {
-      id: "member-3",
-      name: "শায়েখ ড. আহমদ আলী",
-      role: "শিক্ষা উপদেষ্টা",
-      bio: "ইসলামিক স্টাডিজ ও কারিকুলাম ডেভেলপমেন্ট বিশেষজ্ঞ",
+      id: 'member-3',
+      name: 'শায়েখ ড. আহমদ আলী',
+      role: 'শিক্ষা উপদেষ্টা',
+      bio: 'ইসলামিক স্টাডিজ ও কারিকুলাম ডেভেলপমেন্ট বিশেষজ্ঞ',
       avatar:
-        "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/avatar-3.webp",
+        'https://deifkwefumgah.cloudfront.net/shadcnblocks/block/avatar-3.webp',
     },
     {
-      id: "member-4",
-      name: "উসামা ফরায়েজী",
-      role: "সফটওয়্যার এন্ড AI ইঞ্জিনিয়ার",
-      bio: "জেনারেল এডুকেশন ও কারিকুলাম কো-অর্ডিনেটর",
-      avatar: "Usama Forayaje.webp",
+      id: 'member-4',
+      name: 'উসামা ফরায়েজী',
+      role: 'সফটওয়্যার এন্ড AI ইঞ্জিনিয়ার',
+      bio: 'জেনারেল এডুকেশন ও কারিকুলাম কো-অর্ডিনেটর',
+      avatar: 'Usama Forayaje.webp',
     },
     {
-      id: "member-5",
-      name: "ইঞ্জিনিয়ার সাদমান সাকিব",
-      role: "টেকনিক্যাল ডিরেক্টর",
-      bio: "কারিগরি শিক্ষা ও প্রযুক্তি বিভাগ প্রধান",
+      id: 'member-5',
+      name: 'ইঞ্জিনিয়ার সাদমান সাকিব',
+      role: 'টেকনিক্যাল ডিরেক্টর',
+      bio: 'কারিগরি শিক্ষা ও প্রযুক্তি বিভাগ প্রধান',
       avatar:
-        "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/avatar-5.webp",
+        'https://deifkwefumgah.cloudfront.net/shadcnblocks/block/avatar-5.webp',
     },
     {
-      id: "member-6",
-      name: "ড. আয়েশা সিদ্দিকা",
-      role: "মহিলা শাখা উপদেষ্টা",
-      bio: "মহিলা শিক্ষা ও কারিকুলাম ডেভেলপমেন্ট",
+      id: 'member-6',
+      name: 'ড. আয়েশা সিদ্দিকা',
+      role: 'মহিলা শাখা উপদেষ্টা',
+      bio: 'মহিলা শিক্ষা ও কারিকুলাম ডেভেলপমেন্ট',
       avatar:
-        "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/avatar-6.webp",
+        'https://deifkwefumgah.cloudfront.net/shadcnblocks/block/avatar-6.webp',
     },
   ],
 }) => {
@@ -123,7 +123,7 @@ const Team1 = ({
           className="team-swiper"
           grabCursor={true}
         >
-          {members.map((member) => (
+          {members.map(member => (
             <SwiperSlide key={member.id}>
               <div className="flex flex-col items-center group">
                 <div className="relative mb-4">
@@ -189,16 +189,16 @@ const Team = () => {
 
   const teamMembers = [
     {
-      name: { bn: "মাওলানা জামাল মাসরুর", en: "Mawlana Jamal Masrur" },
+      name: { bn: 'মাওলানা জামাল মাসরুর', en: 'Mawlana Jamal Masrur' },
       title: {
-        bn: "প্রতিষ্ঠাতা প্রিন্সিপাল",
-        en: "Founder Principal"
+        bn: 'প্রতিষ্ঠাতা প্রিন্সিপাল',
+        en: 'Founder Principal',
       },
       bio: {
-        bn: "মানযিল ইনস্টিটিউটের প্রতিষ্ঠাতা ও চেয়ারম্যান, মানযিল গ্রুপ। ইসলামী শিক্ষা ও আধুনিক শিক্ষার সমন্বয়ে একটি আদর্শ শিক্ষা ব্যবস্থা গড়ে তোলার লক্ষ্যে কাজ করছেন।",
-        en: "Founder and Chairman of Manzil Institute, Manzil Group. Working towards building an ideal education system through the integration of Islamic education and modern education."
+        bn: 'মানযিল ইনস্টিটিউটের প্রতিষ্ঠাতা ও চেয়ারম্যান, মানযিল গ্রুপ। ইসলামী শিক্ষা ও আধুনিক শিক্ষার সমন্বয়ে একটি আদর্শ শিক্ষা ব্যবস্থা গড়ে তোলার লক্ষ্যে কাজ করছেন।',
+        en: 'Founder and Chairman of Manzil Institute, Manzil Group. Working towards building an ideal education system through the integration of Islamic education and modern education.',
       },
-      imageUrl: "/jamalmasrur.webp",
+      imageUrl: '/jamalmasrur.webp',
     },
   ];
   return (
@@ -217,16 +217,25 @@ const Team = () => {
         }}
         className="flex flex-col justify-center px-6 lg:px-8 max-w-(--breakpoint-xl) mx-auto"
       >
-
         {/* Main Heading with Animation */}
         <div className="mb-6 text-center sm:mb-8 lg:mb-12">
           <div className="inline-flex items-center justify-center px-3 py-1 mb-4 bg-[#00AEEF]/20 dark:bg-[#00AEEF]/10 rounded-full">
             <Users className="size-4 text-[#00AEEF] dark:text-[#00AEEF]/80 mr-2" />
-            <span className={cn("text-sm font-semibold text-[#00AEEF] dark:text-[#00AEEF]/80", language === 'bn' ? "bengali-text" : "")}>
+            <span
+              className={cn(
+                'text-sm font-semibold text-[#00AEEF] dark:text-[#00AEEF]/80',
+                language === 'bn' ? 'bengali-text' : ''
+              )}
+            >
               {language === 'bn' ? 'আমাদের নেতৃত্ব' : 'Our Leadership'}
             </span>
           </div>
-          <h2 className={cn("text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-4 leading-tight", language === 'bn' ? "bengali-text" : "english-text")}>
+          <h2
+            className={cn(
+              'text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-4 leading-tight',
+              language === 'bn' ? 'bengali-text' : 'english-text'
+            )}
+          >
             {language === 'bn' ? 'পরিচালনা পরিষদ' : 'Board of Directors'}
           </h2>
           <div className="flex items-center justify-center gap-2 mb-6">
@@ -234,17 +243,23 @@ const Team = () => {
             <Award className="size-5 text-[#00AEEF] dark:text-[#00AEEF]/80" />
             <div className="w-6 h-1 bg-gradient-to-l from-transparent to-[#00AEEF] rounded-full"></div>
           </div>
-          <p className={cn("text-base sm:text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed", language === 'bn' ? "bengali-text" : "english-text")}>
-           {language === 'bn'
-             ? 'দক্ষ ও অভিজ্ঞ নেতৃত্বের মাধ্যমে আমরা গড়ে তুলছি একটি আদর্শ শিক্ষা ব্যবস্থা যা ভবিষ্যতের নেতাদের তৈরি করবে।'
-             : 'Through skilled and experienced leadership, we are building an ideal education system that will create future leaders.'
-           }
+          <p
+            className={cn(
+              'text-base sm:text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed',
+              language === 'bn' ? 'bengali-text' : 'english-text'
+            )}
+          >
+            {language === 'bn'
+              ? 'দক্ষ ও অভিজ্ঞ নেতৃত্বের মাধ্যমে আমরা গড়ে তুলছি একটি আদর্শ শিক্ষা ব্যবস্থা যা ভবিষ্যতের নেতাদের তৈরি করবে।'
+              : 'Through skilled and experienced leadership, we are building an ideal education system that will create future leaders.'}
           </p>
         </div>
         <div className="flex flex-col justify-center w-full gap-6 mb-12 sm:flex-row sm:gap-8 lg:gap-12">
           {teamMembers.map((member, index) => (
             <div
-              key={typeof member.name === 'object' ? member.name.bn : member.name}
+              key={
+                typeof member.name === 'object' ? member.name.bn : member.name
+              }
               className="group relative max-w-sm mx-auto text-center bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-2xl hover:shadow-[#00AEEF]/10 transition-all duration-500 p-6 border border-gray-100 dark:border-gray-700 hover:border-[#00AEEF]/60 dark:hover:border-[#00AEEF]/40 overflow-hidden"
             >
               {/* Decorative background elements */}
@@ -254,9 +269,13 @@ const Team = () => {
               {/* Profile Image with enhanced styling */}
               <div className="relative mb-6">
                 <div className="absolute inset-0 bg-gradient-to-r from-[#00AEEF]/60 to-purple-400 rounded-xl blur-lg opacity-20 group-hover:opacity-40 transition-opacity duration-300"></div>
-                <Image
+                <LazyImage
                   src={member.imageUrl}
-                  alt={typeof member.name === 'object' ? member.name[language] || member.name.bn : member.name}
+                  alt={
+                    typeof member.name === 'object'
+                      ? member.name[language] || member.name.bn
+                      : member.name
+                  }
                   width={128}
                   height={128}
                   className="relative w-32 h-32 sm:w-36 sm:h-36 lg:w-40 lg:h-40 rounded-xl object-cover bg-gradient-to-br from-[#00AEEF]/20 to-[#00AEEF]/30 dark:from-[#00AEEF]/10 dark:to-[#00AEEF]/20 mx-auto shadow-xl group-hover:scale-105 transition-transform duration-300 border-4 border-white dark:border-gray-700"
@@ -265,23 +284,47 @@ const Team = () => {
                 <div className="absolute -top-2 -right-2 bg-gradient-to-r from-[#00AEEF] to-purple-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg animate-pulse">
                   <Sparkles className="inline w-3 h-3 mr-1" />
                   {language === 'bn'
-                    ? (index === 0 ? "চেয়ারম্যান" : "পরিচালক")
-                    : (index === 0 ? "Chairman" : "Director")
-                  }
+                    ? index === 0
+                      ? 'চেয়ারম্যান'
+                      : 'পরিচালক'
+                    : index === 0
+                      ? 'Chairman'
+                      : 'Director'}
                 </div>
               </div>
 
               {/* Name and Title */}
-              <h3 className={cn("text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-[#00AEEF] dark:group-hover:text-[#00AEEF]/80 transition-colors duration-300", language === 'bn' ? "bengali-text" : "")}>
-                {typeof member.name === 'object' ? member.name[language] || member.name.bn : member.name}
+              <h3
+                className={cn(
+                  'text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-[#00AEEF] dark:group-hover:text-[#00AEEF]/80 transition-colors duration-300',
+                  language === 'bn' ? 'bengali-text' : ''
+                )}
+              >
+                {typeof member.name === 'object'
+                  ? member.name[language] || member.name.bn
+                  : member.name}
               </h3>
-              <p className={cn("text-[#00AEEF] dark:text-[#00AEEF]/80 font-semibold text-sm mb-4 uppercase tracking-wide", language === 'bn' ? "bengali-text" : "")}>
-                {typeof member.title === 'object' ? member.title[language] || member.title.bn : member.title}
+              <p
+                className={cn(
+                  'text-[#00AEEF] dark:text-[#00AEEF]/80 font-semibold text-sm mb-4 uppercase tracking-wide',
+                  language === 'bn' ? 'bengali-text' : ''
+                )}
+              >
+                {typeof member.title === 'object'
+                  ? member.title[language] || member.title.bn
+                  : member.title}
               </p>
 
               {/* Bio with better styling */}
-              <p className={cn("text-gray-600 dark:text-gray-300 text-sm leading-relaxed mb-6 px-2", language === 'bn' ? "bengali-text" : "")}>
-                {typeof member.bio === 'object' ? member.bio[language] || member.bio.bn : member.bio}
+              <p
+                className={cn(
+                  'text-gray-600 dark:text-gray-300 text-sm leading-relaxed mb-6 px-2',
+                  language === 'bn' ? 'bengali-text' : ''
+                )}
+              >
+                {typeof member.bio === 'object'
+                  ? member.bio[language] || member.bio.bn
+                  : member.bio}
               </p>
 
               {/* Enhanced Social Media Buttons */}
@@ -292,7 +335,7 @@ const Team = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-center p-2 text-green-600 transition-all duration-200 bg-green-100 rounded-md shadow-none cursor-pointer hover:bg-green-200 dark:bg-green-900/30 dark:hover:bg-green-800/50 hover:text-green-700 dark:text-green-400 hover:scale-105"
-                  onClick={(e) => e.stopPropagation()}
+                  onClick={e => e.stopPropagation()}
                   aria-label="WhatsApp"
                 >
                   <svg
@@ -311,7 +354,7 @@ const Team = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="bg-[#00AEEF]/20 hover:bg-[#00AEEF]/30 dark:bg-[#00AEEF]/10 dark:hover:bg-[#00AEEF]/20 text-[#00AEEF] hover:text-[#00AEEF]/90 dark:text-[#00AEEF]/80 shadow-none transition-all duration-200 hover:scale-105 cursor-pointer rounded-md p-2 flex items-center justify-center"
-                  onClick={(e) => e.stopPropagation()}
+                  onClick={e => e.stopPropagation()}
                   aria-label="Facebook"
                 >
                   <Facebook className="stroke-current size-5" />
@@ -323,7 +366,7 @@ const Team = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-center p-2 transition-all duration-200 rounded-md shadow-none cursor-pointer bg-sky-100 hover:bg-sky-200 dark:bg-sky-900/30 dark:hover:bg-sky-800/50 text-sky-600 hover:text-sky-700 dark:text-sky-400 hover:scale-105 disabled:opacity-60"
-                  onClick={(e) => e.stopPropagation()}
+                  onClick={e => e.stopPropagation()}
                   aria-label="Twitter"
                 >
                   <TwitterIcon className="stroke-current size-5" />
@@ -335,7 +378,7 @@ const Team = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="bg-[#00AEEF]/20 hover:bg-[#00AEEF]/30 dark:bg-[#00AEEF]/10 dark:hover:bg-[#00AEEF]/20 text-[#00AEEF]/90 hover:text-[#00AEEF] dark:text-[#00AEEF]/70 shadow-none transition-all duration-200 hover:scale-105 cursor-pointer rounded-md p-2 flex items-center justify-center disabled:opacity-60"
-                  onClick={(e) => e.stopPropagation()}
+                  onClick={e => e.stopPropagation()}
                   aria-label="LinkedIn"
                 >
                   <Linkedin className="stroke-current size-5" />
@@ -347,7 +390,7 @@ const Team = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-center p-2 text-white transition-all duration-200 rounded-md shadow-none cursor-pointer bg-black/60 dark:bg-black/20 hover:bg-black/50 hover:scale-105"
-                  onClick={(e) => e.stopPropagation()}
+                  onClick={e => e.stopPropagation()}
                   aria-label="TikTok"
                 >
                   <svg
@@ -366,11 +409,29 @@ const Team = () => {
 
         {/* CTA buttons for desktop */}
         <div className="hidden gap-3 mt-8 mb-12 sm:flex sm:flex-row-reverse sm:justify-center">
-          <Button size="lg" className="bg-[#00AEEF] hover:bg-[#00AEEF]/90 text-white" asChild>
-            <Link href="/campus" className={cn(language === 'bn' ? "bengali-text" : "english-text")}>{language === 'bn' ? 'ক্যাম্পাস দেখুন' : 'See Campus'}</Link>
+          <Button
+            size="lg"
+            className="bg-[#00AEEF] hover:bg-[#00AEEF]/90 text-white"
+            asChild
+          >
+            <Link
+              href="/campus"
+              className={cn(
+                language === 'bn' ? 'bengali-text' : 'english-text'
+              )}
+            >
+              {language === 'bn' ? 'ক্যাম্পাস দেখুন' : 'See Campus'}
+            </Link>
           </Button>
           <Button size="lg" variant="outline" asChild>
-            <Link href="/admission" className={cn(language === 'bn' ? "bengali-text" : "english-text")}>{language === 'bn' ? 'ভর্তি প্রক্রিয়া' : 'Admission Process'}</Link>
+            <Link
+              href="/admission"
+              className={cn(
+                language === 'bn' ? 'bengali-text' : 'english-text'
+              )}
+            >
+              {language === 'bn' ? 'ভর্তি প্রক্রিয়া' : 'Admission Process'}
+            </Link>
           </Button>
         </div>
 
@@ -378,20 +439,35 @@ const Team = () => {
 
         {/* CTA buttons at bottom for mobile */}
         <div className="flex flex-col justify-center gap-3 px-6 mt-12 sm:hidden">
-          <Button size="lg" className="w-full bg-[#00AEEF] hover:bg-[#00AEEF]/90 text-white" asChild>
-            <Link href="/campus" className={cn(language === 'bn' ? "bengali-text" : "english-text")}>{language === 'bn' ? 'ক্যাম্পাস দেখুন' : 'See Campus'}</Link>
+          <Button
+            size="lg"
+            className="w-full bg-[#00AEEF] hover:bg-[#00AEEF]/90 text-white"
+            asChild
+          >
+            <Link
+              href="/campus"
+              className={cn(
+                language === 'bn' ? 'bengali-text' : 'english-text'
+              )}
+            >
+              {language === 'bn' ? 'ক্যাম্পাস দেখুন' : 'See Campus'}
+            </Link>
           </Button>
           <Button size="lg" variant="outline" className="w-full" asChild>
-            <Link href="/admission" className={cn(language === 'bn' ? "bengali-text" : "english-text")}>{language === 'bn' ? 'ভর্তি প্রক্রিয়া' : 'Admission Process'}</Link>
+            <Link
+              href="/admission"
+              className={cn(
+                language === 'bn' ? 'bengali-text' : 'english-text'
+              )}
+            >
+              {language === 'bn' ? 'ভর্তি প্রক্রিয়া' : 'Admission Process'}
+            </Link>
           </Button>
         </div>
       </AnimatedGroup>
-
     </section>
   );
 };
 
 export default Team;
 export { Team1 };
-
-

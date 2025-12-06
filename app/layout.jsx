@@ -1,18 +1,18 @@
-import React, { Suspense } from 'react'
-import { Inter } from 'next/font/google'
+import React, { Suspense } from 'react';
+import { Inter } from 'next/font/google';
 
-import './globals.css'
-import { Providers } from '@/components/providers'
-import FloatingActionButtons from '@/components/FloatingActionButtons'
-import { Skeleton } from '@/components/ui/skeleton'
-import StructuredData from '@/components/seo/StructuredData'
+import './globals.css';
+import { Providers } from '@/components/providers';
+import FloatingActionButtons from '@/components/FloatingActionButtons';
+import { Skeleton } from '@/components/ui/skeleton';
+import StructuredData from '@/components/seo/StructuredData';
 
 const inter = Inter({
   subsets: ['latin'],
   display: 'swap',
   preload: true,
-  variable: '--font-inter'
-})
+  variable: '--font-inter',
+});
 
 // Server-safe Loading Skeleton for root layout
 function RootLoadingSkeleton() {
@@ -87,12 +87,14 @@ function RootLoadingSkeleton() {
         </section>
       </main>
     </div>
-  )
+  );
 }
 
 export const metadata = {
   title: 'Manzil Institute - Quality Islamic Education',
-  description: 'Manzil Institute offers integrated MIC Curriculum, Madrasa Education, General Education & Technical Education in Bangladesh. Providing comprehensive Islamic and modern education for students.',
+  description:
+    'Manzil Institute offers integrated MIC Curriculum, Madrasa Education, General Education & Technical Education in Bangladesh. Providing comprehensive Islamic and modern education for students.',
+  viewport: 'width=device-width, initial-scale=1',
   keywords: [
     'Manzil Institute',
     'Islamic Education',
@@ -103,7 +105,7 @@ export const metadata = {
     'Modern Education',
     'Technical Education',
     'Quality Education',
-    'Islamic Studies'
+    'Islamic Studies',
   ],
   authors: [{ name: 'Manzil Institute' }],
   creator: 'Manzil Institute',
@@ -123,7 +125,8 @@ export const metadata = {
   },
   openGraph: {
     title: 'Manzil Institute - Quality Islamic Education',
-    description: 'Manzil Institute offers integrated MIC Curriculum, Madrasa Education, General Education & Technical Education in Bangladesh. Providing comprehensive Islamic and modern education for students.',
+    description:
+      'Manzil Institute offers integrated MIC Curriculum, Madrasa Education, General Education & Technical Education in Bangladesh. Providing comprehensive Islamic and modern education for students.',
     url: 'https://institute.manzilgroupbd.com',
     siteName: 'Manzil Institute',
     images: [
@@ -140,8 +143,11 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Manzil Institute - Quality Islamic Education',
-    description: 'Manzil Institute offers integrated MIC Curriculum, Madrasa Education, General Education & Technical Education in Bangladesh.',
-    images: ['https://institute.manzilgroupbd.com/manzil-institute-logo-dark.webp'],
+    description:
+      'Manzil Institute offers integrated MIC Curriculum, Madrasa Education, General Education & Technical Education in Bangladesh.',
+    images: [
+      'https://institute.manzilgroupbd.com/manzil-institute-logo-dark.webp',
+    ],
     creator: '@manzilinstitute',
   },
   robots: {
@@ -162,54 +168,88 @@ export const metadata = {
     yandex: 'your-yandex-verification-code',
     yahoo: 'your-yahoo-verification-code',
   },
-}
+};
 
 export default function RootLayout({ children }) {
-
   // Structured data for the organization
   const organizationData = {
     name: 'Manzil Institute',
     alternateName: 'Manzil International Institute',
-    description: 'Manzil Institute offers integrated MIC Curriculum, Madrasa Education, General Education & Technical Education in Bangladesh.',
+    description:
+      'Manzil Institute offers integrated MIC Curriculum, Madrasa Education, General Education & Technical Education in Bangladesh.',
     url: 'https://institute.manzilgroupbd.com',
     logo: 'https://institute.manzilgroupbd.com/manzil-institute-logo-dark.webp',
     sameAs: [
       'https://www.facebook.com/manzilinstitute',
       'https://www.instagram.com/manzilinstitute',
-      'https://www.linkedin.com/company/manzil-institute'
+      'https://www.linkedin.com/company/manzil-institute',
     ],
     address: {
       '@type': 'PostalAddress',
       addressCountry: 'BD',
       addressRegion: 'Dhaka',
-      addressLocality: 'Dhaka'
+      addressLocality: 'Dhaka',
     },
     contactPoint: {
       '@type': 'ContactPoint',
       telephone: '+880-1234-567890',
       contactType: 'customer service',
-      availableLanguage: ['English', 'Bengali']
+      availableLanguage: ['English', 'Bengali'],
     },
     email: 'info@manzilinstitute.edu.bd',
     foundingDate: '2020',
-    educationalCredentialAwarded: ['MIC Certificate', 'Madrasa Certificate', 'Technical Certificate'],
+    educationalCredentialAwarded: [
+      'MIC Certificate',
+      'Madrasa Certificate',
+      'Technical Certificate',
+    ],
     hasEducationalUse: 'Islamic and Modern Education',
-    knowsAbout: ['Islamic Studies', 'Modern Education', 'Technical Education', 'Bangladesh Education System'],
+    knowsAbout: [
+      'Islamic Studies',
+      'Modern Education',
+      'Technical Education',
+      'Bangladesh Education System',
+    ],
     areaServed: 'Bangladesh',
-    priceRange: '$$'
-  }
+    priceRange: '$$',
+  };
 
   return (
     <html lang="en" suppressHydrationWarning={true}>
+      <head>
+        {/* Preload critical resources */}
+        <link
+          rel="preload"
+          href="/manzil-institute-logo-dark.webp"
+          as="image"
+          type="image/webp"
+        />
+        <link
+          rel="preload"
+          href="/fonts/kalpurush.ttf"
+          as="font"
+          type="font/ttf"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="dns-prefetch"
+          href="//fonts.googleapis.com"
+        />
+        <link
+          rel="dns-prefetch"
+          href="//fonts.gstatic.com"
+        />
+      </head>
       <body className={`${inter.variable} font-sans`}>
-        <StructuredData type="EducationalOrganization" data={organizationData} />
+        <StructuredData
+          type="EducationalOrganization"
+          data={organizationData}
+        />
         <Providers>
-          <Suspense fallback={<RootLoadingSkeleton />}>
-            {children}
-          </Suspense>
+          <Suspense fallback={<RootLoadingSkeleton />}>{children}</Suspense>
           <FloatingActionButtons />
         </Providers>
       </body>
     </html>
-  )
+  );
 }

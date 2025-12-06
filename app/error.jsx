@@ -1,11 +1,11 @@
-'use client'
+'use client';
 
-import { useEffect } from 'react'
+import { useEffect } from 'react';
 
 export default function Error({ error, reset }) {
   useEffect(() => {
-    console.error(error)
-  }, [error])
+    console.error(error);
+  }, [error]);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
@@ -21,5 +21,5 @@ export default function Error({ error, reset }) {
         </button>
       </div>
     </div>
-  )
+  );
 }

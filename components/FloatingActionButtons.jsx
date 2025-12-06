@@ -1,73 +1,99 @@
-"use client";
+'use client';
 
-import React from 'react'
-import { useState, useEffect, useCallback, useRef } from 'react'
-import { ArrowUp } from 'lucide-react'
+import React from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { ArrowUp } from 'lucide-react';
 import { Button } from './ui/button';
 
 const FloatingActionButtons = () => {
-  const [isVisible, setIsVisible] = useState(false)
-  const [progress, setProgress] = useState(0)
-  const rafRef = useRef(null)
+  const [isVisible, setIsVisible] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const rafRef = useRef(null);
 
   // Show button when page is scrolled up to given distance
   const toggleVisibility = useCallback(() => {
-    const scrolled = window.pageYOffset
-    setIsVisible(scrolled > 200)
-  }, [])
+    const scrolled = window.pageYOffset;
+    setIsVisible(scrolled > 200);
+  }, []);
 
   // Calculate scroll progress with throttling
   const calculateProgress = useCallback(() => {
-    if (rafRef.current) return
+    if (rafRef.current) return;
 
     rafRef.current = requestAnimationFrame(() => {
-      const scrolled = window.pageYOffset
-      const maxHeight = document.body.scrollHeight - window.innerHeight
-      const newProgress = maxHeight > 0 ? (scrolled / maxHeight) * 100 : 0
-      setProgress(newProgress)
-      rafRef.current = null
-    })
-  }, [])
+      const scrolled = window.pageYOffset;
+      const maxHeight = document.body.scrollHeight - window.innerHeight;
+      const newProgress = maxHeight > 0 ? (scrolled / maxHeight) * 100 : 0;
+      setProgress(newProgress);
+      rafRef.current = null;
+    });
+  }, []);
 
   // Set the scroll event listeners
   useEffect(() => {
-    window.addEventListener('scroll', toggleVisibility, { passive: true })
-    window.addEventListener('scroll', calculateProgress, { passive: true })
+    window.addEventListener('scroll', toggleVisibility, { passive: true });
+    window.addEventListener('scroll', calculateProgress, { passive: true });
     return () => {
-      window.removeEventListener('scroll', toggleVisibility)
-      window.removeEventListener('scroll', calculateProgress)
+      window.removeEventListener('scroll', toggleVisibility);
+      window.removeEventListener('scroll', calculateProgress);
       if (rafRef.current) {
-        cancelAnimationFrame(rafRef.current)
+        cancelAnimationFrame(rafRef.current);
       }
-    }
-  }, [toggleVisibility, calculateProgress])
+    };
+  }, [toggleVisibility, calculateProgress]);
 
   // Scroll to top smoothly
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
-      behavior: 'smooth'
-    })
-  }
+      behavior: 'smooth',
+    });
+  };
 
   // WhatsApp link with predefined message
-  const whatsappUrl = 'https://wa.me/8801822478883?text=%E0%A6%86%E0%A6%AE%E0%A6%BF%20%E0%A6%86%E0%A6%AA%E0%A6%A8%E0%A6%BE%E0%A6%A6%E0%A7%87%E0%A6%B0%20%E0%A6%87%E0%A6%A8%E0%A6%B8%E0%A7%8D%E0%A6%9F%E0%A6%BF%E0%A6%9F%E0%A6%BF%E0%A6%89%E0%A6%9F%20%E0%A6%B8%E0%A6%AE%E0%A7%8D%E0%A6%AA%E0%A6%B0%E0%A7%8D%E0%A6%95%E0%A7%87%20%E0%A6%9C%E0%A6%BE%E0%A6%A8%E0%A6%A4%E0%A7%87%20%E0%A6%9A%E0%A6%BE%E0%A6%87'
+  const whatsappUrl =
+    'https://wa.me/8801822478883?text=%E0%A6%86%E0%A6%AE%E0%A6%BF%20%E0%A6%86%E0%A6%AA%E0%A6%A8%E0%A6%BE%E0%A6%A6%E0%A7%87%E0%A6%B0%20%E0%A6%87%E0%A6%A8%E0%A6%B8%E0%A7%8D%E0%A6%9F%E0%A6%BF%E0%A6%9F%E0%A6%BF%E0%A6%89%E0%A6%9F%20%E0%A6%B8%E0%A6%AE%E0%A7%8D%E0%A6%AA%E0%A6%B0%E0%A7%8D%E0%A6%95%E0%A7%87%20%E0%A6%9C%E0%A6%BE%E0%A6%A8%E0%A6%A4%E0%A7%87%20%E0%A6%9A%E0%A6%BE%E0%A6%87';
 
   return (
     <div className="fixed bottom-2 right-5 z-50 flex flex-col-reverse gap-0">
       {/* Back to Top Button */}
       <button
         onClick={scrollToTop}
-        className={`bg-[#00AEEF] hover:bg-[#00AEEF]/90 text-white p-3 rounded-full shadow-lg transition-all duration-600 transform hover:scale-110 relative overflow-hidden ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-full pointer-events-none'
-          }`}
-        style={{ transitionTimingFunction: 'cubic-bezier(0.68, -0.55, 0.265, 1.55)' }}
+        className={`bg-[#00AEEF] hover:bg-[#00AEEF]/90 text-white p-3 rounded-full shadow-lg transition-all duration-600 transform hover:scale-110 relative overflow-hidden ${
+          isVisible
+            ? 'opacity-100 translate-y-0'
+            : 'opacity-0 translate-y-full pointer-events-none'
+        }`}
+        style={{
+          transitionTimingFunction: 'cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+        }}
         aria-label="Back to top"
       >
         <ArrowUp className="w-6 h-6  relative z-10" />
         {/* Progress ring */}
-        <svg className="absolute p-0.5 inset-0 w-full h-full" viewBox="0 0 24 24">
-          <circle cx="12" cy="12" r="11" fill="none" stroke="rgba(0,0,0,0.2)" strokeWidth="2" />
-          <circle cx="12" cy="12" r="11" fill="none"  stroke="rgba(255,255,255,0.8)" strokeWidth="2" strokeDasharray="69.1" strokeDashoffset={`${69.1 * (1 - progress / 100)}`} transform="rotate(-90 12 12)" />
+        <svg
+          className="absolute p-0.5 inset-0 w-full h-full"
+          viewBox="0 0 24 24"
+        >
+          <circle
+            cx="12"
+            cy="12"
+            r="11"
+            fill="none"
+            stroke="rgba(0,0,0,0.2)"
+            strokeWidth="2"
+          />
+          <circle
+            cx="12"
+            cy="12"
+            r="11"
+            fill="none"
+            stroke="rgba(255,255,255,0.8)"
+            strokeWidth="2"
+            strokeDasharray="69.1"
+            strokeDashoffset={`${69.1 * (1 - progress / 100)}`}
+            transform="rotate(-90 12 12)"
+          />
         </svg>
       </button>
 
@@ -76,9 +102,12 @@ const FloatingActionButtons = () => {
         href={whatsappUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className={`bg-green-600 hover:bg-green-700 text-white p-3 rounded-full shadow-lg transition-all duration-600 transform hover:scale-110 ${isVisible ? '-translate-y-[20px]' : 'translate-y-full'
-          }`}
-        style={{ transitionTimingFunction: 'cubic-bezier(0.68, -0.55, 0.265, 1.55)' }}
+        className={`bg-green-600 hover:bg-green-700 text-white p-3 rounded-full shadow-lg transition-all duration-600 transform hover:scale-110 ${
+          isVisible ? '-translate-y-[20px]' : 'translate-y-full'
+        }`}
+        style={{
+          transitionTimingFunction: 'cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+        }}
         aria-label="Contact via WhatsApp"
       >
         <svg
@@ -91,7 +120,7 @@ const FloatingActionButtons = () => {
         </svg>
       </a>
     </div>
-  )
-}
+  );
+};
 
-export default FloatingActionButtons
+export default FloatingActionButtons;

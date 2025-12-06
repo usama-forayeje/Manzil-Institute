@@ -1,7 +1,5 @@
-import React from 'react'
-import { Skeleton } from "./ui/skeleton"
-import { withErrorBoundary } from "./ErrorBoundary"
-import FallbackComponent from "./FallbackComponent"
+import React from 'react';
+import { Skeleton } from './ui/skeleton';
 
 function LoadingSkeleton() {
   return (
@@ -75,7 +73,7 @@ function LoadingSkeleton() {
         </section>
       </main>
     </div>
-  )
+  );
 }
 
-export default LoadingSkeleton
+export default LoadingSkeleton;

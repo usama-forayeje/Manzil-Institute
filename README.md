@@ -210,11 +210,11 @@ Located in `components/ui/`:
 Each route file exports a `Route` component using `createFileRoute`:
 
 ```jsx
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/about')({
   component: AboutComponent,
-})
+});
 ```
 
 ## 🎨 Styling
@@ -326,6 +326,7 @@ Before deploying, ensure you have:
 Create the following environment files:
 
 #### `.env.local` (Development)
+
 ```env
 # API Configuration
 VITE_API_URL=http://localhost:3001/api
@@ -339,6 +340,7 @@ VITE_ENABLE_DEBUG=false
 ```
 
 #### `.env.production` (Production)
+
 ```env
 # API Configuration
 VITE_API_URL=https://api.manzilinstitute.com
@@ -366,6 +368,7 @@ VITE_RECAPTCHA_SITE_KEY=your_recaptcha_key
 #### Vercel (Recommended)
 
 **Option 1: Vercel CLI**
+
 ```bash
 # Install Vercel CLI
 npm i -g vercel
@@ -378,11 +381,13 @@ vercel --prod
 ```
 
 **Option 2: GitHub Integration**
+
 1. Connect your GitHub repository to Vercel
 2. Vercel will automatically detect the project settings
 3. Configure the following in Vercel dashboard:
 
 **Build Settings:**
+
 - **Framework Preset**: `Vite`
 - **Root Directory**: `./` (leave empty)
 - **Build Command**: `pnpm build`
@@ -393,10 +398,12 @@ vercel --prod
 Add all production environment variables from `.env.production`
 
 **Domain Configuration:**
+
 - Add custom domain in Vercel dashboard
 - Configure DNS records as instructed
 
 **Advanced Settings:**
+
 - **Node.js Version**: `18.x` or higher
 - **Build Image**: `Ubuntu Latest`
 - **Function Region**: `Washington D.C. (iad1)` or nearest
@@ -458,6 +465,7 @@ firebase deploy
 #### Security Headers
 
 The `vercel.json` includes security headers:
+
 - `X-Frame-Options: DENY`
 - `X-Content-Type-Options: nosniff`
 - `Referrer-Policy: strict-origin-when-cross-origin`
@@ -488,17 +496,20 @@ The `vercel.json` includes security headers:
 The project includes several production optimizations:
 
 #### Code Splitting
+
 - **Route-based splitting**: TanStack Router automatically splits code by routes
 - **Dynamic imports**: Components are lazy-loaded as needed
 - **Vendor chunking**: Third-party libraries are bundled separately
 
 #### Asset Optimization
+
 - **Image optimization**: Vite automatically converts images to WebP/AVIF when supported
 - **CSS minification**: Tailwind CSS is purged and minified
 - **JavaScript minification**: Terser is used for production builds
 - **Tree shaking**: Unused code is automatically removed
 
 #### Caching Strategy
+
 - **Static assets**: Cached for 1 year with immutable headers
 - **HTML**: Not cached to ensure updates are immediate
 - **Service worker**: Ready for PWA features (manifest.json included)
@@ -516,11 +527,13 @@ pnpm build
 ### Runtime Performance
 
 #### React Optimizations
+
 - **Concurrent features**: React 19 concurrent rendering enabled
 - **Suspense boundaries**: Proper loading states for better UX
 - **Error boundaries**: Graceful error handling
 
 #### Router Optimizations
+
 - **Preloading**: Routes are preloaded on hover/link focus
 - **Scroll restoration**: Maintains scroll position on navigation
 - **Memory management**: Efficient route caching
@@ -528,19 +541,22 @@ pnpm build
 ### Monitoring & Analytics
 
 #### Performance Monitoring
+
 ```javascript
 // Add to your app for performance monitoring
-import { onCLS, onFID, onFCP, onLCP, onTTFB } from 'web-vitals'
+import { onCLS, onFID, onFCP, onLCP, onTTFB } from 'web-vitals';
 
-onCLS(console.log)
-onFID(console.log)
-onFCP(console.log)
-onLCP(console.log)
-onTTFB(console.log)
+onCLS(console.log);
+onFID(console.log);
+onFCP(console.log);
+onLCP(console.log);
+onTTFB(console.log);
 ```
 
 #### Error Tracking
+
 Consider integrating error tracking services:
+
 - **Sentry**: Comprehensive error monitoring
 - **LogRocket**: Session replay and error tracking
 - **Bugsnag**: Real-time error monitoring

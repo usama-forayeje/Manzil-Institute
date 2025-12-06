@@ -1,55 +1,78 @@
-"use client";
+'use client';
 
-import { Menu, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import React from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useLanguageStore } from "@/lib/store";
-import { ModeToggle } from "./themes/theme-toggle";
-import { cn } from "@/lib/utils";
+import { Menu, X, ChevronDown } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import React from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useLanguageStore } from '@/lib/store';
+import { ModeToggle } from './themes/theme-toggle';
+import { cn } from '@/lib/utils';
 import { useTheme } from '@/components/themes/theme-provider';
-import Image from "next/image";
+import Image from 'next/image';
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from '@/components/ui/dropdown-menu';
 
 const menuItems = [
   {
-    key: "home",
-    href: "/",
+    key: 'home',
+    href: '/',
     label: {
-      en: "Home",
-      bn: "হোম",
+      en: 'Home',
+      bn: 'হোম',
     },
   },
   {
-    key: "about",
-    href: "#about",
+    key: 'about',
+    href: '#about',
     label: {
-      en: "About",
-      bn: "আমাদের সম্পর্কে",
+      en: 'About',
+      bn: 'আমাদের সম্পর্কে',
     },
   },
   {
-    key: "curriculum",
-    href: "#mic-curriculum",
+    key: 'curriculum',
+    href: '#curriculum',
     label: {
-      en: "Curriculum",
-      bn: "কারিকুলাম",
+      en: 'Curriculum',
+      bn: 'কারিকুলাম',
     },
   },
   {
-    key: "admission",
-    href: "/admission",
+    key: 'admission',
+    href: '/admission',
     label: {
-      en: "Admission",
-      bn: "ভর্তি",
+      en: 'Admission',
+      bn: 'ভর্তি',
     },
   },
   {
-    key: "campus",
-    href: "/campus",
+    key: 'campus',
+    href: '/campus',
     label: {
-      en: "Campus",
-      bn: "ক্যাম্পাস",
+      en: 'Campus',
+      bn: 'ক্যাম্পাস',
+    },
+  },
+];
+
+const courseItems = [
+  {
+    href: '/admission/mic',
+    label: {
+      en: 'MIC Admission Info',
+      bn: 'MIC ভর্তি তথ্য',
+    },
+  },
+  {
+    href: '/admission/mnc',
+    label: {
+      en: 'MNC Admission Info',
+      bn: 'MNC ভর্তি তথ্য',
     },
   },
 ];
@@ -63,6 +86,8 @@ const HeroHeader = () => {
   const menuRef = React.useRef(null);
   const buttonRef = React.useRef(null);
   const { theme } = useTheme();
+  const [admissionOpen, setAdmissionOpen] = React.useState(false);
+  const [mobileAdmissionOpen, setMobileAdmissionOpen] = React.useState(false);
 
   React.useEffect(() => {
     setMounted(true);
@@ -72,13 +97,13 @@ const HeroHeader = () => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
     };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   // Bahire click korle menu close howar function
   React.useEffect(() => {
-    const handleClickOutside = (event) => {
+    const handleClickOutside = event => {
       // Check if click is outside menu AND outside menu button
       if (
         menuRef.current &&
@@ -87,29 +112,35 @@ const HeroHeader = () => {
         !buttonRef.current.contains(event.target)
       ) {
         setIsMenuOpen(false);
+        setMobileAdmissionOpen(false);
       }
     };
     if (isMenuOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener('mousedown', handleClickOutside);
     }
 
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isMenuOpen]);
 
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
-  const toggleLanguage = () => setLanguage(language === "en" ? "bn" : "en");
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+    if (isMenuOpen) {
+      setMobileAdmissionOpen(false);
+    }
+  };
+  const toggleLanguage = () => setLanguage(language === 'en' ? 'bn' : 'en');
 
   return (
     <header className="fixed z-50 w-full">
       <nav className="px-4">
         <div
           className={cn(
-            "mx-auto transition-all duration-300 mt-2",
+            'mx-auto transition-all duration-300 mt-2',
             isScrolled
-              ? "max-w-5xl bg-background/50 rounded-2xl border backdrop-blur-lg"
-              : "max-w-6xl"
+              ? 'max-w-5xl bg-background/50 rounded-2xl border backdrop-blur-lg'
+              : 'max-w-6xl'
           )}
         >
           {/* Navbar Container */}
@@ -119,7 +150,11 @@ const HeroHeader = () => {
               <Link href="/" className="flex items-center">
                 {mounted ? (
                   <Image
-                    src={theme === 'dark' ? '/manzil-logo/manzil-institute-logo-dark.webp' : '/manzil-logo/manzil-institute-logo-light.webp'}
+                    src={
+                      theme === 'dark'
+                        ? '/manzil-logo/manzil-institute-logo-dark.webp'
+                        : '/manzil-logo/manzil-institute-logo-light.webp'
+                    }
                     alt="Manzil Institute Logo"
                     width="170"
                     height="40"
@@ -134,29 +169,74 @@ const HeroHeader = () => {
             {/* Desktop Navigation - Center (Only on 1024px+) */}
             <div className="hidden lg:flex justify-center flex-grow">
               <div className="flex items-center space-x-8">
-                {menuItems.map((item) => {
+                {menuItems.map(item => {
                   const href =
-                    item.href.startsWith("#") && pathname !== "/"
+                    item.href.startsWith('#') && pathname !== '/'
                       ? `/${item.href}`
                       : item.href;
-                  return (
-                    <Link
-                      key={item.key}
-                      href={href}
-                      className={cn(
-                        "text-gray-700 dark:text-gray-300 hover:text-[#00AEEF] text-sm font-medium transition-colors duration-150 whitespace-nowrap",
-                        language === "bn" && "bengali-text"
-                      )}
-                      onClick={(e) => {
-                        if (item.href.startsWith("#") && pathname !== "/") {
-                          // Navigate to home page with hash
-                          window.location.href = item.href;
-                        }
-                      }}
-                    >
-                      {item.label[language]}
-                    </Link>
-                  );
+                  if (item.key === 'admission') {
+                    return (
+                      <DropdownMenu
+                        key={item.key}
+                        open={admissionOpen}
+                        onOpenChange={setAdmissionOpen}
+                      >
+                        <DropdownMenuTrigger
+                          asChild
+                          onMouseEnter={() => setAdmissionOpen(true)}
+                          onClick={() => setAdmissionOpen(true)}
+                        >
+                          <button
+                            className={cn(
+                              'text-gray-700 dark:text-gray-300 hover:text-[#00AEEF] text-sm font-medium transition-colors duration-150 whitespace-nowrap',
+                              language === 'bn' && 'bengali-text'
+                            )}
+                            aria-expanded={admissionOpen}
+                            aria-haspopup="menu"
+                          >
+                            {item.label[language]}
+                          </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent
+                          onMouseLeave={() => setAdmissionOpen(false)}
+                        >
+                          {courseItems.map(course => (
+                            <DropdownMenuItem key={course.href} asChild>
+                              <Link
+                                href={course.href}
+                                className={cn(
+                                  'hover:text-[#00AEEF] hover:bg-[#00AEEF]/10',
+                                  language === 'bn' && 'bengali-text'
+                                )}
+                                onClick={() => {}}
+                              >
+                                {course.label[language]}
+                              </Link>
+                            </DropdownMenuItem>
+                          ))}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    );
+                  } else {
+                    return (
+                      <Link
+                        key={item.key}
+                        href={href}
+                        className={cn(
+                          'text-gray-700 dark:text-gray-300 hover:text-[#00AEEF] text-sm font-medium transition-colors duration-150 whitespace-nowrap',
+                          language === 'bn' && 'bengali-text'
+                        )}
+                        onClick={e => {
+                          if (item.href.startsWith('#') && pathname !== '/') {
+                            // Navigate to home page with hash
+                            window.location.href = item.href;
+                          }
+                        }}
+                      >
+                        {item.label[language]}
+                      </Link>
+                    );
+                  }
                 })}
               </div>
             </div>
@@ -172,30 +252,35 @@ const HeroHeader = () => {
               >
                 <span
                   className={cn(
-                    "text-xs font-semibold whitespace-nowrap",
-                    language === "bn" && "bengali-text"
+                    'text-xs font-semibold whitespace-nowrap',
+                    language === 'bn' && 'bengali-text'
                   )}
                 >
-                  {language === "en" ? "বাংলা" : "English"}
+                  {language === 'en' ? 'বাংলা' : 'English'}
                 </span>
               </Button>
               <Button
                 asChild
-                variant={isScrolled ? "default" : "outline"}
+                variant={isScrolled ? 'default' : 'outline'}
                 size="sm"
                 className={cn(
-                  "text-xs font-semibold whitespace-nowrap h-9",
-                  isScrolled ? "bg-[#00AEEF] text-white hover:bg-[#00AEEF]/90" : ""
+                  'text-xs font-semibold whitespace-nowrap h-9',
+                  isScrolled
+                    ? 'bg-[#00AEEF] text-white hover:bg-[#00AEEF]/90'
+                    : ''
                 )}
               >
-                <Link href="/apply" className={language === "bn" ? "kalpurush-font" : ""}>
+                <Link
+                  href="/apply"
+                  className={language === 'bn' ? 'kalpurush-font' : ''}
+                >
                   {isScrolled
-                    ? language === "en"
-                      ? "Apply Now"
-                      : "এপ্লাই করুন"
-                    : language === "en"
-                    ? "Login"
-                    : "লগইন"}
+                    ? language === 'en'
+                      ? 'Apply Now'
+                      : 'এপ্লাই করুন'
+                    : language === 'en'
+                      ? 'Login'
+                      : 'লগইন'}
                 </Link>
               </Button>
             </div>
@@ -212,17 +297,17 @@ const HeroHeader = () => {
                 >
                   <span
                     className={cn(
-                      "text-xs font-semibold",
-                      language === "bn" && "bengali-text"
+                      'text-xs font-semibold',
+                      language === 'bn' && 'bengali-text'
                     )}
                   >
-                    {language === "en" ? "বাংলা" : "EN"}
+                    {language === 'en' ? 'বাংলা' : 'EN'}
                   </span>
                 </Button>
                 <Button
                   ref={buttonRef}
                   onClick={toggleMenu}
-                  aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+                  aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
                   className="p-2 bg-transparent text-black dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
                 >
                   {isMenuOpen ? (
@@ -239,52 +324,107 @@ const HeroHeader = () => {
           <div
             ref={menuRef}
             className={cn(
-              "lg:hidden  bg-background/95 backdrop-blur-lg border-t border-gray-200 dark:border-gray-700 pt-1  px-6 rounded-b-2xl transition-all duration-300 ease-in-out overflow-hidden",
+              'lg:hidden  bg-background/95 backdrop-blur-lg border-t border-gray-200 dark:border-gray-700 pt-1  px-6 rounded-b-2xl transition-all duration-300 ease-in-out overflow-hidden',
               isMenuOpen
-                ? "max-h-96 opacity-100 translate-y-0"
-                : "max-h-0 opacity-0 -translate-y-4 pointer-events-none"
+                ? 'max-h-96 opacity-100 translate-y-0'
+                : 'max-h-0 opacity-0 -translate-y-4 pointer-events-none'
             )}
           >
             <div className="space-y-2">
-              {menuItems.map((item) => (
-                <Link
-                  key={item.key}
-                  href={item.href}
-                  className={cn(
-                    "block py-3 px-4 text-gray-700 dark:text-gray-300 text-center hover:bg-[#00AEEF]/10 dark:hover:bg-[#00AEEF]/5 hover:text-[#00AEEF] rounded-lg transition-colors duration-150 font-medium",
-                    language === "bn" ? "bengali-text" : "english-text"
-                  )}
-                  onClick={(e) => {
-                    setIsMenuOpen(false);
-                    if (item.href.startsWith("#") && pathname !== "/") {
-                      // Navigate to home page with hash
-                      window.location.href = item.href;
-                    }
-                  }}
-                >
-                  {item.label[language]}
-                </Link>
-              ))}
+              {menuItems.map(item => {
+                if (item.key === 'admission') {
+                  return (
+                    <div key={item.key}>
+                      <button
+                        onClick={() =>
+                          setMobileAdmissionOpen(!mobileAdmissionOpen)
+                        }
+                        className={cn(
+                          'flex items-center justify-start w-full py-3 px-4 text-gray-700 dark:text-gray-300 text-left hover:bg-[#00AEEF]/10 dark:hover:bg-[#00AEEF]/5 hover:text-[#00AEEF] rounded-lg transition-colors duration-150 font-medium',
+                          language === 'bn' ? 'bengali-text' : 'english-text'
+                        )}
+                      >
+                        {item.label[language]}
+                        <ChevronDown
+                          className={cn(
+                            'ml-2 h-4 w-4 transition-transform',
+                            mobileAdmissionOpen ? 'rotate-180' : ''
+                          )}
+                        />
+                      </button>
+                      {mobileAdmissionOpen && (
+                        <div className="ml-4 mt-2 space-y-2">
+                          {courseItems.map(course => (
+                            <Link
+                              key={course.href}
+                              href={course.href}
+                              className={cn(
+                                'block py-2 px-4 text-left text-gray-600 dark:text-gray-400  hover:bg-[#00AEEF]/10 dark:hover:bg-[#00AEEF]/5 hover:text-[#00AEEF] rounded-lg transition-colors duration-150',
+                                language === 'bn'
+                                  ? 'bengali-text'
+                                  : 'english-text'
+                              )}
+                              onClick={() => {
+                                setIsMenuOpen(false);
+                                setMobileAdmissionOpen(false);
+                              }}
+                            >
+                              {course.label[language]}
+                            </Link>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                } else {
+                  return (
+                    <Link
+                      key={item.key}
+                      href={item.href}
+                      className={cn(
+                        'block py-3 px-4 text-gray-700 dark:text-gray-300 text-left hover:bg-[#00AEEF]/10 dark:hover:bg-[#00AEEF]/5 hover:text-[#00AEEF] rounded-lg transition-colors duration-150 font-medium',
+                        language === 'bn' ? 'bengali-text' : 'english-text'
+                      )}
+                      onClick={e => {
+                        setIsMenuOpen(false);
+                        if (item.href.startsWith('#') && pathname !== '/') {
+                          // Navigate to home page with hash
+                          window.location.href = item.href;
+                        }
+                      }}
+                    >
+                      {item.label[language]}
+                    </Link>
+                  );
+                }
+              })}
             </div>
 
             <div className="flex flex-col pt-6 mt-6 mb-6 space-y-3 border-t border-gray-200 dark:border-gray-700">
               <Button
                 asChild
-                variant={isScrolled ? "default" : "outline"}
+                variant={isScrolled ? 'default' : 'outline'}
                 size="sm"
                 className={cn(
-                  "w-full text-sm font-semibold",
-                  isScrolled ? "bg-[#00AEEF] hover:bg-[#00AEEF]/90 text-white" : ""
+                  'w-full justify-start text-left text-sm font-semibold',
+                  isScrolled
+                    ? 'bg-[#00AEEF] hover:bg-[#00AEEF]/90 text-white'
+                    : ''
                 )}
               >
-                <Link href="/apply" className={language === "bn" ? "kalpurush-font" : "english-text"}>
+                <Link
+                  href="/apply"
+                  className={
+                    language === 'bn' ? 'kalpurush-font' : 'english-text'
+                  }
+                >
                   {isScrolled
-                    ? language === "en"
-                      ? "Apply Now"
-                      : "এপ্লাই করুন"
-                    : language === "en"
-                    ? "Login"
-                    : "লগইন"}
+                    ? language === 'en'
+                      ? 'Apply Now'
+                      : 'এপ্লাই করুন'
+                    : language === 'en'
+                      ? 'Login'
+                      : 'লগইন'}
                 </Link>
               </Button>
             </div>

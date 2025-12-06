@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider } from '@/components/themes/theme-provider';
@@ -23,7 +23,7 @@ function makeQueryClient() {
       },
       mutations: {
         retry: 1,
-        onError: (error) => {
+        onError: error => {
           console.error('Mutation error:', error);
         },
       },
@@ -40,7 +40,7 @@ function getQueryClient() {
 
 export function Providers({ children }) {
   const client = getQueryClient();
-  console.log('Providers rendering')
+  console.log('Providers rendering');
 
   return (
     <QueryClientProvider client={client}>

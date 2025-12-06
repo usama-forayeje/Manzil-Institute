@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { motion } from 'framer-motion';
 
@@ -70,7 +69,7 @@ const presetVariants = {
   },
 };
 
-const addDefaultVariants = (variants) => ({
+const addDefaultVariants = variants => ({
   hidden: { ...defaultItemVariants.hidden, ...variants.hidden },
   visible: { ...defaultItemVariants.visible, ...variants.visible },
 });
@@ -85,7 +84,9 @@ function AnimatedGroup({
   const Component = motion[as] || motion.div;
 
   const containerVariants = variants?.container || defaultContainerVariants;
-  const itemVariants = variants?.item ? addDefaultVariants(variants.item) : defaultItemVariants;
+  const itemVariants = variants?.item
+    ? addDefaultVariants(variants.item)
+    : defaultItemVariants;
 
   return (
     <Component
@@ -95,7 +96,7 @@ function AnimatedGroup({
       animate="visible"
       {...props}
     >
-      {React.Children.map(children, (child) =>
+      {React.Children.map(children, child =>
         React.isValidElement(child) ? (
           <motion.div key={child.key} variants={itemVariants}>
             {child}

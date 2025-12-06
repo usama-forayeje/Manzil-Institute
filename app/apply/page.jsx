@@ -1,9 +1,15 @@
-"use client"
-import { Construction, Clock, Users, BookOpen, CheckCircle } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
-import NotFound from '../not-found'
-import ErrorBoundary from '../../components/ErrorBoundary'
+'use client';
+import {
+  Construction,
+  Clock,
+  Users,
+  BookOpen,
+  CheckCircle,
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import NotFound from '../not-found';
+import ErrorBoundary from '../../components/ErrorBoundary';
 
 const transitionVariants = {
   item: {
@@ -23,7 +29,7 @@ const transitionVariants = {
       },
     },
   },
-}
+};
 
 export default function ApplicationPage() {
   // const { language } = useLanguageStore()
@@ -547,5 +553,5 @@ export default function ApplicationPage() {
         <NotFound />
       </div>
     </ErrorBoundary>
-  )
+  );
 }

@@ -262,6 +262,19 @@ export default function RootLayout({ children }) {
           href="//www.linkedin.com"
         />
 
+        {/* Google Analytics */}
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-7DZC9QPNDG"></script>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-7DZC9QPNDG');
+            `,
+          }}
+        />
+
         {/* Preconnect for faster connections */}
         <link
           rel="preconnect"

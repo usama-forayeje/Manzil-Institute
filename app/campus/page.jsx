@@ -28,6 +28,7 @@ import {
   Layers,
   FlaskConical,
   Globe,
+  Pause,
 } from 'lucide-react';
 import {
   motion,
@@ -35,6 +36,7 @@ import {
   useTransform,
   useSpring,
   useInView,
+  AnimatePresence,
 } from 'framer-motion';
 import { Button } from '../../components/ui/button';
 import { useLanguageStore } from '../../lib/store';
@@ -42,8 +44,6 @@ import { cn } from '../../lib/utils';
 import ErrorBoundary from '../../components/ErrorBoundary';
 import FooterSection from '../../components/footer';
 import HeroHeader from '@/components/header';
-import { Pause } from 'lucide-react';
-import { AnimatePresence } from 'framer-motion';
 import { useTheme } from '../../components/themes/theme-provider';
 
 // --- Image Assets (Replace with real paths) ---
@@ -57,7 +57,7 @@ const images = {
   generalClass:
     'https://ik.imagekit.io/lgd2hue3i/Manzil-Institute/generalClass.jpg',
   dorm: 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?q=80&w=2669&auto=format&fit=crop',
-  // Video Thumbnails (High Quality Vertical preferred for Chaicode style)
+  // Video Thumbnails
   videoThumb1:
     'https://ik.imagekit.io/lgd2hue3i/Manzil-Institute/office.jpg',
   videoThumb2:
@@ -132,7 +132,7 @@ const tourSteps = [
   },
 ];
 
-// --- Data for Section 4 (Premium Amenities - with Sub-text) ---
+// --- Data for Section 4 (Premium Amenities) ---
 const amenitiesData = [
   {
     icon: Monitor,
@@ -226,7 +226,7 @@ const amenitiesData = [
   },
 ];
 
-// --- TikTok Video Data (Placeholders) ---
+// --- TikTok Video Data ---
 const tiktokVideos = [
   {
     id: 'video1',
@@ -262,7 +262,7 @@ const tiktokVideos = [
 
 export default function CampusPage() {
   const { language } = useLanguageStore();
-  const { theme } = useTheme(); // Subscribe to theme changes to ensure re-renders
+  const { theme } = useTheme();
 
   // --- Global Background Pattern (Subtle) ---
   const bgPattern =
@@ -332,7 +332,7 @@ export default function CampusPage() {
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                   <Button
                     className={cn(
-                      'group h-14 px-8 rounded-full bg-gradient-to-r from-[#00AEEF] to-[#0099CC] hover:from-[#00AEEF]/90 hover:to-[#0099CC]/90 text-white text-lg font-bold shadow-[0_0_40px_-10px_rgba(0,174,239,0.5)] hover:shadow-[0_0_60px_-10px_rgba(0,174,239,0.8)] transition-all duration-500 hover:scale-110',
+                      'group h-14 px-8 bg-gradient-to-r from-[#00AEEF] to-[#0099CC] hover:from-[#00AEEF]/90 hover:to-[#0099CC]/90 text-white text-lg font-bold shadow-[0_0_40px_-10px_rgba(0,174,239,0.5)] hover:shadow-[0_0_60px_-10px_rgba(0,174,239,0.8)] transition-all duration-500 hover:scale-110',
                       language === 'bn' && 'kalpurush-font'
                     )}
                     onClick={() =>
@@ -347,7 +347,7 @@ export default function CampusPage() {
                   <Button
                     variant="outline"
                     className={cn(
-                      'group h-14 px-8 rounded-full border-black/20 dark:border-white/20 hover:border-[#00AEEF]/50 text-black dark:text-white hover:text-[#00AEEF] hover:bg-[#00AEEF]/10 text-lg backdrop-blur-md transition-all duration-300 hover:scale-105',
+                      'group h-14 px-8 border-black/20 dark:border-white/20 hover:border-[#00AEEF]/50 text-black dark:text-white hover:text-[#00AEEF] hover:bg-[#00AEEF]/10 text-lg backdrop-blur-md transition-all duration-300 hover:scale-105',
                       language === 'bn' && 'kalpurush-font'
                     )}
                     onClick={() =>
@@ -367,9 +367,9 @@ export default function CampusPage() {
             <div className="absolute bottom-0 w-full h-32 bg-gradient-to-t from-[#00AEEF]/10 to-transparent dark:from-[#00AEEF]/20 transform perspective-[500px] rotate-x-60 origin-bottom" />
           </section>
 
-          {/* ==================== 2. NEXT LEVEL STICKY SCROLL TOUR (MOBILE RESPONSIVE FIXED) ==================== */}
-          <section id="tour" className="relative bg-white dark:bg-[#020617] py-32">
-            <div className="max-w-7xl mx-auto px-6 mb-24">
+          {/* ==================== 2. AWESOME STICKY SCROLL TOUR (FIXED RESPONSIVE) ==================== */}
+          <section id="tour" className="relative bg-white dark:bg-[#020617] py-20 md:py-32">
+            <div className="max-w-7xl mx-auto px-6 mb-12 md:mb-24">
               <SectionHeading
                 title={language === 'bn' ? 'ক্যাম্পাস ইনসাইড' : 'Inside Campus'}
                 subtitle={
@@ -380,22 +380,23 @@ export default function CampusPage() {
                 lang={language}
               />
             </div>
+
+            {/* The Main Responsive Sticky Component */}
             <StickyScroll steps={tourSteps} lang={language} />
+
           </section>
 
-          {/* ==================== 3. TIKTOK STYLE VIDEO SECTION (AUTO-SCROLL & NO SCROLLBAR) ==================== */}
+          {/* ==================== 3. TIKTOK STYLE VIDEO SECTION ==================== */}
           <section
             id="gallery"
             className="py-24 relative overflow-hidden bg-gray-100 dark:bg-[#000000]"
           >
-            {/* Fancy Background Glows */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
               <div className="absolute top-[20%] right-[-10%] w-[500px] h-[500px] bg-purple-600/20 rounded-full blur-[120px]" />
               <div className="absolute bottom-[20%] left-[-10%] w-[500px] h-[500px] bg-blue-600/20 rounded-full blur-[120px]" />
             </div>
             <div className="max-w-[1400px] mx-auto px-6 relative z-10">
               <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
-                {' '}
                 <div>
                   <h2
                     className={cn(
@@ -419,12 +420,12 @@ export default function CampusPage() {
                 </div>
               </div>
 
-              {/* THE REELS COMPONENT */}
+              {/* REELS COMPONENT */}
               <ReelsGallery videos={tiktokVideos} lang={language} />
             </div>
           </section>
 
-          {/* ==================== 4. BENTO GRID AMENITIES (PREMIUM WITH SUB-TEXT) ==================== */}
+          {/* ==================== 4. BENTO GRID AMENITIES ==================== */}
           <section className="py-24 px-4 relative z-10 bg-white dark:bg-[#030712] border-t border-black/5 dark:border-white/5">
             <div className="max-w-7xl mx-auto">
               <div className="text-center mb-16">
@@ -456,7 +457,6 @@ export default function CampusPage() {
           {/* ==================== 5. CALL TO ACTION (CTA) ==================== */}
           <section className="py-20 px-4">
             <div className="max-w-5xl mx-auto bg-gradient-to-r from-[#00AEEF] to-blue-600 rounded-[40px] p-8 md:p-16 text-center relative overflow-hidden group">
-              {/* Animated Background */}
               <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 group-hover:opacity-20 transition-opacity duration-700" />
               <div className="absolute -top-24 -right-24 w-64 h-64 bg-white/20 rounded-full blur-[80px] group-hover:bg-white/30 transition-colors" />
 
@@ -484,8 +484,9 @@ export default function CampusPage() {
 
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
                   <Button
+                    size="sm"
                     className={cn(
-                      'h-14 px-10 rounded-full bg-white text-[#00AEEF] hover:bg-gray-100 text-lg font-bold w-full sm:w-auto',
+                      'bg-white text-[#00AEEF] hover:bg-gray-100 font-bold w-full sm:w-auto',
                       language === 'bn' && 'kalpurush-font'
                     )}
                     onClick={() => (window.location.href = '/contact')}
@@ -496,7 +497,8 @@ export default function CampusPage() {
                   </Button>
                   <Button
                     variant="outline"
-                    className="h-14 px-10 rounded-full border-white text-white hover:bg-white/10 dark:hover:bg-black/10 text-lg w-full sm:w-auto"
+                    size="sm"
+                    className="border-white text-white hover:bg-white/10 dark:hover:bg-black/10 w-full sm:w-auto"
                   >
                     <Phone className="mr-2 h-5 w-5" /> 01407-046001
                   </Button>
@@ -512,66 +514,10 @@ export default function CampusPage() {
 }
 
 // ----------------------------------------------------------------------
-// SUB COMPONENTS (ANIMATED & ENHANCED)
+// SUB COMPONENTS (OPTIMIZED)
 // ----------------------------------------------------------------------
 
-// Sub-component for the scrolling text (Desktop only)
-const ScrollTextItem = ({ data, index, lang, isActive }) => {
-  const ref = useRef(null);
-
-  const activeClass = cn(
-    'transition-all duration-700',
-    isActive ? 'opacity-100 translate-y-0' : 'opacity-30 translate-y-16'
-  );
-
-  return (
-    <div ref={ref} className="h-[100vh] flex flex-col justify-center">
-      <motion.div
-        className={cn('p-6 rounded-2xl bg-transparent', activeClass)}
-        initial={{ scale: 0.98 }}
-        animate={{ scale: isActive ? 1 : 0.98 }}
-        transition={{ duration: 0.5 }}
-      >
-        <div className="flex items-center gap-4 mb-4">
-          <span
-            className={cn(
-              'text-7xl font-mono transition-colors duration-500',
-              isActive ? 'text-[#00AEEF]' : 'text-black/10 dark:text-white/10'
-            )}
-          >
-            {index + 1 < 10 ? `0${index + 1}` : index + 1}
-          </span>
-          <div
-            className={cn(
-              'h-[2px] w-20 transition-colors duration-500',
-              isActive ? 'bg-[#00AEEF]' : 'bg-black/20 dark:bg-white/20'
-            )}
-          />
-        </div>
-
-        <h3
-          className={cn(
-            'text-3xl md:text-5xl font-bold leading-tight mb-4 text-black dark:text-white',
-            lang === 'bn' && 'kalpurush-font'
-          )}
-        >
-          {data.title[lang === 'bn' ? 'bn' : 'en']}
-        </h3>
-
-        <p
-          className={cn(
-            'text-lg md:text-xl text-gray-600 dark:text-gray-400 leading-relaxed max-w-lg',
-            lang === 'bn' && 'kalpurush-font'
-          )}
-        >
-          {data.desc[lang === 'bn' ? 'bn' : 'en']}
-        </p>
-      </motion.div>
-    </div>
-  );
-};
-
-// 2. Bento Grid Card (Updated with Sub-text)
+// 1. Bento Grid Card
 const BentoCard = ({
   icon: Icon,
   title,
@@ -634,109 +580,13 @@ const BentoCard = ({
   );
 };
 
-// 3. Video Swiper (Auto-Scroll & No Scrollbar)
-const VideoSwiper = ({ videos, lang }) => {
-  const scrollRef = useRef(null);
-  const playersRef = useRef([]);
-  const embedUrls = ['qkMoppbvb9w', '-qeY4TS1sNQ'];
-
-  useEffect(() => {
-    const initializePlayers = () => {
-      videos.forEach((video, idx) => {
-        const player = new window.YT.Player(`video-${idx}`, {
-          videoId: embedUrls[idx % embedUrls.length],
-          playerVars: {
-            controls: 1,
-            modestbranding: 1,
-            rel: 0,
-            fs: 1,
-            autoplay: 0,
-          },
-          events: {
-            onStateChange: event => {
-              if (event.data === window.YT.PlayerState.PLAYING) {
-                playersRef.current.forEach((p, i) => {
-                  if (i !== idx && p && typeof p.pauseVideo === 'function') {
-                    p.pauseVideo();
-                  }
-                });
-              }
-            },
-          },
-        });
-        playersRef.current[idx] = player;
-      });
-    };
-
-    if (window.YT && window.YT.Player) {
-      initializePlayers();
-    } else {
-      if (!document.querySelector('script[src*="youtube.com/iframe_api"]')) {
-        const tag = document.createElement('script');
-        tag.src = 'https://www.youtube.com/iframe_api';
-        const firstScriptTag = document.getElementsByTagName('script')[0];
-        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-      }
-      window.onYouTubeIframeAPIReady = initializePlayers;
-    }
-
-    return () => {
-      playersRef.current.forEach(player => {
-        if (player && typeof player.destroy === 'function') {
-          player.destroy();
-        }
-      });
-      playersRef.current = [];
-    };
-  }, [videos]);
-
-  return (
-    <div
-      ref={scrollRef}
-      className="flex overflow-x-auto gap-6 pb-8 snap-x snap-mandatory cursor-grab active:cursor-grabbing px-2 md:px-0 no-scrollbar"
-    >
-      {videos.map((video, idx) => (
-        <motion.div
-          key={idx}
-          className="snap-center shrink-0 w-[240px] sm:w-[280px] md:w-[320px] h-[240px] sm:h-[350px] md:h-[450px] rounded-[32px] overflow-hidden relative group border border-black/10 dark:border-white/10 bg-gray-900 shadow-2xl cursor-pointer"
-          initial={{ opacity: 0, x: 50 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5, delay: idx * 0.1 }}
-          viewport={{ once: true }}
-          onClick={() =>
-            window.open(
-              `https://youtube.com/shorts/${embedUrls[idx % embedUrls.length]}`,
-              '_blank'
-            )
-          }
-        >
-          <div
-            id={`video-${idx}`}
-            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-          ></div>
-          <div className="absolute bottom-4 left-4 right-4 text-black dark:text-white">
-            <h3
-              className={cn(
-                'text-lg font-bold',
-                lang === 'bn' && 'kalpurush-font'
-              )}
-            >
-              {video.title[lang === 'bn' ? 'bn' : 'en']}
-            </h3>
-          </div>
-        </motion.div>
-      ))}
-    </div>
-  );
-};
-
+// 2. Reels Gallery
 const ReelsGallery = ({ videos, lang }) => {
   const [playingVideoId, setPlayingVideoId] = useState(null);
 
-  // Function to handle play click - Stops others, plays selected
   const handlePlay = id => {
     if (playingVideoId === id) {
-      setPlayingVideoId(null); // Toggle off if clicked again
+      setPlayingVideoId(null);
     } else {
       setPlayingVideoId(id);
     }
@@ -774,7 +624,6 @@ const ReelCard = ({ video, lang, isPlaying, onPlay, index }) => {
           : 'hover:-translate-y-2'
       )}
     >
-      {/* 1. Thumbnail / Cover Image */}
       <div
         className={cn(
           'absolute inset-0 z-10 transition-opacity duration-500',
@@ -788,10 +637,8 @@ const ReelCard = ({ video, lang, isPlaying, onPlay, index }) => {
           height={600}
           className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity"
         />
-        {/* Dark Gradient Overlay for text readability */}
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/90" />
 
-        {/* Play Button Icon Centered */}
         <div className="absolute inset-0 flex items-center justify-center">
           <button
             onClick={onPlay}
@@ -801,7 +648,6 @@ const ReelCard = ({ video, lang, isPlaying, onPlay, index }) => {
           </button>
         </div>
 
-        {/* Text Details at Bottom */}
         <div className="absolute bottom-6 left-6 right-6">
           <h3
             className={cn(
@@ -814,14 +660,12 @@ const ReelCard = ({ video, lang, isPlaying, onPlay, index }) => {
         </div>
       </div>
 
-      {/* 2. YouTube Iframe (Only loads when playing) */}
       <div className="absolute inset-0 z-0 bg-black">
         {isPlaying ? (
           <iframe
             width="100%"
             height="100%"
             src={`https://www.youtube.com/embed/${video.ytId}?autoplay=1&controls=0&modestbranding=1&rel=0&loop=1&playlist=${video.ytId}&playsinline=1`}
-            //  title="YouTube video player"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
             className="w-full h-full object-cover"
@@ -829,10 +673,9 @@ const ReelCard = ({ video, lang, isPlaying, onPlay, index }) => {
         ) : null}
       </div>
 
-      {/* 3. Close/Stop Button (Visible only when playing) */}
       {isPlaying && (
         <button
-          onClick={onPlay} // Toggles to null (stop)
+          onClick={onPlay}
           className="absolute top-4 right-4 z-20 p-2 rounded-full bg-black/50 text-white backdrop-blur-sm hover:bg-black/70 transition-colors"
         >
           <Pause className="w-5 h-5" />
@@ -873,113 +716,18 @@ const SectionHeading = ({ title, subtitle, center, lang }) => (
   </div>
 );
 
-const MobileFirstStickyScroll = ({ steps, lang }) => {
-  const [activeCard, setActiveCard] = useState(0);
-  const ref = useRef(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ['start start', 'end end'],
-  });
-  const cardLength = steps.length;
-
-  useTransform(scrollYProgress, [0, 1], [0, cardLength]);
-
-  useEffect(() => {
-    const unsubscribe = scrollYProgress.on('change', latest => {
-      const cardsBreakpoints = steps.map((_, index) => index / cardLength);
-      const closestBreakpointIndex = cardsBreakpoints.reduce(
-        (acc, breakpoint, index) => {
-          const distance = Math.abs(latest - breakpoint);
-          if (distance < Math.abs(latest - cardsBreakpoints[acc])) {
-            return index;
-          }
-          return acc;
-        },
-        0
-      );
-      setActiveCard(closestBreakpointIndex);
-    });
-    return () => unsubscribe();
-  }, [scrollYProgress, cardLength, steps]);
-
-  return (
-    <div
-      ref={ref}
-      className="flex justify-center relative space-x-0 md:space-x-10 p-4 md:p-10"
-    >
-      {/* Text Side */}
-      <div className="relative flex items-start px-4 md:w-5/12">
-        <div className="max-w-2xl">
-          {steps.map((item, index) => (
-            <div
-              key={index}
-              className="my-20 md:my-40 md:h-[60vh] flex flex-col justify-center"
-            >
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: activeCard === index ? 1 : 0.3 }}
-                className="transition-opacity duration-500"
-              >
-                <div className="text-sm font-mono text-[#00AEEF] mb-4">
-                  0{index + 1}.
-                </div>
-                <h2
-                  className={cn(
-                    'text-3xl md:text-5xl font-bold text-black dark:text-white mb-6',
-                    lang === 'bn' && 'kalpurush-font'
-                  )}
-                >
-                  {item.title[lang === 'bn' ? 'bn' : 'en']}
-                </h2>
-                <p
-                  className={cn(
-                    'text-lg text-black dark:text-white max-w-sm leading-relaxed',
-                    lang === 'bn' && 'kalpurush-font'
-                  )}
-                >
-                  {item.desc[lang === 'bn' ? 'bn' : 'en']}
-                </p>
-              </motion.div>
-            </div>
-          ))}
-          <div className="h-40" />
-        </div>
-      </div>
-
-      {/* Image Side (Sticky) */}
-      <div className="hidden md:block w-6/12 sticky top-32 h-[500px] rounded-[30px] overflow-hidden border border-white/10 bg-[#0f172a]">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeCard}
-            initial={{ opacity: 0, scale: 1.1 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
-            className="absolute inset-0"
-          >
-            <LazyImage
-              src={steps[activeCard].image}
-              alt="campus"
-              width={800}
-              height={500}
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute inset-0 bg-black/20" />
-          </motion.div>
-        </AnimatePresence>
-      </div>
-    </div>
-  );
-};
-
-// STICKY SCROLL (Improved for dark mode)
+// ====================================================================
+// NEXT LEVEL STICKY SCROLL (ULTRA RESPONSIVE & PREMIUM UI)
+// ====================================================================
 const StickyScroll = ({ steps, lang }) => {
   const [activeCard, setActiveCard] = useState(0);
   const ref = useRef(null);
+
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ['start start', 'end end'],
   });
+
   const cardLength = steps.length;
 
   useTransform(scrollYProgress, [0, 1], [0, cardLength]);
@@ -1005,83 +753,154 @@ const StickyScroll = ({ steps, lang }) => {
   return (
     <div
       ref={ref}
-      className="flex justify-center relative space-x-0 md:space-x-10 p-4 md:p-10"
+      className="relative flex flex-col lg:flex-row justify-center lg:space-x-12 px-4 md:px-10 max-w-[1500px] mx-auto"
     >
-      {/* Text Side */}
-      <div className="relative flex items-start px-4 md:w-5/12">
-        <div className="max-w-2xl">
-          {steps.map((item, index) => (
-            <div
-              key={index}
-              className="my-20 md:my-40 md:h-[60vh] flex flex-col justify-center"
-            >
+
+      {/* --------------------------------------------------
+          CONTENT SIDE (TEXT) - Wider on Desktop
+          -------------------------------------------------- */}
+      <div className="relative z-10 w-full lg:w-[50%] order-2 lg:order-1 mt-[5vh] lg:mt-0">
+        <div className="flex flex-col">
+          {steps.map((item, index) => {
+            // Check if this card is active
+            const isActive = activeCard === index;
+
+            return (
               <motion.div
+                key={index}
                 initial={{ opacity: 0 }}
-                animate={{ opacity: activeCard === index ? 1 : 0.3 }}
-                className="transition-opacity duration-500"
+                whileInView={{ opacity: 1 }}
+                viewport={{ margin: "-20% 0px -20% 0px" }}
+                className={cn(
+                  "flex flex-col justify-center mb-[40vh] lg:mb-0 lg:h-[70vh] transition-all duration-500 ease-out", // Reduced height and faster transition
+                  // Desktop: Remove blur, increased inactive opacity
+                  isActive ? "lg:opacity-100 lg:scale-100" : "lg:opacity-50 lg:scale-[0.98]"
+                )}
               >
-                <div className="text-sm font-mono text-[#00AEEF] mb-4">
-                  0{index + 1}.
+                {/* CARD CONTAINER */}
+                <div
+                  className={cn(
+                    "relative overflow-hidden rounded-[24px] p-8 md:p-12 transition-all duration-500",
+                    // Mobile: Glassmorphism Card Style (kept for awesome mobile look)
+                    "bg-white/90 dark:bg-[#0f172a]/95 backdrop-blur-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-black/5 dark:border-white/10",
+                    // Desktop: Clearer style with active border
+                    "lg:bg-transparent lg:shadow-none lg:border-l-4",
+                    isActive
+                      ? "lg:border-[#00AEEF] lg:bg-gradient-to-r lg:from-[#00AEEF]/5 lg:to-transparent"
+                      : "lg:border-transparent"
+                  )}
+                >
+
+                  {/* Number Badge */}
+                  <div className="flex items-center gap-3 mb-6">
+                    <span
+                      className={cn(
+                        "text-sm font-bold font-mono px-3 py-1 rounded-full transition-colors duration-500",
+                        isActive
+                          ? "bg-[#00AEEF] text-white"
+                          : "bg-gray-200 dark:bg-gray-800 text-gray-500"
+                      )}
+                    >
+                      0{index + 1}
+                    </span>
+                    <span className="text-xs font-semibold tracking-widest uppercase text-gray-400">
+                      {lang === 'bn' ? 'ফিচার' : 'FEATURE'}
+                    </span>
+                  </div>
+
+                  {/* Title */}
+                  <h2
+                    className={cn(
+                      'text-2xl md:text-4xl lg:text-5xl font-bold mb-6 transition-colors duration-500',
+                      // Inactive text color slightly improved
+                      isActive ? "text-black dark:text-white" : "text-gray-500 dark:text-gray-500",
+                      lang === 'bn' && 'kalpurush-font'
+                    )}
+                  >
+                    {item.title[lang === 'bn' ? 'bn' : 'en']}
+                  </h2>
+
+                  {/* Description */}
+                  <p
+                    className={cn(
+                      'text-base md:text-xl leading-relaxed transition-colors duration-500',
+                      // Inactive text color slightly improved
+                      isActive ? "text-gray-600 dark:text-gray-300" : "text-gray-400 dark:text-gray-600",
+                      lang === 'bn' && 'kalpurush-font'
+                    )}
+                  >
+                    {item.desc[lang === 'bn' ? 'bn' : 'en']}
+                  </p>
+
+                  {/* Mobile Only: Small Image Indicator if needed or decorative element */}
+                  <div className={cn(
+                    "absolute top-0 right-0 w-32 h-32 bg-[#00AEEF]/10 rounded-full blur-3xl -z-10 transition-opacity duration-500",
+                    isActive ? "opacity-100" : "opacity-0"
+                  )} />
                 </div>
-                <h2
-                  className={cn(
-                    'text-3xl md:text-5xl font-bold text-black dark:text-white mb-6',
-                    lang === 'bn' && 'kalpurush-font'
-                  )}
-                >
-                  {item.title[lang === 'bn' ? 'bn' : 'en']}
-                </h2>
-                <p
-                  className={cn(
-                    'text-lg text-gray-400 max-w-sm leading-relaxed',
-                    lang === 'bn' && 'kalpurush-font'
-                  )}
-                >
-                  {item.desc[lang === 'bn' ? 'bn' : 'en']}
-                </p>
               </motion.div>
-            </div>
-          ))}
-          <div className="h-40" />
+            );
+          })}
+          {/* Bottom spacer for comfortable scrolling */}
+          <div className="h-[20vh] lg:h-0" />
         </div>
       </div>
 
-      {/* Image Side (Sticky) */}
-      <div className="hidden md:block w-6/12 sticky top-32 h-[500px] rounded-[30px] overflow-hidden border border-white/10 dark:border-black/10 bg-[#0f172a] dark:bg-white">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeCard}
-            initial={{ opacity: 0, scale: 1.1 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
-            className="absolute inset-0"
-          >
-            <LazyImage
-              src={steps[activeCard].image}
-              width={800}
-              height={500}
-              alt="campus"
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute inset-0 bg-black/20 dark:bg-white/20" />
-          </motion.div>
-        </AnimatePresence>
-      </div>
-    </div>
-  );
-};
-
-// Subtle Background Effect for Hero
-const BackgroundBeams = () => {
-  return (
-    <div className="absolute inset-0 z-0 flex items-center justify-center bg-[#020617] overflow-hidden">
+      {/* --------------------------------------------------
+          IMAGE SIDE (STICKY) - Reduced Width and Height
+          -------------------------------------------------- */}
       <div
-        className="absolute top-[-20%] left-[-10%] w-[70%] h-[70%] rounded-full bg-blue-900/10 blur-[120px] animate-pulse"
-        style={{ animationDuration: '8s' }}
-      />
-      <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] rounded-full bg-cyan-900/10 blur-[120px]" />
-      <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-100 contrast-150" />
+        className={cn(
+          "w-full lg:w-[40%] order-1 lg:order-2", // Reduced width
+          // Mobile Sticky: Top overlay style
+          "sticky top-[80px] h-[40vh] z-0 mb-[-15vh]",
+          // Desktop Sticky: Tighter vertical centering
+          "lg:sticky lg:top-0 lg:h-screen lg:flex lg:items-center lg:mb-0 lg:py-20"
+        )}
+      >
+        <div className="relative w-full h-full lg:h-[500px] rounded-[32px] overflow-hidden shadow-2xl border border-white/20 dark:border-white/10 bg-gray-900 group">
+
+          {/* Animated Gradient Border Effect */}
+          <div className="absolute inset-0 z-20 pointer-events-none rounded-[32px] ring-1 ring-inset ring-black/10 dark:ring-white/10" />
+
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeCard}
+              initial={{ opacity: 0, scale: 1.1, filter: "blur(10px)" }}
+              animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.6, ease: "easeInOut" }}
+              className="absolute inset-0 w-full h-full"
+            >
+              <LazyImage
+                src={steps[activeCard].image}
+                width={1000}
+                height={800}
+                alt="campus-tour"
+                className="w-full h-full object-cover"
+              />
+
+              {/* Overlay Gradient for better visibility */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60" />
+
+              {/* Desktop Only: Image Caption/Title overlay at bottom of image */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="absolute bottom-6 left-6 z-30 hidden lg:block"
+              >
+                <div className="bg-white/10 backdrop-blur-md border border-white/20 px-6 py-3 rounded-full">
+                  <p className={cn("text-white font-medium", lang === 'bn' && 'kalpurush-font')}>
+                    {steps[activeCard].title[lang === 'bn' ? 'bn' : 'en']}
+                  </p>
+                </div>
+              </motion.div>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      </div>
+
     </div>
   );
 };

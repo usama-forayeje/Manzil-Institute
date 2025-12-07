@@ -59,7 +59,7 @@ const FloatingActionButtons = () => {
       {/* Back to Top Button */}
       <button
         onClick={scrollToTop}
-        className={`bg-[#00AEEF] hover:bg-[#00AEEF]/90 text-white p-3 shadow-lg transition-all duration-600 transform hover:scale-110 relative overflow-hidden ${
+        className={`bg-[#00AEEF] hover:bg-[#00AEEF]/90 text-white p-3 rounded-full shadow-lg transition-all duration-600 transform hover:scale-110 relative overflow-hidden ${
           isVisible
             ? 'opacity-100 translate-y-0'
             : 'opacity-0 translate-y-full pointer-events-none'
@@ -102,7 +102,7 @@ const FloatingActionButtons = () => {
         href={whatsappUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className={`bg-green-600 hover:bg-green-700 text-white p-3 shadow-lg transition-all duration-600 transform hover:scale-110 ${
+        className={`bg-green-600 hover:bg-green-700 text-white p-3 rounded-full shadow-lg transition-all duration-600 transform hover:scale-110 ${
           isVisible ? '-translate-y-[20px]' : 'translate-y-full'
         }`}
         style={{

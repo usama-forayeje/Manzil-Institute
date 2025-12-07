@@ -214,6 +214,8 @@ export default function RootLayout({ children }) {
     areaServed: 'Bangladesh',
     priceRange: '$$',
   };
+  const isDevelopment = process.env.NODE_ENV === 'development';
+  const csp = `default-src 'self'; script-src 'self' 'unsafe-inline' ${isDevelopment ? "'unsafe-eval' " : ""}https://fonts.googleapis.com https://www.google.com https://www.googleapis.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com https://www.google.com https://www.googleapis.com; img-src 'self' data: https:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://www.google.com https://www.googleapis.com https://www.google-analytics.com https://www.googletagmanager.com; frame-src 'self' https://www.google.com https://www.youtube.com; object-src 'none'; base-uri 'self'; form-action 'self';`;
 
   return (
     <html lang="en" suppressHydrationWarning={true}>
@@ -341,7 +343,7 @@ export default function RootLayout({ children }) {
         {/* Content Security Policy */}
         <meta
           httpEquiv="Content-Security-Policy"
-          content="default-src 'self'; script-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://www.google.com https://www.googleapis.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com https://www.google.com https://www.googleapis.com; img-src 'self' data: https:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://www.google.com https://www.googleapis.com https://www.google-analytics.com https://www.googletagmanager.com; frame-src 'self' https://www.google.com; object-src 'none'; base-uri 'self'; form-action 'self';"
+          content={csp}
         />
       </head>
       <body className={`${inter.variable} font-sans`}>

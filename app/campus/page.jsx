@@ -42,42 +42,32 @@ import { cn } from '../../lib/utils';
 import ErrorBoundary from '../../components/ErrorBoundary';
 import FooterSection from '../../components/footer';
 import HeroHeader from '@/components/header';
+import { Pause } from 'lucide-react';
+import { AnimatePresence } from 'framer-motion';
+import { useTheme } from '../../components/themes/theme-provider';
 
 // --- Image Assets (Replace with real paths) ---
 const images = {
-  bridge:
-    'https://ik.imagekit.io/lgd2hue3i/Manzil-Institute/building.jpg',
-  building:
-    'https://ik.imagekit.io/lgd2hue3i/Manzil-Institute/building-2.jpg',
-  corridor:
-    'https://ik.imagekit.io/lgd2hue3i/Manzil-Institute/coridor.jpg',
-  reception:
-    'https://ik.imagekit.io/lgd2hue3i/Manzil-Institute/office.jpg',
+  bridge: 'https://ik.imagekit.io/lgd2hue3i/Manzil-Institute/building.jpg',
+  building: 'https://ik.imagekit.io/lgd2hue3i/Manzil-Institute/building-2.jpg',
+  corridor: 'https://ik.imagekit.io/lgd2hue3i/Manzil-Institute/coridor.jpg',
+  reception: 'https://ik.imagekit.io/lgd2hue3i/Manzil-Institute/office.jpg',
   arabicClass:
     'https://ik.imagekit.io/lgd2hue3i/Manzil-Institute/arabicClass-1.jpg',
   generalClass:
     'https://ik.imagekit.io/lgd2hue3i/Manzil-Institute/generalClass.jpg',
-  languageLab:
-    '/languageclass.webp',
-  computerLab:
-    'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=2670&auto=format&fit=crop',
-  engineering:
-    'https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=2670&auto=format&fit=crop',
-  auditorium:
-    'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?q=80&w=2669&auto=format&fit=crop',
-  students:
-    'https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?q=80&w=2669&auto=format&fit=crop',
   dorm: 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?q=80&w=2669&auto=format&fit=crop',
+  // Video Thumbnails (High Quality Vertical preferred for Chaicode style)
   videoThumb1:
-    'https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=2674&auto=format&fit=crop',
+    'https://ik.imagekit.io/lgd2hue3i/Manzil-Institute/office.jpg',
   videoThumb2:
-    'https://images.unsplash.com/photo-1492619375914-88005aa9e8fb?q=80&w=2674&auto=format&fit=crop',
+    'https://ik.imagekit.io/lgd2hue3i/Manzil-Institute/building-2.jpg',
   videoThumb3:
-    'https://images.unsplash.com/photo-1516321497487-e288fb19713f?q=80&w=2674&auto=format&fit=crop',
+    'https://ik.imagekit.io/lgd2hue3i/Manzil-Institute/arabicClass-1.jpg',
   videoThumb4:
-    'https://images.unsplash.com/photo-1551434678-e076c223a692?q=80&w=2674&auto=format&fit=crop',
+    'https://ik.imagekit.io/lgd2hue3i/Manzil-Institute/generalClass.jpg',
   videoThumb5:
-    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=2674&auto=format&fit=crop',
+    'https://ik.imagekit.io/lgd2hue3i/Manzil-Institute/building.jpg',
   videoThumb6:
     'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=2674&auto=format&fit=crop',
 };
@@ -239,53 +229,40 @@ const amenitiesData = [
 // --- TikTok Video Data (Placeholders) ---
 const tiktokVideos = [
   {
-    id: 1,
-    title: {
-      bn: 'ক্যাম্পাস লাইফ ভ্লগ - পার্ট ১',
-      en: 'Campus Life Vlog - Part 1',
-    },
-    tiktokUrl: 'https://www.tiktok.com/@jamalmasrur/video/7504959872937577746',
+    id: 'video1',
+    ytId: 'qkMoppbvb9w',
+    title: { bn: 'ক্যাম্পাস ট্যুর', en: 'Campus Tour' },
     thumbnail: images.videoThumb1,
   },
   {
-    id: 2,
-    title: { bn: 'ক্লাসের এক ঝলক', en: 'A Glimpse of the Class' },
-    tiktokUrl:
-      'https://www.tiktok.com/@placeholder_manzil/video/7302484732168345858',
+    id: 'video2',
+    ytId: '-qeY4TS1sNQ',
+    title: { bn: 'ক্লাস টাইম', en: 'Class Time' },
     thumbnail: images.videoThumb2,
   },
   {
-    id: 3,
-    title: { bn: 'শিক্ষক-শিক্ষার্থী সম্পর্ক', en: 'Teacher-Student Bond' },
-    tiktokUrl:
-      'https://www.tiktok.com/@placeholder_manzil/video/7302484732168345858',
+    id: 'video3',
+    ytId: 'nuKcyV8_pUc',
+    title: { bn: 'স্টুডেন্ট লাইফ', en: 'Student Life' },
     thumbnail: images.videoThumb3,
   },
   {
-    id: 4,
-    title: { bn: 'ল্যাবের কিছু মুহূর্ত', en: 'Moments in the Lab' },
-    tiktokUrl:
-      'https://www.tiktok.com/@placeholder_manzil/video/7302484732168345858',
+    id: 'video4',
+    ytId: 'G5EP-mxhABo',
+    title: { bn: 'ল্যাব মোমেন্টস', en: 'Lab Moments' },
     thumbnail: images.videoThumb4,
   },
   {
-    id: 5,
-    title: { bn: 'ডর্মের পরিবেশ', en: 'Dormitory Environment' },
-    tiktokUrl:
-      'https://www.tiktok.com/@placeholder_manzil/video/7302484732168345858',
+    id: 'video5',
+    ytId: 'WpeqBxqgHwg',
+    title: { bn: 'খেলাধুলা', en: 'Sports Fun' },
     thumbnail: images.videoThumb5,
-  },
-  {
-    id: 6,
-    title: { bn: 'স্পোর্টস ডে ফান', en: 'Sports Day Fun' },
-    tiktokUrl:
-      'https://www.tiktok.com/@placeholder_manzil/video/7302484732168345858',
-    thumbnail: images.videoThumb6,
   },
 ];
 
 export default function CampusPage() {
   const { language } = useLanguageStore();
+  const { theme } = useTheme(); // Subscribe to theme changes to ensure re-renders
 
   // --- Global Background Pattern (Subtle) ---
   const bgPattern =
@@ -391,56 +368,59 @@ export default function CampusPage() {
           </section>
 
           {/* ==================== 2. NEXT LEVEL STICKY SCROLL TOUR (MOBILE RESPONSIVE FIXED) ==================== */}
-          <section id="tour" className="relative bg-white dark:bg-[#030712] py-24">
-            <div className="max-w-7xl mx-auto px-4 mb-16 md:mb-24">
-              <h2
-                className={cn(
-                  'text-4xl md:text-6xl font-bold text-black dark:text-white mb-4',
-                  language === 'bn' && 'kalpurush-font'
-                )}
-              >
-                {language === 'bn' ? 'ক্যাম্পাস ইনসাইড' : 'Inside Campus'}
-              </h2>
-              <div className="h-1 w-20 bg-[#00AEEF] rounded-full" />
+          <section id="tour" className="relative bg-white dark:bg-[#020617] py-32">
+            <div className="max-w-7xl mx-auto px-6 mb-24">
+              <SectionHeading
+                title={language === 'bn' ? 'ক্যাম্পাস ইনসাইড' : 'Inside Campus'}
+                subtitle={
+                  language === 'bn'
+                    ? 'আধুনিক শিক্ষার পরিবেশ'
+                    : 'Environment for modern learning'
+                }
+                lang={language}
+              />
             </div>
-
-            <MobileFirstStickyScroll steps={tourSteps} lang={language} />
+            <StickyScroll steps={tourSteps} lang={language} />
           </section>
 
           {/* ==================== 3. TIKTOK STYLE VIDEO SECTION (AUTO-SCROLL & NO SCROLLBAR) ==================== */}
           <section
             id="gallery"
-            className="py-8 relative overflow-hidden border-t border-black/5 dark:border-white/5"
+            className="py-24 relative overflow-hidden bg-gray-100 dark:bg-[#000000]"
           >
-            <div className="max-w-[1400px] mx-auto px-4 relative z-10">
-              <div className="flex items-end justify-between mb-12">
+            {/* Fancy Background Glows */}
+            <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+              <div className="absolute top-[20%] right-[-10%] w-[500px] h-[500px] bg-purple-600/20 rounded-full blur-[120px]" />
+              <div className="absolute bottom-[20%] left-[-10%] w-[500px] h-[500px] bg-blue-600/20 rounded-full blur-[120px]" />
+            </div>
+            <div className="max-w-[1400px] mx-auto px-6 relative z-10">
+              <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+                {' '}
                 <div>
                   <h2
                     className={cn(
-                      'text-3xl md:text-5xl font-bold text-black dark:text-white mb-2',
+                      'text-4xl md:text-6xl font-bold text-black dark:text-white mb-3',
                       language === 'bn' && 'kalpurush-font'
                     )}
                   >
                     {language === 'bn' ? 'ক্যাম্পাস রিলস' : 'Campus Reels'}
                   </h2>
-                  <p className="text-gray-600 dark:text-gray-400">
+                  <p className="text-black dark:text-white text-lg">
                     {language === 'bn'
-                      ? 'শিক্ষার্থীদের জীবনের খন্ডচিত্র'
-                      : 'Glimpses of student life'}
+                      ? 'ভিডিওর মাধ্যমে আমাদের দেখুন'
+                      : 'Experience us through visuals'}
                   </p>
                 </div>
-                <div className="hidden md:flex gap-2">
-                  <Button
-                    variant="link"
-                    className="text-[#00AEEF] hover:text-blue-400"
-                  >
-                    {language === 'bn' ? 'সব ভিডিও দেখুন' : 'View All Videos'}{' '}
-                    <MoveRight className="ml-2 w-4 h-4" />
-                  </Button>
+                <div className="flex items-center gap-2 text-[#00AEEF] font-medium cursor-pointer hover:underline underline-offset-4">
+                  <span>
+                    {language === 'bn' ? 'সব ভিডিও দেখুন' : 'Watch all videos'}
+                  </span>{' '}
+                  <MoveRight size={20} />
                 </div>
               </div>
 
-              <VideoSwiper videos={tiktokVideos} lang={language} />
+              {/* THE REELS COMPONENT */}
+              <ReelsGallery videos={tiktokVideos} lang={language} />
             </div>
           </section>
 
@@ -534,163 +514,6 @@ export default function CampusPage() {
 // ----------------------------------------------------------------------
 // SUB COMPONENTS (ANIMATED & ENHANCED)
 // ----------------------------------------------------------------------
-
-// 1. MOBILE-FIRST Sticky Scroll Component (Fixed for mobile)
-const MobileFirstStickyScroll = ({ steps, lang }) => {
-  const containerRef = useRef(null);
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ['start start', 'end end'],
-  });
-  const [activeIndex, setActiveIndex] = useState(0);
-
-  const itemHeight = 1 / steps.length;
-
-  useEffect(() => {
-    return scrollYProgress.on('change', latest => {
-      const newIndex = Math.min(
-        steps.length - 1,
-        Math.floor(latest / itemHeight)
-      );
-
-      if (newIndex !== activeIndex) {
-        setActiveIndex(newIndex);
-      }
-    });
-  }, [scrollYProgress, itemHeight, activeIndex, steps.length]);
-
-  return (
-    <div ref={containerRef} className="relative">
-      {/* MOBILE VIEW: Stacked Image and Text */}
-      <div className="md:hidden">
-        {steps.map((step, i) => (
-          <div key={i} className="min-h-[100vh] flex flex-col mb-20">
-            {/* Image at TOP */}
-            <div className="h-[50vh] w-full rounded-2xl overflow-hidden relative mb-6">
-              <LazyImage
-                src={step.image}
-                alt={step.title[lang === 'bn' ? 'bn' : 'en']}
-                fill
-                className="object-cover"
-              />
-              <div className="absolute bottom-4 left-4 right-4">
-                <h3
-                  className={cn(
-                    'text-xl font-bold text-black dark:text-white',
-                    lang === 'bn' && 'kalpurush-font'
-                  )}
-                >
-                  {step.title[lang === 'bn' ? 'bn' : 'en']}
-                </h3>
-                <p className="text-sm text-[#00AEEF]">
-                  {lang === 'bn'
-                    ? `ছবি ${i + 1} / ${steps.length}`
-                    : `Photo ${i + 1} / ${steps.length}`}
-                </p>
-              </div>
-            </div>
-
-            {/* Text BELOW Image */}
-            <div className="px-4">
-              <div className="flex items-center gap-4 mb-4">
-                <span
-                  className={cn(
-                    'text-5xl font-mono',
-                    i === activeIndex ? 'text-[#00AEEF]' : 'text-black/10 dark:text-white/10'
-                  )}
-                >
-                  {i + 1 < 10 ? `0${i + 1}` : i + 1}
-                </span>
-                <div
-                  className={cn(
-                    'h-[2px] w-20',
-                    i === activeIndex ? 'bg-[#00AEEF]' : 'bg-black/20 dark:bg-white/20'
-                  )}
-                />
-              </div>
-
-              <h3
-                className={cn(
-                  'text-2xl font-bold mb-4 text-black dark:text-white',
-                  lang === 'bn' && 'kalpurush-font'
-                )}
-              >
-                {step.title[lang === 'bn' ? 'bn' : 'en']}
-              </h3>
-
-              <p
-                className={cn(
-                  'text-gray-600 dark:text-gray-400',
-                  lang === 'bn' && 'kalpurush-font'
-                )}
-              >
-                {step.desc[lang === 'bn' ? 'bn' : 'en']}
-              </p>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* DESKTOP VIEW: Original Sticky Layout */}
-      <div className="hidden md:flex max-w-7xl mx-auto min-h-[500vh]">
-        {/* Sticky Image Area (Right) */}
-        <div className="w-1/2 sticky top-20 h-[calc(100vh-80px)] p-4">
-          {steps.map((step, i) => (
-            <motion.div
-              key={i}
-              className="absolute inset-0 flex items-center justify-center p-8 transition-all duration-700 h-full w-full"
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{
-                opacity: i === activeIndex ? 1 : 0,
-                scale: i === activeIndex ? 1 : 0.95,
-              }}
-              transition={{ duration: 0.4, ease: 'easeInOut' }}
-            >
-              <div className="w-full h-full relative rounded-3xl overflow-hidden shadow-2xl border border-black/10 dark:border-white/10 group">
-                <LazyImage
-                  src={step.image}
-                  alt={step.title[lang === 'bn' ? 'bn' : 'en']}
-                  fill
-                  className="object-cover transition-all duration-1000 group-hover:scale-105 group-hover:brightness-110"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-
-                <div className="absolute bottom-6 left-6 right-6 z-10">
-                  <h3
-                    className={cn(
-                      'text-2xl font-bold text-white mb-1',
-                      lang === 'bn' && 'kalpurush-font'
-                    )}
-                  >
-                    {step.title[lang === 'bn' ? 'bn' : 'en']}
-                  </h3>
-                  <p className="text-[#00AEEF] text-sm font-mono">
-                    {lang === 'bn'
-                      ? `ছবি ${i + 1} / ${steps.length}`
-                      : `Photo ${i + 1} / ${steps.length}`}
-                  </p>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-
-        {/* Scrolling Text Area (Left) */}
-        <div className="w-1/2 p-4 px-4">
-          {steps.map((step, i) => (
-            <ScrollTextItem
-              key={i}
-              data={step}
-              index={i}
-              lang={lang}
-              isActive={i === activeIndex}
-            />
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-};
 
 // Sub-component for the scrolling text (Desktop only)
 const ScrollTextItem = ({ data, index, lang, isActive }) => {
@@ -891,7 +714,7 @@ const VideoSwiper = ({ videos, lang }) => {
             id={`video-${idx}`}
             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
           ></div>
-          <div className="absolute bottom-4 left-4 right-4 text-white">
+          <div className="absolute bottom-4 left-4 right-4 text-black dark:text-white">
             <h3
               className={cn(
                 'text-lg font-bold',
@@ -903,6 +726,362 @@ const VideoSwiper = ({ videos, lang }) => {
           </div>
         </motion.div>
       ))}
+    </div>
+  );
+};
+
+const ReelsGallery = ({ videos, lang }) => {
+  const [playingVideoId, setPlayingVideoId] = useState(null);
+
+  // Function to handle play click - Stops others, plays selected
+  const handlePlay = id => {
+    if (playingVideoId === id) {
+      setPlayingVideoId(null); // Toggle off if clicked again
+    } else {
+      setPlayingVideoId(id);
+    }
+  };
+
+  return (
+    <div className="relative w-full overflow-x-auto pb-12 pt-4 px-2 no-scrollbar cursor-grab active:cursor-grabbing">
+      <div className="flex gap-6 md:gap-8 w-max mx-auto md:mx-0">
+        {videos.map((video, idx) => (
+          <ReelCard
+            key={video.id}
+            video={video}
+            lang={lang}
+            isPlaying={playingVideoId === video.id}
+            onPlay={() => handlePlay(video.id)}
+            index={idx}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const ReelCard = ({ video, lang, isPlaying, onPlay, index }) => {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 50 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5, delay: index * 0.1 }}
+      className={cn(
+        'relative w-[280px] md:w-[320px] aspect-[9/16] rounded-[32px] overflow-hidden bg-gray-900 border border-white/10 shadow-2xl shrink-0 group transition-transform duration-300',
+        isPlaying
+          ? 'ring-2 ring-[#00AEEF] scale-[1.02]'
+          : 'hover:-translate-y-2'
+      )}
+    >
+      {/* 1. Thumbnail / Cover Image */}
+      <div
+        className={cn(
+          'absolute inset-0 z-10 transition-opacity duration-500',
+          isPlaying ? 'opacity-0 pointer-events-none' : 'opacity-100'
+        )}
+      >
+        <LazyImage
+          src={video.thumbnail}
+          alt="thumbnail"
+          width={800}
+          height={600}
+          className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity"
+        />
+        {/* Dark Gradient Overlay for text readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/90" />
+
+        {/* Play Button Icon Centered */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <button
+            onClick={onPlay}
+            className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-300"
+          >
+            <Play className="w-6 h-6 text-white fill-white ml-1" />
+          </button>
+        </div>
+
+        {/* Text Details at Bottom */}
+        <div className="absolute bottom-6 left-6 right-6">
+          <h3
+            className={cn(
+              'text-xl font-bold text-white leading-tight',
+              lang === 'bn' && 'kalpurush-font'
+            )}
+          >
+            {video.title[lang === 'bn' ? 'bn' : 'en']}
+          </h3>
+        </div>
+      </div>
+
+      {/* 2. YouTube Iframe (Only loads when playing) */}
+      <div className="absolute inset-0 z-0 bg-black">
+        {isPlaying ? (
+          <iframe
+            width="100%"
+            height="100%"
+            src={`https://www.youtube.com/embed/${video.ytId}?autoplay=1&controls=0&modestbranding=1&rel=0&loop=1&playlist=${video.ytId}&playsinline=1`}
+            //  title="YouTube video player"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+            className="w-full h-full object-cover"
+          />
+        ) : null}
+      </div>
+
+      {/* 3. Close/Stop Button (Visible only when playing) */}
+      {isPlaying && (
+        <button
+          onClick={onPlay} // Toggles to null (stop)
+          className="absolute top-4 right-4 z-20 p-2 rounded-full bg-black/50 text-white backdrop-blur-sm hover:bg-black/70 transition-colors"
+        >
+          <Pause className="w-5 h-5" />
+        </button>
+      )}
+    </motion.div>
+  );
+};
+
+const SectionHeading = ({ title, subtitle, center, lang }) => (
+  <div className={cn('mb-8', center && 'text-center')}>
+    <motion.h2
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      className={cn(
+        'text-3xl md:text-5xl font-bold text-black dark:text-white mb-3',
+        lang === 'bn' && 'kalpurush-font'
+      )}
+    >
+      {title}
+    </motion.h2>
+    <motion.div
+      initial={{ width: 0 }}
+      whileInView={{ width: center ? 80 : 60 }}
+      transition={{ delay: 0.2, duration: 0.8 }}
+      className={cn('h-1 bg-[#00AEEF] rounded-full mb-4', center && 'mx-auto')}
+    />
+    {subtitle && (
+      <p
+        className={cn(
+          'text-gray-400 text-lg',
+          lang === 'bn' && 'kalpurush-font'
+        )}
+      >
+        {subtitle}
+      </p>
+    )}
+  </div>
+);
+
+const MobileFirstStickyScroll = ({ steps, lang }) => {
+  const [activeCard, setActiveCard] = useState(0);
+  const ref = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ['start start', 'end end'],
+  });
+  const cardLength = steps.length;
+
+  useTransform(scrollYProgress, [0, 1], [0, cardLength]);
+
+  useEffect(() => {
+    const unsubscribe = scrollYProgress.on('change', latest => {
+      const cardsBreakpoints = steps.map((_, index) => index / cardLength);
+      const closestBreakpointIndex = cardsBreakpoints.reduce(
+        (acc, breakpoint, index) => {
+          const distance = Math.abs(latest - breakpoint);
+          if (distance < Math.abs(latest - cardsBreakpoints[acc])) {
+            return index;
+          }
+          return acc;
+        },
+        0
+      );
+      setActiveCard(closestBreakpointIndex);
+    });
+    return () => unsubscribe();
+  }, [scrollYProgress, cardLength, steps]);
+
+  return (
+    <div
+      ref={ref}
+      className="flex justify-center relative space-x-0 md:space-x-10 p-4 md:p-10"
+    >
+      {/* Text Side */}
+      <div className="relative flex items-start px-4 md:w-5/12">
+        <div className="max-w-2xl">
+          {steps.map((item, index) => (
+            <div
+              key={index}
+              className="my-20 md:my-40 md:h-[60vh] flex flex-col justify-center"
+            >
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: activeCard === index ? 1 : 0.3 }}
+                className="transition-opacity duration-500"
+              >
+                <div className="text-sm font-mono text-[#00AEEF] mb-4">
+                  0{index + 1}.
+                </div>
+                <h2
+                  className={cn(
+                    'text-3xl md:text-5xl font-bold text-black dark:text-white mb-6',
+                    lang === 'bn' && 'kalpurush-font'
+                  )}
+                >
+                  {item.title[lang === 'bn' ? 'bn' : 'en']}
+                </h2>
+                <p
+                  className={cn(
+                    'text-lg text-black dark:text-white max-w-sm leading-relaxed',
+                    lang === 'bn' && 'kalpurush-font'
+                  )}
+                >
+                  {item.desc[lang === 'bn' ? 'bn' : 'en']}
+                </p>
+              </motion.div>
+            </div>
+          ))}
+          <div className="h-40" />
+        </div>
+      </div>
+
+      {/* Image Side (Sticky) */}
+      <div className="hidden md:block w-6/12 sticky top-32 h-[500px] rounded-[30px] overflow-hidden border border-white/10 bg-[#0f172a]">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeCard}
+            initial={{ opacity: 0, scale: 1.1 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+            className="absolute inset-0"
+          >
+            <LazyImage
+              src={steps[activeCard].image}
+              alt="campus"
+              width={800}
+              height={500}
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-black/20" />
+          </motion.div>
+        </AnimatePresence>
+      </div>
+    </div>
+  );
+};
+
+// STICKY SCROLL (Improved for dark mode)
+const StickyScroll = ({ steps, lang }) => {
+  const [activeCard, setActiveCard] = useState(0);
+  const ref = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ['start start', 'end end'],
+  });
+  const cardLength = steps.length;
+
+  useTransform(scrollYProgress, [0, 1], [0, cardLength]);
+
+  useEffect(() => {
+    const unsubscribe = scrollYProgress.on('change', latest => {
+      const cardsBreakpoints = steps.map((_, index) => index / cardLength);
+      const closestBreakpointIndex = cardsBreakpoints.reduce(
+        (acc, breakpoint, index) => {
+          const distance = Math.abs(latest - breakpoint);
+          if (distance < Math.abs(latest - cardsBreakpoints[acc])) {
+            return index;
+          }
+          return acc;
+        },
+        0
+      );
+      setActiveCard(closestBreakpointIndex);
+    });
+    return () => unsubscribe();
+  }, [scrollYProgress, cardLength, steps]);
+
+  return (
+    <div
+      ref={ref}
+      className="flex justify-center relative space-x-0 md:space-x-10 p-4 md:p-10"
+    >
+      {/* Text Side */}
+      <div className="relative flex items-start px-4 md:w-5/12">
+        <div className="max-w-2xl">
+          {steps.map((item, index) => (
+            <div
+              key={index}
+              className="my-20 md:my-40 md:h-[60vh] flex flex-col justify-center"
+            >
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: activeCard === index ? 1 : 0.3 }}
+                className="transition-opacity duration-500"
+              >
+                <div className="text-sm font-mono text-[#00AEEF] mb-4">
+                  0{index + 1}.
+                </div>
+                <h2
+                  className={cn(
+                    'text-3xl md:text-5xl font-bold text-black dark:text-white mb-6',
+                    lang === 'bn' && 'kalpurush-font'
+                  )}
+                >
+                  {item.title[lang === 'bn' ? 'bn' : 'en']}
+                </h2>
+                <p
+                  className={cn(
+                    'text-lg text-gray-400 max-w-sm leading-relaxed',
+                    lang === 'bn' && 'kalpurush-font'
+                  )}
+                >
+                  {item.desc[lang === 'bn' ? 'bn' : 'en']}
+                </p>
+              </motion.div>
+            </div>
+          ))}
+          <div className="h-40" />
+        </div>
+      </div>
+
+      {/* Image Side (Sticky) */}
+      <div className="hidden md:block w-6/12 sticky top-32 h-[500px] rounded-[30px] overflow-hidden border border-white/10 dark:border-black/10 bg-[#0f172a] dark:bg-white">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeCard}
+            initial={{ opacity: 0, scale: 1.1 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+            className="absolute inset-0"
+          >
+            <LazyImage
+              src={steps[activeCard].image}
+              width={800}
+              height={500}
+              alt="campus"
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-black/20 dark:bg-white/20" />
+          </motion.div>
+        </AnimatePresence>
+      </div>
+    </div>
+  );
+};
+
+// Subtle Background Effect for Hero
+const BackgroundBeams = () => {
+  return (
+    <div className="absolute inset-0 z-0 flex items-center justify-center bg-[#020617] overflow-hidden">
+      <div
+        className="absolute top-[-20%] left-[-10%] w-[70%] h-[70%] rounded-full bg-blue-900/10 blur-[120px] animate-pulse"
+        style={{ animationDuration: '8s' }}
+      />
+      <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] rounded-full bg-cyan-900/10 blur-[120px]" />
+      <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-100 contrast-150" />
     </div>
   );
 };

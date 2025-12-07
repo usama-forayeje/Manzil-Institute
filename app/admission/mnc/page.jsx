@@ -11,13 +11,40 @@ import {
   MapPin,
   CheckCircle,
   AlertCircle,
+  Utensils,
+  Coffee,
+  Apple,
+  ChevronDown,
+  Moon,
+  Droplets,
+  BookOpen,
+  Calculator,
+  Monitor,
+  Sun,
   Book,
+  Sunset,
+  Activity,
+  Languages,
+  Wrench,
+  ChefHat,
+  Bed,
+  ChevronRight,
   Star,
+  AlarmClock,
 } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
 import { useLanguageStore } from '../../../lib/store';
 import { cn } from '../../../lib/utils';
 import { AnimatedGroup } from '../../../components/ui/animated-group';
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableCaption,
+} from '../../../components/ui/table';
 import {
   useAdmissionData,
   usePrefetchAdmissionData,
@@ -26,7 +53,6 @@ import ErrorBoundary from '../../../components/ErrorBoundary';
 import LoadingSkeleton from '../../../components/LoadingSkeleton';
 import FooterSection from '../../../components/footer';
 import HeroHeader from '@/components/header';
-import { BookOpen } from 'lucide-react';
 
 // Verification log for import paths
 console.log('MNC Admission Page - Import verification:', {
@@ -376,7 +402,234 @@ export default function MNCAdmissionPage() {
       ],
     },
   };
-
+  
+  const micDailyRoutine = {
+    morning: [
+      {
+        time: '4:30 AM - 5:00 AM',
+        name: { bn: 'ঘুম থেকে ওঠা', en: 'Wake Up' },
+        description: {
+          bn: 'ঘুম ভাঙা, পানি পান ও প্রস্তুতি',
+          en: 'Waking up, drinking water and preparation',
+        },
+        duration: '30 min',
+        icon: 'AlarmClock',
+        category: 'preparation',
+      },
+      {
+        time: '5:00 AM - 5:30 AM',
+        name: { bn: 'ফজর নামাজ', en: 'Fajr Prayer' },
+        description: {
+          bn: 'ফজর নামাজ ও সকাল যিকির',
+          en: 'Fajr prayer and morning dhikr',
+        },
+        duration: '30 min',
+        icon: 'Moon',
+        category: 'prayer',
+      },
+      {
+        time: '5:30 AM - 6:00 AM',
+        name: { bn: 'কুরআন তিলাওয়াত', en: 'Quran Recitation' },
+        description: { bn: 'হিফজ ও তিলাওয়াত', en: 'Hifz and recitation' },
+        duration: '30 min',
+        icon: 'Book',
+        category: 'study',
+      },
+      {
+        time: '6:00 AM - 7:00 AM',
+        name: { bn: 'সকালের নাস্তা', en: 'Breakfast' },
+        description: {
+          bn: 'হালাল পুষ্টিকর খাবার',
+          en: 'Healthy halal breakfast',
+        },
+        duration: '1 hour',
+        icon: 'Utensils',
+        category: 'meal',
+      },
+      {
+        time: '7:00 AM - 9:00 AM',
+        name: { bn: 'ইসলামী শিক্ষা', en: 'Islamic Studies' },
+        description: { bn: 'ফিকহ, হাদিস, আকাইদ', en: 'Fiqh, Hadith, Aqeedah' },
+        duration: '2 hours',
+        icon: 'BookOpen',
+        category: 'class',
+      },
+      {
+        time: '9:00 AM - 10:00 AM',
+        name: { bn: 'সাধারণ শিক্ষা', en: 'General Education' },
+        description: { bn: 'গণিত, বিজ্ঞান', en: 'Math & Science' },
+        duration: '1 hour',
+        icon: 'Calculator',
+        category: 'class',
+      },
+      {
+        time: '10:00 AM - 10:30 AM',
+        name: { bn: 'চা বিরতি', en: 'Tea Break' },
+        description: { bn: 'চা ও বিস্কুট', en: 'Tea & biscuits' },
+        duration: '30 min',
+        icon: 'Coffee',
+        category: 'break',
+      },
+      {
+        time: '10:30 AM - 12:00 PM',
+        name: { bn: 'কম্পিউটার শিক্ষা', en: 'Computer Education' },
+        description: {
+          bn: 'আইটি, টাইপিং, প্রোগ্রামিং',
+          en: 'IT, typing, programming',
+        },
+        duration: '1.5 hours',
+        icon: 'Monitor',
+        category: 'class',
+      },
+    ],
+  
+    afternoon: [
+      {
+        time: '12:00 PM - 1:00 PM',
+        name: { bn: 'যোহর নামাজ', en: 'Dhuhr Prayer' },
+        description: { bn: 'যোহর নামাজ ও যিকির', en: 'Dhuhr prayer & dhikr' },
+        duration: '1 hour',
+        icon: 'Sun',
+        category: 'prayer',
+      },
+      {
+        time: '1:00 PM - 2:00 PM',
+        name: { bn: 'দুপুরের খাবার', en: 'Lunch' },
+        description: { bn: 'ভাত, মাছ/মাংস, ডাল', en: 'Rice, fish/meat, dal' },
+        duration: '1 hour',
+        icon: 'Utensils',
+        category: 'meal',
+      },
+      {
+        time: '2:00 PM - 3:00 PM',
+        name: { bn: 'বিশ্রাম', en: 'Rest' },
+        description: {
+          bn: 'দুপুরের ঘুম ও তিলাওয়াত',
+          en: 'Rest & light recitation',
+        },
+        duration: '1 hour',
+        icon: 'Bed',
+        category: 'rest',
+      },
+      {
+        time: '3:00 PM - 4:00 PM',
+        name: { bn: 'আসর নামাজ', en: 'Asr Prayer' },
+        description: { bn: 'আসর নামাজ ও যিকির', en: 'Asr prayer & dhikr' },
+        duration: '1 hour',
+        icon: 'Sunset',
+        category: 'prayer',
+      },
+      {
+        time: '4:00 PM - 5:00 PM',
+        name: { bn: 'খেলাধুলা', en: 'Sports' },
+        description: {
+          bn: 'ফুটবল, ক্রিকেট, ব্যায়াম',
+          en: 'Football, cricket, exercise',
+        },
+        duration: '1 hour',
+        icon: 'Activity',
+        category: 'activity',
+      },
+      {
+        time: '5:00 PM - 6:00 PM',
+        name: { bn: 'ভাষা শিক্ষা', en: 'Language Learning' },
+        description: { bn: 'আরবি ও ইংরেজি', en: 'Arabic & English' },
+        duration: '1 hour',
+        icon: 'Languages',
+        category: 'class',
+      },
+    ],
+  
+    evening: [
+      {
+        time: '6:00 PM - 7:00 PM',
+        name: { bn: 'মাগরিব নামাজ', en: 'Maghrib Prayer' },
+        description: { bn: 'মাগরিব নামাজ ও যিকির', en: 'Maghrib prayer & dhikr' },
+        duration: '1 hour',
+        icon: 'Moon',
+        category: 'prayer',
+      },
+      {
+        time: '7:00 PM - 8:00 PM',
+        name: { bn: 'রাতের খাবার', en: 'Dinner' },
+        description: { bn: 'ভাত, তরকারি, সালাদ', en: 'Rice, curry, salad' },
+        duration: '1 hour',
+        icon: 'Utensils',
+        category: 'meal',
+      },
+      {
+        time: '8:00 PM - 9:00 PM',
+        name: { bn: 'কারিগরি শিক্ষা', en: 'Vocational Training' },
+        description: {
+          bn: 'হস্তশিল্প ও স্কিল ডেভেলপমেন্ট',
+          en: 'Crafts & skill development',
+        },
+        duration: '1 hour',
+        icon: 'Wrench',
+        category: 'class',
+      },
+      {
+        time: '9:00 PM - 10:00 PM',
+        name: { bn: 'ইশা নামাজ', en: 'Isha Prayer' },
+        description: { bn: 'ইশা নামাজ ও যিকির', en: 'Isha prayer & dhikr' },
+        duration: '1 hour',
+        icon: 'Moon',
+        category: 'prayer',
+      },
+    ],
+  
+    night: [
+      {
+        time: '10:00 PM - 11:00 PM',
+        name: { bn: 'রাতের পড়াশোনা', en: 'Night Study' },
+        description: { bn: 'হোমওয়ার্ক ও রিভিশন', en: 'Homework & revision' },
+        duration: '1 hour',
+        icon: 'BookOpen',
+        category: 'study',
+      },
+      {
+        time: '11:00 PM - 12:00 AM',
+        name: { bn: 'দক্ষতা প্রশিক্ষণ', en: 'Skill Training' },
+        description: {
+          bn: 'রান্না, ফার্স্ট এইড, লাইফ স্কিল',
+          en: 'Cooking, first aid, life skills',
+        },
+        duration: '1 hour',
+        icon: 'ChefHat',
+        category: 'class',
+      },
+      {
+        time: '12:00 AM - 1:00 AM',
+        name: { bn: 'রাতের স্ন্যাকস', en: 'Night Snacks' },
+        description: {
+          bn: 'দুধ, কুকি, হালাল স্ন্যাকস',
+          en: 'Milk, cookies, halal snacks',
+        },
+        duration: '1 hour',
+        icon: 'Coffee',
+        category: 'meal',
+      },
+      {
+        time: '1:00 AM - 4:00 AM',
+        name: { bn: 'রাতের ঘুম', en: 'Night Sleep' },
+        description: {
+          bn: 'পর্যাপ্ত ঘুম ও বিশ্রাম',
+          en: 'Adequate sleep & rest',
+        },
+        duration: '3 hours',
+        icon: 'Bed',
+        category: 'rest',
+      },
+    ],
+  };
+  
+  const periodNames = {
+    morning: { bn: 'সকাল', en: 'Morning' },
+    afternoon: { bn: 'দুপুর', en: 'Afternoon' },
+    evening: { bn: 'সন্ধ্যা', en: 'Evening' },
+    night: { bn: 'রাত', en: 'Night' },
+  };
+  
   // Scroll to top when component mounts
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -447,7 +700,7 @@ export default function MNCAdmissionPage() {
     },
     {
       id: '24hour',
-      label: language === 'bn' ? '২৪ ঘণ্টা রাউটিং' : '24 Houre Routing',
+      label: language === 'bn' ? 'রুটিন' : 'Daily Routine',
     },
     {
       id: 'rules',
@@ -554,7 +807,7 @@ export default function MNCAdmissionPage() {
         <HeroHeader />
 
         <main
-          className="min-h-screen bg-gray-50 dark:bg-gray-900 mx-auto max-w-7xl px-4 sm:px-6 pt-24 pb-12"
+          className="min-h-screen  mx-auto max-w-7xl px-4 sm:px-6 pt-24 pb-12"
           dir="ltr"
         >
           <AnimatedGroup
@@ -727,422 +980,7 @@ export default function MNCAdmissionPage() {
 
               {/* Requirements & Documents */}
               {activeTab === 'requirements' && (
-                <div className="space-y-6 sm:space-y-8">
-                  <h3
-                    className={cn(
-                      'text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6',
-                      language === 'bn' && 'bengali-text'
-                    )}
-                  >
-                    {language === 'bn'
-                      ? 'MNC লেভেল অনুযায়ী যোগ্যতা ও প্রয়োজনীয় ডকুমেন্ট'
-                      : 'MNC Level-wise Eligibility & Required Documents'}
-                  </h3>
-
-                  <div className="grid md:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
-                    {/* Level 1 */}
-                    <div className="bg-[#00AEEF]/10 dark:bg-[#00AEEF]/5 rounded-2xl p-4 sm:p-6">
-                      <div className="flex items-center gap-2 mb-3 sm:mb-4">
-                        <div className="w-2 h-2 sm:w-3 sm:h-3 bg-[#00AEEF] rounded-full"></div>
-                        <h4
-                          className={cn(
-                            'font-semibold text-[#00AEEF]/90 dark:text-[#00AEEF]/70 text-sm sm:text-base',
-                            language === 'bn' && 'bengali-text'
-                          )}
-                        >
-                          {language === 'bn' ? 'MNC লেভেল ১' : 'MNC Level 1'}
-                        </h4>
-                      </div>
-
-                      <div className="space-y-3 sm:space-y-4">
-                        <div>
-                          <h5
-                            className={cn(
-                              'font-medium text-gray-900 dark:text-white mb-1 sm:mb-2 text-sm sm:text-base',
-                              language === 'bn' && 'bengali-text'
-                            )}
-                          >
-                            {language === 'bn' ? 'বয়স:' : 'Age:'}
-                          </h5>
-                          <p
-                            className={cn(
-                              'text-xs sm:text-sm text-gray-600 dark:text-gray-400',
-                              language === 'bn' && 'bengali-text'
-                            )}
-                          >
-                            {safeData.requirements.level1.age}
-                          </p>
-                        </div>
-
-                        <div>
-                          <h5
-                            className={cn(
-                              'font-medium text-gray-900 dark:text-white mb-1 sm:mb-2 text-sm sm:text-base',
-                              language === 'bn' && 'bengali-text'
-                            )}
-                          >
-                            {language === 'bn'
-                              ? 'একাডেমিক যোগ্যতা:'
-                              : 'Academic Qualification:'}
-                          </h5>
-                          <ul className="space-y-1">
-                            {safeData.requirements.level1.academic.map(
-                              (item, idx) => (
-                                <li
-                                  key={idx}
-                                  className="flex items-center gap-2"
-                                >
-                                  <CheckCircle className="w-3 h-3 text-green-500" />
-                                  <span
-                                    className={cn(
-                                      'text-xs sm:text-sm text-gray-700 dark:text-gray-300',
-                                      language === 'bn' && 'bengali-text'
-                                    )}
-                                  >
-                                    {item}
-                                  </span>
-                                </li>
-                              )
-                            )}
-                          </ul>
-                        </div>
-
-                        <div>
-                          <h5
-                            className={cn(
-                              'font-medium text-gray-900 dark:text-white mb-1 sm:mb-2 text-sm sm:text-base',
-                              language === 'bn' && 'bengali-text'
-                            )}
-                          >
-                            {language === 'bn'
-                              ? 'প্রয়োজনীয় ডকুমেন্ট:'
-                              : 'Required Documents:'}
-                          </h5>
-                          <ul className="space-y-1">
-                            {safeData.requirements.level1.documents.map(
-                              (doc, idx) => (
-                                <li
-                                  key={idx}
-                                  className="flex items-center gap-2"
-                                >
-                                  <AlertCircle className="w-3 h-3 text-orange-500" />
-                                  <span
-                                    className={cn(
-                                      'text-xs sm:text-sm text-gray-700 dark:text-gray-300',
-                                      language === 'bn' && 'bengali-text'
-                                    )}
-                                  >
-                                    {doc}
-                                  </span>
-                                </li>
-                              )
-                            )}
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Level 2 */}
-                    <div className="bg-green-50 dark:bg-green-900/20 rounded-2xl p-4 sm:p-6">
-                      <div className="flex items-center gap-2 mb-3 sm:mb-4">
-                        <div className="w-2 h-2 sm:w-3 sm:h-3 bg-green-500 rounded-full"></div>
-                        <h4
-                          className={cn(
-                            'font-semibold text-green-700 dark:text-green-300 text-sm sm:text-base',
-                            language === 'bn' && 'bengali-text'
-                          )}
-                        >
-                          {language === 'bn' ? 'MNC লেভেল ২' : 'MNC Level 2'}
-                        </h4>
-                      </div>
-
-                      <div className="space-y-3 sm:space-y-4">
-                        <div>
-                          <h5
-                            className={cn(
-                              'font-medium text-gray-900 dark:text-white mb-1 sm:mb-2 text-sm sm:text-base',
-                              language === 'bn' && 'bengali-text'
-                            )}
-                          >
-                            {language === 'bn' ? 'বয়স:' : 'Age:'}
-                          </h5>
-                          <p
-                            className={cn(
-                              'text-xs sm:text-sm text-gray-600 dark:text-gray-400',
-                              language === 'bn' && 'bengali-text'
-                            )}
-                          >
-                            {safeData.requirements.level2.age}
-                          </p>
-                        </div>
-
-                        <div>
-                          <h5
-                            className={cn(
-                              'font-medium text-gray-900 dark:text-white mb-1 sm:mb-2 text-sm sm:text-base',
-                              language === 'bn' && 'bengali-text'
-                            )}
-                          >
-                            {language === 'bn'
-                              ? 'একাডেমিক যোগ্যতা:'
-                              : 'Academic Qualification:'}
-                          </h5>
-                          <ul className="space-y-1">
-                            {safeData.requirements.level2.academic.map(
-                              (item, idx) => (
-                                <li
-                                  key={idx}
-                                  className="flex items-center gap-2"
-                                >
-                                  <CheckCircle className="w-3 h-3 text-green-500" />
-                                  <span
-                                    className={cn(
-                                      'text-xs sm:text-sm text-gray-700 dark:text-gray-300',
-                                      language === 'bn' && 'bengali-text'
-                                    )}
-                                  >
-                                    {item}
-                                  </span>
-                                </li>
-                              )
-                            )}
-                          </ul>
-                        </div>
-
-                        <div>
-                          <h5
-                            className={cn(
-                              'font-medium text-gray-900 dark:text-white mb-1 sm:mb-2 text-sm sm:text-base',
-                              language === 'bn' && 'bengali-text'
-                            )}
-                          >
-                            {language === 'bn'
-                              ? 'প্রয়োজনীয় ডকুমেন্ট:'
-                              : 'Required Documents:'}
-                          </h5>
-                          <ul className="space-y-1">
-                            {safeData.requirements.level2.documents.map(
-                              (doc, idx) => (
-                                <li
-                                  key={idx}
-                                  className="flex items-center gap-2"
-                                >
-                                  <AlertCircle className="w-3 h-3 text-orange-500" />
-                                  <span
-                                    className={cn(
-                                      'text-xs sm:text-sm text-gray-700 dark:text-gray-300',
-                                      language === 'bn' && 'bengali-text'
-                                    )}
-                                  >
-                                    {doc}
-                                  </span>
-                                </li>
-                              )
-                            )}
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Level 3 */}
-                    <div className="bg-purple-50 dark:bg-purple-900/20 rounded-2xl p-4 sm:p-6">
-                      <div className="flex items-center gap-2 mb-3 sm:mb-4">
-                        <div className="w-2 h-2 sm:w-3 sm:h-3 bg-purple-500 rounded-full"></div>
-                        <h4
-                          className={cn(
-                            'font-semibold text-purple-700 dark:text-purple-300 text-sm sm:text-base',
-                            language === 'bn' && 'bengali-text'
-                          )}
-                        >
-                          {language === 'bn' ? 'MNC লেভেল ৩' : 'MNC Level 3'}
-                        </h4>
-                      </div>
-
-                      <div className="space-y-3 sm:space-y-4">
-                        <div>
-                          <h5
-                            className={cn(
-                              'font-medium text-gray-900 dark:text-white mb-1 sm:mb-2 text-sm sm:text-base',
-                              language === 'bn' && 'bengali-text'
-                            )}
-                          >
-                            {language === 'bn' ? 'বয়স:' : 'Age:'}
-                          </h5>
-                          <p
-                            className={cn(
-                              'text-xs sm:text-sm text-gray-600 dark:text-gray-400',
-                              language === 'bn' && 'bengali-text'
-                            )}
-                          >
-                            {safeData.requirements.level3.age}
-                          </p>
-                        </div>
-
-                        <div>
-                          <h5
-                            className={cn(
-                              'font-medium text-gray-900 dark:text-white mb-1 sm:mb-2 text-sm sm:text-base',
-                              language === 'bn' && 'bengali-text'
-                            )}
-                          >
-                            {language === 'bn'
-                              ? 'একাডেমিক যোগ্যতা:'
-                              : 'Academic Qualification:'}
-                          </h5>
-                          <ul className="space-y-1">
-                            {safeData.requirements.level3.academic.map(
-                              (item, idx) => (
-                                <li
-                                  key={idx}
-                                  className="flex items-center gap-2"
-                                >
-                                  <CheckCircle className="w-3 h-3 text-green-500" />
-                                  <span
-                                    className={cn(
-                                      'text-xs sm:text-sm text-gray-700 dark:text-gray-300',
-                                      language === 'bn' && 'bengali-text'
-                                    )}
-                                  >
-                                    {item}
-                                  </span>
-                                </li>
-                              )
-                            )}
-                          </ul>
-                        </div>
-
-                        <div>
-                          <h5
-                            className={cn(
-                              'font-medium text-gray-900 dark:text-white mb-1 sm:mb-2 text-sm sm:text-base',
-                              language === 'bn' && 'bengali-text'
-                            )}
-                          >
-                            {language === 'bn'
-                              ? 'প্রয়োজনীয় ডকুমেন্ট:'
-                              : 'Required Documents:'}
-                          </h5>
-                          <ul className="space-y-1">
-                            {safeData.requirements.level3.documents.map(
-                              (doc, idx) => (
-                                <li
-                                  key={idx}
-                                  className="flex items-center gap-2"
-                                >
-                                  <AlertCircle className="w-3 h-3 text-orange-500" />
-                                  <span
-                                    className={cn(
-                                      'text-xs sm:text-sm text-gray-700 dark:text-gray-300',
-                                      language === 'bn' && 'bengali-text'
-                                    )}
-                                  >
-                                    {doc}
-                                  </span>
-                                </li>
-                              )
-                            )}
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Additional Level */}
-                    <div className="bg-orange-50 dark:bg-orange-900/20 rounded-2xl p-4 sm:p-6">
-                      <div className="flex items-center gap-2 mb-3 sm:mb-4">
-                        <div className="w-2 h-2 sm:w-3 sm:h-3 bg-orange-500 rounded-full"></div>
-                        <h4
-                          className={cn(
-                            'font-semibold text-orange-700 dark:text-orange-300 text-sm sm:text-base',
-                            language === 'bn' && 'bengali-text'
-                          )}
-                        >
-                          {language === 'bn'
-                            ? 'MNC উচ্চ লেভেল'
-                            : 'MNC Advanced Level'}
-                        </h4>
-                      </div>
-
-                      <div className="space-y-3 sm:space-y-4">
-                        <div>
-                          <h5
-                            className={cn(
-                              'font-medium text-gray-900 dark:text-white mb-1 sm:mb-2 text-sm sm:text-base',
-                              language === 'bn' && 'bengali-text'
-                            )}
-                          >
-                            {language === 'bn' ? 'বয়স:' : 'Age:'}
-                          </h5>
-                          <p
-                            className={cn(
-                              'text-xs sm:text-sm text-gray-600 dark:text-gray-400',
-                              language === 'bn' && 'bengali-text'
-                            )}
-                          >
-                            {language === 'bn'
-                              ? '১২ বছরের উপরে'
-                              : 'Above 12 years'}
-                          </p>
-                        </div>
-
-                        <div>
-                          <h5
-                            className={cn(
-                              'font-medium text-gray-900 dark:text-white mb-1 sm:mb-2 text-sm sm:text-base',
-                              language === 'bn' && 'bengali-text'
-                            )}
-                          >
-                            {language === 'bn'
-                              ? 'একাডেমিক যোগ্যতা:'
-                              : 'Academic Qualification:'}
-                          </h5>
-                          <ul className="space-y-1">
-                            <li className="flex items-center gap-2">
-                              <CheckCircle className="w-3 h-3 text-green-500" />
-                              <span
-                                className={cn(
-                                  'text-xs sm:text-sm text-gray-700 dark:text-gray-300',
-                                  language === 'bn' && 'bengali-text'
-                                )}
-                              >
-                                {language === 'bn'
-                                  ? 'পূর্ববর্তী লেভেল সম্পন্ন'
-                                  : 'Previous level completed'}
-                              </span>
-                            </li>
-                          </ul>
-                        </div>
-
-                        <div>
-                          <h5
-                            className={cn(
-                              'font-medium text-gray-900 dark:text-white mb-1 sm:mb-2 text-sm sm:text-base',
-                              language === 'bn' && 'bengali-text'
-                            )}
-                          >
-                            {language === 'bn'
-                              ? 'প্রয়োজনীয় ডকুমেন্ট:'
-                              : 'Required Documents:'}
-                          </h5>
-                          <ul className="space-y-1">
-                            <li className="flex items-center gap-2">
-                              <AlertCircle className="w-3 h-3 text-orange-500" />
-                              <span
-                                className={cn(
-                                  'text-xs sm:text-sm text-gray-700 dark:text-gray-300',
-                                  language === 'bn' && 'bengali-text'
-                                )}
-                              >
-                                {language === 'bn'
-                                  ? 'পূর্ববর্তী রেজাল্ট কার্ড'
-                                  : 'Previous result card'}
-                              </span>
-                            </li>
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <div></div>
               )}
 
               {/* Fee Structure */}
@@ -1159,7 +997,7 @@ export default function MNCAdmissionPage() {
                       : 'MNC Fee Structure - Detailed Information'}
                   </h3>
 
-                  {/* One-time Fees */}
+                  {/* Residential Fees Table */}
                   <div className="bg-gradient-to-r from-[#00AEEF]/10 to-purple-50 dark:from-[#00AEEF]/5 dark:to-purple-900/20 rounded-2xl p-4 sm:p-6">
                     <h4
                       className={cn(
@@ -1168,140 +1006,117 @@ export default function MNCAdmissionPage() {
                       )}
                     >
                       {language === 'bn'
-                        ? 'এককালীন ফি (ভর্তির সময়)'
-                        : 'One-time Fees (At Admission)'}
+                        ? 'আবাসিক ফি'
+                        : 'Residential Fees'}
                     </h4>
-                    <div className="grid gap-3 sm:gap-4">
-                      {safeData.feeStructure.oneTime.map((fee, index) => (
-                        <div
-                          key={index}
-                          className="flex justify-between items-center p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700"
-                        >
-                          <span
-                            className={cn(
-                              'font-medium text-gray-900 dark:text-white text-sm sm:text-base',
-                              language === 'bn' && 'bengali-text'
-                            )}
-                          >
-                            {fee.name}
-                          </span>
-                          <span className="font-bold text-[#00AEEF] text-sm sm:text-base">
-                            {fee.amount}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className={cn(language === 'bn' && 'bengali-text')}>
+                            {language === 'bn' ? 'বিবরণ' : 'Description'}
+                          </TableHead>
+                          <TableHead className={cn(language === 'bn' && 'bengali-text')}>
+                            {language === 'bn' ? 'পরিমাণ' : 'Amount'}
+                          </TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        <TableRow>
+                          <TableCell className={cn(language === 'bn' && 'bengali-text')}>
+                            {language === 'bn' ? 'ভর্তি ফি' : 'Admission Fee'}
+                          </TableCell>
+                          <TableCell className="font-bold text-[#00AEEF]">৫০০০</TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell className={cn(language === 'bn' && 'bengali-text')}>
+                            {language === 'bn' ? 'আইডি কার্ড' : 'ID Card'}
+                          </TableCell>
+                          <TableCell className="font-bold text-[#00AEEF]">২০০</TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell className={cn(language === 'bn' && 'bengali-text')}>
+                            {language === 'bn' ? 'আবাসিক ফি' : 'Residential Fee'}
+                          </TableCell>
+                          <TableCell className="font-bold text-[#00AEEF]">১০০০</TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell className={cn(language === 'bn' && 'bengali-text')}>
+                            {language === 'bn' ? 'মাসিক বেতন' : 'Monthly Salary'}
+                          </TableCell>
+                          <TableCell className="font-bold text-[#00AEEF]">২০০০</TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell className={cn(language === 'bn' && 'bengali-text')}>
+                            {language === 'bn' ? 'খাবার' : 'Food'}
+                          </TableCell>
+                          <TableCell className="font-bold text-[#00AEEF]">৮০০০</TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell className={cn(language === 'bn' && 'bengali-text')}>
+                            {language === 'bn' ? 'কোচিং (বাধ্যতামূলক)' : 'Coaching (mandatory)'}
+                          </TableCell>
+                          <TableCell className="font-bold text-[#00AEEF]">১০০০</TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell className={cn(language === 'bn' && 'bengali-text')}>
+                            {language === 'bn' ? 'এককালীন' : 'One-time'}
+                          </TableCell>
+                          <TableCell className="font-bold text-[#00AEEF]">১৩৪০০</TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell className={cn(language === 'bn' && 'bengali-text')}>
+                            {language === 'bn' ? 'মাসিক ক্লাস ৬ থেকে' : 'Monthly Class up to 6'}
+                          </TableCell>
+                          <TableCell className="font-bold text-[#00AEEF]">৮০০০</TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell className={cn(language === 'bn' && 'bengali-text')}>
+                            {language === 'bn' ? 'মাসিক ক্লাস ৬ এর নিচে' : 'Monthly Class Below 6'}
+                          </TableCell>
+                          <TableCell className="font-bold text-[#00AEEF]">৭০০০</TableCell>
+                        </TableRow>
+                      </TableBody>
+                    </Table>
                   </div>
 
-                  {/* Monthly Fees */}
-                  <div className="space-y-4">
-                    {/* Tuition Fees */}
-                    <div className="bg-green-50 dark:bg-green-900/20 rounded-2xl p-4 sm:p-6">
-                      <h4
-                        className={cn(
-                          'text-base sm:text-lg md:text-xl font-semibold text-green-800 dark:text-green-200 mb-4',
-                          language === 'bn' && 'bengali-text'
-                        )}
-                      >
-                        {language === 'bn'
-                          ? 'টিউশন ফি (মাসিক)'
-                          : 'Tuition Fees (Monthly)'}
-                      </h4>
-                      <div className="grid gap-3 sm:gap-4">
-                        {safeData.feeStructure.monthly.tuition.map(
-                          (fee, index) => (
-                            <div
-                              key={index}
-                              className="flex justify-between items-center p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700"
-                            >
-                              <span
-                                className={cn(
-                                  'font-medium text-gray-900 dark:text-white text-sm sm:text-base',
-                                  language === 'bn' && 'bengali-text'
-                                )}
-                              >
-                                {fee.name}
-                              </span>
-                              <span className="font-bold text-green-600 text-sm sm:text-base">
-                                {fee.amount}
-                              </span>
-                            </div>
-                          )
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Residential Fees */}
-                    <div className="bg-blue-50 dark:bg-blue-900/20 rounded-2xl p-4 sm:p-6">
-                      <h4
-                        className={cn(
-                          'text-base sm:text-lg md:text-xl font-semibold text-blue-800 dark:text-blue-200 mb-4',
-                          language === 'bn' && 'bengali-text'
-                        )}
-                      >
-                        {language === 'bn'
-                          ? 'আবাসিক ফি (মাসিক)'
-                          : 'Residential Fees (Monthly)'}
-                      </h4>
-                      <div className="grid gap-3 sm:gap-4">
-                        {safeData.feeStructure.monthly.residential.map(
-                          (fee, index) => (
-                            <div
-                              key={index}
-                              className="flex justify-between items-center p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700"
-                            >
-                              <span
-                                className={cn(
-                                  'font-medium text-gray-900 dark:text-white text-sm sm:text-base',
-                                  language === 'bn' && 'bengali-text'
-                                )}
-                              >
-                                {fee.name}
-                              </span>
-                              <span className="font-bold text-blue-600 text-sm sm:text-base">
-                                {fee.amount}
-                              </span>
-                            </div>
-                          )
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Food Fees */}
-                    <div className="bg-orange-50 dark:bg-orange-900/20 rounded-2xl p-4 sm:p-6">
-                      <h4
-                        className={cn(
-                          'text-base sm:text-lg md:text-xl font-semibold text-orange-800 dark:text-orange-200 mb-4',
-                          language === 'bn' && 'bengali-text'
-                        )}
-                      >
-                        {language === 'bn'
-                          ? 'খাদ্য ফি (মাসিক)'
-                          : 'Food Fees (Monthly)'}
-                      </h4>
-                      <div className="grid gap-3 sm:gap-4">
-                        {safeData.feeStructure.monthly.food.map(
-                          (fee, index) => (
-                            <div
-                              key={index}
-                              className="flex justify-between items-center p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700"
-                            >
-                              <span
-                                className={cn(
-                                  'font-medium text-gray-900 dark:text-white text-sm sm:text-base',
-                                  language === 'bn' && 'bengali-text'
-                                )}
-                              >
-                                {fee.name}
-                              </span>
-                              <span className="font-bold text-orange-600 text-sm sm:text-base">
-                                {fee.amount}
-                              </span>
-                            </div>
-                          )
-                        )}
-                      </div>
-                    </div>
+                  {/* Non-Residential Fees Table */}
+                  <div className="bg-green-50 dark:bg-green-900/20 rounded-2xl p-4 sm:p-6">
+                    <h4
+                      className={cn(
+                        'text-base sm:text-lg md:text-xl font-semibold text-green-800 dark:text-green-200 mb-4',
+                        language === 'bn' && 'bengali-text'
+                      )}
+                    >
+                      {language === 'bn'
+                        ? 'অনাবাসিক ফি'
+                        : 'Non-Residential Fees'}
+                    </h4>
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className={cn(language === 'bn' && 'bengali-text')}>
+                            {language === 'bn' ? 'বিবরণ' : 'Description'}
+                          </TableHead>
+                          <TableHead className={cn(language === 'bn' && 'bengali-text')}>
+                            {language === 'bn' ? 'পরিমাণ' : 'Amount'}
+                          </TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        <TableRow>
+                          <TableCell className={cn(language === 'bn' && 'bengali-text')}>
+                            {language === 'bn' ? 'কোচিং সহ' : 'With Coaching'}
+                          </TableCell>
+                          <TableCell className="font-bold text-green-600">৪০০০</TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell className={cn(language === 'bn' && 'bengali-text')}>
+                            {language === 'bn' ? 'কোচিং ছাড়া' : 'Without Coaching'}
+                          </TableCell>
+                          <TableCell className="font-bold text-green-600">৩০০০</TableCell>
+                        </TableRow>
+                      </TableBody>
+                    </Table>
                   </div>
                 </div>
               )}
@@ -1483,119 +1298,91 @@ export default function MNCAdmissionPage() {
                 </div>
               )}
 
-              {/* 24 Hour Routing */}
+              {/* === Daily Routine (Timeline V2) === */}
               {activeTab === '24hour' && (
-                <div className="space-y-6 sm:space-y-8">
-                  <h3
-                    className={cn(
-                      'text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6',
-                      language === 'bn' && 'bengali-text'
-                    )}
-                  >
-                    {language === 'bn'
-                      ? '২৪ ঘণ্টা রাউটিং - সার্বক্ষণিক সহায়তা'
-                      : '24 Hour Routing - Round-the-Clock Support'}
-                  </h3>
+                <div className="max-w-4xl mx-auto space-y-12">
+                  <SectionHeader
+                    title={
+                      language === 'bn' ? 'দৈনন্দিন রুটিন' : 'Daily Routine'
+                    }
+                    subtitle={
+                      language === 'bn'
+                        ? 'MIC শিক্ষার্থীদের সারাদিনের কার্যক্রম'
+                        : 'Day-to-day activities of MIC students'
+                    }
+                  />
 
-                  <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-2xl p-4 sm:p-6">
-                    <h4
-                      className={cn(
-                        'text-base sm:text-lg md:text-xl font-semibold text-gray-900 dark:text-white mb-4',
-                        language === 'bn' && 'bengali-text'
-                      )}
-                    >
-                      {language === 'bn'
-                        ? 'কী হলো ২৪ ঘণ্টা রাউটিং?'
-                        : 'What is 24 Hour Routing?'}
-                    </h4>
-                    <p
-                      className={cn(
-                        'text-sm sm:text-base text-gray-700 dark:text-gray-300 mb-4',
-                        language === 'bn' && 'bengali-text'
-                      )}
-                    >
-                      {language === 'bn'
-                        ? '২৪ ঘণ্টা রাউটিং সিস্টেম MNC ভর্তি প্রক্রিয়ায় সার্বক্ষণিক সহায়তা প্রদান করে। এটি নিশ্চিত করে যে যেকোনো সময়ে জরুরি তথ্য বা সহায়তার প্রয়োজনে আবেদনকারীরা সঠিক সহায়তা পান।'
-                        : 'The 24 Hour Routing system provides round-the-clock support for the MNC admission process. It ensures that applicants receive appropriate assistance whenever they need urgent information or help.'}
-                    </p>
-
-                    <div className="grid md:grid-cols-2 gap-4 sm:gap-6">
-                      <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
-                        <h5
-                          className={cn(
-                            'font-semibold text-gray-900 dark:text-white mb-2',
-                            language === 'bn' && 'bengali-text'
-                          )}
-                        >
-                          {language === 'bn'
-                            ? 'সহায়তার ধরন'
-                            : 'Types of Support'}
-                        </h5>
-                        <ul className="space-y-1 text-sm text-gray-600 dark:text-gray-400">
-                          <li>
-                            •{' '}
-                            {language === 'bn'
-                              ? 'জরুরি যোগাযোগ'
-                              : 'Emergency Contact'}
-                          </li>
-                          <li>
-                            •{' '}
-                            {language === 'bn'
-                              ? 'প্রযুক্তিগত সহায়তা'
-                              : 'Technical Support'}
-                          </li>
-                          <li>
-                            •{' '}
-                            {language === 'bn'
-                              ? 'আবেদন সহায়তা'
-                              : 'Application Assistance'}
-                          </li>
-                          <li>
-                            •{' '}
-                            {language === 'bn'
-                              ? 'পেমেন্ট সাপোর্ট'
-                              : 'Payment Support'}
-                          </li>
-                        </ul>
+                  {Object.entries(micDailyRoutine).map(
+                    ([period, activities], pIdx) => (
+                      <div key={pIdx} className="relative pl-8 md:pl-0">
+                        <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 border-b pb-2 dark:border-gray-700">
+                          {periodNames[period][language === 'bn' ? 'bn' : 'en']}
+                        </h3>
+                        <div className="grid md:grid-cols-2 gap-4">
+                          {activities.map((activity, aIdx) => {
+                            const IconComponent =
+                              {
+                                Moon,
+                                Droplets,
+                                Utensils,
+                                BookOpen,
+                                Calculator,
+                                Monitor,
+                                Sun,
+                                Book,
+                                Sunset,
+                                Activity,
+                                Languages,
+                                Wrench,
+                                ChefHat,
+                                Bed,
+                                Coffee,
+                                AlarmClock,
+                              }[activity.icon] || Clock;
+                            return (
+                              <div
+                                key={aIdx}
+                                className="flex gap-4 p-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow"
+                              >
+                                <div className="w-12 h-12 rounded-xl bg-gray-50 dark:bg-gray-700 flex items-center justify-center shrink-0 text-[#00AEEF]">
+                                  <IconComponent className="w-6 h-6" />
+                                </div>
+                                <div>
+                                  <span className="text-xs font-bold text-[#00AEEF] block mb-1">
+                                    {activity.time}
+                                  </span>
+                                  <h4
+                                    className={cn(
+                                      'font-bold text-gray-900 dark:text-white text-sm mb-1',
+                                      language === 'bn' && 'bengali-text'
+                                    )}
+                                  >
+                                    {
+                                      activity.name[
+                                      language === 'bn' ? 'bn' : 'en'
+                                      ]
+                                    }
+                                  </h4>
+                                  <p
+                                    className={cn(
+                                      'text-xs text-gray-500',
+                                      language === 'bn' && 'bengali-text'
+                                    )}
+                                  >
+                                    {
+                                      activity.description[
+                                      language === 'bn' ? 'bn' : 'en'
+                                      ]
+                                    }
+                                  </p>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
                       </div>
-
-                      <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
-                        <h5
-                          className={cn(
-                            'font-semibold text-gray-900 dark:text-white mb-2',
-                            language === 'bn' && 'bengali-text'
-                          )}
-                        >
-                          {language === 'bn'
-                            ? 'যোগাযোগের মাধ্যম'
-                            : 'Communication Channels'}
-                        </h5>
-                        <ul className="space-y-1 text-sm text-gray-600 dark:text-gray-400">
-                          <li>
-                            •{' '}
-                            {language === 'bn'
-                              ? '২৪/৭ হেল্পলাইন'
-                              : '24/7 Helpline'}
-                          </li>
-                          <li>
-                            • {language === 'bn' ? 'লাইভ চ্যাট' : 'Live Chat'}
-                          </li>
-                          <li>
-                            •{' '}
-                            {language === 'bn'
-                              ? 'ইমেইল সাপোর্ট'
-                              : 'Email Support'}
-                          </li>
-                          <li>
-                            •{' '}
-                            {language === 'bn'
-                              ? 'অ্যাপ নোটিফিকেশন'
-                              : 'App Notifications'}
-                          </li>
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
+                    )
+                  )}
                 </div>
               )}
 

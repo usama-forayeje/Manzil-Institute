@@ -152,7 +152,7 @@ export default function FooterSection() {
         bn: 'মানজিল হাউজিং',
       },
       href: 'https://housing.manzilgroupbd.com',
-    },
+    }, 
     {
       title: {
         en: 'Manzil Properties',

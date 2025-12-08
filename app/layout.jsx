@@ -125,29 +125,30 @@ export const metadata = {
     },
   },
   openGraph: {
-    title: 'Manzil Institute - Quality Islamic Education',
+    title: 'মানজিল ইনস্টিটিউট - মাদরাসা জেনারেল কারিগরি শিক্ষার সমন্বয়',
     description:
-      'Manzil Institute offers integrated MIC Curriculum, Madrasa Education, General Education & Technical Education in Bangladesh. Providing comprehensive Islamic and modern education for students.',
+      'মানজিল ইনস্টিটিউট বাংলাদেশে একীভূত কারিকুলাম, মাদ্রাসা শিক্ষা, জেনারেল শিক্ষা এবং প্রযুক্তিগত শিক্ষা প্রদান করে। ছাত্রদের জন্য ব্যাপক ইসলামী এবং আধুনিক শিক্ষা প্রদান করে।',
     url: 'https://institute.manzilgroupbd.com',
     siteName: 'Manzil Institute',
     images: [
       {
-        url: 'https://institute.manzilgroupbd.com/manzil-logo/manzil-institute-logo-dark.webp',
+        url: 'https://institute.manzilgroupbd.com/manzil-institute.png',
         width: 1200,
         height: 630,
-        alt: 'Manzil Institute - Quality Islamic Education',
+        alt: 'মানজিল ইনস্টিটিউট - মাদরাসা জেনারেল কারিগরি শিক্ষার সমন্বয়',
       },
     ],
-    locale: 'en_US',
+    locale: 'bn_BD',
+    alternateLocales: ['en_US'],
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Manzil Institute - Quality Islamic Education',
+    title: 'মানজিল ইনস্টিটিউট - মাদরাসা জেনারেল কারিগরি শিক্ষার সমন্বয়',
     description:
-      'Manzil Institute offers integrated MIC Curriculum, Madrasa Education, General Education & Technical Education in Bangladesh.',
+      'মানজিল ইনস্টিটিউট বাংলাদেশে একীভূত কারিকুলাম, মাদ্রাসা শিক্ষা, জেনারেল শিক্ষা এবং প্রযুক্তিগত শিক্ষা প্রদান করে।',
     images: [
-      'https://institute.manzilgroupbd.com/manzil-logo/manzil-institute-logo-dark.webp',
+      'https://institute.manzilgroupbd.com/manzil-institute.png',
     ],
     creator: '@manzilinstitute',
   },
@@ -179,7 +180,7 @@ export default function RootLayout({ children }) {
     description:
       'Manzil Institute offers integrated MIC Curriculum, Madrasa Education, General Education & Technical Education in Bangladesh.',
     url: 'https://institute.manzilgroupbd.com',
-    logo: 'https://institute.manzilgroupbd.com/manzil-institute-logo-dark.webp',
+    logo: 'https://institute.manzilgroupbd.com/manzil-institute.png',
     sameAs: [
       'https://www.facebook.com/manzilinstitute',
       'https://www.instagram.com/manzilinstitute',
@@ -218,12 +219,12 @@ export default function RootLayout({ children }) {
   const csp = `default-src 'self'; script-src 'self' 'unsafe-inline' ${isDevelopment ? "'unsafe-eval' " : ""}https://fonts.googleapis.com https://www.google.com https://www.googleapis.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com https://www.google.com https://www.googleapis.com; img-src 'self' data: https:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://www.google.com https://www.googleapis.com https://www.google-analytics.com https://www.googletagmanager.com; frame-src 'self' https://www.google.com https://www.youtube.com; object-src 'none'; base-uri 'self'; form-action 'self';`;
 
   return (
-    <html lang="en" suppressHydrationWarning={true}>
+    <html lang="bn" suppressHydrationWarning={true}>
       <head>
         {/* Preload critical resources */}
         <link
           rel="preload"
-          href="/manzil-logo/manzil-institute-logo-dark.webp"
+          href="/manzil-institute.png"
           as="image"
           type="image/webp"
         />
@@ -345,6 +346,11 @@ export default function RootLayout({ children }) {
           httpEquiv="Content-Security-Policy"
           content={csp}
         />
+
+        {/* Bengali metadata */}
+        <meta name="title" lang="bn" content="মানজিল ইনস্টিটিউট - মাদরাসা জেনারেল কারিগরি শিক্ষার সমন্বয়" />
+        <meta name="description" lang="bn" content="মানজিল ইনস্টিটিউট বাংলাদেশে একীভূত কারিকুলাম, মাদ্রাসা শিক্ষা, সাধারণ শিক্ষা এবং প্রযুক্তিগত শিক্ষা প্রদান করে। ছাত্রদের জন্য ব্যাপক ইসলামী এবং আধুনিক শিক্ষা প্রদান করে।" />
+        <meta name="keywords" lang="bn" content="মানজিল ইনস্টিটিউট, ইসলামী শিক্ষা, মাদ্রাসা শিক্ষা, বাংলাদেশ শিক্ষা, ধর্মীয় শিক্ষা, আধুনিক শিক্ষা, প্রযুক্তিগত শিক্ষা, গুণগত শিক্ষা, ইসলামী অধ্যয়ন" />
       </head>
       <body className={`${inter.variable} font-sans`}>
         <StructuredData

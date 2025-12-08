@@ -46,6 +46,46 @@ import FooterSection from '../../components/footer';
 import HeroHeader from '@/components/header';
 import { useTheme } from '../../components/themes/theme-provider';
 
+export const metadata = {
+  title: 'Manzil Campus - Modern Islamic Education Facility in Bangladesh',
+  description: 'Explore Manzil Institute\'s state-of-the-art campus in Dhaka, Bangladesh. Discover modern classrooms, digital labs, residential facilities, and premium amenities for Islamic education.',
+  keywords: [
+    'Manzil Campus',
+    'Islamic education campus Bangladesh',
+    'Modern madrasa facilities',
+    'Digital smart lab Bangladesh',
+    'AC dormitory Bangladesh',
+    'Islamic school campus Dhaka',
+    'Manzil Institute facilities',
+    'Campus tour Bangladesh',
+    'Premium education amenities',
+  ],
+  openGraph: {
+    title: 'মানযিল ক্যাম্পাস - বাংলাদেশে আধুনিক ইসলামিক শিক্ষা সুবিধা',
+    description: 'ঢাকা, বাংলাদেশে মানজিল ইনস্টিটিউটের অত্যাধুনিক ক্যাম্পাস অন্বেষণ করুন। ইসলামিক শিক্ষার জন্য আধুনিক ক্লাসরুম, ডিজিটাল ল্যাব, আবাসিক সুবিধা এবং প্রিমিয়াম সুবিধা আবিষ্কার করুন।',
+    url: 'https://institute.manzilgroupbd.com/campus',
+    siteName: 'Manzil Institute',
+    images: [
+      {
+        url: 'https://institute.manzilgroupbd.com/manzil-institute.png',
+        width: 1200,
+        height: 630,
+        alt: 'মানযিল ক্যাম্পাস',
+      },
+    ],
+    locale: 'bn_BD',
+    alternateLocales: ['en_US'],
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'মানযিল ক্যাম্পাস - বাংলাদেশে আধুনিক ইসলামিক শিক্ষা সুবিধা',
+    description: 'ঢাকা, বাংলাদেশে মানজিল ইনস্টিটিউটের অত্যাধুনিক ক্যাম্পাস অন্বেষণ করুন। ইসলামিক শিক্ষার জন্য আধুনিক ক্লাসরুম, ডিজিটাল ল্যাব, আবাসিক সুবিধা এবং প্রিমিয়াম সুবিধা আবিষ্কার করুন।',
+    images: ['https://institute.manzilgroupbd.com/manzil-institute.png'],
+    creator: '@manzilinstitute',
+  },
+};
+
 // --- Image Assets (Replace with real paths) ---
 const images = {
   bridge: 'https://ik.imagekit.io/lgd2hue3i/Manzil-Institute/building.jpg',

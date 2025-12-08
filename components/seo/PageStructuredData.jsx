@@ -35,7 +35,7 @@ export const getPageStructuredData = () => ({
       'Modern Islamic curriculum',
     ],
     url: 'https://institute.manzilgroupbd.com',
-    image: 'https://institute.manzilgroupbd.com/manzil-institute-logo-dark.png',
+    image: 'https://institute.manzilgroupbd.com/manzil-institute.png',
   },
 
   seoDataBn: {
@@ -62,7 +62,7 @@ export const getPageStructuredData = () => ({
       'আধুনিক ইসলামিক কারিকুলাম',
     ],
     url: 'https://institute.manzilgroupbd.com',
-    image: 'https://institute.manzilgroupbd.com/manzil-institute-logo-dark.png',
+    image: 'https://institute.manzilgroupbd.com/manzil-institute.png',
   },
 
   coursesDataEn: [
@@ -183,7 +183,7 @@ export const getPageStructuredData = () => ({
     description:
       'Manzil International Institute offers integrated MIC Curriculum, Madrasa Education, General Education & Technical Education in Bangladesh. Comprehensive Islamic education for building future leaders with Quran, Hadith, modern academics & technical skills.',
     url: 'https://institute.manzilgroupbd.com',
-    logo: 'https://institute.manzilgroupbd.com/manzil-institute-logo-dark.png',
+    logo: 'https://institute.manzilgroupbd.com/manzil-institute.png',
     sameAs: [
       'https://www.facebook.com/manzilinstitute',
       'https://www.instagram.com/manzilinstitute',

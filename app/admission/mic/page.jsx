@@ -1,6 +1,45 @@
 "use client"
 
 import { useState, useEffect } from 'react';
+
+export const metadata = {
+  title: 'MIC Admission Process - Manzil International Curriculum Bangladesh',
+  description: 'Complete admission process for MIC Curriculum at Manzil International Institute. Comprehensive Islamic and modern education program integrating Madrasa, General and Technical education for 7 years.',
+  keywords: [
+    'MIC admission',
+    'Manzil International Curriculum admission',
+    'Islamic education Bangladesh',
+    'Madrasa curriculum admission',
+    'Technical education admission',
+    'Bangladesh Islamic curriculum',
+    'MIC program admission',
+    'Manzil Institute MIC',
+  ],
+  openGraph: {
+    title: 'MIC ভর্তি প্রক্রিয়া - বাংলাদেশে মানজিল ইন্টারন্যাশনাল কারিকুলাম',
+    description: 'মানজিল ইন্টারন্যাশনাল ইনস্টিটিউটে MIC কারিকুলামের সম্পূর্ণ ভর্তি প্রক্রিয়া। 7 বছরের জন্য মাদ্রাসা, সাধারণ এবং প্রযুক্তিগত শিক্ষাকে একীভূত করে ব্যাপক ইসলামী এবং আধুনিক শিক্ষা প্রোগ্রাম।',
+    url: 'https://institute.manzilgroupbd.com/admission/mic',
+    siteName: 'Manzil Institute',
+    images: [
+      {
+        url: 'https://institute.manzilgroupbd.com/manzil-institute.png',
+        width: 1200,
+        height: 630,
+        alt: 'MIC ভর্তি প্রক্রিয়া',
+      },
+    ],
+    locale: 'bn_BD',
+    alternateLocales: ['en_US'],
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'MIC ভর্তি প্রক্রিয়া - বাংলাদেশে মানজিল ইন্টারন্যাশনাল কারিকুলাম',
+    description: 'মানজিল ইন্টারন্যাশনাল ইনস্টিটিউটে MIC কারিকুলামের সম্পূর্ণ ভর্তি প্রক্রিয়া। 7 বছরের জন্য মাদ্রাসা, সাধারণ এবং প্রযুক্তিগত শিক্ষাকে একীভূত করে ব্যাপক ইসলামী এবং আধুনিক শিক্ষা প্রোগ্রাম।',
+    images: ['https://institute.manzilgroupbd.com/manzil-institute.png'],
+    creator: '@manzilinstitute',
+  },
+};
 import {
   ArrowLeft,
   Download,

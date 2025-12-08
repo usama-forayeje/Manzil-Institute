@@ -27,24 +27,28 @@ export const metadata = {
   description: seoDataEn.description,
   keywords: seoDataEn.keywords,
   openGraph: {
-    title: seoDataEn.title,
-    description: seoDataEn.description,
+    title: seoDataBn.title,
+    description: seoDataBn.description,
     url: seoDataEn.url,
+    siteName: 'Manzil Institute',
     images: [
       {
         url: seoDataEn.image,
         width: 1200,
         height: 630,
-        alt: 'Manzil Institute Logo',
+        alt: seoDataBn.title,
       },
     ],
+    locale: 'bn_BD',
+    alternateLocales: ['en_US'],
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: seoDataEn.title,
-    description: seoDataEn.description,
+    title: seoDataBn.title,
+    description: seoDataBn.description,
     images: [seoDataEn.image],
+    creator: '@manzilinstitute',
   },
 };
 

@@ -11,6 +11,45 @@ import { cn } from '@/lib/utils';
 import NotFound from '../not-found';
 import ErrorBoundary from '../../components/ErrorBoundary';
 
+export const metadata = {
+  title: 'মানজিল ইন্টারন্যাশনাল ইনস্টিটিউটে আবেদন করুন - অনলাইন ভর্তি ফর্ম',
+  description: 'মানজিল ইন্টারন্যাশনাল ইনস্টিটিউটে আপনার অনলাইন আবেদন জমা দিন। বাংলাদেশে MIC কারিকুলাম, মাদ্রাসা শিক্ষা এবং প্রযুক্তিগত শিক্ষা প্রোগ্রামের জন্য ভর্তি ফর্ম সম্পূর্ণ করুন।',
+  keywords: [
+    'মানজিল ইনস্টিটিউট আবেদন',
+    'অনলাইন ভর্তি ফর্ম',
+    'MIC কারিকুলাম আবেদন',
+    'বাংলাদেশ ইসলামিক স্কুল আবেদন',
+    'ভর্তি ফর্ম বাংলাদেশ',
+    'মানজিল ইন্টারন্যাশনাল ইনস্টিটিউট আবেদন',
+    'অনলাইন আবেদন বাংলাদেশ',
+    'ইসলামিক শিক্ষা আবেদন'
+  ],
+  openGraph: {
+    title: 'মানজিল ইন্টারন্যাশনাল ইনস্টিটিউটে আবেদন করুন - অনলাইন ভর্তি ফর্ম | Apply to Manzil International Institute - Online Admission Form',
+    description: 'মানজিল ইন্টারন্যাশনাল ইনস্টিটিউটে আপনার অনলাইন আবেদন জমা দিন। বাংলাদেশে MIC কারিকুলাম, মাদ্রাসা শিক্ষা এবং প্রযুক্তিগত শিক্ষা প্রোগ্রামের জন্য ভর্তি ফর্ম সম্পূর্ণ করুন। | Submit your online application to Manzil International Institute. Complete the admission form for MIC Curriculum, Madrasa Education, and Technical Education programs in Bangladesh.',
+    url: 'https://institute.manzilgroupbd.com/apply',
+    siteName: 'Manzil Institute',
+    images: [
+      {
+        url: 'https://institute.manzilgroupbd.com/manzil-institute.png',
+        width: 1200,
+        height: 630,
+        alt: 'মানজিল ইনস্টিটিউট আবেদন',
+      },
+    ],
+    locale: 'bn_BD',
+    alternateLocales: ['en_US'],
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'মানজিল ইন্টারন্যাশনাল ইনস্টিটিউটে আবেদন করুন - অনলাইন ভর্তি ফর্ম | Apply to Manzil International Institute - Online Admission Form',
+    description: 'মানজিল ইন্টারন্যাশনাল ইনস্টিটিউটে আপনার অনলাইন আবেদন জমা দিন। বাংলাদেশে MIC কারিকুলাম, মাদ্রাসা শিক্ষা এবং প্রযুক্তিগত শিক্ষা প্রোগ্রামের জন্য ভর্তি ফর্ম সম্পূর্ণ করুন। | Submit your online application to Manzil International Institute. Complete the admission form for MIC Curriculum, Madrasa Education, and Technical Education programs in Bangladesh.',
+    images: ['https://institute.manzilgroupbd.com/manzil-institute.png'],
+    creator: '@manzilinstitute',
+  },
+};
+
 const transitionVariants = {
   item: {
     hidden: {

@@ -37,8 +37,6 @@ export const metadata = {
   },
 };
 
-import MICCurriculumClientPage from './mic-curriculum-client';
-
-export default function MICCurriculumPage() {
-  return <MICCurriculumClientPage />;
+export default function Layout({ children }) {
+  return children;
 }

@@ -36,8 +36,6 @@ export const metadata = {
   },
 };
 
-import MNCCurriculumClientPage from './mnc-curriculum-client';
-
-export default function MNCCurriculumPage() {
-  return <MNCCurriculumClientPage />;
+export default function Layout({ children }) {
+  return children;
 }

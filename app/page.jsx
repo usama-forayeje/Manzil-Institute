@@ -1,6 +1,5 @@
 import { lazy, Suspense } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
-import { getPageStructuredData } from '@/components/seo/PageStructuredData';
 
 const HeroHeader = lazy(() => import('@/components/header.jsx'));
 const HeroSection = lazy(() => import('@/components/hero-section.jsx'));
@@ -13,30 +12,38 @@ const Contact = lazy(() => import('@/components/contact.jsx'));
 const FooterSection = lazy(() => import('@/components/footer.jsx'));
 const Team = lazy(() => import('@/components/team.jsx'));
 
-const {
-  seoDataEn,
-  seoDataBn,
-  coursesDataEn,
-  coursesDataBn,
-  organizationDataEn,
-  organizationDataBn,
-} = getPageStructuredData();
-
 export const metadata = {
-  title: seoDataEn.title,
-  description: seoDataEn.description,
-  keywords: seoDataEn.keywords,
+  title: 'Manzil Institute - Quality Islamic Education | MIC Curriculum Bangladesh | Future Leaders',
+  description: 'Manzil Institute offers integrated MIC Curriculum, Madrasa Education, General Education & Technical Education in Bangladesh. Comprehensive Islamic education for building future leaders with Quran, Hadith, modern academics & technical skills.',
+  keywords: [
+    'Manzil Institute',
+    'MIC Curriculum Bangladesh',
+    'Madrasa Education',
+    'General Education',
+    'Technical Education',
+    'Islamic Education Bangladesh',
+    'Manzil International Institute admission',
+    'Quran education',
+    'Hadith studies',
+    'Islamic values',
+    'Character development',
+    'Future leader training',
+    'Bangladesh Islamic school',
+    'Integrated education Bangladesh',
+    'Religious education Bangladesh',
+    'Modern Islamic curriculum',
+  ],
   openGraph: {
-    title: seoDataBn.title,
-    description: seoDataBn.description,
-    url: seoDataEn.url,
+    title: 'মানজিল ইনস্টিটিউট - মানসম্পন্ন ইসলামিক শিক্ষা | এমআইসি কারিকুলাম বাংলাদেশ | ভবিষ্যত নেতৃত্ব',
+    description: 'মানজিল ইনস্টিটিউট বাংলাদেশে একীভূত এমআইসি কারিকুলাম, মাদ্রাসা শিক্ষা, সাধারণ শিক্ষা এবং কারিগরি শিক্ষা প্রদান করে। কুরআন, হাদিস, আধুনিক একাডেমিক এবং কারিগরি দক্ষতার সাথে ভবিষ্যত নেতৃত্ব গঠনের জন্য ব্যাপক ইসলামিক শিক্ষা।',
+    url: 'https://institute.manzilgroupbd.com',
     siteName: 'Manzil Institute',
     images: [
       {
-        url: seoDataEn.image,
+        url: 'https://institute.manzilgroupbd.com/manzil-institute.png',
         width: 1200,
         height: 630,
-        alt: seoDataBn.title,
+        alt: 'মানজিল ইনস্টিটিউট - মানসম্পন্ন ইসলামিক শিক্ষা | এমআইসি কারিকুলাম বাংলাদেশ | ভবিষ্যত নেতৃত্ব',
       },
     ],
     locale: 'bn_BD',
@@ -45,9 +52,9 @@ export const metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: seoDataBn.title,
-    description: seoDataBn.description,
-    images: [seoDataEn.image],
+    title: 'মানজিল ইনস্টিটিউট - মানসম্পন্ন ইসলামিক শিক্ষা | এমআইসি কারিকুলাম বাংলাদেশ | ভবিষ্যত নেতৃত্ব',
+    description: 'মানজিল ইনস্টিটিউট বাংলাদেশে একীভূত এমআইসি কারিকুলাম, মাদ্রাসা শিক্ষা, সাধারণ শিক্ষা এবং কারিগরি শিক্ষা প্রদান করে। কুরআন, হাদিস, আধুনিক একাডেমিক এবং কারিগরি দক্ষতার সাথে ভবিষ্যত নেতৃত্ব গঠনের জন্য ব্যাপক ইসলামিক শিক্ষা।',
+    images: ['https://institute.manzilgroupbd.com/manzil-institute.png'],
     creator: '@manzilinstitute',
   },
 };

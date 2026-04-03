@@ -64,8 +64,14 @@ export function ThemeProvider({
 export const useTheme = (): ThemeContextType => {
   const context = useContext(ThemeProviderContext);
 
-  if (context === undefined)
-    throw new Error('useTheme must be used within a ThemeProvider');
+  if (context === undefined) {
+    // Return default values when not inside a provider
+    return {
+      theme: 'dark',
+      setTheme: () => {},
+      resolvedTheme: 'dark',
+    };
+  }
 
   return context;
 };

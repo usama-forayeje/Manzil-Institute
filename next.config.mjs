@@ -1,9 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   /* config options here */
-  // Use static export to avoid Next.js 16.0.3 Turbopack static generation bug
-  output: "export",
-  trailingSlash: true,
   images: {
     unoptimized: true,
     formats: ["image/webp", "image/avif"],

@@ -38,13 +38,13 @@ const HeroHeader = () => {
 
   // Bahire click korle menu close howar function
   React.useEffect(() => {
-    const handleClickOutside = event => {
+    const handleClickOutside = (event: MouseEvent) => {
       // Check if click is outside menu AND outside menu button
       if (
         menuRef.current &&
-        !menuRef.current.contains(event.target) &&
+        !menuRef.current.contains(event.target as Node) &&
         buttonRef.current &&
-        !buttonRef.current.contains(event.target)
+        !buttonRef.current.contains(event.target as Node)
       ) {
         setIsMenuOpen(false);
       }
@@ -77,7 +77,7 @@ const HeroHeader = () => {
           {/* Navbar Container */}
           <div className="flex items-center justify-between px-6 py-3">
             {/* Logo - Left */}
-            <div className="flex justify-start flex-shrink-0">
+            <div className="flex justify-start shrink-0">
               <Link href="/" className="flex items-center">
                 {mounted ? (
                   <Image
@@ -92,13 +92,13 @@ const HeroHeader = () => {
                     className="h-10 w-auto object-contain"
                   />
                 ) : (
-                  <div className="w-[170px] h-10 bg-gray-200 dark:bg-gray-700 animate-pulse rounded" />
+                  <div className="w-42.5 h-10 bg-gray-200 dark:bg-gray-700 animate-pulse rounded" />
                 )}
               </Link>
             </div>
 
             {/* Desktop Navigation - Center (Only on 1024px+) */}
-            <Suspense fallback={<div className="hidden lg:flex justify-center flex-grow w-64 h-6 bg-gray-200 dark:bg-gray-700 animate-pulse rounded" />}>
+            <Suspense fallback={<div className="hidden lg:flex justify-center grow w-64 h-6 bg-gray-200 dark:bg-gray-700 animate-pulse rounded" />}>
               <DesktopMenu
                 admissionOpen={admissionOpen}
                 setAdmissionOpen={setAdmissionOpen}
@@ -107,7 +107,7 @@ const HeroHeader = () => {
             </Suspense>
 
             {/* Desktop Action Buttons - Right (Only on 1024px+) */}
-            <div className="hidden lg:flex justify-end items-center space-x-3 flex-shrink-0">
+            <div className="hidden lg:flex justify-end items-center space-x-3 shrink-0">
               <ModeToggle />
               <Button
                 variant="ghost"
@@ -136,7 +136,7 @@ const HeroHeader = () => {
                 )}
               >
                 <Link
-                  href="/apply"
+                  href="/login"
                   className={language === 'bn' ? 'kalpurush-font' : ''}
                 >
                   {isScrolled
@@ -151,7 +151,7 @@ const HeroHeader = () => {
             </div>
 
             {/* Mobile Buttons (Only on screens below 1024px) */}
-            <div className=" lg:hidden jastify-between items-center space-x-2  flex-shrink-0">
+            <div className=" lg:hidden jastify-between items-center space-x-2  shrink-0">
               <div className="flex items-center space-x-1">
                 <ModeToggle />
                 <Button

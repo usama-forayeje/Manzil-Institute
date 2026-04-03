@@ -45,7 +45,7 @@ export default function HomeLoading() {
       <main className="pt-16">
         {/* Hero Section */}
         <section className="relative min-h-[90vh] flex items-center overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-white/90 via-white/70 to-white/30 dark:from-gray-950/95 dark:via-gray-950/80 dark:to-gray-950/40" />
+          <div className="absolute inset-0 bg-linear-to-r from-white/90 via-white/70 to-white/30 dark:from-gray-950/95 dark:via-gray-950/80 dark:to-gray-950/40" />
           
           <div className="relative z-10 w-full py-20 lg:py-32">
             <div className="max-w-7xl px-6 mx-auto md:px-12">

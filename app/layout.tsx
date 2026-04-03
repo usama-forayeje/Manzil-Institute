@@ -1,6 +1,6 @@
 import React, { Suspense } from 'react';
 import { Inter } from 'next/font/google';
-import { Metadata } from 'next';
+import { Metadata, Viewport } from 'next';
 import Script from 'next/script';
 import './globals.css';
 import { Providers } from '@/components/providers';
@@ -94,9 +94,6 @@ function RootLoadingSkeleton() {
 
 export const metadata: Metadata = {
   title: 'Manzil Institute - Quality Islamic Education',
-  description:
-    'Manzil Institute offers integrated MIC Curriculum, Madrasa Education, General Education & Technical Education in Bangladesh. Providing comprehensive Islamic and modern education for students.',
-  viewport: 'width=device-width, initial-scale=1',
   keywords: [
     'Manzil Institute',
     'Islamic Education',
@@ -171,6 +168,15 @@ export const metadata: Metadata = {
     yandex: 'your-yandex-verification-code',
     yahoo: 'your-yahoo-verification-code',
   },
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
+    { media: '(prefers-color-scheme: dark)', color: '#0f172a' },
+  ],
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

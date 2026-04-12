@@ -1,3 +1,6 @@
+// Force dynamic rendering because the header uses cookies for session
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import { Skeleton } from '@/components/ui/skeleton';
 import { LazyImage } from '@/components/ui/lazy-image';

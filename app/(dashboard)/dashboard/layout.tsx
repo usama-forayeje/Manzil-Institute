@@ -1,3 +1,6 @@
+// Force dynamic rendering because this layout uses cookies
+export const dynamic = 'force-dynamic';
+
 import { getSession } from '@/lib/auth/actions';
 import { redirect } from 'next/navigation';
 import { headers, cookies } from 'next/headers';

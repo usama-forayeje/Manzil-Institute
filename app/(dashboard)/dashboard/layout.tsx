@@ -11,7 +11,6 @@ import { AppSidebar } from '@/components/dashboard/AppSidebar';
 import { HeaderDashboard } from '@/components/dashboard/HeaderDashboard';
 import { roleNavItems } from '@/config/nav';
 
-
 export default async function DashboardLayout({
   children,
 }: {
@@ -61,7 +60,7 @@ export default async function DashboardLayout({
   const navItems = roleNavItems[role] || roleNavItems.student;
   const userName = user?.name || 'User';
   const userEmail = user?.email || 'user@example.com';
-  
+
   // Get avatar from session
   const userAvatar = session.userAvatar || undefined;
 
@@ -72,14 +71,14 @@ export default async function DashboardLayout({
   return (
     <ThemeProvider defaultTheme="dark" storageKey="manzil-theme">
       <SidebarProvider defaultOpen={defaultOpen}>
-        <AppSidebar 
+        <AppSidebar
           navItems={navItems}
           userName={userName}
           userEmail={userEmail}
           userAvatar={userAvatar}
         />
         <SidebarInset>
-          <HeaderDashboard 
+          <HeaderDashboard
             userName={userName}
             userEmail={userEmail}
             userAvatar={userAvatar}

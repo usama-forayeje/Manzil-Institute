@@ -53,18 +53,9 @@ import {
 import ErrorBoundary from '../../../components/ErrorBoundary';
 import LoadingSkeleton from '../../../components/LoadingSkeleton';
 import FooterSection from '../../../components/footer';
-import HeroHeader from '@/components/header';
+import { ClientHeader } from '@/components/header';
 
-// Verification log for import paths
-console.log('MNC Admission Page - Import verification:', {
-  cn: typeof cn,
-  AnimatedGroup: typeof AnimatedGroup,
-  useAdmissionData: typeof useAdmissionData,
-  ErrorBoundary: typeof ErrorBoundary,
-  LoadingSkeleton: typeof LoadingSkeleton,
-  FooterSection: typeof FooterSection,
-  HeroHeader: typeof HeroHeader,
-});
+// Component imports verified
 
 const transitionVariants = {
   item: {
@@ -741,7 +732,7 @@ export default function MNCAdmissionPage() {
     return (
       <ErrorBoundary>
         <div>
-          <HeroHeader />
+          <ClientHeader />
           <main className="min-h-screen bg-gray-50 dark:bg-gray-900 mx-auto max-w-7xl px-4 sm:px-6 pt-24 pb-12">
             <LoadingSkeleton />
           </main>
@@ -756,7 +747,7 @@ export default function MNCAdmissionPage() {
     return (
       <ErrorBoundary>
         <div>
-          <HeroHeader />
+          <ClientHeader />
           <main className="min-h-screen bg-gray-50 dark:bg-gray-900 mx-auto max-w-7xl px-4 sm:px-6 pt-24 pb-12">
             <div className="text-center py-12">
               <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
@@ -805,7 +796,7 @@ export default function MNCAdmissionPage() {
         <script type="application/ld+json">
           {JSON.stringify(breadcrumbSchema)}
         </script>
-        <HeroHeader />
+        <ClientHeader />
 
         <main
           className="min-h-screen  mx-auto max-w-7xl px-4 sm:px-6 pt-24 pb-12"

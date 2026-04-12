@@ -20,6 +20,7 @@ export const COLLECTIONS = {
   USERS:                process.env.NEXT_PUBLIC_COL_USERS                ?? "",
   STUDENTS:             process.env.NEXT_PUBLIC_COL_STUDENTS             ?? "",
   STAFF:                process.env.NEXT_PUBLIC_COL_STAFF                ?? "",
+  STAFF_APPLICATIONS:   process.env.NEXT_PUBLIC_COL_STAFF_APPLICATIONS   ?? "",
   FEE_STRUCTURES:       process.env.NEXT_PUBLIC_COL_FEE_STRUCTURES       ?? "",
   FEE_TRANSACTIONS:     process.env.NEXT_PUBLIC_COL_FEE_TRANSACTIONS     ?? "",
   EXPENSE_CATEGORIES:   process.env.NEXT_PUBLIC_COL_EXPENSE_CATEGORIES   ?? "",
@@ -50,6 +51,8 @@ export const COLLECTIONS = {
   SETTINGS:             process.env.NEXT_PUBLIC_COL_SETTINGS             ?? "",
   POLICIES:             process.env.NEXT_PUBLIC_COL_POLICIES             ?? "",
   POLICY_ACKNOWLEDGEMENTS: process.env.NEXT_PUBLIC_COL_POLICY_ACKNOWLEDGEMENTS ?? "",
+  DESIGNATIONS:           process.env.NEXT_PUBLIC_COL_DESIGNATIONS           ?? "",
+  TERMS_CONDITIONS:      process.env.NEXT_PUBLIC_COL_TERMS_CONDITIONS      ?? "",
 } as const;
 
 // Shorthand aliases (বেশি ব্যবহৃত collections)

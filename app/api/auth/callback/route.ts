@@ -131,8 +131,18 @@ export async function GET(request: NextRequest) {
     // 8. Redirect based on role
     const redirectPath = ROLE_DASHBOARD[role as UserRole] ?? '/dashboard/student';
     return NextResponse.redirect(new URL(redirectPath, request.url));
-  } catch (error) {
-    console.error('Auth callback error:', error);
+  } catch (error: any) {
+    // Handle specific OAuth errors
+    if (error.message?.includes('invalid_grant') || error.code === 400) {
+      return NextResponse.redirect(new URL('/login?error=invalid_grant&retry=true', request.url));
+    }
+
+    // Handle other authentication errors
+    if (error.message?.includes('unauthorized') || error.code === 401) {
+      return NextResponse.redirect(new URL('/login?error=auth_failed', request.url));
+    }
+
+    // Generic fallback
     return NextResponse.redirect(new URL('/login?error=callback_failed', request.url));
   }
 }

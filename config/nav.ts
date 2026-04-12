@@ -22,7 +22,8 @@ export type NavIcon =
   | "nfc"        | "library"    | "salary"      | "leave"
   | "exam"       | "timetable"  | "messages"    | "profile"
   | "child"      | "tools"      | "audit"       | "policies"
-  | "health"     | "receipt"    | "accounts";
+  | "health"     | "receipt"    | "accounts"    | "terms"
+  | "designations";
 
 // ─── SUPER ADMIN ───────────────────────────────────────────
 // সম্পূর্ণ system এর access — কোনো restriction নেই
@@ -480,6 +481,18 @@ const superAdminNav: NavItem[] = [
         href: "/dashboard/admin/settings/backup",
         icon: "tools",
       },
+      {
+        title: "Designations",
+        titleBn: "পদবী / পদমর্যাদা",
+        href: "/dashboard/admin/settings/designations",
+        icon: "designations",
+      },
+      {
+        title: "Terms & Conditions",
+        titleBn: "নিয়ম ও শর্তাবলী",
+        href: "/dashboard/admin/settings/terms",
+        icon: "terms",
+      },
     ],
   },
 ];
@@ -897,6 +910,8 @@ export const iconMap: Record<NavIcon, string> = {
   health:     "Activity",
   receipt:    "FileCheck",
   accounts:   "BookMarked",
+  terms:      "ScrollText",
+  designations: "Briefcase",
 };
 
 // ─── Role metadata ─────────────────────────────────────────

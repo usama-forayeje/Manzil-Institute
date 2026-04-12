@@ -1,7 +1,7 @@
 'use client';
 
 import React, { Suspense, useEffect } from 'react';
-import HeroHeader from '@/components/header';
+import { ClientHeader } from '@/components/header';
 import FooterSection from '@/components/footer';
 import LoadingSkeleton from '@/components/LoadingSkeleton';
 import { AlertCircle } from 'lucide-react';
@@ -231,7 +231,7 @@ export default function MICCurriculumClientPage(): JSX.Element {
     return (
       <div>
         <Suspense fallback={<div>Loading...</div>}>
-          <HeroHeader />
+          <ClientHeader />
         </Suspense>
         <main className="min-h-screen bg-gray-50 dark:bg-gray-900 mx-auto max-w-7xl px-4 sm:px-6 pt-12 pb-18">
           <LoadingSkeleton />
@@ -248,7 +248,7 @@ export default function MICCurriculumClientPage(): JSX.Element {
     return (
       <div>
         <Suspense fallback={<div>Loading...</div>}>
-          <HeroHeader />
+          <ClientHeader />
         </Suspense>
         <main className="min-h-screen bg-gray-50 dark:bg-gray-900 mx-auto max-w-7xl px-4 sm:px-6 pt-12 pb-18">
           <div className="text-center py-12">
@@ -284,7 +284,7 @@ export default function MICCurriculumClientPage(): JSX.Element {
     return (
       <div>
         <Suspense fallback={<div>Loading...</div>}>
-          <HeroHeader />
+          <ClientHeader />
         </Suspense>
         <main className="min-h-screen bg-gray-50 dark:bg-gray-900 mx-auto max-w-7xl px-4 sm:px-6 pt-12 pb-18">
           <LoadingSkeleton />
@@ -322,7 +322,7 @@ export default function MICCurriculumClientPage(): JSX.Element {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
       <Suspense fallback={<div>Loading...</div>}>
-        <HeroHeader />
+        <ClientHeader />
       </Suspense>
 
       <main

@@ -50,7 +50,7 @@ import {
   MOBILE_BANKING_PROVIDERS,
 } from "@/validations/staff";
 import { useStaffFormStore, useStep6Data, useStep3Data } from "@/store/staffFormStore";
-import { getTermsByDesignation as getTermsFromDB } from "@/lib/actions/terms";
+import { getAllTerms } from "@/lib/actions/terms";
 import { DESIGNATIONS_REQUIRING_TERMS } from "@/config/terms";
 import { HelpTooltip } from "@/components/ui/HelpTooltip";
 import { useState } from "react";
@@ -159,16 +159,24 @@ export default function Step6PaymentAgreement({ onPrev, onSubmit, isLoading, des
   const designation = propDesignation || step3Data?.designation || "";
   const [isTermsExpanded, setIsTermsExpanded] = useState(false);
   const [currentTerms, setCurrentTerms] = useState<any>(null);
+  const [allTermsCache, setAllTermsCache] = useState<Record<string, any>>({});
   const currentDesignation = designation || "";
 
-  // Load terms from DB when designation changes
+  // Load all terms once when component mounts
   useEffect(() => {
-    if (designation) {
-      getTermsFromDB(designation).then((terms: any) => {
-        setCurrentTerms(terms);
-      });
+    getAllTerms().then((termsCache) => {
+      setAllTermsCache(termsCache);
+    });
+  }, []);
+
+  // Update current terms when designation changes (from cache)
+  useEffect(() => {
+    if (designation && allTermsCache[designation]) {
+      setCurrentTerms(allTermsCache[designation]);
+    } else {
+      setCurrentTerms(null);
     }
-  }, [designation]);
+  }, [designation, allTermsCache]);
 
   const showTermsSection = currentTerms && DESIGNATIONS_REQUIRING_TERMS.includes(currentDesignation.toLowerCase());
   const hideTerms = currentDesignation.toLowerCase() === "adviser" || currentDesignation.toLowerCase() === "unpaid_teacher";

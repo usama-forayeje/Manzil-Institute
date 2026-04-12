@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollText, Plus, Edit, Save, X, Trash2, ChevronDown, ChevronRight, RefreshCw, Search } from "lucide-react";
-import { getTermsByDesignation, getDesignations, saveTerms } from "@/lib/actions/terms";
+import { getTermsByDesignation, getDesignations, saveTerms, getAllTerms } from "@/lib/actions/terms";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import {
@@ -64,23 +64,15 @@ export default function TermsManagementPage() {
   const loadAllData = async () => {
     setLoading(true);
     try {
-      // Load designations
-      const desData = await getDesignations();
+      // Load designations and all terms in parallel for maximum performance
+      const [desData, allTerms] = await Promise.all([
+        getDesignations(),
+        getAllTerms()
+      ]);
+
       setDesignations(desData as Designation[]);
-      
-      // Load terms for each designation
-      const terms: Record<string, any> = {};
-      for (const des of desData as Designation[]) {
-        const desId = getDesId(des);
-        if (desId) {
-          const termsResult = await getTermsByDesignation(desId);
-          if (termsResult) {
-            terms[desId] = termsResult;
-          }
-        }
-      }
-      setTermsData(terms);
-      
+      setTermsData(allTerms);
+
       // Expand first designation by default
       if (desData.length > 0) {
         setExpandedSections({ [getDesId(desData[0])]: true });

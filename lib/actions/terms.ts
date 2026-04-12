@@ -75,26 +75,26 @@ export async function getTermsByDesignation(designationId: string): Promise<Role
     }
 
     const { databases } = await createAdminClient();
-    
+
     // First, find the designation document to get its $id
     let designationDocId = designationId;
-    
+
     const designationsResponse = await databases.listDocuments(
       DATABASE_ID,
       COLLECTIONS.DESIGNATIONS,
       [Query.limit(100)]
     );
-    
-    const matchingDesignation = designationsResponse.documents.find((doc: any) => 
+
+    const matchingDesignation = designationsResponse.documents.find((doc: any) =>
       (doc.designation_id || "").toLowerCase() === designationId.toLowerCase() ||
       (doc.label_en || "").toLowerCase() === designationId.toLowerCase() ||
       doc.$id === designationId
     );
-    
+
     if (matchingDesignation) {
       designationDocId = matchingDesignation.$id;
     }
-    
+
     const response = await databases.listDocuments(
       DATABASE_ID,
       COLLECTIONS.TERMS_CONDITIONS,
@@ -106,7 +106,7 @@ export async function getTermsByDesignation(designationId: string): Promise<Role
 
     if (response.documents.length > 0) {
       const doc = response.documents[0];
-      
+
       let sections = doc.sections;
       if (typeof sections === "string") {
         try {
@@ -115,7 +115,7 @@ export async function getTermsByDesignation(designationId: string): Promise<Role
           sections = [];
         }
       }
-      
+
       return {
         title: doc.title,
         sections: sections as RoleTerms["sections"],
@@ -125,6 +125,79 @@ export async function getTermsByDesignation(designationId: string): Promise<Role
     return getConfigTerms(designationId);
   } catch (error) {
     return getConfigTerms(designationId);
+  }
+}
+
+/**
+ * Get all terms for all designations in a single batch query
+ * Much faster than calling getTermsByDesignation for each designation
+ */
+export async function getAllTerms(): Promise<Record<string, RoleTerms>> {
+  try {
+    if (!COLLECTIONS.TERMS_CONDITIONS) {
+      // Fallback to config - get all designations and their terms
+      const designations = await getDesignations();
+      const allTerms: Record<string, RoleTerms> = {};
+
+      for (const des of designations) {
+        const desId = des.$id || des.designation_id || "";
+        if (desId) {
+          const terms = getConfigTerms(desId);
+          if (terms) {
+            allTerms[desId] = terms;
+          }
+        }
+      }
+      return allTerms;
+    }
+
+    const { databases } = await createAdminClient();
+
+    // Get all terms in a single query
+    const response = await databases.listDocuments(
+      DATABASE_ID,
+      COLLECTIONS.TERMS_CONDITIONS,
+      [Query.limit(100)] // Assuming max 100 designations
+    );
+
+    const allTerms: Record<string, RoleTerms> = {};
+
+    for (const doc of response.documents) {
+      const designationId = doc.designation_id;
+      if (designationId) {
+        let sections = doc.sections;
+        if (typeof sections === "string") {
+          try {
+            sections = JSON.parse(sections);
+          } catch (e) {
+            sections = [];
+          }
+        }
+
+        allTerms[designationId] = {
+          title: doc.title,
+          sections: sections as RoleTerms["sections"],
+        };
+      }
+    }
+
+    return allTerms;
+  } catch (error) {
+    console.error("Error fetching all terms:", error);
+    // Fallback to config
+    const designations = await getDesignations();
+    const allTerms: Record<string, RoleTerms> = {};
+
+    for (const des of designations) {
+      const desId = des.$id || des.designation_id || "";
+      if (desId) {
+        const terms = getConfigTerms(desId);
+        if (terms) {
+          allTerms[desId] = terms;
+        }
+      }
+    }
+    return allTerms;
   }
 }
 

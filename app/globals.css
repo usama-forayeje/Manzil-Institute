@@ -76,6 +76,24 @@
   animation: reveal 0.4s ease-in-out forwards;
 }
 
+/* SolaimanLipi font for Bengali text */
+@font-face {
+  font-family: 'SolaimanLipi';
+  src: url('/fonts/SolaimanLipi.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* SolaimanLipi font for Bengali text */
+@font-face {
+  font-family: 'SolaimanLipi';
+  src: url('/fonts/SolaimanLipi.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* Kalpurush font for Bengali text */
 @font-face {
   font-family: 'Kalpurush';
@@ -89,6 +107,15 @@
 
 /* Ensure Kalpurush loads properly */
 .kalpurush-font {
+  font-family:
+    'Kalpurush', 'Hind Siliguri', 'Noto Serif Bengali', sans-serif !important;
+}
+
+/* Kalpurush font must also apply to native form controls (select, option, input)
+   since browsers don't always inherit font-family for these elements */
+.kalpurush-font select,
+.kalpurush-font option,
+.kalpurush-font input {
   font-family:
     'Kalpurush', 'Hind Siliguri', 'Noto Serif Bengali', sans-serif !important;
 }
@@ -195,6 +222,7 @@ h6 {
 /* Bengali text class for proper font rendering */
 .bengali-text {
   font-family:
+    'SolaimanLipi',
     'Kalpurush',
     'Noto Serif Bengali',
     'Hind Siliguri',
@@ -501,7 +529,6 @@ header nav * {
 }
 
 header nav .flex {
-  display: flex !important;
   flex-direction: row !important;
 }
 

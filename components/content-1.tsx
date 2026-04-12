@@ -43,7 +43,6 @@ const transitionVariants = {
         bounce: 0.3,
         duration: 1.5,
       },
-
     },
   },
 };
@@ -69,7 +68,6 @@ export default function ContentSection() {
       en: 'We believe transforming a nation requires education that builds ethical and responsible human beings, not just jobholders. Manzil Institute serves as this moral school for our future generation.',
     },
     chairman: {
-      
       bn: 'বিজ্ঞ ওলামায়ে কেরাম ও তরুণ আলেমদের দীর্ঘ গবেষণার ফলে দেশে প্রথম এমন এক ব্যতিক্রমধর্মী মাদরাসা চালু হয়েছে, যেখানে ধর্মীয়, সাধারণ ও কারিগরি শিক্ষার আধুনিক ও বিজ্ঞানসম্মত সমন্বয় ঘটানো হয়েছে।',
       en: "Through extensive research by scholars, we launched the country's first exceptional madrasa that scientifically integrates Religious, General, and Technical education.",
     },
@@ -164,11 +162,6 @@ export default function ContentSection() {
       src: '/computer-class.webp',
       alt: 'Computer Class',
       fallback: '/computer-class.jpg',
-    },
-    {
-      src: '/childclass.webp',
-      alt: 'Classroom',
-      fallback: '/manzil institutte logo.jpg',
     },
     {
       src: '/carigory-class.webp',

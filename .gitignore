@@ -40,3 +40,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 firebase-debug.log
+app/(dashboard)/dashboard/layout.tsx.backup
+.gitignore
+components/staff/staff-schema.md
+.kilo/plans/1775386389389-lucky-river.md

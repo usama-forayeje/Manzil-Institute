@@ -20,6 +20,8 @@ export const COLLECTIONS = {
   USERS:                process.env.NEXT_PUBLIC_COL_USERS                ?? "",
   STUDENTS:             process.env.NEXT_PUBLIC_COL_STUDENTS             ?? "",
   STAFF:                process.env.NEXT_PUBLIC_COL_STAFF                ?? "",
+  STAFF_APPLICATIONS:   process.env.NEXT_PUBLIC_COL_STAFF_APPLICATIONS   ?? "",
+  STAFF_APPLICATIONS:   process.env.NEXT_PUBLIC_COL_STAFF_APPLICATIONS   ?? "",
   FEE_STRUCTURES:       process.env.NEXT_PUBLIC_COL_FEE_STRUCTURES       ?? "",
   FEE_TRANSACTIONS:     process.env.NEXT_PUBLIC_COL_FEE_TRANSACTIONS     ?? "",
   EXPENSE_CATEGORIES:   process.env.NEXT_PUBLIC_COL_EXPENSE_CATEGORIES   ?? "",

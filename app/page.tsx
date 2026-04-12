@@ -1,10 +1,9 @@
-import { lazy, Suspense } from 'react';
 import { Metadata } from 'next';
 import { Skeleton } from '@/components/ui/skeleton';
 import { LazyImage } from '@/components/ui/lazy-image';
 import FloatingActionButtons from '@/components/FloatingActionButtons';
-
-const HeroHeader = lazy(() => import('@/components/header.tsx'));
+import HeroHeader from '@/components/header';
+import { lazy, Suspense } from 'react';
 const HeroSection = lazy(() => import('@/components/hero-section.tsx'));
 const ContentSection = lazy(() => import('@/components/content-1.tsx'));
 const CurriculumSection = lazy(

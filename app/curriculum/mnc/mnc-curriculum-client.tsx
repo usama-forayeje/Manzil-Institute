@@ -21,7 +21,7 @@ import {
 import { useMNCCurriculumData } from '@/hooks/useData';
 import { useLanguageStore } from '@/lib/store';
 import { AnimatedGroup } from '@/components/ui/animated-group';
-import SubjectModal from '@/components/ui/subject-modal';
+
 import { MNCCurriculumData, Language } from '@/types/api';
 
 // Stage icons mapping
@@ -622,13 +622,13 @@ export default function MNCCurriculumClientPage() {
         </AnimatedGroup>
       </main>
 
-      {/* Subject Modal */}
-      {selectedSubject && (
+      {/* Subject Modal - Temporarily removed */}
+      {/* {selectedSubject && (
         <SubjectModal
           subject={selectedSubject}
           onClose={() => setSelectedSubject(null)}
         />
-      )}
+      )} */}
     </div>
   );
 }

@@ -51,7 +51,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // 2. Public routes (no session required)
-  const publicPaths = ['/', '/api/auth/callback'];
+  const publicPaths = ['/', '/api/auth/callback', "/apply/staff",];
   if (publicPaths.includes(pathname)) {
     return NextResponse.next();
   }

@@ -3,8 +3,8 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useLanguageStore } from '@/lib/store';
 import { cn } from '@/lib/utils';
+import { getDashboardUrl } from '@/lib/dashboard';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -29,10 +29,19 @@ interface CourseItem {
   };
 }
 
+interface User {
+  name: string;
+  email: string;
+  avatar?: string;
+  role: string;
+}
+
 interface DesktopMenuProps {
   admissionOpen: boolean;
   setAdmissionOpen: (open: boolean) => void;
   language: string;
+  user: User | null;
+  isLoadingAuth: boolean;
 }
 
 const menuItems: MenuItem[] = [
@@ -58,14 +67,6 @@ const menuItems: MenuItem[] = [
     label: {
       en: 'Curriculum',
       bn: 'কারিকুলাম',
-    },
-  },
-  {
-    key: 'admission',
-    href: '/admission',
-    label: {
-      en: 'Admission',
-      bn: 'ভর্তি',
     },
   },
   {
@@ -95,11 +96,11 @@ const courseItems: CourseItem[] = [
   },
 ];
 
-export default function DesktopMenu({ admissionOpen, setAdmissionOpen, language }: DesktopMenuProps) {
+export default function DesktopMenu({ admissionOpen, setAdmissionOpen, language, user, isLoadingAuth }: DesktopMenuProps) {
   const pathname = usePathname();
 
   return (
-    <div className="hidden lg:flex justify-center flex-grow">
+    <div className="hidden md:flex justify-center grow">
       <div className="flex items-center space-x-8">
         {menuItems.map((item: MenuItem) => {
           const href =
@@ -170,6 +171,19 @@ export default function DesktopMenu({ admissionOpen, setAdmissionOpen, language 
             );
           }
         })}
+
+        {/* Dashboard navigation for authenticated users */}
+        {!isLoadingAuth && user && user.role && user.role !== 'student' && (
+          <Link
+            href={getDashboardUrl(user.role)}
+            className={cn(
+              'text-gray-700 dark:text-gray-300 hover:text-[#00AEEF]/80 text-sm font-semibold transition-colors duration-150 whitespace-nowrap flex items-center',
+              language === 'bn' && 'bengali-text'
+            )}
+          >
+            {language === 'en' ? 'Dashboard' : 'ড্যাশবোর্ড'}
+          </Link>
+        )}
       </div>
     </div>
   );

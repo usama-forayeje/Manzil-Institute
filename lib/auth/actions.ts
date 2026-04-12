@@ -1,14 +1,17 @@
 'use server';
 
 import { createAdminClient } from '@/lib/appwrite/admin';
-import { createSessionClient } from '@/lib/appwrite/server';
+import { createSessionClient, NoSessionError } from '@/lib/appwrite/server';
 import { OAuthProvider } from 'node-appwrite';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { DATABASE_ID, USERS_COLLECTION_ID } from '@/config/appwrite';
-import { ID, Query } from 'node-appwrite';
+import { Query } from 'node-appwrite';
 
-// Step 1: Login button এ click করলে এটা call হয়
+/**
+ * Initiates Google OAuth2 sign-in flow.
+ * Redirects the user to Google's consent screen.
+ */
 export async function signInWithGoogle() {
   const { account } = await createAdminClient();
 
@@ -21,91 +24,121 @@ export async function signInWithGoogle() {
   redirect(redirectUrl);
 }
 
-// Step 3: Callback এ session বানাই
+/**
+ * Creates a user session from OAuth callback credentials.
+ * Sets the session cookie for subsequent requests.
+ */
 export async function createSessionFromToken(userId: string, secret: string) {
-  const { account } = await createAdminClient();
-  const session = await account.createSession(userId, secret);
+  try {
+    const { account } = await createAdminClient();
+    const session = await account.createSession(userId, secret);
 
-  const cookieStore = await cookies();
-  const isProduction = process.env.NODE_ENV === 'production';
-  const isSecure = isProduction;
+    const cookieStore = await cookies();
+    const isProduction = process.env.NODE_ENV === 'production';
 
-  cookieStore.set('appwrite-session', session.secret, {
-    httpOnly: true,
-    secure: isSecure,
-    sameSite: 'lax',
-    path: '/',
-  });
+    cookieStore.set('appwrite-session', session.secret, {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: 'lax',
+      path: '/',
+    });
 
-  return session;
+    return session;
+  } catch (error: any) {
+    // Re-throw with more context
+    throw new Error(`Session creation failed: ${error.message}`);
+  }
 }
 
+/**
+ * Deletes the current user session and clears the session cookie.
+ */
 export async function signOut() {
   try {
     const { account } = await createSessionClient();
     await account.deleteSession('current');
-  } catch {}
+  } catch {
+    // Session may already be invalid, continue to clear cookie
+  }
 
   const cookieStore = await cookies();
   cookieStore.delete('appwrite-session');
-  redirect('/');
 }
 
+/**
+ * Retrieves the current authenticated user's session and associated user document.
+ * Returns null if no session exists or if the session is invalid.
+ */
 export async function getSession() {
   try {
     const { account, databases } = await createSessionClient();
     const authUser = await account.get();
 
-    let userDoc = null;
-    let userAvatar = undefined;
-    
-    // Try to get document directly by auth user ID
-    try {
-      userDoc = await databases.getDocument(
-        DATABASE_ID,
-        USERS_COLLECTION_ID,
-        authUser.$id
-      );
-    } catch {
-      // Try query by email
-      if (authUser.email) {
-        let result = await databases.listDocuments(
-          DATABASE_ID,
-          USERS_COLLECTION_ID,
-          [Query.equal('email', authUser.email)]
-        );
-        if (result.documents?.length) {
-          userDoc = result.documents[0];
-        }
-      }
-      
-      // Try query by name if still not found
-      if (!userDoc && authUser.name) {
-        let result = await databases.listDocuments(
-          DATABASE_ID,
-          USERS_COLLECTION_ID,
-          [Query.equal('name', authUser.name)]
-        );
-        if (result.documents?.length) {
-          userDoc = result.documents[0];
-        }
-      }
-    }
+    const userDoc = await getUserDocument(databases, authUser);
 
-    userAvatar = userDoc?.avatarUrl;
-    
     return {
       user: authUser,
       role: userDoc?.role ?? 'student',
       userDoc,
-      userAvatar,
+      userAvatar: userDoc?.avatarUrl,
     };
   } catch (e) {
+    // NoSessionError is expected for unauthenticated users - return null silently
+    if (e instanceof NoSessionError) {
+      return null;
+    }
+    // Log unexpected errors for debugging
     console.error('Session Error:', e);
     return null;
   }
 }
 
+/**
+ * Fetches the user document from Appwrite using multiple fallback strategies.
+ */
+async function getUserDocument(databases: any, authUser: any) {
+  // Strategy 1: Direct document lookup by auth user ID
+  try {
+    return await databases.getDocument(
+      DATABASE_ID,
+      USERS_COLLECTION_ID,
+      authUser.$id
+    );
+  } catch {
+    // Continue to fallback strategies
+  }
+
+  // Strategy 2: Query by email
+  if (authUser.email) {
+    const result = await databases.listDocuments(
+      DATABASE_ID,
+      USERS_COLLECTION_ID,
+      [Query.equal('email', authUser.email)]
+    );
+    if (result.documents?.length) {
+      return result.documents[0];
+    }
+  }
+
+  // Strategy 3: Query by name
+  if (authUser.name) {
+    const result = await databases.listDocuments(
+      DATABASE_ID,
+      USERS_COLLECTION_ID,
+      [Query.equal('name', authUser.name)]
+    );
+    if (result.documents?.length) {
+      return result.documents[0];
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Refreshes the user role cookie with the latest value from the database.
+ * Useful after role changes to avoid stale client-side state.
+ */
 export async function refreshUserRoleCookie(userId: string) {
   const { databases } = await createAdminClient();
   const userDoc = await databases.getDocument(
@@ -113,6 +146,7 @@ export async function refreshUserRoleCookie(userId: string) {
     USERS_COLLECTION_ID,
     userId
   );
+
   const cookieStore = await cookies();
   cookieStore.set('appwrite-user-role', userDoc.role, {
     httpOnly: true,

@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
 import { AnimatedGroup } from '@/components/ui/animated-group';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import FooterSection from '@/components/footer';
-import HeroHeader from '@/components/header';
+import { ClientHeader } from '@/components/header';
 
 const transitionVariants = {
   item: {
@@ -80,7 +80,7 @@ export default function AdmissionFormPage() {
         <script type="application/ld+json">
           {JSON.stringify(breadcrumbSchema)}
         </script>
-        <HeroHeader />
+        <ClientHeader />
 
         <main
           className="min-h-screen bg-gray-50 dark:bg-gray-900 mx-auto max-w-4xl px-4 sm:px-6 pt-24 pb-12"

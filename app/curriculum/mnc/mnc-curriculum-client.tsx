@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import HeroHeader from '@/components/header';
+import { ClientHeader } from '@/components/header';
 import LoadingSkeleton from '@/components/LoadingSkeleton';
 import { Suspense } from 'react';
 import {
@@ -21,7 +21,7 @@ import {
 import { useMNCCurriculumData } from '@/hooks/useData';
 import { useLanguageStore } from '@/lib/store';
 import { AnimatedGroup } from '@/components/ui/animated-group';
-import SubjectModal from '@/components/ui/subject-modal';
+
 import { MNCCurriculumData, Language } from '@/types/api';
 
 // Stage icons mapping
@@ -256,7 +256,7 @@ export default function MNCCurriculumClientPage() {
     return (
       <div>
         <Suspense fallback={<div>Loading...</div>}>
-          <HeroHeader />
+          <ClientHeader />
         </Suspense>
         <main className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 dark:from-gray-900 dark:to-gray-800 mx-auto max-w-7xl px-4 sm:px-6 pt-24 pb-18">
           <LoadingSkeleton />
@@ -270,7 +270,7 @@ export default function MNCCurriculumClientPage() {
     return (
       <div>
         <Suspense fallback={<div>Loading...</div>}>
-          <HeroHeader />
+          <ClientHeader />
         </Suspense>
         <main className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 dark:from-gray-900 dark:to-gray-800 mx-auto max-w-7xl px-4 sm:px-6 pt-24 pb-18">
           <div className="text-center py-12">
@@ -298,7 +298,7 @@ export default function MNCCurriculumClientPage() {
     return (
       <div>
         <Suspense fallback={<div>Loading...</div>}>
-          <HeroHeader />
+          <ClientHeader />
         </Suspense>
         <main className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 dark:from-gray-900 dark:to-gray-800 mx-auto max-w-7xl px-4 sm:px-6 pt-24 pb-18">
           <LoadingSkeleton />
@@ -310,7 +310,7 @@ export default function MNCCurriculumClientPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       <Suspense fallback={<div>Loading...</div>}>
-        <HeroHeader />
+        <ClientHeader />
       </Suspense>
 
       <main className="mx-auto max-w-7xl px-4 sm:px-6 pt-24 pb-18">
@@ -622,13 +622,13 @@ export default function MNCCurriculumClientPage() {
         </AnimatedGroup>
       </main>
 
-      {/* Subject Modal */}
-      {selectedSubject && (
+      {/* Subject Modal - Temporarily removed */}
+      {/* {selectedSubject && (
         <SubjectModal
           subject={selectedSubject}
           onClose={() => setSelectedSubject(null)}
         />
-      )}
+      )} */}
     </div>
   );
 }

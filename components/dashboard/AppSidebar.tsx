@@ -94,6 +94,7 @@ export function AppSidebar({
   const handleLogout = async () => {
     try {
       await signOut();
+      window.location.href = '/login';
     } catch (error) {
       console.error('Logout failed:', error);
     }
@@ -106,7 +107,7 @@ export function AppSidebar({
           {/* Expanded */}
           <div className="flex items-center justify-center h-9 w-auto max-w-[140px] overflow-hidden group-data-[collapsible=icon]:hidden">
             <Image
-              src="/manzil-insitute-logo-dark.jpg"
+              src="/manzil-logo/manzil-institute-logo-dark.webp"
               alt="Manzil Institute"
               width={140}
               height={40}

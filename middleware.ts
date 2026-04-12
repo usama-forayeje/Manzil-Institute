@@ -2,11 +2,21 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { UserRole, ROLE_DASHBOARD } from './config/appwrite';
 
+// Next.js middleware function
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const session = request.cookies.get('appwrite-session');
 
-  // 1. Redirect logged‑in users away from /login based on their role
+  // Skip static files and API routes
+  if (
+    pathname.startsWith('/api') ||
+    pathname.startsWith('/_next') ||
+    pathname.includes('/favicon.ico')
+  ) {
+    return NextResponse.next();
+  }
+
+  // Redirect logged‑in users from /login
   if (pathname === '/login') {
     if (session?.value) {
       const role = request.cookies.get('appwrite-user-role')?.value;
@@ -18,7 +28,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // middleware.ts - dashboard রুটের জন্য রোল চেক
+  // Role-based dashboard access
   if (pathname.startsWith('/dashboard')) {
     if (!session?.value) {
       return NextResponse.redirect(new URL('/login', request.url));
@@ -33,16 +43,10 @@ export async function middleware(request: NextRequest) {
       '/dashboard/parent': ['super_admin', 'manager', 'parent'],
     };
 
-    // find which dashboard path the user is trying to access
     const matchedPath = Object.keys(allowedRolesForPath).find(path =>
       pathname.startsWith(path)
     );
-    if (
-      matchedPath &&
-      role &&
-      !allowedRolesForPath[matchedPath].includes(role)
-    ) {
-      // Redirect to their own dashboard
+    if (matchedPath && role && !allowedRolesForPath[matchedPath].includes(role)) {
       if (ROLE_DASHBOARD[role]) {
         return NextResponse.redirect(new URL(ROLE_DASHBOARD[role], request.url));
       }
@@ -50,29 +54,16 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // 2. Public routes (no session required)
-  const publicPaths = ['/', '/api/auth/callback'];
+  // Allow public routes
+  const publicPaths = ['/', '/api/auth/callback', '/apply/staff'];
   if (publicPaths.includes(pathname)) {
     return NextResponse.next();
   }
 
-  // 3. Protect dashboard routes
-  if (pathname.startsWith('/dashboard')) {
-    if (!session?.value) {
-      return NextResponse.redirect(new URL('/login', request.url));
-    }
-    // session exists – let the dashboard layout handle RBAC
-  }
-
-  // 4. All other routes are allowed
   return NextResponse.next();
 }
 
+// Config export for matcher
 export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
+  matcher: '/((?!api|_next/static|_next/image|favicon.ico).*)'
 };
-
-
-
-
-

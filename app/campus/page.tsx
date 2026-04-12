@@ -42,7 +42,7 @@ import { useLanguageStore } from '@/lib/store';
 import { cn } from '@/lib/utils';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import FooterSection from '@/components/footer';
-import HeroHeader from '@/components/header';
+import { ClientHeader } from '@/components/header';
 import { useTheme } from '@/components/themes/theme-provider';
 
 // Types
@@ -327,7 +327,7 @@ export default function CampusPage(): JSX.Element {
       <div
         className={`min-h-screen bg-white dark:bg-[#030712] text-black dark:text-white selection:bg-[#00AEEF] selection:text-white ${bgPattern}`}
       >
-        <HeroHeader />
+        <ClientHeader />
 
         <main className="relative pt-20">
           {/* ==================== 1. NEXT LEVEL HERO SECTION ==================== */}

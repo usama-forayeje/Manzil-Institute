@@ -39,3 +39,13 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+firebase-debug.log
+test.txt
+.kilo/plans/1775386389389-lucky-river.md
+.gitignore
+.gitignore
+docs/SETUP_TERMS_COLLECTIONS.md
+config/terms_data.json
+.kilocode/mcp.json
+nul
+dev.log

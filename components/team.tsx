@@ -435,7 +435,7 @@ const Team = () => {
           </Button>
         </div>
 
-        <Team1 />
+        {/* <Team1 /> */}
 
         {/* CTA buttons at bottom for mobile */}
         <div className="flex flex-col justify-center gap-3 px-6 mt-12 sm:hidden">

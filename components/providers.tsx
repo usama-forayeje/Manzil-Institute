@@ -2,7 +2,7 @@
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider } from '@/components/themes/theme-provider';
-import { useLanguageStore } from '@/lib/store';
+import { ActiveThemeProvider } from '@/components/themes/active-theme';
 
 interface ProvidersProps {
   children: React.ReactNode;
@@ -47,9 +47,11 @@ export function Providers({ children }: ProvidersProps) {
 
   return (
     <QueryClientProvider client={client}>
-      <ThemeProvider defaultTheme="dark" storageKey="manzil-theme">
-        {children}
-      </ThemeProvider>
+      <ActiveThemeProvider initialTheme="light">
+        <ThemeProvider defaultTheme="dark" storageKey="manzil-theme">
+          {children}
+        </ThemeProvider>
+      </ActiveThemeProvider>
     </QueryClientProvider>
   );
 }

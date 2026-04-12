@@ -41,7 +41,7 @@ import { useAdmissionData } from '../../../hooks/useData';
 import ErrorBoundary from '../../../components/ErrorBoundary';
 import LoadingSkeleton from '../../../components/LoadingSkeleton';
 import FooterSection from '../../../components/footer';
-import HeroHeader from '@/components/header';
+import { ClientHeader } from '@/components/header';
 
 // --- Constants (Data) ---
 const mealSchedule = {
@@ -219,7 +219,7 @@ export default function MICAdmissionPage() {
   return (
     <ErrorBoundary>
       <div className="min-h-screen bg-gray-50/50 dark:bg-gray-950">
-        <HeroHeader />
+        <ClientHeader />
 
         {/* --- Hero Section with Pattern --- */}
         <section className="relative pt-32 pb-12 px-4 overflow-hidden">

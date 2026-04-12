@@ -164,11 +164,6 @@ export default function ContentSection() {
       fallback: '/computer-class.jpg',
     },
     {
-      src: '/childclass.webp',
-      alt: 'Classroom',
-      fallback: '/manzil institutte logo.jpg',
-    },
-    {
       src: '/carigory-class.webp',
       alt: 'Category Class',
       fallback: '/manzil logo.jpg',

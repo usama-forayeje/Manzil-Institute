@@ -3,22 +3,42 @@
 import { createAdminClient } from "@/lib/appwrite/server";
 import { DATABASE_ID, COLLECTIONS } from "@/config/appwrite";
 import { ID, Query } from "appwrite";
-import { 
-  getTermsByDesignation as getConfigTerms, 
+import {
+  getTermsByDesignation as getConfigTerms,
   DESIGNATIONS_REQUIRING_TERMS,
-  type RoleTerms 
+  type RoleTerms
 } from "@/config/terms";
 import { DESIGNATION_LABELS } from "@/validations/staff";
 
+// Cache for server-side data to avoid repeated DB calls
+let designationsCache: any[] | null = null;
+let termsCache: Record<string, RoleTerms> | null = null;
+let cacheTimestamp = 0;
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+// Invalidate cache function
+export function invalidateTermsCache() {
+  designationsCache = null;
+  termsCache = null;
+  cacheTimestamp = 0;
+}
+
 /**
- * Get all active designations from database
+ * Get all active designations from database with caching
  * Falls back to config if DB is not available
  */
 export async function getDesignations() {
+  const now = Date.now();
+
+  // Return cached data if still fresh
+  if (designationsCache && (now - cacheTimestamp) < CACHE_DURATION) {
+    return designationsCache;
+  }
+
   try {
     if (!COLLECTIONS.DESIGNATIONS) {
       // Fallback to config
-      return Object.entries(DESIGNATION_LABELS).map(([id, label]) => ({
+      const fallbackData = Object.entries(DESIGNATION_LABELS).map(([id, label]) => ({
         designation_id: id,
         label_bn: label,
         label_en: id,
@@ -27,6 +47,11 @@ export async function getDesignations() {
         is_active: true,
         sort_order: 0,
       }));
+
+      // Cache fallback data too
+      designationsCache = fallbackData;
+      cacheTimestamp = now;
+      return fallbackData;
     }
 
     const { databases } = await createAdminClient();
@@ -39,7 +64,7 @@ export async function getDesignations() {
     );
 
     // Convert Appwrite Document objects to plain JS objects
-    return response.documents.map((doc: any) => ({
+    const data = response.documents.map((doc: any) => ({
       $id: doc.$id,
       designation_id: doc.designation_id,
       label_bn: doc.label_bn,
@@ -49,10 +74,16 @@ export async function getDesignations() {
       is_active: doc.is_active ?? true,
       sort_order: doc.sort_order ?? 100,
     }));
+
+    // Cache the data
+    designationsCache = data;
+    cacheTimestamp = now;
+
+    return data;
   } catch (error) {
     console.error("Error fetching designations:", error);
     // Fallback to config
-    return Object.entries(DESIGNATION_LABELS).map(([id, label]) => ({
+    const fallbackData = Object.entries(DESIGNATION_LABELS).map(([id, label]) => ({
       designation_id: id,
       label_bn: label,
       label_en: id,
@@ -61,6 +92,11 @@ export async function getDesignations() {
       is_active: true,
       sort_order: 0,
     }));
+
+    // Cache fallback data too
+    designationsCache = fallbackData;
+    cacheTimestamp = now;
+    return fallbackData;
   }
 }
 
@@ -129,10 +165,17 @@ export async function getTermsByDesignation(designationId: string): Promise<Role
 }
 
 /**
- * Get all terms for all designations in a single batch query
+ * Get all terms for all designations in a single batch query with caching
  * Much faster than calling getTermsByDesignation for each designation
  */
 export async function getAllTerms(): Promise<Record<string, RoleTerms>> {
+  const now = Date.now();
+
+  // Return cached data if still fresh
+  if (termsCache && (now - cacheTimestamp) < CACHE_DURATION) {
+    return termsCache;
+  }
+
   try {
     if (!COLLECTIONS.TERMS_CONDITIONS) {
       // Fallback to config - get all designations and their terms
@@ -148,6 +191,10 @@ export async function getAllTerms(): Promise<Record<string, RoleTerms>> {
           }
         }
       }
+
+      // Cache the data
+      termsCache = allTerms;
+      cacheTimestamp = now;
       return allTerms;
     }
 
@@ -181,6 +228,10 @@ export async function getAllTerms(): Promise<Record<string, RoleTerms>> {
       }
     }
 
+    // Cache the data
+    termsCache = allTerms;
+    cacheTimestamp = now;
+
     return allTerms;
   } catch (error) {
     console.error("Error fetching all terms:", error);
@@ -197,6 +248,10 @@ export async function getAllTerms(): Promise<Record<string, RoleTerms>> {
         }
       }
     }
+
+    // Cache fallback data too
+    termsCache = allTerms;
+    cacheTimestamp = now;
     return allTerms;
   }
 }
@@ -257,6 +312,9 @@ export async function updateTerms(
       );
     }
 
+    // Invalidate cache after successful update
+    invalidateTermsCache();
+
     return { success: true };
   } catch (error) {
     console.error("Error updating terms:", error);
@@ -299,6 +357,10 @@ export async function updateDesignation(
           label_en: labelEn,
         }
       );
+
+      // Invalidate cache after successful update
+      invalidateTermsCache();
+
       return { success: true };
     }
 
@@ -362,6 +424,9 @@ export async function createDesignation(
         sort_order: sortOrder,
       }
     );
+
+    // Invalidate cache after successful creation
+    invalidateTermsCache();
 
     return { success: true, saved: true, docId: result.$id };
   } catch (error) {
@@ -430,6 +495,10 @@ export async function saveTerms(
         existing.documents[0].$id,
         docData
       );
+
+      // Invalidate cache after successful update
+      invalidateTermsCache();
+
       return { success: true, saved: true, docId: existing.documents[0].$id };
     } else {
       // Create new
@@ -439,6 +508,10 @@ export async function saveTerms(
         ID.unique(),
         docData
       );
+
+      // Invalidate cache after successful creation
+      invalidateTermsCache();
+
       return { success: true, saved: true, docId: result.$id };
     }
   } catch (error) {

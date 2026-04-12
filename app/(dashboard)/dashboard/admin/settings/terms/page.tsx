@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollText, Plus, Edit, Save, X, Trash2, ChevronDown, ChevronRight, RefreshCw, Search } from "lucide-react";
-import { getTermsByDesignation, getDesignations, saveTerms, getAllTerms } from "@/lib/actions/terms";
+import { useDesignations, useAllTerms, useSaveTerms, useInvalidateTermsCache } from "@/lib/hooks/use-terms";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import {
@@ -38,12 +38,15 @@ interface Designation {
 }
 
 export default function TermsManagementPage() {
-  const [loading, setLoading] = useState(true);
-  const [designations, setDesignations] = useState<Designation[]>([]);
-  const [termsData, setTermsData] = useState<Record<string, any>>({});
+  // React Query hooks for automatic caching and real-time updates
+  const { data: designations = [], isLoading: designationsLoading } = useDesignations();
+  const { data: termsData = {}, isLoading: termsLoading } = useAllTerms();
+  const saveTermsMutation = useSaveTerms();
+  const invalidateCache = useInvalidateTermsCache();
+
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
   const [searchTerm, setSearchTerm] = useState("");
-  
+
   // Modal states
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingDesignation, setEditingDesignation] = useState<string | null>(null);
@@ -54,35 +57,20 @@ export default function TermsManagementPage() {
     isActive: true,
   });
 
-  useEffect(() => {
-    loadAllData();
-  }, []);
+  const loading = designationsLoading || termsLoading;
 
   // Helper to get designation ID
   const getDesId = (des: Designation): string => des.$id || des.designation_id || "";
 
-  const loadAllData = async () => {
-    setLoading(true);
-    try {
-      // Load designations and all terms in parallel for maximum performance
-      const [desData, allTerms] = await Promise.all([
-        getDesignations(),
-        getAllTerms()
-      ]);
-
-      setDesignations(desData as Designation[]);
-      setTermsData(allTerms);
-
-      // Expand first designation by default
-      if (desData.length > 0) {
-        setExpandedSections({ [getDesId(desData[0])]: true });
-      }
-    } catch (error) {
-      console.error("Error loading data:", error);
-    } finally {
-      setLoading(false);
+  // Set expanded section when designations load
+  useEffect(() => {
+    if (designations.length > 0 && !loading) {
+      setExpandedSections({ [getDesId(designations[0])]: true });
     }
-  };
+  }, [designations, loading]);
+
+  // React Query automatically handles data loading and caching
+  // No need for manual loadAllData function
 
   const toggleSection = (designationId: string) => {
     setExpandedSections(prev => ({
@@ -178,23 +166,19 @@ export default function TermsManagementPage() {
       toast.error("Title আবশ্যক!");
       return;
     }
-    
+
     try {
-      const result = await saveTerms(
-        formData.designationId,
-        formData.title,
-        formData.sections,
-        formData.isActive
-      );
-      
-      if (result.saved) {
-        toast.success(`Terms ডাটাবেসে সেভ হয়েছে! ✅`);
-      } else {
-        toast.success(`Terms সেভ করা হয়েছে! (DB সংযুক্ত নেই)`);
-      }
-      
+      await saveTermsMutation.mutateAsync({
+        designationId: formData.designationId,
+        title: formData.title,
+        sections: formData.sections,
+        isActive: formData.isActive,
+      });
+
+      toast.success(`Terms ডাটাবেসে সেভ হয়েছে! ✅`);
       setIsModalOpen(false);
-      loadAllData();
+
+      // React Query automatically invalidates and refetches data
     } catch (error) {
       console.error("Error saving terms:", error);
       toast.error("সমস্যা হয়েছে!");
@@ -231,7 +215,7 @@ export default function TermsManagementPage() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => loadAllData()}
+            onClick={invalidateCache}
             className="gap-2 kalpurush-font"
           >
             <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />

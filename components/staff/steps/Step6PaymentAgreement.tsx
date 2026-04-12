@@ -50,7 +50,7 @@ import {
   MOBILE_BANKING_PROVIDERS,
 } from "@/validations/staff";
 import { useStaffFormStore, useStep6Data, useStep3Data } from "@/store/staffFormStore";
-import { getAllTerms } from "@/lib/actions/terms";
+import { useAllTerms } from "@/lib/hooks/use-terms";
 import { DESIGNATIONS_REQUIRING_TERMS } from "@/config/terms";
 import { HelpTooltip } from "@/components/ui/HelpTooltip";
 import { useState } from "react";
@@ -158,25 +158,13 @@ export default function Step6PaymentAgreement({ onPrev, onSubmit, isLoading, des
   // Use prop designation or fall back to step3Data
   const designation = propDesignation || step3Data?.designation || "";
   const [isTermsExpanded, setIsTermsExpanded] = useState(false);
-  const [currentTerms, setCurrentTerms] = useState<any>(null);
-  const [allTermsCache, setAllTermsCache] = useState<Record<string, any>>({});
   const currentDesignation = designation || "";
 
-  // Load all terms once when component mounts
-  useEffect(() => {
-    getAllTerms().then((termsCache) => {
-      setAllTermsCache(termsCache);
-    });
-  }, []);
+  // React Query automatically handles caching and real-time updates
+  const { data: allTermsCache = {} } = useAllTerms();
 
-  // Update current terms when designation changes (from cache)
-  useEffect(() => {
-    if (designation && allTermsCache[designation]) {
-      setCurrentTerms(allTermsCache[designation]);
-    } else {
-      setCurrentTerms(null);
-    }
-  }, [designation, allTermsCache]);
+  // Get current terms from cache
+  const currentTerms = designation ? allTermsCache[designation] : null;
 
   const showTermsSection = currentTerms && DESIGNATIONS_REQUIRING_TERMS.includes(currentDesignation.toLowerCase());
   const hideTerms = currentDesignation.toLowerCase() === "adviser" || currentDesignation.toLowerCase() === "unpaid_teacher";

@@ -31,6 +31,10 @@ export default function Step2AddressID({ onNext, onPrev }: StepProps) {
 
   const [nidFrontUrl, setNidFrontUrl] = useState<string | null>((savedData as any).nidFrontBase64 ?? savedData.nidFrontCopyUrl ?? null);
   const [nidBackUrl, setNidBackUrl] = useState<string | null>((savedData as any).nidBackBase64 ?? savedData.nidBackCopyUrl ?? null);
+
+  console.log("Step2 NID URLs on load:");
+  console.log("- nidFrontUrl:", nidFrontUrl?.substring(0, 50) ?? "null");
+  console.log("- nidBackUrl:", nidBackUrl?.substring(0, 50) ?? "null");
   const [nidFrontFile, setNidFrontFile] = useState<File | null>(null);
   const [nidBackFile, setNidBackFile] = useState<File | null>(null);
 
@@ -68,6 +72,9 @@ export default function Step2AddressID({ onNext, onPrev }: StepProps) {
       permanentSameAsCurrent: savedData.permanentSameAsCurrent ?? false,
       permanentAddress: getInitialPermanentAddress(),
       nidNumber: savedData.nidNumber ?? "", dateOfBirth: savedData.dateOfBirth ?? "", bloodGroup: savedData.bloodGroup ?? "unknown",
+      // Initialize file fields to avoid Zod validation error
+      nidFrontCopyFile: savedData.nidFrontCopyFile ?? undefined,
+      nidBackCopyFile: savedData.nidBackCopyFile ?? undefined,
     },
   });
 
@@ -117,7 +124,11 @@ export default function Step2AddressID({ onNext, onPrev }: StepProps) {
   // Auto-save form data
   useEffect(() => {
     const subscription = form.watch((value, { name, type }) => {
-      setStep2Data(value as Partial<AddressIDData>);
+      setStep2Data({
+        ...(value as Partial<AddressIDData>),
+        nidFrontCopyFile: nidFrontFile,
+        nidBackCopyFile: nidBackFile,
+      } as any);
       if (type === 'change') {
         if (name === 'currentAddress.division') { form.setValue('currentAddress.district', ''); form.setValue('currentAddress.upazila', ''); form.setValue('currentAddress.thana', ''); }
         if (name === 'currentAddress.district') { form.setValue('currentAddress.upazila', ''); form.setValue('currentAddress.thana', ''); }
@@ -126,7 +137,7 @@ export default function Step2AddressID({ onNext, onPrev }: StepProps) {
       }
     });
     return () => subscription.unsubscribe();
-  }, [form, setStep2Data]);
+  }, [form, setStep2Data, nidFrontFile, nidBackFile]);
 
   // Cleanup ObjectURLs on unmount
   useEffect(() => {
@@ -136,7 +147,14 @@ export default function Step2AddressID({ onNext, onPrev }: StepProps) {
     };
   }, [nidFrontUrl, nidBackUrl]);
 
-  const fileToBase64 = useCallback((file: File): Promise<string> => new Promise((resolve, reject) => { const reader = new FileReader(); reader.readAsDataURL(file); reader.onload = () => resolve(reader.result as string); reader.onerror = reject; }), []);
+  const fileToBase64 = useCallback((file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = reject;
+    });
+  }, []);
 
   const handleFileChange = useCallback(async (e: React.ChangeEvent<HTMLInputElement>, side: 'front' | 'back') => {
     const file = e.target.files?.[0];
@@ -146,41 +164,105 @@ export default function Step2AddressID({ onNext, onPrev }: StepProps) {
       if (side === 'front' && nidFrontUrl?.startsWith('blob:')) URL.revokeObjectURL(nidFrontUrl);
       if (side === 'back' && nidBackUrl?.startsWith('blob:')) URL.revokeObjectURL(nidBackUrl);
 
-      const compressed = await compressImage(file, 0.6); // More aggressive compression to reduce payload
+      const compressed = await compressImage(file, 0.85); // 85% quality compression
       const blobUrl = URL.createObjectURL(compressed);
-      
-      // Immediately convert to base64 for preview only
-      const base64 = await fileToBase64(compressed);
 
+      // Update form state so Zod validation sees the file
       if (side === 'front') {
         setNidFrontFile(compressed);
-        setNidFrontUrl(base64); // Store base64 only for preview
+        setNidFrontUrl(blobUrl);
+        form.setValue('nidFrontCopyFile', compressed as any, { shouldValidate: true });
       } else {
         setNidBackFile(compressed);
-        setNidBackUrl(base64); // Store base64 only for preview
+        setNidBackUrl(blobUrl);
+        form.setValue('nidBackCopyFile', compressed as any, { shouldValidate: true });
       }
 
-      // Auto-save form data without base64 (to reduce payload)
-      setStep2Data(form.getValues() as any);
-    } catch (err) { console.error(err); toast.error("ফাইল প্রসেসিং এ সমস্যা হয়েছে"); }
-  }, [nidFrontUrl, nidBackUrl, form, setStep2Data]);
+      // Keep file refs in store so server can upload once
+      setStep2Data({
+        ...form.getValues(),
+        nidFrontCopyFile: side === 'front' ? compressed : nidFrontFile,
+        nidBackCopyFile: side === 'back' ? compressed : nidBackFile,
+      } as any);
+    } catch (err) { console.error(err); toast.error("কোন ❌ ফাইল প্রসেসিং এ সমস্যা হয়েছে"); }
+  }, [nidFrontUrl, nidBackUrl, form, setStep2Data, nidFrontFile, nidBackFile]);
 
   const onSubmit: SubmitHandler<AddressIDData> = async (data) => {
-    console.log('Step2 onSubmit called with data:', data);
+    try {
+      // Run form validation first
+      const isValid = await form.trigger();
+      console.log("Form validation result:", isValid);
+      if (!isValid) {
+        console.log("Form errors:", form.formState.errors);
+        markIncomplete(2);
+        const errors = form.formState.errors;
+        const firstError = Object.values(errors)[0];
+        if (firstError?.message) {
+          toast.error(`কোন ⚠️ ${firstError.message}`);
+        } else {
+          toast.error("কোন ⚠️ অনুগ্রহ করে সব তথ্য সঠিকভাবে পূরণ করুন");
+        }
+        return;
+      }
 
-    // For now, just proceed directly to test if the button works
-    console.log('Bypassing validation for testing - proceeding to next step');
+      // Check if NID images are uploaded (beyond schema validation)
+      // Note: After page reload, File objects become null but base64 URLs are preserved
+      console.log("NID Validation Check:");
+      console.log("- nidFrontUrl:", nidFrontUrl ? "present" : "null");
+      console.log("- nidFrontFile:", nidFrontFile ? "present" : "null");
+      console.log("- nidBackUrl:", nidBackUrl ? "present" : "null");
+      console.log("- nidBackFile:", nidBackFile ? "present" : "null");
 
-    // Save data with file references (not base64 to reduce payload)
-    setStep2Data({
-      ...data,
-      nidFrontCopyFile: nidFrontFile,
-      nidBackCopyFile: nidBackFile,
-      // Note: base64 data is stored only locally for preview
-    } as any);
+      if (!nidFrontUrl && !nidFrontFile) {
+        markIncomplete(2);
+        toast.error("কোন ⚠️ অনুগ্রহ করে এনআইডির সামনের পৃষ্ঠার ছবি আপলোড করুন");
+        return;
+      }
 
-    console.log('Step2 data saved, calling onNext()');
-    onNext();
+      if (!nidBackUrl && !nidBackFile) {
+        markIncomplete(2);
+        toast.error("কোন ⚠️ অনুগ্রহ করে এনআইডির পিছনের পৃষ্ঠার ছবি আপলোড করুন");
+        console.log("NID Back validation failed - showing toast");
+        return;
+      }
+
+      if (!data.nidNumber || data.nidNumber.trim() === '') {
+        markIncomplete(2);
+        toast.error("কোন ⚠️ অনুগ্রহ করে এনআইডি নম্বর লিখুন");
+        return;
+      }
+
+      let nidFrontBase64: string | undefined;
+      let nidBackBase64: string | undefined;
+
+      if (nidFrontFile) {
+        nidFrontBase64 = await fileToBase64(nidFrontFile);
+      }
+      if (nidBackFile) {
+        nidBackBase64 = await fileToBase64(nidBackFile);
+      }
+
+      console.log("Step2 saving NID data:", {
+        nidFrontFile: !!nidFrontFile,
+        nidBackFile: !!nidBackFile,
+        nidFrontBase64: nidFrontBase64 ? "present" : "null",
+        nidBackBase64: nidBackBase64 ? "present" : "null"
+      });
+
+      setStep2Data({
+        ...data,
+        nidFrontCopyFile: nidFrontFile,
+        nidBackCopyFile: nidBackFile,
+        nidFrontCopyUrl: nidFrontBase64,
+        nidBackCopyUrl: nidBackBase64,
+      } as any);
+
+      console.log("Step2 data saved to store");
+      onNext();
+    } catch (err) {
+      console.error(err);
+      toast.error("কোন ❌ এনআইডি ফাইল প্রসেসিং এ সমস্যা হয়েছে");
+    }
   };
 
   return (
@@ -227,14 +309,14 @@ export default function Step2AddressID({ onNext, onPrev }: StepProps) {
               <div className="space-y-3">
                 <FormLabel className="text-zinc-600 dark:text-zinc-400 flex items-center gap-2">এনআইডি সামনের অংশ (Front Copy) <span className="text-cyan-500">*</span><HelpTooltip content="আপনার জাতীয় পরিচয়পত্রের সামনের পাতার পরিষ্কার ছবি বা স্ক্যান কপি আপলোড করুন।" /></FormLabel>
                 <div onClick={() => nidFrontRef.current?.click()} className={cn("relative group h-40 rounded-2xl border-2 border-dashed flex flex-col items-center justify-center transition-all overflow-hidden bg-white/30 dark:bg-zinc-950/20 cursor-pointer hover:bg-cyan-50/10", nidFrontUrl ? "border-cyan-500" : "border-zinc-200 dark:border-zinc-800 hover:border-cyan-400")}>
-                  {nidFrontUrl ? (<div className="relative w-full h-full"><Image src={nidFrontUrl} alt="NID Front" fill className="object-cover" /><button type="button" onClick={(e) => { e.stopPropagation(); if (nidFrontUrl.startsWith('blob:')) URL.revokeObjectURL(nidFrontUrl); setNidFrontUrl(null); setNidFrontFile(null); if (nidFrontRef.current) nidFrontRef.current.value = ""; }} className="absolute top-2 right-2 h-8 w-8 rounded-lg bg-red-500 text-white flex items-center justify-center shadow-lg hover:bg-red-600 transition-all z-10"><X className="h-4 w-4" /></button></div>) : (<div className="flex flex-col items-center gap-2 group-hover:scale-110 transition-transform"><div className="h-12 w-12 rounded-xl bg-cyan-100 dark:bg-cyan-950 flex items-center justify-center"><FileUp className="h-6 w-6 text-cyan-600 dark:text-cyan-400" /></div><span className="text-xs font-bold text-cyan-600">ছবি আপলোড করুন</span></div>)}
+                  {nidFrontUrl ? (<div className="relative w-full h-full"><Image src={nidFrontUrl} alt="NID Front" fill className="object-cover" /><button type="button" onClick={(e) => { e.stopPropagation(); if (nidFrontUrl.startsWith('blob:')) URL.revokeObjectURL(nidFrontUrl); setNidFrontUrl(null); setNidFrontFile(null); form.setValue('nidFrontCopyFile', undefined as any); if (nidFrontRef.current) nidFrontRef.current.value = ""; }} className="absolute top-2 right-2 h-8 w-8 rounded-lg bg-red-500 text-white flex items-center justify-center shadow-lg hover:bg-red-600 transition-all z-10"><X className="h-4 w-4" /></button></div>) : (<div className="flex flex-col items-center gap-2 group-hover:scale-110 transition-transform"><div className="h-12 w-12 rounded-xl bg-cyan-100 dark:bg-cyan-950 flex items-center justify-center"><FileUp className="h-6 w-6 text-cyan-600 dark:text-cyan-400" /></div><span className="text-xs font-bold text-cyan-600">ছবি আপলোড করুন</span></div>)}
                   <input ref={nidFrontRef} type="file" accept="image/*" className="hidden" onChange={(e) => handleFileChange(e, 'front')} />
                 </div>
               </div>
               <div className="space-y-3">
                 <FormLabel className="text-zinc-600 dark:text-zinc-400 flex items-center gap-2">এনআইডি পিছনের অংশ (Back Copy) <span className="text-cyan-500">*</span><HelpTooltip content="আপনার জাতীয় পরিচয়পত্রের পিছনের পাতার পরিষ্কার ছবি বা স্ক্যান কপি আপলোড করুন।" /></FormLabel>
                 <div onClick={() => nidBackRef.current?.click()} className={cn("relative group h-40 rounded-2xl border-2 border-dashed flex flex-col items-center justify-center transition-all overflow-hidden bg-white/30 dark:bg-zinc-950/20 cursor-pointer hover:bg-cyan-50/10", nidBackUrl ? "border-cyan-500" : "border-zinc-200 dark:border-zinc-800 hover:border-cyan-400")}>
-                  {nidBackUrl ? (<div className="relative w-full h-full"><Image src={nidBackUrl} alt="NID Back" fill className="object-cover" /><button type="button" onClick={(e) => { e.stopPropagation(); if (nidBackUrl.startsWith('blob:')) URL.revokeObjectURL(nidBackUrl); setNidBackUrl(null); setNidBackFile(null); if (nidBackRef.current) nidBackRef.current.value = ""; }} className="absolute top-2 right-2 h-8 w-8 rounded-lg bg-red-500 text-white flex items-center justify-center shadow-lg hover:bg-red-600 transition-all z-10"><X className="h-4 w-4" /></button></div>) : (<div className="flex flex-col items-center gap-2 group-hover:scale-110 transition-transform"><div className="h-12 w-12 rounded-xl bg-cyan-100 dark:bg-cyan-950 flex items-center justify-center"><FileUp className="h-6 w-6 text-cyan-600 dark:text-cyan-400" /></div><span className="text-xs font-bold text-cyan-600">ছবি আপলোড করুন</span></div>)}
+                  {nidBackUrl ? (<div className="relative w-full h-full"><Image src={nidBackUrl} alt="NID Back" fill className="object-cover" /><button type="button" onClick={(e) => { e.stopPropagation(); if (nidBackUrl.startsWith('blob:')) URL.revokeObjectURL(nidBackUrl); setNidBackUrl(null); setNidBackFile(null); form.setValue('nidBackCopyFile', undefined as any); if (nidBackRef.current) nidBackRef.current.value = ""; }} className="absolute top-2 right-2 h-8 w-8 rounded-lg bg-red-500 text-white flex items-center justify-center shadow-lg hover:bg-red-600 transition-all z-10"><X className="h-4 w-4" /></button></div>) : (<div className="flex flex-col items-center gap-2 group-hover:scale-110 transition-transform"><div className="h-12 w-12 rounded-xl bg-cyan-100 dark:bg-cyan-950 flex items-center justify-center"><FileUp className="h-6 w-6 text-cyan-600 dark:text-cyan-400" /></div><span className="text-xs font-bold text-cyan-600">ছবি আপলোড করুন</span></div>)}
                   <input ref={nidBackRef} type="file" accept="image/*" className="hidden" onChange={(e) => handleFileChange(e, 'back')} />
                 </div>
               </div>

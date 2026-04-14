@@ -5,7 +5,7 @@ import { ClientHeader } from '@/components/header';
 import FooterSection from '@/components/footer';
 import LoadingSkeleton from '@/components/LoadingSkeleton';
 import { AlertCircle } from 'lucide-react';
-import { useMICCurriculumData } from '@/hooks/useData';
+import { useMICCurriculum } from '@/hooks/useData';
 import { useLanguageStore } from '@/lib/store';
 import { AnimatedGroup } from '@/components/ui/animated-group';
 import { Button } from '@/components/ui/button';
@@ -219,7 +219,7 @@ export default function MICCurriculumClientPage(): JSX.Element {
     isLoading,
     error,
     refetch,
-  } = useMICCurriculumData(language);
+  } = useMICCurriculum(language);
 
   // Scroll to top when component mounts
   useEffect(() => {

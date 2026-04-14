@@ -10,6 +10,7 @@ import {
   ACCEPTED_IMAGE_TYPES,
   ACCEPTED_DOC_TYPES,
 } from "@/config/appwrite";
+import { convertBengaliToEnglish } from "@/lib/utils";
 import type { FullStaffData } from "@/validations/staff";
 
 // ─── Server-side file validation ─────────────────────────────
@@ -88,49 +89,99 @@ function validateAllFilesServerSide(files: {
 // ─── Duplicate check ─────────────────────────────────────────
 export async function checkDuplicateApplication(
   email?: string,
-  phonePrimary?: string
+  phonePrimary?: string,
+  nidNumber?: string
 ): Promise<{ isDuplicate: boolean; existingApplicationId?: string }> {
-  if (!email && !phonePrimary) {
-    return { isDuplicate: false };
-  }
+  // Primary check: NID + Email combination (most restrictive)
+  if (nidNumber && email) {
+    console.log("🔍 Checking NID + Email combination:");
+    console.log("- Email:", email);
+    console.log("- NID:", nidNumber);
 
-  const { databases } = await createAdminClient();
-  const queries: any[] = [];
+    const { databases } = await createAdminClient();
 
-  if (email) {
-    queries.push(Query.equal("email", email));
-  }
-  if (phonePrimary) {
-    queries.push(Query.equal("phonePrimary", phonePrimary));
-  }
+    try {
+      const existing = await databases.listDocuments(
+        DATABASE_ID,
+        COLLECTIONS.STAFF_APPLICATIONS,
+        [
+          Query.equal("email", email),
+          Query.equal("nidNumber", nidNumber),
+          Query.equal("status", "pending")
+        ]
+      );
 
-  try {
-    const existing = await databases.listDocuments(
-      DATABASE_ID,
-      COLLECTIONS.STAFF_APPLICATIONS,
-      queries
-    );
-
-    if (existing.total > 0) {
-      const pendingApp = existing.documents.find((doc: any) => doc.status === "pending");
-      if (pendingApp) {
+      if (existing.total > 0) {
+        console.log("🚫 Duplicate found - Same NID + Email combination exists");
         return {
           isDuplicate: true,
-          existingApplicationId: pendingApp.applicationId,
+          existingApplicationId: existing.documents[0].applicationId,
         };
       }
+    } catch (error) {
+      console.error("❌ NID+Email duplicate check error:", error);
     }
-
-    return { isDuplicate: false };
-  } catch {
-    return { isDuplicate: false };
   }
+
+  // Fallback checks: individual field checks
+  if (nidNumber) {
+    console.log("🔍 Checking NID only:", nidNumber);
+    try {
+      const { databases } = await createAdminClient();
+      const existing = await databases.listDocuments(
+        DATABASE_ID,
+        COLLECTIONS.STAFF_APPLICATIONS,
+        [
+          Query.equal("nidNumber", nidNumber),
+          Query.equal("status", "pending")
+        ]
+      );
+
+      if (existing.total > 0) {
+        console.log("🚫 Duplicate found - Same NID exists");
+        return {
+          isDuplicate: true,
+          existingApplicationId: existing.documents[0].applicationId,
+        };
+      }
+    } catch (error) {
+      console.error("❌ NID duplicate check error:", error);
+    }
+  }
+
+  if (email) {
+    console.log("🔍 Checking Email only:", email);
+    try {
+      const { databases } = await createAdminClient();
+      const existing = await databases.listDocuments(
+        DATABASE_ID,
+        COLLECTIONS.STAFF_APPLICATIONS,
+        [
+          Query.equal("email", email),
+          Query.equal("status", "pending")
+        ]
+      );
+
+      if (existing.total > 0) {
+        console.log("🚫 Duplicate found - Same Email exists");
+        return {
+          isDuplicate: true,
+          existingApplicationId: existing.documents[0].applicationId,
+        };
+      }
+    } catch (error) {
+      console.error("❌ Email duplicate check error:", error);
+    }
+  }
+
+  console.log("✅ No duplicates found");
+  return { isDuplicate: false };
 }
 
 // ─── Application ID generator ───────────────────────────────
 async function generateApplicationId(databases: any): Promise<string> {
   const year = new Date().getFullYear();
-  const prefix = `APP-${year}-`;
+  const prefix = `MI-${year}-`;
 
   const existing = await databases.listDocuments(
     DATABASE_ID,
@@ -156,12 +207,22 @@ async function generateApplicationId(databases: any): Promise<string> {
 async function uploadFile(
   storage: any,
   bucketId: string,
-  file: File | string // Accept File or base64 string
-): Promise<string> {
+  file: File | string, // Accept File or base64 string
+  customFileId?: string // Optional custom file ID for standard naming
+): Promise<{ url: string; fileId: string } | null> {
   // If bucket ID is empty, skip upload and return empty string
   if (!bucketId) {
-    console.warn("Bucket ID is empty, skipping upload");
-    return "";
+    console.warn("Bucket ID is empty, skipping upload for bucket:", bucketId);
+    return null;
+  }
+
+  // Check if bucket exists by trying to list files (just to check bucket)
+  try {
+    await storage.listFiles(bucketId, [], 1);
+  } catch (bucketError: any) {
+    console.error("Bucket check failed for:", bucketId, "Error:", bucketError.message);
+    console.error("Make sure the bucket exists and is properly configured in Appwrite");
+    return null;
   }
 
   let fileToUpload: File;
@@ -185,29 +246,40 @@ async function uploadFile(
     fileToUpload = file;
   }
 
+  // Use custom file ID or generate unique one
+  const fileId = customFileId || ID.unique();
+
   try {
+    const uploadSize = (fileToUpload.size / 1024 / 1024).toFixed(2); // MB
+    console.log(`📤 Uploading to bucket ${bucketId}: ${uploadSize}MB (${fileId})`);
+
     const result = await storage.createFile(
       bucketId,
-      ID.unique(),
+      fileId,
       fileToUpload
     );
 
-    const url = `${process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT}/storage/buckets/${bucketId}/files/${result.$id}/view?project=${process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID}`;
+    const finalFileId = result.$id;
+    console.log(`✅ Successfully uploaded: ${finalFileId}`);
+    const url = `${process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT}/storage/buckets/${bucketId}/files/${finalFileId}/view?project=${process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID}`;
 
     // Ensure URL is within Appwrite's 500 char limit
+    let finalUrl = url;
     if (url.length > 500) {
       console.warn("Generated URL too long, using shorter version:", url.length);
-      return `${process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT}/storage/buckets/${bucketId}/files/${result.$id}/view`;
+      finalUrl = `${process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT}/storage/buckets/${bucketId}/files/${finalFileId}/view`;
     }
 
-    return url;
+    return { url: finalUrl, fileId: finalFileId };
   } catch (error: any) {
+    console.error("Upload failed for bucket:", bucketId, "Error:", error.message, "Code:", error.code);
     // If bucket doesn't exist, return null instead of empty string
     if (error.code === 404 || error.message?.includes("bucket")) {
       console.warn("Storage bucket not found, skipping upload:", bucketId);
       return null;
     }
-    throw error;
+    // For other errors, return null
+    return null;
   }
 }
 
@@ -221,15 +293,29 @@ export async function createApplication(
     experienceLetterFile?: File;
     cvFile?: File;
     tazkiyahFile?: File;
-    photoUrl?: string;
-    nidFrontCopyUrl?: string;
-    nidBackCopyUrl?: string;
-    certificateUrls?: string[];
-    experienceLetterUrl?: string;
-    cvUrl?: string;
-    tazkiyahUrl?: string;
   }
 ): Promise<{ applicationId: string; success: true }> {
+  // Rate limiting check - prevent duplicate applications
+  console.log("🔒 Starting duplicate check...");
+  const duplicateCheck = await checkDuplicateApplication(
+    formData.email,
+    formData.phonePrimary,
+    formData.nidNumber
+  );
+
+  if (duplicateCheck.isDuplicate) {
+    console.log("🚫 Duplicate application detected!");
+    // Create a custom error that can be handled gracefully
+    const duplicateError = new Error(`DUPLICATE_APPLICATION:এই তথ্য দিয়ে ইতিমধ্যে একটি আবেদন জমা হয়েছে। আবেদন ID: ${duplicateCheck.existingApplicationId}`);
+    duplicateError.name = "DuplicateApplicationError";
+    throw duplicateError;
+  }
+  console.log("✅ Duplicate check passed");
+
+  // Debug: Check bucket configuration
+  console.log("=== Bucket Configuration Check ===");
+  console.log("STAFF_PHOTOS bucket:", BUCKETS.STAFF_PHOTOS || "NOT CONFIGURED");
+  console.log("DOCUMENTS bucket:", BUCKETS.DOCUMENTS || "NOT CONFIGURED");
   const { databases, storage } = await createAdminClient();
 
   const hasFiles = formData.photoFile || formData.nidFrontCopyFile || formData.nidBackCopyFile;
@@ -250,52 +336,172 @@ export async function createApplication(
     }
   }
 
-  let photoUrl = formData.photoUrl || null;
+  let uploadedFileIds: string[] = [];
+  // Handle both photoUrl and photoBase64 from Step 1
+  let photoUrl = formData.photoUrl || formData.photoBase64 || null;
   let nidFrontCopyUrl = formData.nidFrontCopyUrl || null;
   let nidBackCopyUrl = formData.nidBackCopyUrl || null;
-  let certificateUrls = formData.certificateUrls || [];
+  let certificateUrls: string[] = [];
   let experienceLetterUrl = formData.experienceLetterUrl || null;
   let cvUrl = formData.cvUrl || null;
-  let tazkiyahUrl = formData.tazkiyahUrl || null;
+  let tazkiyahUrl: string | null = null;
 
+  // DEBUG: Log received form data keys
+  console.log("=== Server Action: Received form data ===");
+  console.log("Keys:", Object.keys(formData));
+  console.log("photoUrl:", photoUrl ? "present" : "none");
+  console.log("photoBase64:", formData.photoBase64 ? "present" : "none");
+  console.log("nidFrontCopyUrl:", nidFrontCopyUrl ? "present" : "none");
+  console.log("nidBackCopyUrl:", nidBackCopyUrl ? "present" : "none");
+  console.log("formData.nidFrontCopyUrl:", formData.nidFrontCopyUrl ? "present" : "none");
+  console.log("formData.nidBackCopyUrl:", formData.nidBackCopyUrl ? "present" : "none");
+  console.log("certificateUrls:", formData.certificateUrls?.length ?? 0);
+  console.log("cvUrl:", formData.cvUrl ? "present" : "none");
+  console.log("whatsappNo:", formData.whatsappNo);
+  console.log("socialLinks.facebook:", formData.socialLinks?.facebook || "none");
+  console.log("designation:", formData.designation || "none");
+  console.log("designation length:", formData.designation?.length || "N/A");
+  console.log("designation starts with MI?:", formData.designation?.startsWith("MI-") ? "NO - this is App ID format" : "YES - this is designation ID");
+  console.log("nidNumber:", formData.nidNumber || "none");
+  console.log("email:", formData.email || "none");
+
+  // Generate application ID first for file naming
+  const applicationId = await generateApplicationId(databases);
+  const timestamp = Date.now();
+
+  // Get user name for file naming (sanitize: remove spaces, special chars)
+  const rawName = formData.nameEn || formData.nameBn || "user";
+  const sanitizedName = rawName
+    .toLowerCase()
+    .replace(/[^a-z0-9\u0980-\u09FF]/g, "") // Keep Bengali chars too
+    .replace(/\s+/g, "")
+    .substring(0, 20); // Limit length
+
+  // Helper function for standard file naming (Appwrite limit: 36 chars max)
+  const getFileId = (type: string, index?: number) => {
+    const idx = index !== undefined ? `_${index}` : '';
+
+    // Create readable format: username_applicationId_type[_index]
+    // Truncate to fit within 36 char limit
+    const maxNameLen = 8; // Leave room for other parts
+    const shortName = sanitizedName.substring(0, maxNameLen).toLowerCase();
+    const shortAppId = applicationId.replace('MI-', 'MI'); // Remove hyphen to save space
+    const shortType = type.substring(0, 10); // Type can be longer
+
+    let fileId = `${shortName}_${shortAppId}_${shortType}${idx}`;
+
+    // If still too long, truncate further
+    if (fileId.length > 36) {
+      const nameLen = Math.max(3, 36 - shortAppId.length - shortType.length - idx.length - 3); // 3 for underscores
+      const truncatedName = shortName.substring(0, nameLen);
+      fileId = `${truncatedName}_${shortAppId}_${shortType}${idx}`;
+    }
+
+    console.log(`📁 Generated readable fileId: ${fileId} (length: ${fileId.length})`);
+    return fileId;
+  };
+
+  // Photo: Handle File object OR base64 URL
+  console.log("Starting photo upload, photoUrl value:", photoUrl?.substring(0, 30));
   if (formData.photoFile instanceof File) {
-    photoUrl = await uploadFile(storage, BUCKETS.STAFF_PHOTOS, formData.photoFile);
-  }
-  // Upload NID images - either from File object or base64 URL
-  if (formData.nidFrontCopyFile instanceof File) {
-    nidFrontCopyUrl = await uploadFile(storage, BUCKETS.DOCUMENTS, formData.nidFrontCopyFile);
-  } else if (formData.nidFrontCopyUrl && formData.nidFrontCopyUrl.startsWith("data:")) {
-    // It's a base64 URL, upload it
-    nidFrontCopyUrl = await uploadFile(storage, BUCKETS.DOCUMENTS, formData.nidFrontCopyUrl);
-  }
-  if (formData.nidBackCopyFile instanceof File) {
-    nidBackCopyUrl = await uploadFile(storage, BUCKETS.DOCUMENTS, formData.nidBackCopyFile);
-  } else if (formData.nidBackCopyUrl && formData.nidBackCopyUrl.startsWith("data:")) {
-    // It's a base64 URL, upload it
-    nidBackCopyUrl = await uploadFile(storage, BUCKETS.DOCUMENTS, formData.nidBackCopyUrl);
+    const photoResult = await uploadFile(storage, BUCKETS.STAFF_PHOTOS, formData.photoFile, getFileId('profile'));
+    console.log("Photo upload (File) result:", photoResult?.url ? "success" : "null");
+    photoUrl = photoResult?.url || null; if (photoResult?.fileId) uploadedFileIds.push(photoResult.fileId);
+  } else if (photoUrl && photoUrl.startsWith("data:")) {
+    console.log("Photo upload (base64) starting...");
+    const photoResult2 = await uploadFile(storage, BUCKETS.STAFF_PHOTOS, photoUrl, getFileId('profile'));
+    console.log("Photo upload (base64) result:", photoResult2?.url ? "success" : "null");
+    photoUrl = photoResult2?.url || null; if (photoResult2?.fileId) uploadedFileIds.push(photoResult2.fileId);
   }
 
+  // NID Front: Handle File object OR base64 URL
+  console.log("NID Front - hasFile:", !!formData.nidFrontCopyFile, "hasUrl:", !!nidFrontCopyUrl);
+  if (formData.nidFrontCopyFile instanceof File) {
+    const nidFrontResult = await uploadFile(storage, BUCKETS.DOCUMENTS, formData.nidFrontCopyFile, getFileId('nid_front'));
+    console.log("NID Front upload result:", nidFrontResult?.url ? "success" : "failed");
+    nidFrontCopyUrl = nidFrontResult?.url || null; if (nidFrontResult?.fileId) uploadedFileIds.push(nidFrontResult.fileId);
+  } else if (nidFrontCopyUrl && nidFrontCopyUrl.startsWith("data:")) {
+    const nidFrontResult2 = await uploadFile(storage, BUCKETS.DOCUMENTS, nidFrontCopyUrl, getFileId('nid_front'));
+    console.log("NID Front base64 upload result:", nidFrontResult2?.url ? "success" : "failed");
+    nidFrontCopyUrl = nidFrontResult2?.url || null; if (nidFrontResult2?.fileId) uploadedFileIds.push(nidFrontResult2.fileId);
+  }
+
+  // NID Back: Handle File object OR base64 URL
+  console.log("NID Back - hasFile:", !!formData.nidBackCopyFile, "hasUrl:", !!nidBackCopyUrl);
+  if (formData.nidBackCopyFile instanceof File) {
+    const nidBackResult = await uploadFile(storage, BUCKETS.DOCUMENTS, formData.nidBackCopyFile, getFileId('nid_back'));
+    console.log("NID Back upload result:", nidBackResult?.url ? "success" : "failed");
+    nidBackCopyUrl = nidBackResult?.url || null; if (nidBackResult?.fileId) uploadedFileIds.push(nidBackResult.fileId);
+  } else if (nidBackCopyUrl && nidBackCopyUrl.startsWith("data:")) {
+    const nidBackResult2 = await uploadFile(storage, BUCKETS.DOCUMENTS, nidBackCopyUrl, getFileId('nid_back'));
+    console.log("NID Back base64 upload result:", nidBackResult2?.url ? "success" : "failed");
+    nidBackCopyUrl = nidBackResult2?.url || null; if (nidBackResult2?.fileId) uploadedFileIds.push(nidBackResult2.fileId);
+  } else {
+    console.log("NID Back - no file and no base64 URL found");
+  }
+
+  // Certificates: Handle File objects OR base64 URLs from draft
+  console.log("Starting certificate upload, count:", formData.certificateUrls?.length ?? 0);
   if (Array.isArray(formData.certificateFiles)) {
-    for (const file of formData.certificateFiles) {
+    for (let i = 0; i < formData.certificateFiles.length; i++) {
+      const file = formData.certificateFiles[i];
       if (file instanceof File) {
-        const url = await uploadFile(storage, BUCKETS.DOCUMENTS, file);
-        certificateUrls.push(url);
+        const certResult = await uploadFile(storage, BUCKETS.DOCUMENTS, file, getFileId('certificate', i));
+        if (certResult?.url) { certificateUrls.push(certResult.url); if (certResult.fileId) uploadedFileIds.push(certResult.fileId); }
+      }
+    }
+  }
+  if (Array.isArray(formData.certificateUrls)) {
+    for (let i = 0; i < formData.certificateUrls.length; i++) {
+      const url = formData.certificateUrls[i];
+      if (url && url.startsWith("data:")) {
+        const certResult2 = await uploadFile(storage, BUCKETS.DOCUMENTS, url, getFileId('certificate', i));
+        if (certResult2?.url) { certificateUrls.push(certResult2.url); if (certResult2.fileId) uploadedFileIds.push(certResult2.fileId); }
       }
     }
   }
 
+  // Experience Letter: Handle File OR base64 URL
+  console.log("Starting exp letter upload, has value:", !!formData.experienceLetterUrl);
   if (formData.experienceLetterFile instanceof File) {
-    experienceLetterUrl = await uploadFile(storage, BUCKETS.DOCUMENTS, formData.experienceLetterFile);
-  }
-  if (formData.cvFile instanceof File) {
-    cvUrl = await uploadFile(storage, BUCKETS.DOCUMENTS, formData.cvFile);
-  }
-  if (formData.tazkiyahFile instanceof File) {
-    tazkiyahUrl = await uploadFile(storage, BUCKETS.DOCUMENTS, formData.tazkiyahFile);
+    const expResult = await uploadFile(storage, BUCKETS.DOCUMENTS, formData.experienceLetterFile, getFileId('experience_letter'));
+    experienceLetterUrl = expResult?.url || null; if (expResult?.fileId) uploadedFileIds.push(expResult.fileId);
+  } else if (formData.experienceLetterUrl && formData.experienceLetterUrl.startsWith("data:")) {
+    const expResult2 = await uploadFile(storage, BUCKETS.DOCUMENTS, formData.experienceLetterUrl, getFileId('experience_letter'));
+    experienceLetterUrl = expResult2?.url || null; if (expResult2?.fileId) uploadedFileIds.push(expResult2.fileId);
   }
 
-  // ── 3. Application ID generate ───────────────────────────
-  const applicationId = await generateApplicationId(databases);
+  // CV: Handle File OR base64 URL
+  console.log("Starting CV upload, has value:", !!formData.cvUrl);
+  if (formData.cvFile instanceof File) {
+    const cvResult = await uploadFile(storage, BUCKETS.DOCUMENTS, formData.cvFile, getFileId('cv'));
+    cvUrl = cvResult?.url || null; if (cvResult?.fileId) uploadedFileIds.push(cvResult.fileId);
+  } else if (formData.cvUrl && formData.cvUrl.startsWith("data:")) {
+    const cvResult2 = await uploadFile(storage, BUCKETS.DOCUMENTS, formData.cvUrl, getFileId('cv'));
+    cvUrl = cvResult2?.url || null; if (cvResult2?.fileId) uploadedFileIds.push(cvResult2.fileId);
+  }
+
+  // Tazkiyah: Handle File OR base64 URL
+  if (formData.tazkiyahFile instanceof File) {
+    const tazResult = await uploadFile(storage, BUCKETS.DOCUMENTS, formData.tazkiyahFile, getFileId('tazkiyah'));
+    tazkiyahUrl = tazResult?.url || null; if (tazResult?.fileId) uploadedFileIds.push(tazResult.fileId);
+  } else if (formData.tazkiyahUrl && formData.tazkiyahUrl.startsWith("data:")) {
+    const tazResult2 = await uploadFile(storage, BUCKETS.DOCUMENTS, formData.tazkiyahUrl, getFileId('tazkiyah'));
+    tazkiyahUrl = tazResult2?.url || null; if (tazResult2?.fileId) uploadedFileIds.push(tazResult2.fileId);
+  }
+
+  console.log("=== After uploads ===");
+  console.log("photoUrl:", photoUrl ? "UPLOADED" : "null");
+  console.log("nidFrontCopyUrl:", nidFrontCopyUrl ? "UPLOADED" : "null");
+  console.log("certificateUrls:", certificateUrls.length);
+  console.log("cvUrl:", cvUrl ? "UPLOADED" : "null");
+  console.log("experienceLetterUrl:", experienceLetterUrl ? "UPLOADED" : "null");
+
+  // If no buckets are configured, skip file uploads but continue with application
+  const hasBuckets = BUCKETS.STAFF_PHOTOS && BUCKETS.DOCUMENTS;
+  if (!hasBuckets) {
+    console.warn("⚠️ Storage buckets not configured - files will not be uploaded but application will be saved");
+  }
 
   // ── 4. Full address string build ─────────────────────────
   const currentAddr = formData.currentAddress;
@@ -322,6 +528,7 @@ export async function createApplication(
   ].filter(Boolean).join(", ");
 
   // ── 5. Save to STAFF_APPLICATIONS ────────────────────────
+  try {
   await databases.createDocument(
     DATABASE_ID,
     COLLECTIONS.STAFF_APPLICATIONS,
@@ -342,9 +549,10 @@ export async function createApplication(
       nationality: formData.nationality ?? "বাংলাদেশী",
       dateOfBirth: new Date(formData.dateOfBirth).toISOString(),
       bloodGroup: formData.bloodGroup ?? "unknown",
-      // Contact
-      phonePrimary: formData.phonePrimary,
-      phoneSecondary: formData.phoneSecondary || null,
+      // Contact - Convert Bengali numbers to English
+      phonePrimary: convertBengaliToEnglish(formData.phonePrimary),
+      phoneSecondary: formData.phoneSecondary ? convertBengaliToEnglish(formData.phoneSecondary) : null,
+      whatsappNo: formData.whatsappNo ? convertBengaliToEnglish(formData.whatsappNo) : null,
       email: formData.email && formData.email.includes("@") ? formData.email : null,
       // Address
       currentAddress: currentAddressStr,
@@ -352,21 +560,27 @@ export async function createApplication(
       // NID
       nidNumber: formData.nidNumber,
       // Professional
-      designation: formData.designationCustom || formData.designation,
-      department: formData.department || "",
+      
+      designation_id: formData.designation || "", // Should be the document $id from designation collection
+      
       employmentType: formData.employmentType,
       // Education & Skills - Appwrite expects array of strings
-      education: Array.isArray(formData.education) && formData.education.length > 0 
+      education: Array.isArray(formData.education) && formData.education.length > 0
         ? formData.education.map((e: any) => `${e.degree} - ${e.institution} (${e.year})`)
         : [],
-      // socialLinks: JSON.stringify(formData.socialLinks ?? {}), // Remove this if not in Appwrite schema
-      totalExperienceYears: formData.totalExperienceYears ?? 0,
+      // Social Links - individual fields (not JSON)
+      fb_links: formData.socialLinks?.facebook || null,
+      x_link: formData.socialLinks?.twitter || null,
+      linedin_ink: formData.socialLinks?.linkedin || null, // Note: database has "linedin_ink" (typo)
+      instagram_link: formData.socialLinks?.instagram || null,
+      website_link: formData.socialLinks?.website || null,
+      totalExperienceYears: parseInt(formData.totalExperienceYears) || 0,
       isHafiz: formData.isHafiz ?? false,
       specialSkills: formData.specialSkills ?? "",
       // Expected Terms
       expectedSalary: formData.expectedSalary,
       expectedJoiningDate: formData.expectedJoiningDate,
-      noticePeriod: formData.noticePeriod,
+      
       // Payment
       paymentMethod: formData.paymentMethod,
       bankName: formData.bankName || "",
@@ -374,28 +588,36 @@ export async function createApplication(
       accountName: formData.accountName || null,
       accountNumber: formData.accountNumber || null,
       mobileBankingProvider: formData.mobileBankingProvider || null,
-      mobileBankingNumber: formData.mobileBankingNumber || null,
+      mobileBankingNumber: formData.mobileBankingNumber ? convertBengaliToEnglish(formData.mobileBankingNumber) : null,
       // Reference
       referenceName: formData.referenceName,
-      referencePhone: formData.referencePhone,
+      referencePhone: convertBengaliToEnglish(formData.referencePhone),
       referenceOccupation: formData.referenceOccupation || null,
       // Emergency
-      emergencyContactNo: formData.emergencyContactNo,
+      emergencyContactNo: convertBengaliToEnglish(formData.emergencyContactNo),
       emergencyRelationship: formData.emergencyRelationship,
       // Declaration
       declaration: formData.declaration,
-      // Documents
-      photoUrl: photoUrl || "",
-      nidFrontCopyUrl: nidFrontCopyUrl || "",
-      nidBackCopyUrl: nidBackCopyUrl || "",
-      certificateUrls: certificateUrls, // Appwrite expects array
-      experienceLetterUrl: experienceLetterUrl || "",
-      cvUrl: cvUrl || "",
-      tazkiyahUrl: tazkiyahUrl || "",
+      // Documents - only use URLs, not base64 data
+      photoUrl: (photoUrl && !photoUrl.startsWith("data:")) ? photoUrl : "",
+      nidFrontCopyUrl: (nidFrontCopyUrl && !nidFrontCopyUrl.startsWith("data:")) ? nidFrontCopyUrl : "",
+      nidBackCopyUrl: (nidBackCopyUrl && !nidBackCopyUrl.startsWith("data:")) ? nidBackCopyUrl : "",
+      certificateUrls: certificateUrls.filter((url: string) => url && !url.startsWith("data:")), // Filter out base64
+      experienceLetterUrl: (experienceLetterUrl && !experienceLetterUrl.startsWith("data:")) ? experienceLetterUrl : "",
+      cvUrl: (cvUrl && !cvUrl.startsWith("data:")) ? cvUrl : "",
+      
       // Meta - Only include required fields
       appliedAt: new Date().toISOString(),
+      }
+    );
+  } catch (docError) {
+    // Cleanup uploaded files on document creation failure
+    for (const fileId of uploadedFileIds) {
+      try { await storage.deleteFile(BUCKETS.STAFF_PHOTOS, fileId); } catch {}
+      try { await storage.deleteFile(BUCKETS.DOCUMENTS, fileId); } catch {}
     }
-  );
+    throw docError;
+  }
 
   // ── 6. Audit log ─────────────────────────────────────────
   try {
@@ -499,7 +721,7 @@ export async function approveApplication(
       certificateUrls: application.certificateUrls,
       experienceLetterUrl: application.experienceLetterUrl ?? "",
       cvUrl: application.cvUrl ?? "",
-      tazkiyahUrl: application.tazkiyahUrl ?? "",
+      
       paymentMethod: application.paymentMethod,
       bankName: application.bankName ?? "",
       bankBranch: application.bankBranch ?? "",
@@ -510,7 +732,7 @@ export async function approveApplication(
       referenceName: application.referenceName,
       referencePhone: application.referencePhone,
       referenceOccupation: application.referenceOccupation ?? "",
-      noticePeriod: application.noticePeriod,
+      
       declaration: application.declaration,
       createdAt: new Date().toISOString(),
     }
@@ -644,7 +866,7 @@ export async function getApplicationById(applicationDocId: string) {
 }
 
 // ─── Staff ID generator (for approve flow) ─────────────────
-async function generateStaffId(databases: any): Promise<string> {
+async function generateStaffId(databases: any): Promise<{ url: string; fileId: string } | null> {
   const year = new Date().getFullYear();
   const prefix = `STF-${year}-`;
 

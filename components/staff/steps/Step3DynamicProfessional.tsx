@@ -17,10 +17,6 @@ import {
   BookOpen
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { cn, compressImage } from "@/lib/utils";
-import { useStaffFormStore, useStep3Data } from "@/store/staffFormStore";
-import { HelpTooltip } from "@/components/ui/HelpTooltip";
-
 import {
   Form,
   FormControl,
@@ -29,70 +25,58 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { cn, compressImage } from "@/lib/utils";
+import { useStaffFormStore, useStep3Data } from "@/store/staffFormStore";
+import { professionalEducationSchema, type ProfessionalEducationData, TEACHER_DESIGNATIONS, NON_TEACHER_DESIGNATIONS, DESIGNATION_LABELS } from "@/validations/staff";
+import { Separator } from "@/components/ui/separator";
+import { HelpTooltip } from "@/components/ui/HelpTooltip";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { VoiceInputBn } from "@/components/ui/voice-input";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Textarea } from "@/components/ui/textarea";
-import { Separator } from "@/components/ui/separator";
-
-import {
-  professionalEducationSchema,
-  type ProfessionalEducationData,
-  DESIGNATION_LABELS,
-  TEACHER_DESIGNATIONS,
-} from "@/validations/staff";
 import { getDesignations } from "@/lib/actions/terms";
 
-// Reusable Section Header Component
-function SectionHeader({ 
-  icon: Icon, 
-  title, 
-  subtitle,
-  color = "violet"
-}: { 
-  icon: any; 
-  title: string; 
-  subtitle?: string;
-  color?: "cyan" | "amber" | "violet" | "rose";
-}) {
-  const colorMap = {
-    cyan: "bg-cyan-500 text-white",
-    amber: "bg-amber-500 text-white",
-    violet: "bg-violet-500 text-white",
-    rose: "bg-rose-500 text-white",
-  };
-  
-  const subtitleColorMap = {
-    cyan: "text-cyan-600 dark:text-cyan-400",
-    amber: "text-amber-600 dark:text-amber-400",
-    violet: "text-violet-600 dark:text-violet-400",
-    rose: "text-rose-600 dark:text-rose-400",
-  };
-
-  return (
-    <div className="flex items-center gap-3 mb-6 p-4 rounded-xl bg-gradient-to-r from-zinc-50 to-zinc-100/50 dark:from-zinc-800/30 dark:to-zinc-800/20 border-l-4 border-current">
-      <div className={cn("h-10 w-10 rounded-xl flex items-center justify-center shadow-lg", colorMap[color])}>
-        <Icon className="h-5 w-5" />
-      </div>
-      <div>
-        <h3 className={cn("font-bold text-base", subtitleColorMap[color])}>{title}</h3>
-        {subtitle && <p className="text-xs text-zinc-500">{subtitle}</p>}
-      </div>
-    </div>
-  );
-}
+// Helper function to convert file to base64
+const fileToBase64 = (file: File): Promise<string> => new Promise((resolve, reject) => {
+  const reader = new FileReader();
+  reader.readAsDataURL(file);
+  reader.onload = () => resolve(reader.result as string);
+  reader.onerror = reject;
+});
 
 interface StepProps {
   onNext: () => void;
   onPrev: () => void;
+}
+
+function SectionHeader({ icon: Icon, title, subtitle, color = "violet" }: { icon: any; title: string; subtitle?: string; color?: string }) {
+  const colorMap = {
+    violet: "text-violet-800 dark:text-violet-300",
+    emerald: "text-emerald-800 dark:text-emerald-300", 
+    rose: "text-rose-800 dark:text-rose-300",
+    amber: "text-amber-800 dark:text-amber-300",
+    sky: "text-sky-800 dark:text-sky-300",
+  };
+  const subtitleColorMap = {
+    violet: "text-violet-600 dark:text-violet-400",
+    emerald: "text-emerald-600 dark:text-emerald-400",
+    rose: "text-rose-600 dark:text-rose-400",
+    amber: "text-amber-600 dark:text-amber-400",
+    sky: "text-sky-600 dark:text-sky-400",
+  };
+  
+  return (
+    <div className="flex items-center gap-3 p-3 rounded-xl bg-gradient-to-r from-violet-50 to-purple-50 dark:from-violet-900/20 dark:to-purple-900/20 border border-violet-200/50 dark:border-violet-800/50">
+      <div className="p-2 rounded-lg bg-violet-100 dark:bg-violet-900/50">
+        <Icon className="h-5 w-5 text-violet-600 dark:text-violet-400" />
+      </div>
+      <div>
+        <h3 className={cn("font-bold text-base", colorMap[color as keyof typeof colorMap] || colorMap.violet)}>{title}</h3>
+        {subtitle && <p className="text-xs text-zinc-500">{subtitle}</p>}
+      </div>
+    </div>
+  );
 }
 
 export default function Step3DynamicProfessional({ onNext, onPrev }: StepProps) {
@@ -105,6 +89,7 @@ export default function Step3DynamicProfessional({ onNext, onPrev }: StepProps) 
   
   // File states
   const [certificateFiles, setCertificateFiles] = useState<File[]>([]);
+  const [certificatePreviews, setCertificatePreviews] = useState<string[]>([]);
   const [isCompressing, setIsCompressing] = useState(false);
 
   const certRef = useRef<HTMLInputElement>(null);
@@ -112,7 +97,6 @@ export default function Step3DynamicProfessional({ onNext, onPrev }: StepProps) 
   const form = useForm<Pick<ProfessionalEducationData,
     | 'designation'
     | 'designationCustom'
-    | 'department'
     | 'employmentType'
     | 'education'
     | 'isHafiz'
@@ -120,7 +104,6 @@ export default function Step3DynamicProfessional({ onNext, onPrev }: StepProps) 
     resolver: zodResolver(professionalEducationSchema.pick({
       designation: true,
       designationCustom: true,
-      department: true,
       employmentType: true,
       education: true,
       isHafiz: true,
@@ -128,7 +111,6 @@ export default function Step3DynamicProfessional({ onNext, onPrev }: StepProps) 
     defaultValues: {
       designation: savedData.designation ?? "",
       designationCustom: savedData.designationCustom ?? "",
-      department: savedData.department ?? "",
       employmentType: savedData.employmentType ?? "permanent",
       education: savedData.education ?? [{ degree: "", institution: "", year: "" }],
       isHafiz: savedData.isHafiz ?? false,
@@ -137,9 +119,16 @@ export default function Step3DynamicProfessional({ onNext, onPrev }: StepProps) 
 
   // Load designations
   useEffect(() => {
+    console.log("Loading designations...");
     getDesignations()
       .then((designations: any[]) => {
+        console.log("Designations loaded:", designations?.length || 0, "items");
+        console.log("First designation:", designations?.[0]);
         setDbDesignations(designations || []);
+      })
+      .catch((error) => {
+        console.error("Failed to load designations:", error);
+        setDbDesignations([]);
       })
       .finally(() => {
         setIsLoadingDesignations(false);
@@ -160,6 +149,10 @@ export default function Step3DynamicProfessional({ onNext, onPrev }: StepProps) 
       if (savedData.certificateFiles) {
         setCertificateFiles(savedData.certificateFiles as File[]);
       }
+      // Restore certificate previews from base64 URLs
+      if ((savedData as any).certificateUrls && Array.isArray((savedData as any).certificateUrls)) {
+        setCertificatePreviews((savedData as any).certificateUrls);
+      }
     }
   }, []);
 
@@ -167,12 +160,12 @@ export default function Step3DynamicProfessional({ onNext, onPrev }: StepProps) 
   useEffect(() => {
     const timeout = setTimeout(() => {
       const subscription = form.watch((value) => {
-        setStep3Data({ ...value, certificateFiles } as any);
+        setStep3Data({ ...value, certificateFiles, certificateUrls: certificatePreviews } as any);
       });
       return () => subscription.unsubscribe();
     }, 500);
     return () => clearTimeout(timeout);
-  }, [form, setStep3Data, certificateFiles]);
+  }, [form, setStep3Data, certificateFiles, certificatePreviews]);
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
@@ -181,6 +174,7 @@ export default function Step3DynamicProfessional({ onNext, onPrev }: StepProps) 
 
   const designation = form.watch("designation");
   const isTeacher = TEACHER_DESIGNATIONS.includes(designation);
+  const isStaff = NON_TEACHER_DESIGNATIONS.includes(designation);
 
   const handleMultipleFiles = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -192,10 +186,17 @@ export default function Step3DynamicProfessional({ onNext, onPrev }: StepProps) 
         files.map(f => compressImage(f, 0.85))
       );
       setCertificateFiles(prev => [...prev, ...compressedFiles]);
-      toast.success(`${files.length} টি ফাইল আপলোড হয়েছে`);
+      
+      // Generate preview URLs for the new files
+      const newPreviews = await Promise.all(
+        compressedFiles.map(f => fileToBase64(f))
+      );
+      setCertificatePreviews(prev => [...prev, ...newPreviews]);
+      
+      toast.success(`✅ ${files.length} টি ফাইল আপলোড হয়েছে`);
     } catch (err) {
       console.error("Multiple compression failed:", err);
-      toast.error("ফাইল প্রসেসিং এ সমস্যা হয়েছে");
+      toast.error("❌ ফাইল প্রসেসিং এ সমস্যা হয়েছে");
     } finally {
       setIsCompressing(false);
     }
@@ -203,10 +204,20 @@ export default function Step3DynamicProfessional({ onNext, onPrev }: StepProps) 
 
   const removeCertificate = (index: number) => {
     setCertificateFiles(prev => prev.filter((_, i) => i !== index));
+    setCertificatePreviews(prev => prev.filter((_, i) => i !== index));
   };
 
-  const onSubmit: SubmitHandler<any> = (data) => {
-    console.log('Step3 onSubmit called', { data, designation: data.designation });
+  const onSubmit: SubmitHandler<any> = async (data) => {
+    console.log('Step3 onSubmit called', {
+      designation: data.designation,
+      designationType: typeof data.designation,
+      dbDesignationsCount: dbDesignations.length,
+      firstDesignation: dbDesignations[0] ? {
+        $id: dbDesignations[0].$id,
+        designation_id: dbDesignations[0].designation_id,
+        label_en: dbDesignations[0].label_en
+      } : null
+    });
     
     if (!data.designation) {
       console.log('No designation selected');
@@ -230,9 +241,21 @@ export default function Step3DynamicProfessional({ onNext, onPrev }: StepProps) 
     } 
 
     console.log('Saving Step3 data and calling onNext');
+    
+    // Convert certificate files to base64
+    let certificateUrls: string[] = [];
+    for (const file of certificateFiles) {
+      const base64 = await new Promise<string>((resolve) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.readAsDataURL(file);
+      });
+      certificateUrls.push(base64);
+    }
     setStep3Data({
       ...data,
       certificateFiles: certificateFiles.length > 0 ? certificateFiles : undefined,
+      certificateUrls: certificatePreviews,
     });
     onNext();
   };
@@ -299,7 +322,7 @@ export default function Step3DynamicProfessional({ onNext, onPrev }: StepProps) 
                       <SelectContent>
                         {dbDesignations.length > 0 ? (
                           dbDesignations.filter((d: any) => d.is_active !== false).map((d: any) => (
-                            <SelectItem key={d.designation_id || d.label_en} value={d.designation_id || d.label_en}>
+                            <SelectItem key={d.$id || d.designation_id || d.label_en} value={d.$id || d.designation_id || d.label_en}>
                               {d.label_bn}
                             </SelectItem>
                           ))
@@ -314,6 +337,7 @@ export default function Step3DynamicProfessional({ onNext, onPrev }: StepProps) 
                   </FormItem>
                 )}
               />
+
 
               <FormField<any>
                 control={form.control}
@@ -339,13 +363,11 @@ export default function Step3DynamicProfessional({ onNext, onPrev }: StepProps) 
                 )}
               />
 
-              {/* Teacher-specific: Hafiz */}
-              {isTeacher && (
-                <motion.div 
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="md:col-span-2 p-4 rounded-xl border-2 border-violet-200 dark:border-violet-800 bg-violet-50/30 dark:bg-violet-950/20"
-                >
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="md:col-span-2 p-4 rounded-xl border-2 border-violet-200 dark:border-violet-800 bg-violet-50/30 dark:bg-violet-950/20"
+              >
                   <FormField
                     control={form.control}
                     name="isHafiz"
@@ -370,7 +392,6 @@ export default function Step3DynamicProfessional({ onNext, onPrev }: StepProps) 
                     )}
                   />
                 </motion.div>
-              )}
             </div>
           </div>
 

@@ -29,21 +29,21 @@ function BaseVoiceInput({
   ...props
 }: BaseVoiceInputProps) {
   const [mounted, setMounted] = useState(false);
-  const [localVal, setLocalVal] = useState(value);
-  const committedRef = useRef(value);
+  const [localVal, setLocalVal] = useState(value ?? "");
+  const committedRef = useRef(value ?? "");
 
   useEffect(() => setMounted(true), []);
 
   useEffect(() => {
-    if (value !== committedRef.current) {
-      setLocalVal(value);
-      committedRef.current = value;
+    if (value !== undefined && value !== committedRef.current) {
+      setLocalVal(value ?? "");
+      committedRef.current = value ?? "";
     }
   }, [value]);
 
   const handleFinal = useCallback(
     (spoken: string) => {
-      const base = committedRef.current;
+      const base = committedRef.current ?? "";
       const sep = base && !base.endsWith(" ") ? " " : "";
       const updated = base + sep + spoken;
       setLocalVal(updated);
@@ -94,10 +94,13 @@ function BaseVoiceInput({
     }
   };
 
+  // Use a stable controlled value to prevent React warnings
+  const controlledValue = value ?? "";
+
   if (!mounted) {
     return (
       <Component
-        value={value}
+        value={controlledValue}
         onChange={(e: any) => onChange?.(e)}
         className={cn("w-full rounded-md border px-3 py-2 text-sm", className)}
         placeholder={placeholder}

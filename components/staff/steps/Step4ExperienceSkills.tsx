@@ -113,8 +113,11 @@ export default function Step4ExperienceSkills({ onNext, onPrev }: StepProps) {
   
   // File states
   const [cvFile, setCvFile] = useState<File | null>(null);
+  const [cvPreview, setCvPreview] = useState<string | null>(null);
   const [experienceLetterFile, setExperienceLetterFile] = useState<File | null>(null);
+  const [expLetterPreview, setExpLetterPreview] = useState<string | null>(null);
   const [tazkiyahFile, setTazkiyahFile] = useState<File | null>(null);
+  const [tazkiyahPreview, setTazkiyahPreview] = useState<string | null>(null);
   const [isCompressing, setIsCompressing] = useState(false);
 
   const cvRef = useRef<HTMLInputElement>(null);
@@ -158,6 +161,10 @@ export default function Step4ExperienceSkills({ onNext, onPrev }: StepProps) {
       if (savedData.cvFile) setCvFile(savedData.cvFile as File);
       if (savedData.experienceLetterFile) setExperienceLetterFile(savedData.experienceLetterFile as File);
       if (savedData.tazkiyahFile) setTazkiyahFile(savedData.tazkiyahFile as File);
+      // Restore previews from base64 URLs
+      if ((savedData as any).cvUrl) setCvPreview((savedData as any).cvUrl);
+      if ((savedData as any).experienceLetterUrl) setExpLetterPreview((savedData as any).experienceLetterUrl);
+      if ((savedData as any).tazkiyahUrl) setTazkiyahPreview((savedData as any).tazkiyahUrl);
     }
   }, []);
 
@@ -168,14 +175,19 @@ export default function Step4ExperienceSkills({ onNext, onPrev }: StepProps) {
     const subscription = form.watch((value) => {
       if (timerRef.current) clearTimeout(timerRef.current);
       timerRef.current = setTimeout(() => {
-        setStep4Data(value as any);
+        setStep4Data({ 
+          ...value, 
+          cvUrl: cvPreview, 
+          experienceLetterUrl: expLetterPreview,
+          tazkiyahUrl: tazkiyahPreview
+        } as any);
       }, 500);
     });
     return () => {
       subscription.unsubscribe();
       if (timerRef.current) clearTimeout(timerRef.current);
     };
-  }, [form, setStep4Data]);
+  }, [form, setStep4Data, cvPreview, expLetterPreview, tazkiyahPreview]);
 
   const step3Data = useStep3Data();
   const designation = step3Data?.designation ?? (savedData as any)?.designation ?? "";
@@ -187,11 +199,15 @@ export default function Step4ExperienceSkills({ onNext, onPrev }: StepProps) {
     if (!file) return;
     try {
       setIsCompressing(true);
-      const compressed = await compressImage(file, 0.6); // More aggressive compression
+      const compressed = await compressImage(file, 0.85); // 85% quality compression
       setCvFile(compressed);
-      toast.success("CV আপলোড সম্পন্ন!");
+      // Generate preview
+      const reader = new FileReader();
+      reader.onload = () => setCvPreview(reader.result as string);
+      reader.readAsDataURL(compressed);
+      toast.success("✅ CV আপলোড সম্পন্ন!");
     } catch {
-      toast.error("ফাইল প্রসেসিং এ সমস্যা হয়েছে");
+      toast.error("❌ ফাইল প্রসেসিং এ সমস্যা হয়েছে");
     } finally {
       setIsCompressing(false);
     }
@@ -202,11 +218,15 @@ export default function Step4ExperienceSkills({ onNext, onPrev }: StepProps) {
     if (!file) return;
     try {
       setIsCompressing(true);
-      const compressed = await compressImage(file, 0.6); // More aggressive compression
+      const compressed = await compressImage(file, 0.85); // 85% quality compression
       setExperienceLetterFile(compressed);
-      toast.success("অভিজ্ঞতা সনদ আপলোড সম্পন্ন!");
+      // Generate preview
+      const reader = new FileReader();
+      reader.onload = () => setExpLetterPreview(reader.result as string);
+      reader.readAsDataURL(compressed);
+      toast.success("✅ অভিজ্ঞতা সনদ আপলোড সম্পন্ন!");
     } catch {
-      toast.error("ফাইল প্রসেসিং এ সমস্যা হয়েছে");
+      toast.error("❌ ফাইল প্রসেসিং এ সমস্যা হয়েছে");
     } finally {
       setIsCompressing(false);
     }
@@ -217,24 +237,62 @@ export default function Step4ExperienceSkills({ onNext, onPrev }: StepProps) {
     if (!file) return;
     try {
       setIsCompressing(true);
-      const compressed = await compressImage(file, 0.6); // More aggressive compression
+      const compressed = await compressImage(file, 0.85); // 85% quality compression
       setTazkiyahFile(compressed);
-      toast.success("তাজকিয়া সনদ আপলোড সম্পন্ন!");
+      // Generate preview
+      const reader = new FileReader();
+      reader.onload = () => setTazkiyahPreview(reader.result as string);
+      reader.readAsDataURL(compressed);
+      toast.success("✅ তাজকিয়া সনদ আপলোড সম্পন্ন!");
     } catch {
-      toast.error("ফাইল প্রসেসিং এ সমস্যা হয়েছে");
+      toast.error("❌ ফাইল প্রসেসিং এ সমস্যা হয়েছে");
     } finally {
       setIsCompressing(false);
     }
   };
 
-  const onSubmit: SubmitHandler<Step4FormData> = (data) => {
-    setStep4Data({
-      ...data,
-      cvFile: cvFile ?? undefined,
-      experienceLetterFile: experienceLetterFile ?? undefined,
-      tazkiyahFile: tazkiyahFile ?? undefined,
-    } as any);
-    onNext();
+  const onSubmit: SubmitHandler<Step4FormData> = async (data) => {
+    try {
+      let cvBase64: string | undefined;
+      let expLetterBase64: string | undefined;
+      let tazkiyahBase64: string | undefined;
+
+      if (cvFile) {
+        cvBase64 = await new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result as string);
+          reader.readAsDataURL(cvFile);
+        });
+      }
+      if (experienceLetterFile) {
+        expLetterBase64 = await new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result as string);
+          reader.readAsDataURL(experienceLetterFile);
+        });
+      }
+      if (tazkiyahFile) {
+        tazkiyahBase64 = await new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result as string);
+          reader.readAsDataURL(tazkiyahFile);
+        });
+      }
+
+      setStep4Data({
+        ...data,
+        cvFile: cvFile ?? undefined,
+        experienceLetterFile: experienceLetterFile ?? undefined,
+        tazkiyahFile: tazkiyahFile ?? undefined,
+        cvUrl: cvPreview,
+        experienceLetterUrl: expLetterPreview,
+        tazkiyahUrl: tazkiyahPreview,
+      } as any);
+      onNext();
+    } catch (err) {
+      console.error(err);
+      toast.error("❌ ফাইল প্রসেসিং এ সমস্যা হয়েছে");
+    }
   };
 
   return (
@@ -318,18 +376,27 @@ export default function Step4ExperienceSkills({ onNext, onPrev }: StepProps) {
                     <FormItem>
                       <FormLabel className="text-amber-800 dark:text-amber-300">মোট অভিজ্ঞতার বছর</FormLabel>
                       <FormControl>
-                        <div className="relative">
-                          <Input 
-                            type="number" 
-                            min="0"
-                            max="50"
-                            placeholder="০"
-                            className="h-12 pl-10 bg-white/70 dark:bg-zinc-950/50 border-amber-200 dark:border-amber-800 text-lg font-bold text-amber-600"
-                            {...field}
-                            onChange={e => field.onChange(Number(e.target.value))}
-                          />
-                          <span className="absolute left-4 top-3.5 text-amber-500 font-bold">বছর</span>
-                        </div>
+                        <Input 
+                          type="text"
+                          inputMode="numeric"
+                          pattern="[0-9০-৯]*"
+                          min="0"
+                          max="50"
+                          placeholder="বছর সংখ্যা লিখুন"
+                          className="h-12 bg-white/70 dark:bg-zinc-950/50 border-amber-200 dark:border-amber-800 text-lg font-bold"
+                          value={field.value || ""}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            const banglaToEng: Record<string, string> = {
+                              '০': '0', '১': '1', '২': '2', '৩': '3', '৪': '4',
+                              '৫': '5', '৬': '6', '৭': '7', '৮': '8', '৯': '9'
+                            };
+                            // Convert Bengali to English digits
+                            const engVal = val.replace(/[০-৯]/g, d => banglaToEng[d] || d);
+                            // Pass as string so validation transform can handle it
+                            field.onChange(engVal);
+                          }}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -378,13 +445,12 @@ export default function Step4ExperienceSkills({ onNext, onPrev }: StepProps) {
                 )}
               />
 
-              {/* Teacher-specific: Hafiz */}
-              {isTeacher && (
-                <motion.div 
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="p-4 rounded-xl border-2 border-violet-200 dark:border-violet-800 bg-violet-50/30 dark:bg-violet-950/20"
-                >
+              {/* Hafiz Question - for all staff */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="p-4 rounded-xl border-2 border-violet-200 dark:border-violet-800 bg-violet-50/30 dark:bg-violet-950/20"
+              >
                   <FormField
                     control={form.control}
                     name="isHafiz"
@@ -409,7 +475,6 @@ export default function Step4ExperienceSkills({ onNext, onPrev }: StepProps) {
                     )}
                   />
                 </motion.div>
-              )}
             </div>
           </div>
 

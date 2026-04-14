@@ -209,7 +209,6 @@ export async function createStaff(
       referenceName:      formData.referenceName,
       referencePhone:     formData.referencePhone,
       referenceOccupation: formData.referenceOccupation,
-      noticePeriod:       formData.noticePeriod,
       declaration:        formData.declaration,
       createdAt:          new Date().toISOString(),
     }

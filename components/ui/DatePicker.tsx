@@ -44,13 +44,22 @@ export function DatePicker({
   startYear = 1950,
   endYear = new Date().getFullYear() + 2,
 }: DatePickerProps) {
+  const [open, setOpen] = React.useState(false)
+
   // Format: ১৫ জানুয়ারি ২০২৫
   const formattedDate = date
     ? `${toBengaliNum(date.getDate())} ${BN_MONTHS[date.getMonth()]} ${toBengaliNum(date.getFullYear())}`
     : null
 
+  const handleSelect = (selectedDate: Date | undefined) => {
+    setDate(selectedDate)
+    if (selectedDate) {
+      setOpen(false)
+    }
+  }
+
   return (
-    <Popover>
+    <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
           variant="outline"
@@ -71,7 +80,7 @@ export function DatePicker({
         <Calendar
           mode="single"
           selected={date}
-          onSelect={setDate}
+          onSelect={handleSelect}
           initialFocus
           captionLayout="dropdown"
           startMonth={new Date(startYear, 0)}

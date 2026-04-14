@@ -6,11 +6,11 @@ import type { AdmissionData, MICCurriculumData, MNCCurriculumData, Language } fr
 // useAdmissionData hook
 export type UseAdmissionDataResult = UseQueryResult<AdmissionData>;
 
-// useMICCurriculumData hook
-export type UseMICCurriculumDataResult = UseQueryResult<MICCurriculumData>;
+// useMICCurriculum hook
+export type UseMICCurriculumResult = UseQueryResult<MICCurriculumData>;
 
-// useMNCCurriculumData hook
-export type UseMNCCurriculumDataResult = UseQueryResult<MNCCurriculumData>;
+// useMNCCurriculum hook
+export type UseMNCCurriculumResult = UseQueryResult<MNCCurriculumData>;
 
 // useTranslation hook
 export interface UseTranslationResult {
@@ -18,6 +18,3 @@ export interface UseTranslationResult {
   lang: Language;
   setLang: (lang: Language) => void;
 }
-
-// usePrefetchAdmissionData hook
-export type UsePrefetchAdmissionDataResult = () => void;

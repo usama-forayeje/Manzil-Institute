@@ -3,6 +3,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider } from '@/components/themes/theme-provider';
 import { ActiveThemeProvider } from '@/components/themes/active-theme';
+import { Toaster } from 'sonner';
 
 interface ProvidersProps {
   children: React.ReactNode;
@@ -50,6 +51,19 @@ export function Providers({ children }: ProvidersProps) {
       <ActiveThemeProvider initialTheme="light">
         <ThemeProvider defaultTheme="dark" storageKey="manzil-theme">
           {children}
+          <Toaster
+            position="bottom-right"
+            toastOptions={{
+              duration: 4000,
+              style: {
+                background: 'hsl(var(--background))',
+                color: 'hsl(var(--foreground))',
+                border: '1px solid hsl(var(--border))',
+                borderRadius: '12px',
+                boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+              },
+            }}
+          />
         </ThemeProvider>
       </ActiveThemeProvider>
     </QueryClientProvider>

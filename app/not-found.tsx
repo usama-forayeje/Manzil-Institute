@@ -13,9 +13,9 @@ export default function NotFound() {
       button: 'Go Home',
     },
     bn: {
-      title: '৪০৪ - পাজা পাওয়া যায়নি',
-      description: 'আপনি যে পাজা খুঁজছেন সেটি বিদ্যমান নেই।',
-      button: 'হোম পাজে যান',
+      title: '৪০৪ - পেজ পাওয়া যায়নি',
+      description: 'আপনি যে পেজ খুঁজছেন সেটি বিদ্যমান নেই।',
+      button: 'হোম পেজে যান',
     },
   };
 

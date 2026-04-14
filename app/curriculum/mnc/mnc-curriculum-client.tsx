@@ -18,7 +18,7 @@ import {
   ChevronLeft,
   ChevronRight
 } from 'lucide-react';
-import { useMNCCurriculumData } from '@/hooks/useData';
+import { useMNCCurriculum } from '@/hooks/useData';
 import { useLanguageStore } from '@/lib/store';
 import { AnimatedGroup } from '@/components/ui/animated-group';
 
@@ -232,7 +232,7 @@ export default function MNCCurriculumClientPage() {
     isLoading,
     error,
     refetch,
-  } = useMNCCurriculumData(language);
+  } = useMNCCurriculum(language);
 
   const [selectedSubject, setSelectedSubject] = useState<any>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);

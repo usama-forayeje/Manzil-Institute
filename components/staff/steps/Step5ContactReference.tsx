@@ -123,7 +123,7 @@ export default function Step5ContactReference({ onNext, onPrev }: StepProps) {
     };
   }, [form, setStep5Data]);
 
-  const onSubmit: SubmitHandler<Step5FormData> = (data) => {
+  const onSubmit: SubmitHandler<ContactReferenceData> = (data) => {
     // Validation checks
     if (!data.phonePrimary || data.phonePrimary.length < 11) {
       markIncomplete(5);

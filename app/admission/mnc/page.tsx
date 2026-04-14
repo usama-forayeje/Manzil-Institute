@@ -48,7 +48,6 @@ import {
 } from '../../../components/ui/table';
 import {
   useAdmissionData,
-  usePrefetchAdmissionData,
 } from '../../../hooks/useData';
 import ErrorBoundary from '../../../components/ErrorBoundary';
 import LoadingSkeleton from '../../../components/LoadingSkeleton';

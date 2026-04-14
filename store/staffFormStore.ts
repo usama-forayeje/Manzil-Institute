@@ -41,7 +41,7 @@ export type ContactReferenceData = Pick<PaymentReferenceData,
 
 // Step 6: Payment & Agreement
 export type PaymentAgreementData = Pick<PaymentReferenceData,
-  | 'expectedSalary' | 'expectedJoiningDate' | 'noticePeriod'
+  | 'expectedSalary' | 'expectedJoiningDate'
   | 'paymentMethod' | 'bankName' | 'bankBranch' | 'accountName' | 'accountNumber'
   | 'mobileBankingProvider' | 'mobileBankingNumber'
   | 'declaration' | 'additionalNotes'

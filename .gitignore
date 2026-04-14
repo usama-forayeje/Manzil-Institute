@@ -49,3 +49,4 @@ config/terms_data.json
 .kilocode/mcp.json
 nul
 dev.log
+.kilo/skills/changelog-generator/SKILL.md

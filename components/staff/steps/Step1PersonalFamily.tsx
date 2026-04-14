@@ -52,9 +52,18 @@ export default function Step1PersonalFamily({ onNext }: StepProps) {
 
   // Auto-save form data
   useEffect(() => {
-    const subscription = form.watch((value) => { setStep1Data(value as Partial<PersonalFamilyData>); });
+    const subscription = form.watch((value) => {
+      const prev = useStaffFormStore.getState().step1Data as any;
+      setStep1Data({
+        ...prev,
+        ...(value as Partial<PersonalFamilyData>),
+        photoUrl: photoUrl ?? prev?.photoUrl,
+        photoFile: photoFile ?? prev?.photoFile,
+        photoBase64: prev?.photoBase64,
+      } as any);
+    });
     return () => subscription.unsubscribe();
-  }, [form, setStep1Data]);
+  }, [form, setStep1Data, photoUrl, photoFile]);
 
   // Cleanup ObjectURL on unmount
   useEffect(() => {
@@ -91,7 +100,12 @@ export default function Step1PersonalFamily({ onNext }: StepProps) {
     const blobUrl = URL.createObjectURL(file);
     setPhotoFile(file);
     setPhotoUrl(blobUrl);
-  }, [form, photoUrl]);
+    setStep1Data({
+      ...(useStaffFormStore.getState().step1Data as any),
+      photoFile: file,
+      photoUrl: blobUrl,
+    } as any);
+  }, [form, photoUrl, setStep1Data]);
 
   const removePhoto = useCallback(() => {
     if (photoUrl && photoUrl.startsWith('blob:')) {
@@ -99,8 +113,14 @@ export default function Step1PersonalFamily({ onNext }: StepProps) {
     }
     setPhotoFile(null);
     setPhotoUrl(null);
+    setStep1Data({
+      ...(useStaffFormStore.getState().step1Data as any),
+      photoFile: undefined,
+      photoUrl: undefined,
+      photoBase64: undefined,
+    } as any);
     if (fileInputRef.current) fileInputRef.current.value = "";
-  }, [photoUrl]);
+  }, [photoUrl, setStep1Data]);
 
   const onSubmit: SubmitHandler<PersonalFamilyData> = async (data) => {
     if (!photoUrl) {
@@ -116,13 +136,15 @@ export default function Step1PersonalFamily({ onNext }: StepProps) {
       return;
     }
 
-    // Convert to base64 for storage
+    // Compress and convert to base64 for storage
     let photoBase64: string | undefined;
     if (photoFile) {
       try {
-        photoBase64 = await fileToBase64(photoFile);
+        // Compress profile image with 85% quality
+        const compressed = await compressImage(photoFile, 0.85);
+        photoBase64 = await fileToBase64(compressed);
       } catch (err) {
-        toast.error("ছবি প্রসেসিং এ সমস্যা হয়েছে");
+        toast.error("❌ ছবি প্রসেসিং এ সমস্যা হয়েছে");
         return;
       }
     }

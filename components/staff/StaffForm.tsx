@@ -2,32 +2,21 @@
 
 import { useCallback, useState, useEffect, useRef } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { 
-  CheckCircle2, 
-  User, 
-  MapPin, 
-  Briefcase, 
-  Wallet, 
-  Sparkles,
-  Loader2,
-  AlertCircle,
-  Upload,
-  FileText,
+import confetti from "canvas-confetti";
+import {
+  CheckCircle2,
+  User,
+  MapPin,
+  Wallet,
   Phone,
-  Award,
-  CheckCircle,
-  XCircle,
-  Printer,
-  PlusCircle,
   BookOpen,
   Star,
-  Send
+  PhoneCall,
+  HomeIcon
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import confetti from "canvas-confetti";
+import { toast } from "sonner";
 
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 import { Button }   from "@/components/ui/button";
 import { cn }       from "@/lib/utils";
 
@@ -40,7 +29,6 @@ import Step6PaymentAgreement from "./steps/Step6PaymentAgreement";
 
 import { createApplication, checkDuplicateApplication } from "@/lib/actions/application";
 import { useStaffFormStore, useCurrentStep, useIncompleteSteps, useStep3Data } from "@/store/staffFormStore";
-import type { PaymentReferenceData } from "@/validations/staff";
 import { Badge } from "../ui/badge";
 import { validateAllFiles, uploadAllFiles, type UploadProgress } from "@/lib/utils/upload";
 
@@ -174,16 +162,92 @@ function StepIndicator({ current, onStepClick }: { current: number; onStepClick:
 
 // Enhanced Success Screen
 function SuccessScreen({ staffId }: { staffId: string }) {
-  const { reset } = useStaffFormStore();
+  const hasConfettiFired = useRef(false);
+
   useEffect(() => {
-    confetti({ particleCount: 150, spread: 100, origin: { y: 0.6 } });
+    if (hasConfettiFired.current) return;
+    hasConfettiFired.current = true;
+
+    console.log("🎉 Starting confetti sequence...");
+
+    // Create confetti canvas with high z-index
+    const canvas = document.createElement('canvas');
+    canvas.style.position = 'fixed';
+    canvas.style.top = '0';
+    canvas.style.left = '0';
+    canvas.style.width = '100vw';
+    canvas.style.height = '100vh';
+    canvas.style.pointerEvents = 'none';
+    canvas.style.zIndex = '9999';
+    document.body.appendChild(canvas);
+
+    const myConfetti = confetti.create(canvas, {
+      resize: true,
+      useWorker: false // Disable worker to avoid CSP issues
+    });
+
+    // Fire initial burst
+    myConfetti({
+      particleCount: 150,
+      spread: 100,
+      origin: { y: 0.6 },
+      colors: ["#a786ff", "#fd8bbc", "#eca184", "#f8deb1"],
+      gravity: 0.8,
+      ticks: 300
+    });
+
+    // Side cannons for 3 seconds
+    const end = Date.now() + 3000;
+    const interval = setInterval(() => {
+      if (Date.now() > end) {
+        clearInterval(interval);
+        // Remove canvas after animation
+        setTimeout(() => {
+          if (document.body.contains(canvas)) {
+            document.body.removeChild(canvas);
+          }
+        }, 1000);
+        return;
+      }
+
+      // Left cannon
+      myConfetti({
+        particleCount: 3,
+        angle: 60,
+        spread: 55,
+        startVelocity: 60,
+        origin: { x: 0, y: 0.5 },
+        colors: ["#a786ff", "#fd8bbc", "#eca184", "#f8deb1"],
+        gravity: 0.9,
+        ticks: 200
+      });
+
+      // Right cannon
+      myConfetti({
+        particleCount: 3,
+        angle: 120,
+        spread: 55,
+        startVelocity: 60,
+        origin: { x: 1, y: 0.5 },
+        colors: ["#a786ff", "#fd8bbc", "#eca184", "#f8deb1"],
+        gravity: 0.9,
+        ticks: 200
+      });
+    }, 200);
+
+    console.log("🎉 Confetti sequence started!");
   }, []);
+
+  const handleGoHome = () => {
+    window.location.href = "/";
+  };
   
   return (
-    <motion.div 
-      initial={{ opacity: 0, scale: 0.9 }} 
-      animate={{ opacity: 1, scale: 1 }} 
-      className="text-center py-8 sm:py-16 px-4"
+    <motion.div
+      initial={{ opacity: 0, y: -50 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, ease: "easeOut" }}
+      className="text-center py-8 sm:py-16 px-4 kalpurush-font"
     >
       {/* Success Animation */}
       <motion.div
@@ -208,9 +272,9 @@ function SuccessScreen({ staffId }: { staffId: string }) {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
-        className="text-2xl sm:text-3xl font-black text-zinc-800 dark:text-white mb-3"
+        className="text-2xl sm:text-3xl font-black text-zinc-800 dark:text-white mb-3 kalpurush-font"
       >
-        🎉 আবেদন সফল হয়েছে!
+        🎉 আপনার আবেদন সফল হয়েছে!
       </motion.h2>
       
       <motion.p 
@@ -219,18 +283,50 @@ function SuccessScreen({ staffId }: { staffId: string }) {
         transition={{ delay: 0.5 }}
         className="text-zinc-500 mb-2"
       >
-        আপনার রেফারেন্স নম্বর:
+        আপনার আবেদন আইডি:
       </motion.p>
       
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.6 }}
-        className="inline-block px-6 py-3 bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-cyan-950/30 dark:to-blue-950/30 rounded-xl border border-cyan-200 dark:border-cyan-800 mb-8"
+        className="inline-block px-6 py-3 bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-cyan-950/30 dark:to-blue-950/30 rounded-xl border border-cyan-200 dark:border-cyan-800 mb-6"
       >
-        <span className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-600 to-blue-600">
+        <span className="text-2xl font-black text-cyan-600 dark:text-cyan-400">
           {staffId}
         </span>
+      </motion.div>
+
+      {/* Office Contact Info */}
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.65 }}
+        className="mb-6 p-4 rounded-xl bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 max-w-md mx-auto kalpurush-font"
+      >
+        <div className="flex items-center justify-center gap-2 mb-2">
+          <PhoneCall className="h-5 w-5 text-amber-600" />
+          <span className="font-bold text-amber-800 dark:text-amber-200">যোগাযোগের জন্য</span>
+        </div>
+        <p className="text-sm text-amber-700 dark:text-amber-300">
+          যোগাযোগের জন্য অফিসে সরাসরি যোগাযোগ করুন বা নিচের নম্বরে কল করুন:
+        </p>
+        <div className="mt-3 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6">
+          <a 
+            href="tel:+88014070460000" 
+            className="flex items-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-bold transition-colors"
+          >
+            <PhoneCall className="h-4 w-4" />
+            014070460000
+          </a>
+          <a 
+            href="tel:+8801822478883" 
+            className="flex items-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-bold transition-colors"
+          >
+            <PhoneCall className="h-4 w-4" />
+            01822478883
+          </a>
+        </div>
       </motion.div>
       
       <motion.p 
@@ -239,21 +335,22 @@ function SuccessScreen({ staffId }: { staffId: string }) {
         transition={{ delay: 0.7 }}
         className="text-sm text-zinc-500 mb-8 max-w-md mx-auto"
       >
-        আমাদের টিম শীঘ্রই আপনার সাথে যোগাযোগ করবে। ধন্যবাদ!
+        আবেদন করার জন্য আপনাকে ধন্যবাদ । আমাদের টিম শীঘ্রই আপনার সাথে যোগাযোগ করবে। ধন্যবাদ!
       </motion.p>
       
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.8 }}
+        className="flex justify-center"
       >
         <Button 
-          onClick={reset}
+          onClick={handleGoHome}
           size="lg"
-          className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white shadow-lg shadow-cyan-500/30 rounded-xl px-8 h-14 font-bold"
+          className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white shadow-lg shadow-cyan-500/30 rounded-xl px-8 h-12 font-bold"
         >
-          <PlusCircle className="h-5 w-5 mr-2" />
-          নতুন আবেদন করুন
+          <HomeIcon className="h-5 w-5 mr-2" />
+          হোমপেজে ফিরে যান
         </Button>
       </motion.div>
     </motion.div>
@@ -265,16 +362,70 @@ export default function StaffForm() {
   const step3Data = useStep3Data();
   const { step1Data, step2Data, step3Data: step3, step4Data, step5Data, step6Data, nextStep, prevStep, setSubmitting, setSubmittedStaffId, submittedStaffId } = useStaffFormStore();
   const [uploadPhase, setUploadPhase] = useState<string>("idle");
-  const mutation = useMutation({ mutationFn: createApplication, onSuccess: (data) => { setSubmittedStaffId(data.applicationId); } });
+  const mutation = useMutation({
+    mutationFn: createApplication,
+    onError: (error) => {
+      console.error("Mutation error:", error);
+
+      // Handle user-friendly error messages
+      const errorMessage = error.message || "অজানা ত্রুটি";
+
+      // Check for specific error types
+      if (errorMessage.startsWith("DUPLICATE_APPLICATION:")) {
+        // Duplicate application - extract the message and show as warning
+        const actualMessage = errorMessage.replace("DUPLICATE_APPLICATION:", "");
+        toast.warning("ডুপ্লিকেট আবেদন", {
+          description: actualMessage + "\n\nফর্ম রিসেট করে নতুন তথ্য দিয়ে আবার চেষ্টা করুন।",
+          duration: 10000,
+          action: {
+            label: "ফর্ম রিসেট করুন",
+            onClick: () => {
+              useStaffFormStore.getState().reset();
+              toast.success("ফর্ম রিসেট হয়েছে! নতুন তথ্য দিয়ে আবেদন করুন।");
+            },
+          },
+        });
+      } else if (error.name === "DuplicateApplicationError") {
+        // Fallback for custom error type
+        const actualMessage = errorMessage.replace("DUPLICATE_APPLICATION:", "");
+        toast.warning("ডুপ্লিকেট আবেদন", {
+          description: actualMessage + "\n\nফর্ম রিসেট করে নতুন তথ্য দিয়ে আবার চেষ্টা করুন।",
+          duration: 10000,
+          action: {
+            label: "ফর্ম রিসেট করুন",
+            onClick: () => {
+              useStaffFormStore.getState().reset();
+              toast.success("ফর্ম রিসেট হয়েছে! নতুন তথ্য দিয়ে আবেদন করুন।");
+            },
+          },
+        });
+      } else if (errorMessage.includes("bucket") || errorMessage.includes("storage")) {
+        // Storage/configuration error
+        toast.error("স্টোরেজ কনফিগারেশন ত্রুটি", {
+          description: "ফাইল আপলোড সিস্টেম সেটআপ করা হয়নি। আবেদন সেভ হয়েছে কিন্তু ফাইলগুলো আপলোড হয়নি।",
+          duration: 6000,
+        });
+      } else {
+        // Generic error - show as error toast instead of 500
+        toast.error("সাবমিশন ব্যর্থ হয়েছে", {
+          description: errorMessage,
+          duration: 5000,
+        });
+      }
+    },
+    onSuccess: (data) => {
+      setSubmittedStaffId(data.applicationId);
+    },
+  });
 
   // Get current step color
   const colors = STEP_COLORS[STEPS[currentStep - 1].color];
 
   const handleSubmit = useCallback(async () => {
+    console.log("handleSubmit called"); console.log("step1Data:", !!step1Data, "step2Data:", !!step2Data, "step3Data:", !!step3Data, "step4Data:", !!step4Data, "step5Data:", !!step5Data, "step6Data:", !!step6Data); console.log("step4Data keys:", step4Data ? Object.keys(step4Data) : "null");
     setUploadPhase("submitting");
 
-    // Clean data by removing base64 strings to reduce payload size
-    const cleanData = {
+    const cleanData: any = {
       ...step1Data,
       ...step2Data,
       ...step3Data,
@@ -283,10 +434,28 @@ export default function StaffForm() {
       ...step6Data,
     };
 
-    // Remove base64 data from the payload
-    if (cleanData.nidFrontBase64) delete cleanData.nidFrontBase64;
-    if (cleanData.nidBackBase64) delete cleanData.nidBackBase64;
-    if (cleanData.photoBase64) delete cleanData.photoBase64;
+    // Strip blob: URLs (useless on server) but KEEP data: base64 URLs (server uploads them)
+    if (typeof cleanData.photoUrl === "string" && cleanData.photoUrl.startsWith("blob:")) {
+      delete cleanData.photoUrl;
+    }
+
+    // File objects don't survive server action serialization - remove them
+    delete cleanData.photoFile;
+    delete cleanData.nidFrontCopyFile;
+    delete cleanData.nidBackCopyFile;
+    delete cleanData.certificateFiles;
+    delete cleanData.experienceLetterFile;
+    delete cleanData.cvFile;
+    delete cleanData.tazkiyahFile;
+
+    // Log what's being submitted for debugging
+    console.log("=== Submitting data ===");
+    console.log("photoUrl:", cleanData.photoUrl?.substring?.(0, 50) ?? "none");
+    console.log("photoBase64:", cleanData.photoBase64 ? "present" : "none");
+    console.log("nidFrontCopyUrl:", cleanData.nidFrontCopyUrl?.substring?.(0, 50) ?? "none");
+    console.log("certificateUrls:", cleanData.certificateUrls?.length ?? "none");
+    console.log("cvUrl:", cleanData.cvUrl?.substring?.(0, 50) ?? "none");
+    console.log("whatsappNo:", cleanData.whatsappNo);
 
     // Handle empty optional fields to prevent Appwrite validation errors
     if (!cleanData.email || cleanData.email.trim() === '') {
@@ -299,6 +468,10 @@ export default function StaffForm() {
     }
     if (!cleanData.whatsappNo || cleanData.whatsappNo.trim() === '') {
       cleanData.whatsappNo = null;
+    }
+
+    if (mutation.isPending) {
+      return;
     }
 
     console.log('Submitting cleaned data:', cleanData);

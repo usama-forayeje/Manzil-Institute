@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   getDesignations,
   getAllTerms,
+  getTermsByDesignationFromDB,
   saveTerms,
   updateTerms,
   updateDesignation,
@@ -39,12 +40,14 @@ export function useAllTerms() {
 }
 
 export function useTermsByDesignation(designationId: string) {
+  const normalizedId = designationId?.trim() || '';
+
   return useQuery({
-    queryKey: termsQueryKeys.termsByDesignation(designationId),
-    queryFn: () => getAllTerms().then(terms => terms[designationId]),
+    queryKey: termsQueryKeys.termsByDesignation(normalizedId),
+    queryFn: () => getTermsByDesignationFromDB(normalizedId),
     staleTime: 5 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
-    enabled: !!designationId, // Only run if designationId exists
+    enabled: !!normalizedId,
   });
 }
 

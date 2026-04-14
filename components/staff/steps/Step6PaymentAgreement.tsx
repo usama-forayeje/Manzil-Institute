@@ -50,8 +50,7 @@ import {
   MOBILE_BANKING_PROVIDERS,
 } from "@/validations/staff";
 import { useStaffFormStore, useStep6Data, useStep3Data } from "@/store/staffFormStore";
-import { useAllTerms } from "@/lib/hooks/use-terms";
-import { DESIGNATIONS_REQUIRING_TERMS } from "@/config/terms";
+import { useTermsByDesignation } from "@/lib/hooks/use-terms";
 import { HelpTooltip } from "@/components/ui/HelpTooltip";
 import { useState } from "react";
 import { Download } from "lucide-react";
@@ -113,11 +112,11 @@ const generateTermsPrint = (terms: any, designation: string) => {
 const generateTermsDownload = async (terms: any, designation: string) => {
   try {
     if (!terms) {
-      toast.error("কোনো টার্মস পাওয়া যায়নি");
+      toast.error("⚠️ কোনো টার্মস পাওয়া যায়নি");
       return;
     }
 
-    toast.info("Download হচ্ছে...");
+    toast.info("ℹ️ Download হচ্ছে...");
 
     // Create HTML content with Bengali font
     const html = generateTermsHTML(terms, designation);
@@ -136,10 +135,10 @@ const generateTermsDownload = async (terms: any, designation: string) => {
       URL.revokeObjectURL(url);
     }, 100);
 
-    toast.success("Download সম্পন্ন হয়েছে! PDF তে প্রিন্ট করুন।");
+    toast.success("✅ Download সম্পন্ন হয়েছে! PDF তে প্রিন্ট করুন।");
   } catch (err) {
     console.error("Download error:", err);
-    toast.error("Download ব্যর্থ হয়েছে");
+    toast.error("❌ Download ব্যর্থ হয়েছে");
   }
 };
 
@@ -160,21 +159,16 @@ export default function Step6PaymentAgreement({ onPrev, onSubmit, isLoading, des
   const [isTermsExpanded, setIsTermsExpanded] = useState(false);
   const currentDesignation = designation || "";
 
-  // React Query automatically handles caching and real-time updates
-  const { data: allTermsCache = {} } = useAllTerms();
+  const { data: currentTerms, isLoading: termsLoading } = useTermsByDesignation(designation || "");
 
-  // Get current terms from cache
-  const currentTerms = designation ? allTermsCache[designation] : null;
-
-  const showTermsSection = currentTerms && DESIGNATIONS_REQUIRING_TERMS.includes(currentDesignation.toLowerCase());
-  const hideTerms = currentDesignation.toLowerCase() === "adviser" || currentDesignation.toLowerCase() === "unpaid_teacher";
+  const showTermsSection = !!currentDesignation;
+  const hideTerms = false;
 
   const form = useForm<PaymentReferenceData>({
     resolver: zodResolver(paymentReferenceSchema) as any,
     defaultValues: {
       expectedSalary: savedData.expectedSalary ?? undefined,
       expectedJoiningDate: savedData.expectedJoiningDate ?? new Date().toISOString().split("T")[0],
-      noticePeriod: savedData.noticePeriod ?? "",
       paymentMethod: savedData.paymentMethod ?? undefined,
       bankName: savedData.bankName ?? "",
       bankBranch: savedData.bankBranch ?? "",
@@ -192,7 +186,6 @@ export default function Step6PaymentAgreement({ onPrev, onSubmit, isLoading, des
       form.reset({
         expectedSalary: savedData.expectedSalary ?? undefined,
         expectedJoiningDate: savedData.expectedJoiningDate ?? new Date().toISOString().split("T")[0],
-        noticePeriod: savedData.noticePeriod ?? "",
         paymentMethod: savedData.paymentMethod ?? undefined,
         bankName: savedData.bankName ?? "",
         bankBranch: savedData.bankBranch ?? "",
@@ -214,14 +207,10 @@ export default function Step6PaymentAgreement({ onPrev, onSubmit, isLoading, des
   const paymentMethod = form.watch("paymentMethod");
 
   const handleFinalSubmit = (data: PaymentReferenceData) => {
-    const result = paymentReferenceSchema.safeParse(data);
-    if (!result.success) {
-      const missingFields = result.error.issues.map((issue) => issue.message);
-      toast.error("অনুগ্রহ করে নিচের তথ্যগুলো পূরণ করুন:\n" + missingFields.join(", "));
-      return;
-    }
+    console.log("handleFinalSubmit called", data);
+    console.log("Step 6 submit triggered with data:", data);
     setStep6Data(data);
-    onSubmit(data);
+    queueMicrotask(() => onSubmit(data));
   };
 
   return (
@@ -237,14 +226,40 @@ export default function Step6PaymentAgreement({ onPrev, onSubmit, isLoading, des
                 <span>বেতন ও যোগদানের তথ্য (Terms)</span>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5 p-6 rounded-2xl bg-cyan-50/20 dark:bg-cyan-950/10 border border-cyan-100/50">
+                <FormField control={form.control} name="expectedJoiningDate" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-cyan-800 dark:text-cyan-300 font-bold">প্রত্যাশিত যোগদানের তারিখ <span className="text-cyan-500">*</span></FormLabel>
+                    <FormControl>
+                      <DatePicker 
+                        date={field.value ? new Date(field.value) : undefined} 
+                        setDate={(d) => field.onChange(d ? format(d, "yyyy-MM-dd") : "")} 
+                        startYear={new Date().getFullYear()} 
+                        endYear={new Date().getFullYear() + 5} 
+                        placeholder="যোগদানের তারিখ নির্বাচন করুন" 
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
                 <FormField control={form.control} name="expectedSalary" render={({ field }) => (
-                  <FormItem className="md:col-span-2">
+                  <FormItem>
                     <FormLabel className="text-cyan-800 dark:text-cyan-300 font-bold">প্রত্যাশিত মাসিক বেতন (৳) <span className="text-cyan-500">*</span></FormLabel>
                     <FormControl>
-                      <div className="relative">
-                        <span className="absolute left-4 top-3 text-lg text-zinc-400 font-bold">৳</span>
-                        <Input type="number" placeholder="২০০০০" className="pl-10 h-12 text-lg font-bold bg-white/70 dark:bg-zinc-950/50 border-cyan-200 dark:border-cyan-800 text-cyan-600 focus:ring-cyan-500" {...field} onChange={e => field.onChange(Number(e.target.value))} />
-                      </div>
+                      <VoiceInputBn 
+                        placeholder="যেমন: ২০০০০ বা 20000" 
+                        className="h-12 bg-white/70 dark:bg-zinc-950/50 border-cyan-200 dark:border-cyan-800"
+                        value={field.value ? String(field.value) : ""}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          const banglaToEng: Record<string, string> = {
+                            '০': '0', '১': '1', '২': '2', '৩': '3', '৪': '4',
+                            '৫': '5', '৬': '6', '৭': '7', '৮': '8', '৯': '9'
+                          };
+                          const engVal = val.replace(/[০-৯]/g, d => banglaToEng[d] || d);
+                          const num = parseInt(engVal) || 0;
+                          field.onChange(num);
+                        }}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -275,6 +290,7 @@ export default function Step6PaymentAgreement({ onPrev, onSubmit, isLoading, des
               {paymentMethod === "bank" && (
                 <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-5 rounded-xl border border-dashed border-cyan-200 dark:border-cyan-800">
                   <FormField control={form.control} name="bankName" render={({ field }) => (<FormItem className="sm:col-span-2"><FormLabel>ব্যাংকের নাম</FormLabel><FormControl><VoiceInputBn placeholder="ইসলামী ব্যাংক" className="bg-white/50 dark:bg-zinc-950/50" {...field} /></FormControl></FormItem>)} />
+                  <FormField control={form.control} name="bankBranch" render={({ field }) => (<FormItem><FormLabel>শাখার নাম</FormLabel><FormControl><VoiceInputBn placeholder="শাখার নাম" className="bg-white/50 dark:bg-zinc-950/50" {...field} /></FormControl></FormItem>)} />
                   <FormField control={form.control} name="accountName" render={({ field }) => (<FormItem><FormLabel>অ্যাকাউন্ট নাম</FormLabel><FormControl><VoiceInputBn placeholder="হোল্ডারের নাম" className="bg-white/50 dark:bg-zinc-950/50" {...field} /></FormControl></FormItem>)} />
                   <FormField control={form.control} name="accountNumber" render={({ field }) => (<FormItem><FormLabel>অ্যাকাউন্ট নম্বর</FormLabel><FormControl><Input placeholder="নম্বর লিখুন" className="bg-white/50 dark:bg-zinc-950/50" {...field} /></FormControl></FormItem>)} />
                 </motion.div>
@@ -319,37 +335,46 @@ export default function Step6PaymentAgreement({ onPrev, onSubmit, isLoading, des
           </div>
 
           {/* Dynamic Terms & Conditions Section */}
-          {showTermsSection && currentTerms && (
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
-              <Separator className="opacity-30" />
-              <div className="flex items-center justify-between flex-wrap gap-2">
-                <div className="flex items-center gap-2 text-cyan-600 dark:text-cyan-400 font-semibold"><FileText className="h-5 w-5" /><span>নিয়ম ও শর্তাবলী (Terms & Conditions)</span></div>
-                <div className="flex gap-2">
-                  <Button type="button" variant="outline" size="sm" onClick={() => generateTermsPrint(currentTerms, currentDesignation)} className="text-cyan-600 border-cyan-200 hover:bg-cyan-50"><Printer className="h-4 w-4 mr-1" />প্রিন্ট</Button>
-                  <Button type="button" variant="outline" size="sm" onClick={() => { toast.success("ডাউনলোড হচ্ছে..."); generateTermsDownload(currentTerms, currentDesignation); }} className="text-cyan-600 border-cyan-200 hover:bg-cyan-50"><Download className="h-4 w-4 mr-1" />ডাউনলোড</Button>
-                  <Button type="button" variant="outline" size="sm" onClick={() => setIsTermsExpanded(!isTermsExpanded)} className="text-cyan-600 border-cyan-200 hover:bg-cyan-50">{isTermsExpanded ? <>লুকান <ChevronUp className="ml-1 h-4 w-4" /></> : <>দেখুন <ChevronDown className="ml-1 h-4 w-4" /></>}</Button>
+          {showTermsSection && (
+            termsLoading ? (
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
+                <Separator className="opacity-30" />
+                <div className="p-6 rounded-xl bg-cyan-50 dark:bg-cyan-950/20 border border-cyan-200 dark:border-cyan-800 text-center">
+                  <p className="text-cyan-700 dark:text-cyan-300 font-medium">নিয়ম ও শর্তাবলী লোড হচ্ছে...</p>
                 </div>
-              </div>
-              <AnimatePresence>
-                {isTermsExpanded && (
-                  <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="rounded-2xl border border-cyan-200 dark:border-cyan-800 bg-white/50 dark:bg-zinc-900/50 overflow-hidden">
-                    <div className="p-6 space-y-4 max-h-[400px] overflow-y-auto">
-                      <h3 className="text-lg font-bold text-cyan-700 dark:text-cyan-400 text-center border-b border-cyan-100 dark:border-cyan-800 pb-3">{currentTerms.title}</h3>
-                      {currentTerms.sections.map((section, idx) => (
-                        <div key={idx} className="space-y-2">
-                          <h4 className="font-bold text-zinc-700 dark:text-zinc-300 text-sm">{section.title}</h4>
-                          <ul className="space-y-1">{section.content.map((item, itemIdx) => (<li key={itemIdx} className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed flex gap-2"><span className="text-cyan-500 mt-0.5">•</span><span>{item}</span></li>))}</ul>
-                        </div>
-                      ))}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-              <div className="flex items-center gap-3 p-4 rounded-xl bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800">
-                <Checkbox id="termsAccepted" checked={form.watch("declaration") || false} onCheckedChange={(checked) => form.setValue("declaration", checked as boolean)} className="h-5 w-5 border-amber-500" />
-                <label htmlFor="termsAccepted" className="text-sm font-medium text-amber-800 dark:text-amber-300 cursor-pointer">আমি উপরের সকল <span className="font-bold underline">নিয়ম ও শর্তাবলী</span> পড়ে বুঝেছি এবং সম্মত হচ্ছি।<span className="text-red-500 ml-1">*</span></label>
-              </div>
-            </motion.div>
+              </motion.div>
+            ) : currentTerms ? (
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
+                <Separator className="opacity-30" />
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <div className="flex items-center gap-2 text-cyan-600 dark:text-cyan-400 font-semibold"><FileText className="h-5 w-5" /><span>নিয়ম ও শর্তাবলী (Terms & Conditions)</span></div>
+                  <div className="flex gap-2">
+                    <Button type="button" variant="outline" size="sm" onClick={() => generateTermsPrint(currentTerms, currentDesignation)} className="text-cyan-600 border-cyan-200 hover:bg-cyan-50"><Printer className="h-4 w-4 mr-1" />প্রিন্ট</Button>
+                     <Button type="button" variant="outline" size="sm" onClick={() => { toast.success("ℹ️ ডাউনলোড হচ্ছে..."); generateTermsDownload(currentTerms, currentDesignation); }} className="text-cyan-600 border-cyan-200 hover:bg-cyan-50"><Download className="h-4 w-4 mr-1" />ডাউনলোড</Button>
+                    <Button type="button" variant="outline" size="sm" onClick={() => setIsTermsExpanded(!isTermsExpanded)} className="text-cyan-600 border-cyan-200 hover:bg-cyan-50">{isTermsExpanded ? <>লুকান <ChevronUp className="ml-1 h-4 w-4" /></> : <>দেখুন <ChevronDown className="ml-1 h-4 w-4" /></>}</Button>
+                  </div>
+                </div>
+                <AnimatePresence>
+                  {isTermsExpanded && (
+                    <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="rounded-2xl border border-cyan-200 dark:border-cyan-800 bg-white/50 dark:bg-zinc-900/50 overflow-hidden">
+                      <div className="p-6 space-y-4 max-h-[400px] overflow-y-auto">
+                        <h3 className="text-lg font-bold text-cyan-700 dark:text-cyan-400 text-center border-b border-cyan-100 dark:border-cyan-800 pb-3">{currentTerms.title}</h3>
+                        {currentTerms.sections.map((section, idx) => (
+                          <div key={idx} className="space-y-2">
+                            <h4 className="font-bold text-zinc-700 dark:text-zinc-300 text-sm">{section.title}</h4>
+                            <ul className="space-y-1">{section.content.map((item, itemIdx) => (<li key={itemIdx} className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed flex gap-2"><span className="text-cyan-500 mt-0.5">•</span><span>{item}</span></li>))}</ul>
+                          </div>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+                <div className="flex items-center gap-3 p-4 rounded-xl bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800">
+                  <Checkbox id="termsAccepted" checked={form.watch("declaration") || false} onCheckedChange={(checked) => form.setValue("declaration", checked as boolean)} className="h-5 w-5 border-amber-500" />
+                  <label htmlFor="termsAccepted" className="text-sm font-medium text-amber-800 dark:text-amber-300 cursor-pointer">আমি উপরের সকল <span className="font-bold underline">নিয়ম ও শর্তাবলী</span> পড়ে বুঝেছি এবং সম্মত হচ্ছি।<span className="text-red-500 ml-1">*</span></label>
+                </div>
+              </motion.div>
+            ) : null
           )}
 
           {/* Declaration */}
@@ -369,7 +394,7 @@ export default function Step6PaymentAgreement({ onPrev, onSubmit, isLoading, des
               <RotateCcw className="h-5 w-5" />
             </Button>
             <Button type="button" variant="ghost" onClick={onPrev} disabled={isLoading} className="text-zinc-500 hover:text-cyan-600 rounded-xl px-6">← ফিরে যান</Button>
-            <Button type="submit" size="lg" disabled={isLoading} className="bg-cyan-600 hover:bg-cyan-700 text-white min-w-[180px] shadow-lg shadow-cyan-600/30 rounded-xl font-bold h-12 text-lg">
+            <Button type="button" size="lg" disabled={isLoading} onClick={() => { console.log("Button clicked, calling getValues..."); const data = form.getValues(); console.log("Got values:", data); handleFinalSubmit(data); }} className="bg-cyan-600 hover:bg-cyan-700 text-white min-w-[180px] shadow-lg shadow-cyan-600/30 rounded-xl font-bold h-12 text-lg">
               {isLoading ? (
                 <span className="flex items-center gap-2">
                   <span className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" />

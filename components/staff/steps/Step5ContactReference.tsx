@@ -313,7 +313,7 @@ export default function Step5ContactReference({ onNext, onPrev }: StepProps) {
                     <FormLabel className="text-amber-800 dark:text-amber-300">
                       সম্পর্ক <span className="text-red-500">*</span>
                     </FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value || undefined}>
+                    <Select onValueChange={field.onChange} value={field.value || ""}>
                       <FormControl>
                         <SelectTrigger className="h-11 bg-white/70 dark:bg-zinc-950/50 border-amber-200 dark:border-amber-800">
                           <SelectValue placeholder="সিলেক্ট করুন" />

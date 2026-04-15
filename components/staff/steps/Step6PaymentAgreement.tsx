@@ -199,9 +199,13 @@ export default function Step6PaymentAgreement({ onPrev, onSubmit, isLoading, des
     }
   }, []);
 
+  // Debounced auto-save to prevent focus loss
   useEffect(() => {
-    const subscription = form.watch((value) => { setStep6Data(value as any); });
-    return () => subscription.unsubscribe();
+    const timeout = setTimeout(() => {
+      const subscription = form.watch((value) => { setStep6Data(value as any); });
+      return () => subscription.unsubscribe();
+    }, 1000);
+    return () => clearTimeout(timeout);
   }, [form, setStep6Data]);
 
   const paymentMethod = form.watch("paymentMethod");
@@ -279,7 +283,7 @@ export default function Step6PaymentAgreement({ onPrev, onSubmit, isLoading, des
             <FormField control={form.control} name="paymentMethod" render={({ field }) => (
               <FormItem>
                 <FormLabel>পেমেন্ট মেথড নির্বাচন করুন <span className="text-cyan-500">*</span></FormLabel>
-                <Select onValueChange={field.onChange} value={field.value || undefined}>
+                <Select onValueChange={field.onChange} value={field.value || ""}>
                   <FormControl><SelectTrigger className="h-12 bg-white/50 dark:bg-zinc-950/50"><SelectValue placeholder="সিলেক্ট মেথড" /></SelectTrigger></FormControl>
                   <SelectContent>{Object.entries(PAYMENT_METHOD_LABELS).map(([v, l]) => <SelectItem key={v} value={v}>{l}</SelectItem>)}</SelectContent>
                 </Select>
@@ -298,7 +302,7 @@ export default function Step6PaymentAgreement({ onPrev, onSubmit, isLoading, des
               {paymentMethod === "mobile_banking" && (
                 <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-5 rounded-xl border border-dashed border-cyan-200 dark:border-cyan-800">
                   <FormField control={form.control} name="mobileBankingProvider" render={({ field }) => (
-                    <FormItem><FormLabel>প্রোভাইডার</FormLabel><Select onValueChange={field.onChange} value={field.value || undefined}><FormControl><SelectTrigger className="bg-white/50 dark:bg-zinc-950/50"><SelectValue placeholder="সিলেক্ট" /></SelectTrigger></FormControl><SelectContent>{Object.entries(MOBILE_BANKING_PROVIDERS).map(([v, l]) => <SelectItem key={v} value={v}>{l}</SelectItem>)}</SelectContent></Select></FormItem>
+                    <FormItem><FormLabel>প্রোভাইডার</FormLabel>                    <Select onValueChange={field.onChange} value={field.value || ""}><FormControl><SelectTrigger className="bg-white/50 dark:bg-zinc-950/50"><SelectValue placeholder="সিলেক্ট" /></SelectTrigger></FormControl><SelectContent>{Object.entries(MOBILE_BANKING_PROVIDERS).map(([v, l]) => <SelectItem key={v} value={v}>{l}</SelectItem>)}</SelectContent></Select></FormItem>
                   )} />
                   <FormField control={form.control} name="mobileBankingNumber" render={({ field }) => (<FormItem><FormLabel>মোবাইল ব্যাংকিং নম্বর</FormLabel><FormControl><Input placeholder="01XXXXXXXXX" className="bg-white/50 dark:bg-zinc-950/50" {...field} /></FormControl></FormItem>)} />
                 </motion.div>

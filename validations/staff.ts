@@ -230,7 +230,6 @@ export const UPAZILAS_BY_DISTRICT: Record<string, string[]> = {
 const addressSchema = z.object({
   division: z.string().min(1, "বিভাগ নির্বাচন করুন").optional().or(z.literal("")),
   district: z.string().min(1, "জেলা নির্বাচন করুন").optional().or(z.literal("")),
-  upazila: z.string().min(1, "উপজেলা নির্বাচন করুন").optional().or(z.literal("")),
   thana: z.string().min(1, "থানা উল্লেখ করুন").optional().or(z.literal("")),
   postOffice: z.string().min(1, "পোস্ট অফিস উল্লেখ করুন").optional().or(z.literal("")),
   village: z.string().min(1, "গ্রাম/এলাকা অবশ্যই দিতে হবে").optional().or(z.literal("")),
@@ -285,7 +284,6 @@ export type PersonalFamilyData = z.infer<typeof personalFamilySchema>;
 const emptyPermanentAddress = z.object({
   division: z.string(),
   district: z.string(),
-  upazila: z.string(),
   thana: z.string(),
   postOffice: z.string(),
   village: z.string(),
@@ -317,7 +315,6 @@ export const addressIDSchema = z.object({
     // Only check if permanentAddress has actual values (not empty)
     if (pa && pa.division) {
       if (!pa?.district) ctx.addIssue({ code: z.ZodIssueCode.custom, message: "স্থায়ী ঠিকানার জেলা দিন", path: ["permanentAddress", "district"] });
-      if (!pa?.upazila) ctx.addIssue({ code: z.ZodIssueCode.custom, message: "স্থায়ী ঠিকানার উপজেলা দিন", path: ["permanentAddress", "upazila"] });
       if (!pa?.thana) ctx.addIssue({ code: z.ZodIssueCode.custom, message: "স্থায়ী ঠিকানার থানা দিন", path: ["permanentAddress", "thana"] });
       if (!pa?.postOffice) ctx.addIssue({ code: z.ZodIssueCode.custom, message: "স্থায়ী ঠিকানার পোস্ট অফিস দিন", path: ["permanentAddress", "postOffice"] });
       if (!pa?.village) ctx.addIssue({ code: z.ZodIssueCode.custom, message: "স্থায়ী ঠিকানার গ্রাম/এলাকা দিন", path: ["permanentAddress", "village"] });
@@ -396,7 +393,6 @@ export const professionalEducationSchema = z.object({
   certificateUrls: z.array(z.string()).optional(),
   experienceLetterUrl: z.string().optional(),
   cvUrl: z.string().optional(),
-  tazkiyahUrl: z.string().optional(),
 });
 
 export type ProfessionalEducationData = z.infer<typeof professionalEducationSchema>;

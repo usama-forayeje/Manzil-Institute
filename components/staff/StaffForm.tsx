@@ -438,37 +438,33 @@ export default function StaffForm() {
     if (typeof cleanData.photoUrl === "string" && cleanData.photoUrl.startsWith("blob:")) {
       delete cleanData.photoUrl;
     }
+    if (typeof cleanData.nidFrontCopyUrl === "string" && cleanData.nidFrontCopyUrl.startsWith("blob:")) {
+      delete cleanData.nidFrontCopyUrl;
+    }
+    if (typeof cleanData.nidBackCopyUrl === "string" && cleanData.nidBackCopyUrl.startsWith("blob:")) {
+      delete cleanData.nidBackCopyUrl;
+    }
 
-    // File objects don't survive server action serialization - remove them
-    delete cleanData.photoFile;
-    delete cleanData.nidFrontCopyFile;
-    delete cleanData.nidBackCopyFile;
-    delete cleanData.certificateFiles;
-    delete cleanData.experienceLetterFile;
-    delete cleanData.cvFile;
-    delete cleanData.tazkiyahFile;
+    // Keep base64 URLs for server upload - they will be converted to File objects server-side
+    // photoBase64, nidFrontBase64, nidBackBase64 are only used for client-side preview
 
-    // Log what's being submitted for debugging
-    console.log("=== Submitting data ===");
-    console.log("photoUrl:", cleanData.photoUrl?.substring?.(0, 50) ?? "none");
-    console.log("photoBase64:", cleanData.photoBase64 ? "present" : "none");
-    console.log("nidFrontCopyUrl:", cleanData.nidFrontCopyUrl?.substring?.(0, 50) ?? "none");
-    console.log("certificateUrls:", cleanData.certificateUrls?.length ?? "none");
-    console.log("cvUrl:", cleanData.cvUrl?.substring?.(0, 50) ?? "none");
-    console.log("whatsappNo:", cleanData.whatsappNo);
+
 
     // Handle empty optional fields to prevent Appwrite validation errors
     if (!cleanData.email || cleanData.email.trim() === '') {
       cleanData.email = null;
     }
 
-    // Handle other optional fields
-    if (!cleanData.phoneSecondary || cleanData.phoneSecondary.trim() === '') {
-      cleanData.phoneSecondary = null;
-    }
-    if (!cleanData.whatsappNo || cleanData.whatsappNo.trim() === '') {
-      cleanData.whatsappNo = null;
-    }
+    // Add debug logging before submission
+    console.log('🔍 DEBUG: About to submit with data fields:', {
+      hasPhotoFile: !!cleanData.photoFile,
+      hasPhotoBase64: !!cleanData.photoBase64 && cleanData.photoBase64.startsWith('data:'),
+      photoUrlType: typeof cleanData.photoUrl,
+      photoUrlPreview: cleanData.photoUrl?.substring(0, 50) + '...',
+      hasNidFrontFile: !!cleanData.nidFrontCopyFile,
+      hasNidFrontBase64: !!cleanData.nidFrontBase64 && cleanData.nidFrontBase64.startsWith('data:'),
+      step1DataKeys: Object.keys(step1Data)
+    });
 
     if (mutation.isPending) {
       return;

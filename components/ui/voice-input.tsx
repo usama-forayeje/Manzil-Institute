@@ -139,19 +139,19 @@ function BaseVoiceInput({
         onChange={handleChange}
         placeholder={placeholder}
         className={cn(
-          "w-full rounded-lg border bg-background px-3 py-2 pr-20 text-sm transition-all duration-200 outline-none",
+          "w-full rounded-lg border bg-background px-3 py-2 pr-20 text-sm transition-all duration-200 outline-none cursor-text",
           "focus:ring-2 focus:ring-cyan-500/30 focus:border-cyan-500/50",
           isListening && "ring-2 ring-green-500/30 border-green-500/50 bg-green-50/10 dark:bg-green-900/5",
           className
         )}
       />
 
-      <div className="absolute inset-y-0 right-2 flex items-center gap-1.5 overflow-hidden">
+      <div className="absolute inset-y-0 right-2 flex items-center gap-1.5 z-10 pointer-events-none">
         {localVal.length > 0 && (
           <button
             type="button"
             onClick={handleClear}
-            className="flex h-6 w-6 items-center justify-center rounded-full text-muted-foreground transition-all duration-200 hover:bg-red-50 dark:hover:bg-red-950/30 hover:text-red-500 hover:scale-110"
+            className="flex h-6 w-6 items-center justify-center rounded-full text-muted-foreground transition-all duration-200 hover:bg-red-50 dark:hover:bg-red-950/30 hover:text-red-500 hover:scale-110 pointer-events-auto"
             aria-label="Clear"
           >
             <X className="h-3.5 w-3.5" />
@@ -162,7 +162,7 @@ function BaseVoiceInput({
           type="button"
           onClick={handleMic}
           className={cn(
-            "flex h-8 w-8 items-center justify-center rounded-full transition-all duration-200",
+            "flex h-8 w-8 items-center justify-center rounded-full transition-all duration-200 pointer-events-auto",
             isListening
               ? "bg-[#11a311] text-white shadow-lg shadow-green-500/30 scale-110"
               : "text-muted-foreground hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-950/20 hover:scale-110"

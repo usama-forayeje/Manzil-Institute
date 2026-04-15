@@ -1056,7 +1056,7 @@ export function getTermsByDesignation(designation: string): RoleTerms | null {
     principal: PRINCIPAL_TERMS,
     secondary_principal: SECONDARY_PRINCIPAL_TERMS,
     headmaster: HEADMASTER_TERMS,
-    
+
     // Teachers
     assistant_teacher: ASSISTANT_TEACHER_TERMS,
     general_teacher: GENERAL_TEACHER_TERMS,
@@ -1066,7 +1066,7 @@ export function getTermsByDesignation(designation: string): RoleTerms | null {
     hifz_teacher: HIFZ_TEACHER_TERMS,
     nazera_teacher: NAZERA_TEACHER_TERMS,
     it_teacher: IT_TEACHER_TERMS,
-    
+
     // IT/Technical
     web_developer: WEB_DEVELOPER_TERMS,
     digital_marketer: DIGITAL_MARKETER_TERMS,
@@ -1074,24 +1074,26 @@ export function getTermsByDesignation(designation: string): RoleTerms | null {
     content_writer: CONTENT_WRITER_TERMS,
     librarian: LIBRARIAN_TERMS,
     lab_assistant: LAB_ASSISTANT_TERMS,
-    
+
     // Admin
     accountant: ACCOUNTANT_TERMS,
     office_assistant: OFFICE_ASSISTANT_TERMS,
     staff: STAFF_TERMS,
-    
+
     // Support
     boarding_manager: BOARDING_MANAGER_TERMS,
     guard: GUARD_TERMS,
     caretaker: CARETAKER_TERMS,
     driver: DRIVER_TERMS,
     cleaner: CLEANER_TERMS,
-    
+
     // Advisory
     adviser: ADVISOR_TERMS,
   };
 
-  return termsMap[designation] || null;
+  // Case-insensitive lookup
+  const normalizedDesignation = designation.toLowerCase().replace(/\s+/g, '_');
+  return termsMap[normalizedDesignation] || null;
 }
 
 // All designations that require accepting terms
@@ -1100,17 +1102,16 @@ export const DESIGNATIONS_REQUIRING_TERMS = [
   "principal",
   "secondary_principal",
   "headmaster",
-  
+
   // Teachers
   "assistant_teacher",
   "general_teacher",
   "residential_teacher",
   "unResidential_teacher",
-  "unpaid_teacher",
   "hifz_teacher",
   "nazera_teacher",
   "it_teacher",
-  
+
   // IT/Technical
   "web_developer",
   "digital_marketer",
@@ -1118,19 +1119,18 @@ export const DESIGNATIONS_REQUIRING_TERMS = [
   "content_writer",
   "librarian",
   "lab_assistant",
-  
+
   // Admin
   "accountant",
   "office_assistant",
   "staff",
-  
+
   // Support
   "boarding_manager",
   "guard",
   "caretaker",
   "driver",
   "cleaner",
-  
-  // Advisory
-  "adviser",
+
+  // Note: adviser and unpaid_teacher do not require terms
 ];

@@ -16,8 +16,8 @@ let termsCache: Record<string, RoleTerms> | null = null;
 let cacheTimestamp = 0;
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
-// Invalidate cache function
-export function invalidateTermsCache() {
+// Invalidate cache function - must be async because this file has "use server" directive
+export async function invalidateTermsCache(): Promise<void> {
   designationsCache = null;
   termsCache = null;
   cacheTimestamp = 0;
@@ -37,6 +37,7 @@ export async function getDesignations() {
 
   try {
     if (!COLLECTIONS.DESIGNATIONS) {
+      console.log("❌ DESIGNATIONS collection not configured");
       // Fallback to config
       const fallbackData = Object.entries(DESIGNATION_LABELS).map(([id, label]) => ({
         designation_id: id,
@@ -54,14 +55,91 @@ export async function getDesignations() {
       return fallbackData;
     }
 
-    const { databases } = await createAdminClient();
-    const response = await databases.listDocuments(
-      DATABASE_ID,
-      COLLECTIONS.DESIGNATIONS,
-      [
-        Query.orderAsc("sort_order"),
-      ]
-    );
+    console.log("🔍 Loading designations from database collection:", COLLECTIONS.DESIGNATIONS);
+
+    console.log("🔍 Querying designations collection:");
+    console.log("- DATABASE_ID:", DATABASE_ID);
+    console.log("- COLLECTIONS.DESIGNATIONS:", COLLECTIONS.DESIGNATIONS);
+
+    try {
+      const { databases } = await createAdminClient();
+      const response = await databases.listDocuments(
+        DATABASE_ID,
+        COLLECTIONS.DESIGNATIONS,
+        [
+          Query.orderAsc("sort_order"),
+        ]
+      );
+
+      console.log("🔍 Database response:", {
+        total: response.total,
+        documentsCount: response.documents?.length || 0,
+        firstDoc: response.documents?.[0] ? {
+          $id: response.documents[0].$id,
+          label_en: response.documents[0].label_en,
+          label_bn: response.documents[0].label_bn
+        } : null
+      });
+
+      // If no documents found, use fallback
+      if (response.documents.length === 0) {
+        console.log("⚠️ No designation documents found, using fallback data");
+        const fallbackData = Object.entries(DESIGNATION_LABELS).map(([id, label]) => ({
+          $id: `fallback_${id}`, // Fake ID for fallback
+          designation_id: id,
+          label_bn: label,
+          label_en: id,
+          category: getCategoryFromId(id),
+          has_terms: DESIGNATIONS_REQUIRING_TERMS.includes(id),
+          is_active: true,
+          sort_order: 0,
+        }));
+
+        designationsCache = fallbackData;
+        cacheTimestamp = now;
+        return fallbackData;
+      }
+
+      // Convert Appwrite Document objects to plain JS objects
+      const data = response.documents.map((doc: any) => ({
+        $id: doc.$id,
+        designation_id: doc.designation_id,
+        label_bn: doc.label_bn,
+        label_en: doc.label_en,
+        category: doc.category,
+        has_terms: doc.has_terms ?? true,
+        is_active: doc.is_active ?? true,
+        sort_order: doc.sort_order ?? 100,
+      }));
+
+      console.log("✅ Loaded designations from database:", data.length, "items");
+      console.log("First item:", data[0]);
+
+      // Cache the data
+      designationsCache = data;
+      cacheTimestamp = now;
+      return data;
+
+    } catch (dbError) {
+      console.error("❌ Database error loading designations:", dbError);
+      console.log("⚠️ Falling back to hardcoded designations due to database error");
+
+      // Fallback to config
+      const fallbackData = Object.entries(DESIGNATION_LABELS).map(([id, label]) => ({
+        $id: `fallback_${id}`, // Fake ID for fallback
+        designation_id: id,
+        label_bn: label,
+        label_en: id,
+        category: getCategoryFromId(id),
+        has_terms: DESIGNATIONS_REQUIRING_TERMS.includes(id),
+        is_active: true,
+        sort_order: 0,
+      }));
+
+      designationsCache = fallbackData;
+      cacheTimestamp = now;
+      return fallbackData;
+    }
 
     // Convert Appwrite Document objects to plain JS objects
     const data = response.documents.map((doc: any) => ({
@@ -74,6 +152,8 @@ export async function getDesignations() {
       is_active: doc.is_active ?? true,
       sort_order: doc.sort_order ?? 100,
     }));
+
+    console.log("✅ Loaded designations from database:", data.length, "items");
 
     // Cache the data
     designationsCache = data;
@@ -168,6 +248,87 @@ export async function getTermsByDesignation(designationId: string): Promise<Role
  * Get all terms for all designations in a single batch query with caching
  * Much faster than calling getTermsByDesignation for each designation
  */
+/**
+ * Get terms for a specific designation from database
+ */
+export async function getTermsByDesignationFromDB(designationId: string): Promise<RoleTerms | null> {
+  if (!COLLECTIONS.TERMS_CONDITIONS || !designationId) {
+    return null;
+  }
+
+  const normalizedInput = designationId.trim();
+
+  try {
+    const { databases } = await createAdminClient();
+
+    let resolvedDesignationIds: string[] = [normalizedInput];
+
+    if (COLLECTIONS.DESIGNATIONS) {
+      const designationsResponse = await databases.listDocuments(
+        DATABASE_ID,
+        COLLECTIONS.DESIGNATIONS,
+        [Query.limit(500)]
+      );
+
+      const normalizedLookup = normalizedInput.toLowerCase();
+      const matchedDesignation = designationsResponse.documents.find((doc: any) => {
+        const docId = (doc.$id || "").toLowerCase();
+        const designationKey = (doc.designation_id || "").toLowerCase();
+        const labelEn = (doc.label_en || "").toLowerCase();
+        const labelBn = (doc.label_bn || "").toLowerCase();
+
+        return (
+          docId === normalizedLookup ||
+          designationKey === normalizedLookup ||
+          labelEn === normalizedLookup ||
+          labelBn === normalizedLookup
+        );
+      });
+
+      if (matchedDesignation) {
+        resolvedDesignationIds = [
+          matchedDesignation.$id,
+          matchedDesignation.designation_id,
+          matchedDesignation.label_en,
+        ].filter(Boolean);
+      }
+    }
+
+    for (const resolvedId of resolvedDesignationIds) {
+      const response = await databases.listDocuments(
+        DATABASE_ID,
+        COLLECTIONS.TERMS_CONDITIONS,
+        [
+          Query.equal("designation_id", resolvedId),
+          Query.limit(1),
+        ]
+      );
+
+      if (response.documents.length === 0) continue;
+
+      const doc = response.documents[0];
+      let sections = doc.sections;
+
+      if (typeof sections === "string") {
+        try {
+          sections = JSON.parse(sections);
+        } catch {
+          sections = [];
+        }
+      }
+
+      return {
+        title: doc.title,
+        sections: sections as RoleTerms["sections"],
+      };
+    }
+  } catch (error) {
+    console.error(`Error fetching terms for designation ${designationId}:`, error);
+  }
+
+  return null;
+}
+
 export async function getAllTerms(): Promise<Record<string, RoleTerms>> {
   const now = Date.now();
 
@@ -176,84 +337,67 @@ export async function getAllTerms(): Promise<Record<string, RoleTerms>> {
     return termsCache;
   }
 
-  try {
-    if (!COLLECTIONS.TERMS_CONDITIONS) {
-      // Fallback to config - get all designations and their terms
-      const designations = await getDesignations();
-      const allTerms: Record<string, RoleTerms> = {};
+  // First, get all config terms as base (for fallback)
+  const designations = await getDesignations();
+  const allTerms: Record<string, RoleTerms> = {};
 
-      for (const des of designations) {
-        const desId = des.$id || des.designation_id || "";
-        if (desId) {
-          const terms = getConfigTerms(desId);
-          if (terms) {
-            allTerms[desId] = terms;
+  // Try to load all terms from database
+  if (COLLECTIONS.TERMS_CONDITIONS) {
+    try {
+      const { databases } = await createAdminClient();
+
+      // Get all terms in a single query
+      const response = await databases.listDocuments(
+        DATABASE_ID,
+        COLLECTIONS.TERMS_CONDITIONS,
+        [Query.limit(100)] // Assuming max 100 designations
+      );
+
+      for (const doc of response.documents) {
+        const designationId = doc.designation_id;
+        if (designationId) {
+          let sections = doc.sections;
+          if (typeof sections === "string") {
+            try {
+              sections = JSON.parse(sections);
+            } catch (e) {
+              sections = [];
+            }
           }
+
+          // Store database terms
+          allTerms[designationId] = {
+            title: doc.title,
+            sections: sections as RoleTerms["sections"],
+          };
+          // Also store with lowercase key for case-insensitive access
+          allTerms[designationId.toLowerCase()] = allTerms[designationId];
         }
       }
-
-      // Cache the data
-      termsCache = allTerms;
-      cacheTimestamp = now;
-      return allTerms;
+    } catch (error) {
+      console.error("Error fetching terms from database:", error);
+      // Continue with config fallback
     }
-
-    const { databases } = await createAdminClient();
-
-    // Get all terms in a single query
-    const response = await databases.listDocuments(
-      DATABASE_ID,
-      COLLECTIONS.TERMS_CONDITIONS,
-      [Query.limit(100)] // Assuming max 100 designations
-    );
-
-    const allTerms: Record<string, RoleTerms> = {};
-
-    for (const doc of response.documents) {
-      const designationId = doc.designation_id;
-      if (designationId) {
-        let sections = doc.sections;
-        if (typeof sections === "string") {
-          try {
-            sections = JSON.parse(sections);
-          } catch (e) {
-            sections = [];
-          }
-        }
-
-        allTerms[designationId] = {
-          title: doc.title,
-          sections: sections as RoleTerms["sections"],
-        };
-      }
-    }
-
-    // Cache the data
-    termsCache = allTerms;
-    cacheTimestamp = now;
-
-    return allTerms;
-  } catch (error) {
-    console.error("Error fetching all terms:", error);
-    // Fallback to config
-    const designations = await getDesignations();
-    const allTerms: Record<string, RoleTerms> = {};
-
-    for (const des of designations) {
-      const desId = des.$id || des.designation_id || "";
-      if (desId) {
-        const terms = getConfigTerms(desId);
-        if (terms) {
-          allTerms[desId] = terms;
-        }
-      }
-    }
-
-    // Cache fallback data too
-    termsCache = allTerms;
-    cacheTimestamp = now;
-    return allTerms;
   }
+
+  // For designations that don't have database terms, use config as fallback
+  for (const des of designations) {
+    const desId = des.designation_id || des.$id || "";
+    if (desId && !allTerms[desId] && !allTerms[desId.toLowerCase()]) {
+      const configTerms = getConfigTerms(desId);
+      if (configTerms) {
+        allTerms[desId] = configTerms;
+        // Also store with lowercase key for case-insensitive access
+        allTerms[desId.toLowerCase()] = configTerms;
+      }
+    }
+  }
+
+  // Cache the data
+  termsCache = allTerms;
+  cacheTimestamp = now;
+
+  return allTerms;
 }
 
 /**
@@ -271,7 +415,7 @@ export async function updateTerms(
     }
 
     const { databases } = await createAdminClient();
-    
+
     // Check if document exists
     const existing = await databases.listDocuments(
       DATABASE_ID,
@@ -336,7 +480,7 @@ export async function updateDesignation(
     }
 
     const { databases } = await createAdminClient();
-    
+
     // Find document
     const existing = await databases.listDocuments(
       DATABASE_ID,
@@ -393,10 +537,11 @@ export async function createDesignation(
       isActive,
       sortOrder,
     });
-    return { 
-      success: true, 
+    return {
+      success: true,
       saved: false,
       data: {
+        designation_id: (labelEn || labelBn).toLowerCase().trim().replace(/\s+/g, "_"),
         label_bn: labelBn,
         label_en: labelEn || labelBn,
         category,
@@ -409,13 +554,14 @@ export async function createDesignation(
 
   try {
     const { databases } = await createAdminClient();
-    
+
     // Appwrite will generate $id automatically
     const result = await databases.createDocument(
       DATABASE_ID,
       COLLECTIONS.DESIGNATIONS,
       ID.unique(),
       {
+        designation_id: (labelEn || labelBn).toLowerCase().trim().replace(/\s+/g, "_"),
         label_bn: labelBn,
         label_en: labelEn || labelBn,
         category,
@@ -452,8 +598,8 @@ export async function saveTerms(
         sections,
         isActive,
       });
-      return { 
-        success: true, 
+      return {
+        success: true,
         saved: false,
         data: {
           designation_id: designationId,
@@ -465,10 +611,10 @@ export async function saveTerms(
     }
 
     const { databases } = await createAdminClient();
-    
+
     // Convert sections array to JSON string for Appwrite
     const sectionsJson = JSON.stringify(sections);
-    
+
     // Check if document exists
     const existing = await databases.listDocuments(
       DATABASE_ID,

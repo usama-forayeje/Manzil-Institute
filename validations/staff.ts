@@ -230,7 +230,6 @@ export const UPAZILAS_BY_DISTRICT: Record<string, string[]> = {
 const addressSchema = z.object({
   division: z.string().min(1, "বিভাগ নির্বাচন করুন").optional().or(z.literal("")),
   district: z.string().min(1, "জেলা নির্বাচন করুন").optional().or(z.literal("")),
-  upazila: z.string().min(1, "উপজেলা নির্বাচন করুন").optional().or(z.literal("")),
   thana: z.string().min(1, "থানা উল্লেখ করুন").optional().or(z.literal("")),
   postOffice: z.string().min(1, "পোস্ট অফিস উল্লেখ করুন").optional().or(z.literal("")),
   village: z.string().min(1, "গ্রাম/এলাকা অবশ্যই দিতে হবে").optional().or(z.literal("")),
@@ -285,7 +284,6 @@ export type PersonalFamilyData = z.infer<typeof personalFamilySchema>;
 const emptyPermanentAddress = z.object({
   division: z.string(),
   district: z.string(),
-  upazila: z.string(),
   thana: z.string(),
   postOffice: z.string(),
   village: z.string(),
@@ -296,11 +294,11 @@ export const addressIDSchema = z.object({
   currentAddress: addressSchema,
   permanentSameAsCurrent: z.boolean().default(false),
   permanentAddress: emptyPermanentAddress.optional(),
+  // NID - Bengali digit support
   nidNumber: z
     .string()
-    .regex(/^(\d{10}|\d{17})$/, "সঠিক NID নম্বর দিন (১০ বা ১৭ ডিজিট)")
-    .optional()
-    .or(z.literal("")),
+    .transform((val) => convertToEnglishDigits(val))
+    .pipe(z.string().regex(/^(\d{10}|\d{17})$/).optional()),
   dateOfBirth: z.string().min(1, "জন্ম তারিখ দিতে হবে").optional().or(z.literal("")),
   bloodGroup: z
     .enum(["A+", "A-", "B+", "B-", "AB+", "AB-", "0+", "0-", "unknown"])
@@ -311,51 +309,57 @@ export const addressIDSchema = z.object({
   nidFrontCopyUrl: z.string().optional(),
   nidBackCopyUrl: z.string().optional(),
 }).superRefine((data, ctx) => {
-  // Temporarily bypass permanent address validation for testing
   // Only validate permanent address if NOT same as current
-  // if (!data.permanentSameAsCurrent) {
-  //   const pa = data.permanentAddress;
-  //   // Only check if permanentAddress has actual values (not empty)
-  //   if (pa && pa.division) {
-  //     if (!pa?.district) ctx.addIssue({ code: z.ZodIssueCode.custom, message: "স্থায়ী ঠিকানার জেলা দিন", path: ["permanentAddress", "district"] });
-  //     if (!pa?.upazila) ctx.addIssue({ code: z.ZodIssueCode.custom, message: "স্থায়ী ঠিকানার উপজেলা দিন", path: ["permanentAddress", "upazila"] });
-  //     if (!pa?.thana) ctx.addIssue({ code: z.ZodIssueCode.custom, message: "স্থায়ী ঠিকানার থানা দিন", path: ["permanentAddress", "thana"] });
-  //     if (!pa?.postOffice) ctx.addIssue({ code: z.ZodIssueCode.custom, message: "স্থায়ী ঠিকানার পোস্ট অফিস দিন", path: ["permanentAddress", "postOffice"] });
-  //     if (!pa?.village) ctx.addIssue({ code: z.ZodIssueCode.custom, message: "স্থায়ী ঠিকানার গ্রাম/এলাকা দিন", path: ["permanentAddress", "village"] });
-  //   } else {
-  //     // If same as current is NOT checked, permanent address is required
-  //     ctx.addIssue({ code: z.ZodIssueCode.custom, message: "স্থায়ী ঠিকানার বিভাগ দিন", path: ["permanentAddress", "division"] });
-  //   }
-  // }
-  // Temporarily bypass NID validation for testing
-  // if (!data.nidFrontCopyFile && !data.nidFrontCopyUrl) {
-  //   ctx.addIssue({ code: z.ZodIssueCode.custom, message: "NID সামনের ছবি আবশ্যিক", path: ["nidFrontCopyFile"] });
-  // }
-  // if (!data.nidBackCopyFile && !data.nidBackCopyUrl) {
-  //   ctx.addIssue({ code: z.ZodIssueCode.custom, message: "NID পেছনের ছবি আবশ্যিক", path: ["nidBackCopyFile"] });
-  // }
+  if (!data.permanentSameAsCurrent) {
+    const pa = data.permanentAddress;
+    // Only check if permanentAddress has actual values (not empty)
+    if (pa && pa.division) {
+      if (!pa?.district) ctx.addIssue({ code: z.ZodIssueCode.custom, message: "স্থায়ী ঠিকানার জেলা দিন", path: ["permanentAddress", "district"] });
+      if (!pa?.thana) ctx.addIssue({ code: z.ZodIssueCode.custom, message: "স্থায়ী ঠিকানার থানা দিন", path: ["permanentAddress", "thana"] });
+      if (!pa?.postOffice) ctx.addIssue({ code: z.ZodIssueCode.custom, message: "স্থায়ী ঠিকানার পোস্ট অফিস দিন", path: ["permanentAddress", "postOffice"] });
+      if (!pa?.village) ctx.addIssue({ code: z.ZodIssueCode.custom, message: "স্থায়ী ঠিকানার গ্রাম/এলাকা দিন", path: ["permanentAddress", "village"] });
+    } else {
+      // If same as current is NOT checked, permanent address is required
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: "স্থায়ী ঠিকানার বিভাগ দিন", path: ["permanentAddress", "division"] });
+    }
+  }
+  // NID validation is handled manually in the component
 });
 
 export type AddressIDData = z.infer<typeof addressIDSchema>;
 
 // ─── Step 3: Professional & Educational (Dynamic) ──────────
+
+// Bengali to English digit converter for year field
+const convertToEnglishDigits = (str: string): string => {
+  const bengaliDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+  const englishDigits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+  let result = str;
+  bengaliDigits.forEach((bd, i) => {
+    result = result.replace(new RegExp(bd, 'g'), englishDigits[i]);
+  });
+  return result;
+};
+
 export const professionalEducationSchema = z.object({
   designation: z.string().min(1, "পদবী নির্বাচন করুন"),
   designationCustom: z.string().optional(),
-  department: z.string().optional().or(z.literal("")),
   employmentType: z.enum(["permanent", "contract"], {
     message: "চাকরির ধরন নির্বাচন করুন",
   }),
-  // Education (Dynamic depending on role in UI, but common fields here)
-  // Dynamic Education List
-  // Dynamic Education List
+  // Education - accepts both Bengali and English year
   education: z.array(z.object({
     degree: z.string().min(1, "শিক্ষাগত যোগ্যতা/ডিগ্রীর নাম দিন"),
     institution: z.string().min(1, "শিক্ষাপ্রতিষ্ঠানের নাম দিন"),
     year: z.string()
-      .min(4, "পাসের সন দিন")
-      .max(4, "৪ সংখ্যার সাল দিন")
-      .regex(/^\d{4}$/, "সঠিক সাল দিন"),
+      .transform((val) => convertToEnglishDigits(val)) // Convert Bengali to English
+      .refine((val) => val.length === 4, { message: "৪ সংখ্যার সাল দিন" })
+      .refine((val) => /^\d{4}$/.test(val), { message: "সঠিক সাল দিন" })
+      .refine((val) => {
+        const year = parseInt(val, 10);
+        const currentYear = new Date().getFullYear();
+        return year >= 1950 && year <= currentYear + 5;
+      }, { message: "বৈধ সাল দিন" }),
   })).min(1, "অন্তত একটি শিক্ষাগত যোগ্যতা যোগ করুন"),
   // Social Media Links
   socialLinks: z.object({
@@ -365,10 +369,19 @@ export const professionalEducationSchema = z.object({
     linkedin: z.string().url("সঠিক লিঙ্কডইন লিংক দিন").optional().or(z.literal("")),
     website: z.string().url("সঠিক ওয়েবসাইট লিংক দিন").optional().or(z.literal("")),
   }).optional(),
-  // Previous Experience
+  // Previous Experience - Bengali digit support
   previousWorkplace: z.string().optional().or(z.literal("")),
-  previousWorkDuration: z.string().optional().or(z.literal("")),
-  totalExperienceYears: z.number().min(0).optional().default(0),
+  previousWorkDuration: z.string()
+    .optional()
+    .or(z.literal(""))
+    .transform((val) => val ? convertToEnglishDigits(val) : ""),
+  totalExperienceYears: z.string()
+    .optional()
+    .transform((val) => {
+      if (!val) return 0;
+      const num = parseInt(convertToEnglishDigits(val), 10);
+      return isNaN(num) ? 0 : num;
+    }),
   // Role specific fields
   isHafiz: z.boolean().optional().default(false),
   specialSkills: z.string().max(500).optional().or(z.literal("")),
@@ -380,47 +393,55 @@ export const professionalEducationSchema = z.object({
   certificateUrls: z.array(z.string()).optional(),
   experienceLetterUrl: z.string().optional(),
   cvUrl: z.string().optional(),
-  tazkiyahUrl: z.string().optional(),
 });
 
 export type ProfessionalEducationData = z.infer<typeof professionalEducationSchema>;
 
 // ─── Step 5: Contact Reference ───────────────────────────────
+
+// Phone number helper - converts Bengali digits to English
+const convertPhoneToEnglish = (val: string): string => {
+  const bengaliDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+  const englishDigits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+  let result = val;
+  bengaliDigits.forEach((bd, i) => {
+    result = result.replace(new RegExp(bd, 'g'), englishDigits[i]);
+  });
+  return result;
+};
+
 export const contactReferenceSchema = z.object({
-  // Phone numbers (Main contact info)
+  // Phone numbers (Main contact info) - accepts Bengali or English digits
   phonePrimary: z
     .string()
-    .min(11, "মোবাইল নম্বরটি সঠিক নয়")
-    .max(14)
-    .regex(/^(\+880|880|0)1[3-9]\d{8}$/, "সঠিক বাংলাদেশি মোবাইল নম্বর দিন"),
+    .transform((val) => convertPhoneToEnglish(val))
+    .pipe(z.string().min(11).max(14).regex(/^(\+880|880|0)1[3-9]\d{8}$/)),
   phoneSecondary: z
     .string()
-    .regex(/^(\+880|880|0)1[3-9]\d{8}$/, "সঠিক মোবাইল নম্বর দিন")
-    .optional()
-    .or(z.literal("")),
+    .transform((val) => val ? convertPhoneToEnglish(val) : "")
+    .pipe(z.string().regex(/^(\+880|880|0)1[3-9]\d{8}$/).optional()),
   email: z
     .string()
     .email("সঠিক ইমেইল ঠিকানা দিন")
     .optional()
     .or(z.literal("")),
-  // Emergency Contact
+  // Emergency Contact - Bengali digit support
   emergencyContactNo: z
     .string()
-    .min(11, "মোবাইল নম্বরটি সঠিক নয়")
-    .max(14)
-    .regex(/^(\+880|880|0)1[3-9]\d{8}$/, "সঠিক বাংলাদেশি মোবাইল নম্বর দিন"),
+    .transform((val) => convertPhoneToEnglish(val))
+    .pipe(z.string().min(11).max(14).regex(/^(\+880|880|0)1[3-9]\d{8}$/)),
   emergencyRelationship: z.string().min(1, "সম্পর্ক নির্বাচন করুন"),
-  // WhatsApp
+  // WhatsApp - Bengali digit support
   whatsappNo: z
     .string()
-    .min(11, "মোবাইল নম্বরটি সঠিক নয়")
-    .max(14)
-    .regex(/^(\+880|880|0)1[3-9]\d{8}$/, "সঠিক বাংলাদেশি মোবাইল নম্বর দিন")
-    .optional()
-    .or(z.literal("")),
-  // Reference (these should match paymentReferenceSchema)
+    .transform((val) => val ? convertPhoneToEnglish(val) : "")
+    .pipe(z.string().min(11).max(14).regex(/^(\+880|880|0)1[3-9]\d{8}$/).optional()),
+  // Reference - Bengali digit support
   referenceName: z.string().min(2, "সুপারিশকারীর নাম দিতে হবে"),
-  referencePhone: z.string().min(11, "সুপারিশকারীর মোবাইল নম্বর সঠিক নয়"),
+  referencePhone: z
+    .string()
+    .transform((val) => convertPhoneToEnglish(val))
+    .pipe(z.string().min(11)),
   referenceOccupation: z.string().optional().or(z.literal("")),
 });
 
@@ -432,7 +453,6 @@ export const paymentReferenceSchema = z.object({
     .number({ message: "বেতন সংখ্যায় প্রদান করুন" })
     .min(500, "সঠিক বেতন উল্লেখ করুন"),
   expectedJoiningDate: z.string().min(1, "প্রত্যাশিত যোগদানের তারিখ দিন"),
-  noticePeriod: z.string().min(1, "কবে জয়েন করতে পারবেন উল্লেখ করুন"),
   // Payment Info
   paymentMethod: z.enum(["bank", "mobile_banking", "cash"], {
     message: "পেমেন্টের মাধ্যম নির্বাচন করুন",
@@ -440,9 +460,18 @@ export const paymentReferenceSchema = z.object({
   bankName: z.string().optional().or(z.literal("")),
   bankBranch: z.string().optional().or(z.literal("")),
   accountName: z.string().optional().or(z.literal("")),
-  accountNumber: z.string().optional().or(z.literal("")),
+  // Account number - Bengali digit support
+  accountNumber: z
+    .string()
+    .transform((val) => convertToEnglishDigits(val))
+    .optional()
+    .or(z.literal("")),
   mobileBankingProvider: z.enum(["bkash", "nagad", "rocket", "upay"]).optional(),
-  mobileBankingNumber: z.string().optional().or(z.literal("")),
+  // Mobile banking number - Bengali digit support
+  mobileBankingNumber: z
+    .string()
+    .transform((val) => convertToEnglishDigits(val))
+    .pipe(z.string().regex(/^(\+880|880|0)1[3-9]\d{8}$/).optional()),
   // Declaration
   declaration: z.boolean().refine((val) => val === true, {
     message: "ঘোষণাপত্রটি গ্রহণ করা আবশ্যিক",

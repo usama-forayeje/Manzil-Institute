@@ -52,7 +52,14 @@ export const COLLECTIONS = {
   POLICIES:             process.env.NEXT_PUBLIC_COL_POLICIES             ?? "",
   POLICY_ACKNOWLEDGEMENTS: process.env.NEXT_PUBLIC_COL_POLICY_ACKNOWLEDGEMENTS ?? "",
   DESIGNATIONS:           process.env.NEXT_PUBLIC_COL_DESIGNATIONS           ?? "",
-  TERMS_CONDITIONS:      process.env.NEXT_PUBLIC_COL_TERMS_CONDITIONS      ?? "",
+  TERMS_CONDITIONS:        process.env.NEXT_PUBLIC_COL_TERMS_CONDITIONS        ?? "",
+  ADMISSION_DATA:          process.env.NEXT_PUBLIC_COL_ADMISSION_DATA          ?? "",
+  CURRICULUM_DATA:         process.env.NEXT_PUBLIC_COL_CURRICULUM_DATA         ?? "",
+  DAILY_ROUTINE:           process.env.NEXT_PUBLIC_COL_DAILY_ROUTINE           ?? "",
+  MEAL_PLAN:               process.env.NEXT_PUBLIC_COL_MEAL_PLAN               ?? "",
+  CLASS_ROUTINE:           process.env.NEXT_PUBLIC_COL_CLASS_ROUTINE           ?? "",
+  EXAM_SCHEDULE:           process.env.NEXT_PUBLIC_COL_EXAM_SCHEDULE           ?? "",
+  ACADEMIC_CALENDAR:       process.env.NEXT_PUBLIC_COL_ACADEMIC_CALENDAR       ?? "",
 } as const;
 
 // Shorthand aliases (বেশি ব্যবহৃত collections)
@@ -113,7 +120,7 @@ export const MAX_LIMIT  = 100; // Appwrite max per query
 // ─── File size limits (bytes) ──────────────────────────────
 export const FILE_LIMITS = {
   PHOTO:    5  * 1024 * 1024, //  5 MB
-  DOCUMENT: 10 * 1024 * 1024, // 10 MB
+  DOCUMENT: 5 * 1024 * 1024, // 5 MB
   RECEIPT:  5  * 1024 * 1024, //  5 MB
 } as const;
 

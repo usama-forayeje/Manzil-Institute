@@ -139,7 +139,6 @@ export type FileUploadResult = {
   certificateUrls: string[];
   experienceLetterUrl: string;
   cvUrl: string;
-  tazkiyahUrl: string;
 };
 
 export async function uploadAllFiles(
@@ -232,6 +231,5 @@ export async function uploadAllFiles(
     certificateUrls,
     experienceLetterUrl: results.experienceLetter || "",
     cvUrl: results.cv || "",
-    tazkiyahUrl: results.tazkiyah || "",
   };
 }

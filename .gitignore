@@ -42,4 +42,11 @@ next-env.d.ts
 firebase-debug.log
 components/staff/staff-schema.md
 .kilo/plans/1775386389389-lucky-river.md
-app/(dashboard)/dashboard/layout.tsx.backup
+.gitignore
+.gitignore
+docs/SETUP_TERMS_COLLECTIONS.md
+config/terms_data.json
+.kilocode/mcp.json
+nul
+dev.log
+.kilo/skills/changelog-generator/SKILL.md

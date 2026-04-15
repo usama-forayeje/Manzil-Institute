@@ -46,9 +46,6 @@ export default function StaffApplyPage() {
         <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 kalpurush-font">
           সকল তথ্য সঠিকভাবে পূরণ করুন। <span className="text-red-500">*</span> চিহ্নিত ঘর পূরণ করা আবশ্যক।
         </p>
-        <p className="text-[10px] sm:text-xs text-amber-600 dark:text-amber-400 kalpurush-font mt-1">
-          📎 ছবি/ফাইল আপলোড: সর্বোচ্চ 5MB প্রতিটি • মোট আপলোড সাইজ: 10MB
-        </p>
       </div>
 
       <StaffForm />

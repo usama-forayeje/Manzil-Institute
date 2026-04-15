@@ -8,6 +8,16 @@ const nextConfig = {
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     minimumCacheTTL: 31536000, // 1 year
   },
+  // Server action payload limit for multi-step forms
+  serverActions: {
+    bodySizeLimit: "8mb",
+  },
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "8mb",
+    },
+  },
+
   // Enable compression
   compress: true,
   // TypeScript check settings - ignore during build

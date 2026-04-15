@@ -117,7 +117,6 @@
 │ certificateUrls          │ String    │ 5000  │ NO       │ []             │ —       │
 │ experienceLetterUrl      │ String    │ 500   │ NO       │ ""             │ —       │
 │ cvUrl                    │ String    │ 500   │ NO       │ ""             │ —       │
-│ tazkiyahUrl              │ String    │ 500   │ NO       │ ""             │ —       │
 │                          │           │       │          │                │         │
 │ — Meta ─────────────── │           │       │          │                │         │
 │                          │           │       │          │                │         │
@@ -247,7 +246,6 @@ STATUS VALUES:
 │ certificateUrls          │ String    │ 5000  │ NO       │ []             │ —       │
 │ experienceLetterUrl      │ String    │ 500   │ NO       │ ""             │ —       │
 │ cvUrl                    │ String    │ 500   │ NO       │ ""             │ —       │
-│ tazkiyahUrl              │ String    │ 500   │ NO       │ ""             │ —       │
 │                          │           │       │          │                │         │
 │ — NFC & Meta ──────────  │           │       │          │                │         │
 │                          │           │       │          │                │         │

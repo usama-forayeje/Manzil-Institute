@@ -1,7 +1,6 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 
-
 @custom-variant dark (&:is(.dark *));
 
 /* @import './style/theme.css'; */
@@ -79,17 +78,18 @@
 /* SolaimanLipi font for Bengali text */
 @font-face {
   font-family: 'SolaimanLipi';
-  src: url('/fonts/SolaimanLipi.ttf') format('truetype');
+  src: url('/fonts/SolaimanLipi/SolaimanLipi_22-02-2012.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
 }
 
-/* SolaimanLipi font for Bengali text */
+/* SolaimanLipi Bold font for Bengali text */
 @font-face {
   font-family: 'SolaimanLipi';
-  src: url('/fonts/SolaimanLipi.ttf') format('truetype');
-  font-weight: normal;
+  src: url('/fonts/SolaimanLipi/SolaimanLipi_Bold_10-03-12.ttf')
+    format('truetype');
+  font-weight: bold;
   font-style: normal;
   font-display: swap;
 }
@@ -591,7 +591,9 @@ header nav .flex {
 
 /* 3D Card Hover Effect */
 .card-3d {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
   transform-style: preserve-3d;
 }
 
@@ -616,7 +618,8 @@ header nav .flex {
 
 /* Floating Particles Background */
 @keyframes float-particle {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0) rotate(0deg);
   }
   50% {
@@ -656,7 +659,7 @@ header nav .flex {
   top: 0;
   left: 0;
   height: 3px;
-  background: linear-gradient(to right, #00AEEF, purple);
+  background: linear-gradient(to right, #00aeef, purple);
   z-index: 1000;
   transition: width 0.1s ease-out;
 }
@@ -684,20 +687,37 @@ header nav .flex {
   animation: count-up 0.4s ease-out forwards;
 }
 
-.stagger-enter > *:nth-child(1) { animation-delay: 0ms; }
-.stagger-enter > *:nth-child(2) { animation-delay: 100ms; }
-.stagger-enter > *:nth-child(3) { animation-delay: 200ms; }
-.stagger-enter > *:nth-child(4) { animation-delay: 300ms; }
-.stagger-enter > *:nth-child(5) { animation-delay: 400ms; }
-.stagger-enter > *:nth-child(6) { animation-delay: 500ms; }
+.stagger-enter > *:nth-child(1) {
+  animation-delay: 0ms;
+}
+.stagger-enter > *:nth-child(2) {
+  animation-delay: 100ms;
+}
+.stagger-enter > *:nth-child(3) {
+  animation-delay: 200ms;
+}
+.stagger-enter > *:nth-child(4) {
+  animation-delay: 300ms;
+}
+.stagger-enter > *:nth-child(5) {
+  animation-delay: 400ms;
+}
+.stagger-enter > *:nth-child(6) {
+  animation-delay: 500ms;
+}
 
 /* Glowing Effect */
 @keyframes glow {
-  0%, 100% {
-    box-shadow: 0 0 5px currentColor, 0 0 10px currentColor;
+  0%,
+  100% {
+    box-shadow:
+      0 0 5px currentColor,
+      0 0 10px currentColor;
   }
   50% {
-    box-shadow: 0 0 20px currentColor, 0 0 30px currentColor;
+    box-shadow:
+      0 0 20px currentColor,
+      0 0 30px currentColor;
   }
 }
 
@@ -753,7 +773,3 @@ header nav .flex {
     transform: scale(0.98);
   }
 }
-
-
-
-

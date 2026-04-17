@@ -9,14 +9,15 @@ import {
   updateTerms,
   updateDesignation,
   createDesignation,
-  invalidateTermsCache
+  invalidateTermsCache,
 } from '@/lib/actions/terms';
 
 // Query keys for consistent caching
 export const termsQueryKeys = {
   designations: ['terms', 'designations'] as const,
   allTerms: ['terms', 'all'] as const,
-  termsByDesignation: (designationId: string) => ['terms', 'designation', designationId] as const,
+  termsByDesignation: (designationId: string) =>
+    ['terms', 'designation', designationId] as const,
 };
 
 // Custom hooks for terms management with React Query
@@ -25,8 +26,10 @@ export function useDesignations() {
   return useQuery({
     queryKey: termsQueryKeys.designations,
     queryFn: getDesignations,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 30 * 60 * 1000, // 30 minutes
+    staleTime: 60 * 1000, // 1 minute - reduced
+    gcTime: 5 * 60 * 1000, // 5 minutes - reduced
+    refetchOnWindowFocus: false,
+    retry: 1,
   });
 }
 
@@ -34,8 +37,10 @@ export function useAllTerms() {
   return useQuery({
     queryKey: termsQueryKeys.allTerms,
     queryFn: getAllTerms,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 30 * 60 * 1000, // 30 minutes
+    staleTime: 60 * 1000, // 1 minute - reduced for terms
+    gcTime: 5 * 60 * 1000, // 5 minutes - reduced
+    refetchOnWindowFocus: false,
+    retry: 1,
   });
 }
 
@@ -44,7 +49,28 @@ export function useTermsByDesignation(designationId: string) {
 
   return useQuery({
     queryKey: termsQueryKeys.termsByDesignation(normalizedId),
-    queryFn: () => getTermsByDesignationFromDB(normalizedId),
+    queryFn: async () => {
+      const result = await getTermsByDesignationFromDB(normalizedId);
+      // Extract first document since the query returns { documents: [...] }
+      // and we expect terms data to be in the first document
+      if (result?.documents && result.documents.length > 0) {
+        const doc = result.documents[0];
+        // Parse sections if it's a JSON string
+        if (doc.sections && typeof doc.sections === 'string') {
+          try {
+            doc.sections = JSON.parse(doc.sections);
+          } catch {
+            doc.sections = [];
+          }
+        }
+        // Ensure sections is an array
+        if (!Array.isArray(doc.sections)) {
+          doc.sections = [];
+        }
+        return doc;
+      }
+      return null;
+    },
     staleTime: 5 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
     enabled: !!normalizedId,
@@ -57,12 +83,17 @@ export function useSaveTerms() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ designationId, title, sections, isActive }: {
+    mutationFn: ({
+      designationId,
+      title,
+      sections,
+      isActive,
+    }: {
       designationId: string;
       title: string;
       sections: any[];
       isActive?: boolean;
-    }) => saveTerms(designationId, title, sections, isActive),
+    }) => saveTerms({ designationId, title, sections, isActive }),
 
     onSuccess: () => {
       // Invalidate all terms-related queries
@@ -77,7 +108,12 @@ export function useUpdateTerms() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ designationId, title, sections, updatedBy }: {
+    mutationFn: ({
+      designationId,
+      title,
+      sections,
+      updatedBy,
+    }: {
       designationId: string;
       title: string;
       sections: any[];
@@ -95,7 +131,11 @@ export function useUpdateDesignation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ designationId, labelBn, labelEn }: {
+    mutationFn: ({
+      designationId,
+      labelBn,
+      labelEn,
+    }: {
       designationId: string;
       labelBn: string;
       labelEn: string;
@@ -112,14 +152,29 @@ export function useCreateDesignation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ labelBn, labelEn, category, hasTerms, isActive, sortOrder }: {
+    mutationFn: ({
+      labelBn,
+      labelEn,
+      category,
+      hasTerms,
+      isActive,
+      sortOrder,
+    }: {
       labelBn: string;
       labelEn?: string;
       category: string;
       hasTerms?: boolean;
       isActive?: boolean;
       sortOrder?: number;
-    }) => createDesignation(labelBn, labelEn, category, hasTerms, isActive, sortOrder),
+    }) =>
+      createDesignation(
+        labelBn,
+        labelEn,
+        category,
+        hasTerms,
+        isActive,
+        sortOrder
+      ),
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['terms'] });

@@ -1,8 +1,8 @@
 "use client";
 
-import { ID } from "appwrite";
-import { storage, client } from "@/lib/appwrite/client";
-import { BUCKETS, FILE_LIMITS, ACCEPTED_IMAGE_TYPES, ACCEPTED_DOC_TYPES } from "@/config/appwrite";
+import { PutObjectCommand, HeadObjectCommand } from "@aws-sdk/client-s3";
+import { r2Client, validateR2Config, R2_BUCKET, buildR2Key, buildR2Url } from "@/config/r2";
+import { FILE_LIMITS, ACCEPTED_IMAGE_TYPES, ACCEPTED_DOC_TYPES } from "@/config/appwrite";
 
 export type UploadProgress = {
   fileIndex: number;
@@ -96,30 +96,45 @@ export function validateAllFiles(files: {
 
 async function uploadSingleFile(
   file: File,
-  bucketId: string,
+  folder: string,
+  fileId: string,
   onProgress?: (percentage: number) => void
 ): Promise<string> {
-  const fileId = ID.unique();
-  
-  const response = await storage.createFile(
-    bucketId,
-    fileId,
-    file,
-    onProgress
-      ? [
-          (res: any) => {
-            if (res && typeof res.progress === "number") {
-              onProgress(Math.round(res.progress));
-            }
-          },
-        ]
-      : undefined
-  );
+  const r2Validation = validateR2Config();
+  if (!r2Validation.valid) {
+    throw new Error("R2 storage not configured properly");
+  }
 
-  const endpoint = process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT;
-  const projectId = process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID;
+  const r2Key = buildR2Key(folder, fileId);
+  const bucketName = R2_BUCKET;
 
-  return `${endpoint}/storage/buckets/${bucketId}/files/${response.$id}/view?project=${projectId}`;
+  try {
+    const headCommand = new HeadObjectCommand({
+      Bucket: bucketName,
+      Key: r2Key,
+    });
+    await r2Client.send(headCommand);
+  } catch (headErr: any) {
+    if (headErr.name !== 'NotFound' && headErr.name !== 'NoSuchKey') {
+      throw headErr;
+    }
+  }
+
+  const uploadCommand = new PutObjectCommand({
+    Bucket: bucketName,
+    Key: r2Key,
+    Body: file,
+    ContentType: file.type,
+    Metadata: {
+      uploadedAt: new Date().toISOString(),
+      originalName: file.name,
+      fileSize: file.size.toString(),
+    },
+  });
+
+  await r2Client.send(uploadCommand);
+  const url = buildR2Url(folder, fileId);
+  return url;
 }
 
 export type FileUploadInput = {
@@ -141,36 +156,64 @@ export type FileUploadResult = {
   cvUrl: string;
 };
 
+const FILE_TYPE_EXTENSIONS: Record<string, string> = {
+  photo:       "jpg",
+  nid_front:   "jpg",
+  nid_back:    "jpg",
+  cv:          "pdf",
+  exp_letter:  "pdf",
+  tazkiyah:    "pdf",
+  certificate: "jpg",
+};
+
+function generateFileId(fileName: string, type: string, index?: number): string {
+  const timestamp = Date.now();
+  const suffix = index !== undefined ? `_${index}` : "";
+  const sanitizedName = fileName.replace(/[^a-zA-Z0-9]/g, "").substring(0, 20);
+  const folder = `${sanitizedName}_${timestamp}`;
+  const ext = FILE_TYPE_EXTENSIONS[type] ?? "jpg";
+  return `${folder}/${type}${suffix}.${ext}`;
+}
+
 export async function uploadAllFiles(
   files: FileUploadInput,
   onProgress?: ProgressCallback
 ): Promise<FileUploadResult> {
-  const allFiles: { file: File; bucketId: string; key: string }[] = [];
+  const STAFF_PHOTOS = "staff-photos";
+  const DOCUMENTS = "staff-documents";
+  const allFiles: { file: File; folder: string; fileId: string; key: string }[] = [];
 
   if (files.photoFile) {
-    allFiles.push({ file: files.photoFile, bucketId: BUCKETS.STAFF_PHOTOS, key: "photo" });
+    const fileId = generateFileId(files.photoFile.name, 'photo');
+    allFiles.push({ file: files.photoFile, folder: STAFF_PHOTOS, fileId, key: "photo" });
   }
   if (files.nidFrontCopyFile) {
-    allFiles.push({ file: files.nidFrontCopyFile, bucketId: BUCKETS.DOCUMENTS, key: "nidFront" });
+    const fileId = generateFileId(files.nidFrontCopyFile.name, 'nid_front');
+    allFiles.push({ file: files.nidFrontCopyFile, folder: DOCUMENTS, fileId, key: "nidFront" });
   }
   if (files.nidBackCopyFile) {
-    allFiles.push({ file: files.nidBackCopyFile, bucketId: BUCKETS.DOCUMENTS, key: "nidBack" });
+    const fileId = generateFileId(files.nidBackCopyFile.name, 'nid_back');
+    allFiles.push({ file: files.nidBackCopyFile, folder: DOCUMENTS, fileId, key: "nidBack" });
   }
   if (files.certificateFiles) {
     files.certificateFiles.forEach((file, idx) => {
       if (file) {
-        allFiles.push({ file, bucketId: BUCKETS.DOCUMENTS, key: `certificate_${idx}` });
+        const fileId = generateFileId(file.name, 'certificate', idx);
+        allFiles.push({ file, folder: DOCUMENTS, fileId, key: `certificate_${idx}` });
       }
     });
   }
   if (files.experienceLetterFile) {
-    allFiles.push({ file: files.experienceLetterFile, bucketId: BUCKETS.DOCUMENTS, key: "experienceLetter" });
+    const fileId = generateFileId(files.experienceLetterFile.name, 'exp_letter');
+    allFiles.push({ file: files.experienceLetterFile, folder: DOCUMENTS, fileId, key: "experienceLetter" });
   }
   if (files.cvFile) {
-    allFiles.push({ file: files.cvFile, bucketId: BUCKETS.DOCUMENTS, key: "cv" });
+    const fileId = generateFileId(files.cvFile.name, 'cv');
+    allFiles.push({ file: files.cvFile, folder: DOCUMENTS, fileId, key: "cv" });
   }
   if (files.tazkiyahFile) {
-    allFiles.push({ file: files.tazkiyahFile, bucketId: BUCKETS.DOCUMENTS, key: "tazkiyah" });
+    const fileId = generateFileId(files.tazkiyahFile.name, 'tazkiyah');
+    allFiles.push({ file: files.tazkiyahFile, folder: DOCUMENTS, fileId, key: "tazkiyah" });
   }
 
   const totalFiles = allFiles.length;
@@ -178,7 +221,7 @@ export async function uploadAllFiles(
   const certificateUrls: string[] = [];
 
   for (let i = 0; i < allFiles.length; i++) {
-    const { file, bucketId, key } = allFiles[i];
+    const { file, folder, fileId, key } = allFiles[i];
 
     onProgress?.({
       fileIndex: i + 1,
@@ -189,7 +232,7 @@ export async function uploadAllFiles(
     });
 
     try {
-      const url = await uploadSingleFile(file, bucketId, (percentage) => {
+      const url = await uploadSingleFile(file, folder, fileId, (percentage) => {
         onProgress?.({
           fileIndex: i + 1,
           totalFiles,

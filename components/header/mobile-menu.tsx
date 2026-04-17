@@ -116,7 +116,7 @@ export default function MobileMenu({ isMenuOpen, setIsMenuOpen, isScrolled, lang
       setIsMenuOpen(false);
       window.location.href = '/';
     } catch (error) {
-      console.error('Logout failed:', error);
+      // Silent error handling
     }
   };
 

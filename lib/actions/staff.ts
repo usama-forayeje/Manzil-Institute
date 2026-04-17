@@ -1,20 +1,20 @@
 "use server";
 
 import { ID, Query } from "node-appwrite";
+import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { createAdminClient } from "@/lib/appwrite/admin";
 import {
   DATABASE_ID,
   COLLECTIONS,
   BUCKETS,
 } from "@/config/appwrite";
+import { r2Client, validateR2Config, buildR2Key, buildR2Url, R2_BUCKET } from "@/config/r2";
 import type { FullStaffData } from "@/validations/staff";
 
-// ─── Staff ID generator ────────────────────────────────────
 async function generateStaffId(databases: any): Promise<string> {
   const year = new Date().getFullYear();
   const prefix = `STF-${year}-`;
 
-  // সর্বশেষ staff ID বের করো
   const existing = await databases.listDocuments(
     DATABASE_ID,
     COLLECTIONS.STAFF,
@@ -35,87 +35,89 @@ async function generateStaffId(databases: any): Promise<string> {
   return `${prefix}${String(nextNumber).padStart(3, "0")}`;
 }
 
-// ─── File ID generator ─────────────────────────────────────
-// Format: {username}_{staffId}_{type}  (max 36 chars — Appwrite limit)
 function buildFileId(
-  rawName: string,    // nameEn or nameBn
-  staffId: string,     // "STF-2026-001"
-  type: string,        // "profile" | "nid_front" | "nid_back" | "cv" | "certificate" | "exp_letter" | "tazkiyah"
-  index?: number       // for multi-file types (certificates)
+  rawName: string,
+  staffId: string,
+  type: string,
+  index?: number
 ): string {
-  // Sanitize name: only lowercase a-z and 0-9, max 12 chars
   const name = rawName
     .toLowerCase()
     .replace(/[^a-z0-9]/g, "")
     .substring(0, 12);
 
-  // Compact staff ID: "STF-2026-001" → "stf2026001"
   const sId = staffId
     .toLowerCase()
     .replace(/-/g, "");
 
   const suffix = index !== undefined ? `_${index}` : "";
-  const id     = `${name}_${sId}_${type}${suffix}`;
+  const ext = {
+    profile: "jpg", nid_front: "jpg", nid_back: "jpg",
+    cv: "pdf", exp_letter: "pdf", tazkiyah: "pdf", certificate: "jpg",
+  }[type] ?? "jpg";
 
-  console.log(`📝 Generated file ID: ${id} (name: ${name}, staffId: ${staffId}, type: ${type}, suffix: ${suffix})`);
-
-  // Hard cap at 36 chars (Appwrite fileId limit)
-  if (id.length <= 36) return id;
-
-  // Truncate name to fit
-  const overhead   = sId.length + type.length + suffix.length + 3; // 3 underscores
-  const allowedName = Math.max(3, 36 - overhead);
-  return `${name.substring(0, allowedName)}_${sId}_${type}${suffix}`;
+  return `${name}_${sId}/${type}${suffix}.${ext}`;
 }
 
-  // ── 1. File upload helper ───────────────────────────────────
-  async function uploadFile(
-    storage:   any,
-    bucketId:  string,
-    source:    File | string,    // File object OR base64 data URL
-    fileId:    string
-  ): Promise<string> {
-    if (!bucketId) {
-      console.warn(`⚠️ Bucket not configured, skipping upload (type: ${fileId})`);
-      return "";
-    }
-
-    let fileToUpload: File;
-
-    if (typeof source === "string") {
-      // base64 data URL → File
-      if (!source.startsWith("data:")) return "";
-
-      const [meta, base64Data] = source.split(",");
-      if (!base64Data) return "";
-
-      const mimeType = meta.match(/data:([^;]+)/)?.[1] ?? "image/jpeg";
-      try {
-        const binary = atob(base64Data);
-        const bytes  = new Uint8Array(binary.length);
-        for (let i =0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-
-        fileToUpload = new File([bytes], `${fileId}.jpg`, { type: mimeType });
-      } catch (err) {
-        console.error(`Failed to convert base64 for ${fileId}:`, err);
-        return "";
-      }
-    } else {
-      fileToUpload = source;
-    }
-
-    try {
-      const result = await storage.createFile(bucketId, fileId, fileToUpload);
-      const url    = `${process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT}/storage/buckets/${bucketId}/files/${result.$id}/view?project=${process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID}`;
-      console.log(`✅ Uploaded: ${result.$id} (${(fileToUpload.size / 1024).toFixed(1)} KB)`);
-      return url;
-    } catch (err: any) {
-      console.error(`❌ Upload failed (${fileId}):`, err.message);
-      return "";
-    }
+async function uploadFile(
+  folder: string,
+  source: File | string,
+  fileId: string
+): Promise<string> {
+  const r2Validation = validateR2Config();
+  if (!r2Validation.valid) {
+    return "";
   }
 
-// ─── Main Server Action ────────────────────────────────────
+  const r2Key = buildR2Key(folder, fileId);
+  const bucketName = R2_BUCKET;
+
+  let fileToUpload: Uint8Array | File;
+  let contentType: string = "application/octet-stream";
+  let originalName: string = fileId;
+
+  if (typeof source === "string") {
+    if (!source.startsWith("data:")) return "";
+
+    const [meta, base64Data] = source.split(",");
+    if (!base64Data) return "";
+
+    contentType = meta.match(/data:([^;]+)/)?.[1] ?? "image/jpeg";
+    try {
+      const binary = atob(base64Data);
+      const bytes  = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+      fileToUpload = bytes;
+      originalName = `${fileId}.${contentType.split("/")[1] ?? "jpg"}`;
+    } catch {
+      return "";
+    }
+  } else {
+    fileToUpload = source;
+    contentType = source.type;
+    originalName = source.name;
+  }
+
+  try {
+    const uploadCommand = new PutObjectCommand({
+      Bucket: bucketName,
+      Key: r2Key,
+      Body: fileToUpload,
+      ContentType: contentType,
+      ContentDisposition: `inline; filename="${originalName}"`,
+      Metadata: {
+        uploadedAt: new Date().toISOString(),
+        originalName: originalName,
+      },
+    });
+
+    await r2Client.send(uploadCommand);
+    return buildR2Url(folder, fileId);
+  } catch {
+    return "";
+  }
+}
+
 export async function createStaff(
   formData: FullStaffData & {
     photoFile?:           File;
@@ -127,46 +129,37 @@ export async function createStaff(
     tazkiyahFile?:        File;
   }
 ): Promise<{ staffId: string; success: true }> {
-  const { account, databases, storage } = await createAdminClient();
+  const { databases } = await createAdminClient();
 
-  // ── 1. Staff ID generate ─────────────────────────────────
   const staffId = await generateStaffId(databases);
 
-  // ── 2. Generate file ID helper ───────────────────────────
   const rawName = formData.nameEn || formData.nameBn || "user";
   const fid = (type: string, index?: number) => buildFileId(rawName, staffId, type, index);
 
-  // ── 3. Photo upload ──────────────────────────────────────
   let photoUrl = "";
   const photoSource = formData.photoFile ?? (formData as any).photoBase64;
   if (photoSource && (photoSource instanceof File || typeof photoSource === "string")) {
-    photoUrl = await uploadFile(
-      storage,
-      BUCKETS.STAFF_PHOTOS,
-      photoSource,
-      fid("profile")
-    );
+    photoUrl = await uploadFile(BUCKETS.STAFF_PHOTOS, photoSource, fid("profile"));
   }
 
-  // ── 2. Documents upload ──────────────────────────────────
   let nidFrontCopyUrl = "";
   const nidFrontSource = formData.nidFrontCopyFile ?? (formData as any).nidFrontBase64;
   if (nidFrontSource && (nidFrontSource instanceof File || typeof nidFrontSource === "string")) {
-    nidFrontCopyUrl = await uploadFile(storage, BUCKETS.DOCUMENTS, nidFrontSource, fid("nid_front"));
+    nidFrontCopyUrl = await uploadFile(BUCKETS.DOCUMENTS, nidFrontSource, fid("nid_front"));
   }
-  
+
   let nidBackCopyUrl = "";
   const nidBackSource = formData.nidBackCopyFile ?? (formData as any).nidBackBase64;
   if (nidBackSource && (nidBackSource instanceof File || typeof nidBackSource === "string")) {
-    nidBackCopyUrl = await uploadFile(storage, BUCKETS.DOCUMENTS, nidBackSource, fid("nid_back"));
+    nidBackCopyUrl = await uploadFile(BUCKETS.DOCUMENTS, nidBackSource, fid("nid_back"));
   }
 
   const certificateUrls: string[] = [];
   if (Array.isArray(formData.certificateFiles)) {
-    for (let i =0; i < formData.certificateFiles.length; i++) {
+    for (let i = 0; i < formData.certificateFiles.length; i++) {
       const file = formData.certificateFiles[i];
       if (file && (file instanceof File || typeof file === "string")) {
-        const url = await uploadFile(storage, BUCKETS.DOCUMENTS, file, `certificate_${i}`);
+        const url = await uploadFile(BUCKETS.DOCUMENTS, file, fid("certificate", i));
         if (url) certificateUrls.push(url);
       }
     }
@@ -174,55 +167,20 @@ export async function createStaff(
 
   let experienceLetterUrl = "";
   const expLetterSource = formData.experienceLetterFile ?? (formData as any).experienceLetterUrl;
-  // Only upload if URL is base64 (not blob or empty)
   if (expLetterSource && typeof expLetterSource === "string" && expLetterSource.startsWith("data:")) {
-    experienceLetterUrl = await uploadFile(storage, BUCKETS.DOCUMENTS, expLetterSource, fid("exp_letter"));
+    experienceLetterUrl = await uploadFile(BUCKETS.DOCUMENTS, expLetterSource, fid("exp_letter"));
   } else if (expLetterSource instanceof File) {
-    experienceLetterUrl = await uploadFile(storage, BUCKETS.DOCUMENTS, expLetterSource, fid("exp_letter"));
+    experienceLetterUrl = await uploadFile(BUCKETS.DOCUMENTS, expLetterSource, fid("exp_letter"));
   }
 
   let cvUrl = "";
   const cvSource = formData.cvFile ?? (formData as any).cvUrl;
-  // Only upload if URL is base64 (not blob or empty)
   if (cvSource && typeof cvSource === "string" && cvSource.startsWith("data:")) {
-    cvUrl = await uploadFile(storage, BUCKETS.DOCUMENTS, cvSource, fid("cv"));
+    cvUrl = await uploadFile(BUCKETS.DOCUMENTS, cvSource, fid("cv"));
   } else if (cvSource instanceof File) {
-    cvUrl = await uploadFile(storage, BUCKETS.DOCUMENTS, cvSource, fid("cv"));
-  }
-  let nidBackCopyUrl = "";
-  if (formData.nidBackCopyFile instanceof File) {
-    nidBackCopyUrl = await uploadFile(storage, BUCKETS.DOCUMENTS, formData.nidBackCopyFile, fid("nid_back"));
+    cvUrl = await uploadFile(BUCKETS.DOCUMENTS, cvSource, fid("cv"));
   }
 
-  const certificateUrls: string[] = [];
-  if (Array.isArray(formData.certificateFiles)) {
-    for (let i = 0; i < formData.certificateFiles.length; i++) {
-      const file = formData.certificateFiles[i];
-      if (file instanceof File) {
-        const url = await uploadFile(storage, BUCKETS.DOCUMENTS, file, fid("certificate", i));
-        certificateUrls.push(url);
-      }
-    }
-  }
-
-  let experienceLetterUrl = "";
-  if (formData.experienceLetterFile instanceof File) {
-    experienceLetterUrl = await uploadFile(
-      storage,
-      BUCKETS.DOCUMENTS,
-      formData.experienceLetterFile,
-      fid("exp_letter")
-    );
-  }
-
-  let cvUrl = "";
-  if (formData.cvFile instanceof File) {
-    cvUrl = await uploadFile(storage, BUCKETS.DOCUMENTS, formData.cvFile, fid("cv"));
-  }
-
-
-
-  // ── 4. Full address string build ─────────────────────────
   const currentAddr = formData.currentAddress;
   const permanentAddr = formData.permanentSameAsCurrent
     ? currentAddr
@@ -248,14 +206,13 @@ export async function createStaff(
     .filter(Boolean)
     .join(", ");
 
-  // ── 5. Staff collection এ insert ─────────────────────────
   await databases.createDocument(
     DATABASE_ID,
     COLLECTIONS.STAFF,
     ID.unique(),
     {
       staffId,
-      userId:      "",      // Google OAuth এর পরে link হবে
+      userId:      "",
       name:        formData.nameBn || formData.nameEn,
       nameEn:      formData.nameEn,
       nameBn:      formData.nameBn,
@@ -287,23 +244,18 @@ export async function createStaff(
       photo:       photoUrl,
       nfcCardId:   "",
       isActive:    true,
-      // Education & Online Presence
       education:             JSON.stringify(formData.education ?? []),
       socialLinks:           JSON.stringify(formData.socialLinks ?? {}),
-      // Experience
       previousWorkplace:    formData.previousWorkplace ?? "",
       previousWorkDuration: formData.previousWorkDuration ?? "",
       totalExperienceYears: formData.totalExperienceYears ?? 0,
-      // Madrasha specific
       isHafiz:       formData.isHafiz ?? false,
       specialSkills: formData.specialSkills ?? "",
-      // Documents
       nidFrontCopyUrl,
       nidBackCopyUrl,
       certificateUrls:       JSON.stringify(certificateUrls),
       experienceLetterUrl,
       cvUrl,
-      // Payment Info
       paymentMethod:      formData.paymentMethod,
       bankName:           formData.bankName || "",
       bankBranch:         formData.bankBranch || "",
@@ -311,7 +263,6 @@ export async function createStaff(
       accountNumber:      formData.accountNumber || "",
       mobileBankingProvider: formData.mobileBankingProvider || "",
       mobileBankingNumber:   formData.mobileBankingNumber || "",
-      // Reference Info
       referenceName:      formData.referenceName,
       referencePhone:     formData.referencePhone,
       referenceOccupation: formData.referenceOccupation,
@@ -320,7 +271,6 @@ export async function createStaff(
     }
   );
 
-  // ── 6. Audit log ─────────────────────────────────────────
   try {
     await databases.createDocument(
       DATABASE_ID,
@@ -341,14 +291,11 @@ export async function createStaff(
         createdAt:   new Date().toISOString(),
       }
     );
-  } catch {
-    // Audit log failure is non-critical — main flow চলবে
-  }
+  } catch {}
 
   return { staffId, success: true };
 }
 
-// ─── Get staff list ────────────────────────────────────────
 export async function getStaffList({
   search,
   limit = 25,
@@ -374,7 +321,6 @@ export async function getStaffList({
   return databases.listDocuments(DATABASE_ID, COLLECTIONS.STAFF, queries);
 }
 
-// ─── Get single staff ──────────────────────────────────────
 export async function getStaffById(staffId: string) {
   const { databases } = await createAdminClient();
 
@@ -387,7 +333,6 @@ export async function getStaffById(staffId: string) {
   return result.documents[0] ?? null;
 }
 
-// ─── Toggle active status ──────────────────────────────────
 export async function toggleStaffActive(documentId: string, isActive: boolean) {
   const { databases } = await createAdminClient();
 

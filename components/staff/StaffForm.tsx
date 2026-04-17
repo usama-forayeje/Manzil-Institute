@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useCallback, useState, useEffect, useRef } from "react";
-import { useMutation } from "@tanstack/react-query";
-import confetti from "canvas-confetti";
+import { useCallback, useState, useEffect, useRef } from 'react';
+import { useMutation } from '@tanstack/react-query';
+import confetti from 'canvas-confetti';
 import {
   CheckCircle2,
   User,
@@ -12,51 +12,109 @@ import {
   BookOpen,
   Star,
   PhoneCall,
-  HomeIcon
-} from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-import { toast } from "sonner";
+  HomeIcon,
+} from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { toast } from 'sonner';
 
-import { Button }   from "@/components/ui/button";
-import { cn }       from "@/lib/utils";
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
-import Step1PersonalFamily   from "./steps/Step1PersonalFamily";
-import Step2AddressID        from "./steps/Step2AddressID";
-import Step3DynamicProfessional from "./steps/Step3DynamicProfessional";
-import Step4ExperienceSkills from "./steps/Step4ExperienceSkills";
-import Step5ContactReference from "./steps/Step5ContactReference";
-import Step6PaymentAgreement from "./steps/Step6PaymentAgreement";
+import Step1PersonalFamily from './steps/Step1PersonalFamily';
+import Step2AddressID from './steps/Step2AddressID';
+import Step3DynamicProfessional from './steps/Step3DynamicProfessional';
+import Step4ExperienceSkills from './steps/Step4ExperienceSkills';
+import Step5ContactReference from './steps/Step5ContactReference';
+import Step6PaymentAgreement from './steps/Step6PaymentAgreement';
 
-import { createApplication, checkDuplicateApplication } from "@/lib/actions/application";
-import { useStaffFormStore, useCurrentStep, useIncompleteSteps, useStep3Data } from "@/store/staffFormStore";
-import { Badge } from "../ui/badge";
-import { validateAllFiles, uploadAllFiles, type UploadProgress } from "@/lib/utils/upload";
+import {
+  createApplication,
+  checkDuplicateApplication,
+} from '@/lib/actions/application';
+import {
+  useStaffFormStore,
+  useCurrentStep,
+  useIncompleteSteps,
+  useStep3Data,
+} from '@/store/staffFormStore';
+import { Badge } from '../ui/badge';
+import {
+  validateAllFiles,
+  uploadAllFiles,
+  type UploadProgress,
+} from '@/lib/utils/upload';
 
 // New restructured steps based on suggestions
 const STEPS = [
-  { number: 1, label: "প্রোফাইল", labelEn: "Profile", icon: User, color: "cyan" },
-  { number: 2, label: "ঠিকানা ও পরিচয়", labelEn: "Address & ID", icon: MapPin, color: "emerald" },
-  { number: 3, label: "শিক্ষাগত যোগ্যতা", labelEn: "Education", icon: BookOpen, color: "violet" },
-  { number: 4, label: "অভিজ্ঞতা ও দক্ষতা", labelEn: "Experience", icon: Star, color: "amber" },
-  { number: 5, label: "যোগাযোগ ও রেফারেন্স", labelEn: "Contact", icon: Phone, color: "rose" },
-  { number: 6, label: "পেমেন্ট ও চুক্তি", labelEn: "Payment", icon: Wallet, color: "indigo" },
+  {
+    number: 1,
+    label: 'প্রোফাইল',
+    labelEn: 'Profile',
+    icon: User,
+    color: 'whatsapp',
+  },
+  {
+    number: 2,
+    label: 'ঠিকানা ও পরিচয়',
+    labelEn: 'Address & ID',
+    icon: MapPin,
+    color: 'whatsapp',
+  },
+  {
+    number: 3,
+    label: 'শিক্ষাগত যোগ্যতা',
+    labelEn: 'Education',
+    icon: BookOpen,
+    color: 'whatsapp',
+  },
+  {
+    number: 4,
+    label: 'অভিজ্ঞতা ও দক্ষতা',
+    labelEn: 'Experience',
+    icon: Star,
+    color: 'whatsapp',
+  },
+  {
+    number: 5,
+    label: 'যোগাযোগ ও রেফারেন্স',
+    labelEn: 'Contact',
+    icon: Phone,
+    color: 'whatsapp',
+  },
+  {
+    number: 6,
+    label: 'পেমেন্ট ও চুক্তি',
+    labelEn: 'Payment',
+    icon: Wallet,
+    color: 'whatsapp',
+  },
 ] as const;
 
 // Color mapping for each step
-const STEP_COLORS: Record<string, { bg: string, text: string, border: string, light: string, dark: string }> = {
-  cyan:   { bg: "bg-cyan-600",   text: "text-cyan-700",   border: "border-cyan-600",   light: "bg-cyan-50",   dark: "dark:bg-cyan-950" },
-  emerald:{ bg: "bg-emerald-600",text: "text-emerald-700", border: "border-emerald-600", light: "bg-emerald-50",dark: "dark:bg-emerald-950" },
-  violet: { bg: "bg-violet-600",text: "text-violet-700", border: "border-violet-600", light: "bg-violet-50", dark: "dark:bg-violet-950" },
-  amber:  { bg: "bg-amber-600",  text: "text-amber-700",  border: "border-amber-600",  light: "bg-amber-50",  dark: "dark:bg-amber-950" },
-  rose:   { bg: "bg-rose-600",  text: "text-rose-700",   border: "border-rose-600",   light: "bg-rose-50",   dark: "dark:bg-rose-950" },
-  indigo: { bg: "bg-indigo-600",text: "text-indigo-700", border: "border-indigo-600", light: "bg-indigo-50", dark: "dark:bg-indigo-950" },
+const STEP_COLORS: Record<
+  string,
+  { bg: string; text: string; border: string; light: string; dark: string }
+> = {
+  whatsapp: {
+    bg: 'bg-[#25D366]',
+    text: 'text-[#25D366]',
+    border: 'border-[#25D366]',
+    light: 'bg-[#25D366]/10',
+    dark: 'bg-[#25D366]/20',
+  },
 };
 
 // Enhanced Step Indicator with better visual design
-function StepIndicator({ current, onStepClick }: { current: number; onStepClick: (step: number) => void }) {
+function StepIndicator({
+  current,
+  onStepClick,
+}: {
+  current: number;
+  onStepClick: (step: number) => void;
+}) {
   const incompleteSteps = useIncompleteSteps();
   const colors = STEP_COLORS[STEPS[current - 1].color];
-  
+
   return (
     <div className="w-full space-y-4 sm:space-y-6">
       {/* Progress Header */}
@@ -70,7 +128,7 @@ function StepIndicator({ current, onStepClick }: { current: number; onStepClick:
           </p>
         </div>
         <div className="text-right">
-          <div className={cn("text-lg sm:text-xl font-black", colors.text)}>
+          <div className={cn('text-lg sm:text-xl font-black', colors.text)}>
             {Math.round((current / STEPS.length) * 100)}%
           </div>
           <p className="text-xs text-zinc-500">সম্পন্ন</p>
@@ -80,51 +138,54 @@ function StepIndicator({ current, onStepClick }: { current: number; onStepClick:
       {/* Enhanced Progress Bar */}
       <div className="relative h-1.5 sm:h-2 w-full bg-zinc-200/60 dark:bg-zinc-700/60 rounded-full overflow-hidden border border-zinc-300/50 dark:border-zinc-600/50">
         <motion.div
-          className={cn("absolute top-0 left-0 h-full rounded-full", colors.bg)}
+          className={cn('absolute top-0 left-0 h-full rounded-full', colors.bg)}
           initial={{ width: 0 }}
           animate={{ width: `${(current / STEPS.length) * 100}%` }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
+          transition={{ duration: 0.5, ease: 'easeOut' }}
         />
         {/* Shimmer effect */}
         <motion.div
           className="absolute top-0 left-0 h-full w-full bg-gradient-to-r from-transparent via-white/40 to-transparent"
-          animate={{ x: ["-100%", "200%"] }}
-          transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+          animate={{ x: ['-100%', '200%'] }}
+          transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
         />
       </div>
 
       {/* Step Pills - scrollable on mobile */}
       <div className="flex justify-between gap-1 overflow-x-auto pb-2 -mx-2 px-2">
-        {STEPS.map((step) => {
+        {STEPS.map(step => {
           const Icon = step.icon;
           const isDone = current > step.number;
           const isActive = current === step.number;
           const isIncomplete = incompleteSteps.includes(step.number);
           const stepColors = STEP_COLORS[step.color];
-          
+
           return (
-            <div 
-              key={step.number} 
+            <div
+              key={step.number}
               className="flex flex-col items-center flex-1 cursor-pointer group min-w-0"
               onClick={() => onStepClick(step.number)}
             >
               <motion.div
                 initial={false}
-                animate={{ 
-                  backgroundColor: isActive 
-                    ? "var(--cyan-500)" 
-                    : isDone 
-                      ? "var(--zinc-500)" 
-                      : "var(--background)",
+                animate={{
+                  backgroundColor: isActive
+                    ? '#25D366'
+                    : isDone
+                      ? 'var(--zinc-500)'
+                      : 'var(--background)',
                   scale: isActive ? 1.1 : 1,
                 }}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className={cn(
-                  "h-9 w-9 sm:h-11 sm:w-11 rounded-lg sm:rounded-xl flex items-center justify-center border-2 transition-all shadow-lg",
-                  isDone && "bg-zinc-500 border-zinc-500 text-white",
-                  isActive && cn(stepColors.bg, stepColors.border, "text-white"),
-                  !isDone && !isActive && "border-zinc-200 dark:border-zinc-700 text-zinc-400 dark:text-zinc-500 group-hover:border-zinc-300 dark:group-hover:border-zinc-600"
+                  'h-9 w-9 sm:h-11 sm:w-11 rounded-lg sm:rounded-xl flex items-center justify-center border-2 transition-all shadow-lg',
+                  isDone && 'bg-zinc-500 border-zinc-500 text-white',
+                  isActive &&
+                    cn(stepColors.bg, stepColors.border, 'text-white'),
+                  !isDone &&
+                    !isActive &&
+                    'border-zinc-200 dark:border-zinc-700 text-zinc-400 dark:text-zinc-500 group-hover:border-zinc-300 dark:group-hover:border-zinc-600'
                 )}
               >
                 {isDone ? (
@@ -133,21 +194,23 @@ function StepIndicator({ current, onStepClick }: { current: number; onStepClick:
                   <Icon className="h-5 w-5" />
                 )}
               </motion.div>
-              
+
               {/* Incomplete indicator */}
               {isIncomplete && !isActive && (
                 <div className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-red-500 flex items-center justify-center">
                   <span className="text-[8px] text-white font-bold">!</span>
                 </div>
               )}
-              
+
               {/* Step label - show on larger screens */}
-              <span className={cn(
-                "hidden lg:block text-xs font-bold mt-2 transition-colors",
-                isActive && "text-cyan-600 dark:text-cyan-400",
-                isDone && "text-zinc-500",
-                  !isDone && !isActive && "text-zinc-400"
-                )}>
+              <span
+                className={cn(
+                  'hidden lg:block text-xs font-bold mt-2 transition-colors',
+                  isActive && 'text-[#25D366] dark:text-[#25D366]',
+                  isDone && 'text-zinc-500',
+                  !isDone && !isActive && 'text-zinc-400'
+                )}
+              >
                 <span className="text-[10px] sm:text-xs font-bold mt-1 sm:mt-2 truncate text-center hidden xs:block">
                   {step.label}
                 </span>
@@ -168,9 +231,6 @@ function SuccessScreen({ staffId }: { staffId: string }) {
     if (hasConfettiFired.current) return;
     hasConfettiFired.current = true;
 
-    console.log("🎉 Starting confetti sequence...");
-
-    // Create confetti canvas with high z-index
     const canvas = document.createElement('canvas');
     canvas.style.position = 'fixed';
     canvas.style.top = '0';
@@ -183,25 +243,22 @@ function SuccessScreen({ staffId }: { staffId: string }) {
 
     const myConfetti = confetti.create(canvas, {
       resize: true,
-      useWorker: false // Disable worker to avoid CSP issues
+      useWorker: false,
     });
 
-    // Fire initial burst
     myConfetti({
       particleCount: 150,
       spread: 100,
       origin: { y: 0.6 },
-      colors: ["#a786ff", "#fd8bbc", "#eca184", "#f8deb1"],
+      colors: ['#a786ff', '#fd8bbc', '#eca184', '#f8deb1'],
       gravity: 0.8,
-      ticks: 300
+      ticks: 300,
     });
 
-    // Side cannons for 3 seconds
     const end = Date.now() + 3000;
     const interval = setInterval(() => {
       if (Date.now() > end) {
         clearInterval(interval);
-        // Remove canvas after animation
         setTimeout(() => {
           if (document.body.contains(canvas)) {
             document.body.removeChild(canvas);
@@ -210,65 +267,61 @@ function SuccessScreen({ staffId }: { staffId: string }) {
         return;
       }
 
-      // Left cannon
       myConfetti({
         particleCount: 3,
         angle: 60,
         spread: 55,
         startVelocity: 60,
         origin: { x: 0, y: 0.5 },
-        colors: ["#a786ff", "#fd8bbc", "#eca184", "#f8deb1"],
+        colors: ['#a786ff', '#fd8bbc', '#eca184', '#f8deb1'],
         gravity: 0.9,
-        ticks: 200
+        ticks: 200,
       });
 
-      // Right cannon
       myConfetti({
         particleCount: 3,
         angle: 120,
         spread: 55,
         startVelocity: 60,
         origin: { x: 1, y: 0.5 },
-        colors: ["#a786ff", "#fd8bbc", "#eca184", "#f8deb1"],
+        colors: ['#a786ff', '#fd8bbc', '#eca184', '#f8deb1'],
         gravity: 0.9,
-        ticks: 200
+        ticks: 200,
       });
     }, 200);
-
-    console.log("🎉 Confetti sequence started!");
   }, []);
 
   const handleGoHome = () => {
-    window.location.href = "/";
+    window.location.href = '/';
   };
-  
+
   return (
     <motion.div
       initial={{ opacity: 0, y: -50 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, ease: "easeOut" }}
+      transition={{ duration: 0.6, ease: 'easeOut' }}
       className="text-center py-8 sm:py-16 px-4 kalpurush-font"
     >
       {/* Success Animation */}
       <motion.div
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
-        transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+        transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
         className="relative inline-block mb-6 sm:mb-8"
       >
-        <div className="h-24 w-24 sm:h-32 sm:w-32 rounded-full bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center shadow-2xl shadow-green-500/30">
+        <div className="h-24 w-24 sm:h-32 sm:w-32 rounded-full bg-gradient-to-br from-[#25D366] to-[#20BD5A] flex items-center justify-center shadow-2xl shadow-[#25D366]/30">
           <CheckCircle2 className="h-12 w-12 sm:h-16 sm:w-16 text-white" />
         </div>
         {/* Ripple effect */}
         <motion.div
-          className="absolute inset-0 rounded-full border-4 border-green-400"
+          className="absolute inset-0 rounded-full border-4 border-[#25D366]"
           initial={{ scale: 1, opacity: 1 }}
           animate={{ scale: 1.5, opacity: 0 }}
           transition={{ duration: 1.5, repeat: Infinity }}
         />
       </motion.div>
-      
-      <motion.h2 
+
+      <motion.h2
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
@@ -276,8 +329,8 @@ function SuccessScreen({ staffId }: { staffId: string }) {
       >
         🎉 আপনার আবেদন সফল হয়েছে!
       </motion.h2>
-      
-      <motion.p 
+
+      <motion.p
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5 }}
@@ -285,20 +338,18 @@ function SuccessScreen({ staffId }: { staffId: string }) {
       >
         আপনার আবেদন আইডি:
       </motion.p>
-      
-      <motion.div 
+
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.6 }}
-        className="inline-block px-6 py-3 bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-cyan-950/30 dark:to-blue-950/30 rounded-xl border border-cyan-200 dark:border-cyan-800 mb-6"
+        className="inline-block px-6 py-3 bg-gradient-to-r from-[#25D366]/10 to-[#25D366]/10 dark:from-[#25D366]/20 dark:to-[#25D366]/20 rounded-xl border border-[#25D366]/30 dark:border-[#25D366]/30 mb-6"
       >
-        <span className="text-2xl font-black text-cyan-600 dark:text-cyan-400">
-          {staffId}
-        </span>
+        <span className="text-2xl font-black text-[#25D366]">{staffId}</span>
       </motion.div>
 
       {/* Office Contact Info */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.65 }}
@@ -306,21 +357,23 @@ function SuccessScreen({ staffId }: { staffId: string }) {
       >
         <div className="flex items-center justify-center gap-2 mb-2">
           <PhoneCall className="h-5 w-5 text-amber-600" />
-          <span className="font-bold text-amber-800 dark:text-amber-200">যোগাযোগের জন্য</span>
+          <span className="font-bold text-amber-800 dark:text-amber-200">
+            যোগাযোগের জন্য
+          </span>
         </div>
         <p className="text-sm text-amber-700 dark:text-amber-300">
           যোগাযোগের জন্য অফিসে সরাসরি যোগাযোগ করুন বা নিচের নম্বরে কল করুন:
         </p>
         <div className="mt-3 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6">
-          <a 
-            href="tel:+88014070460000" 
+          <a
+            href="tel:+88014070460000"
             className="flex items-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-bold transition-colors"
           >
             <PhoneCall className="h-4 w-4" />
             014070460000
           </a>
-          <a 
-            href="tel:+8801822478883" 
+          <a
+            href="tel:+8801822478883"
             className="flex items-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-bold transition-colors"
           >
             <PhoneCall className="h-4 w-4" />
@@ -328,26 +381,27 @@ function SuccessScreen({ staffId }: { staffId: string }) {
           </a>
         </div>
       </motion.div>
-      
-      <motion.p 
+
+      <motion.p
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.7 }}
         className="text-sm text-zinc-500 mb-8 max-w-md mx-auto"
       >
-        আবেদন করার জন্য আপনাকে ধন্যবাদ । আমাদের টিম শীঘ্রই আপনার সাথে যোগাযোগ করবে। ধন্যবাদ!
+        আবেদন করার জন্য আপনাকে ধন্যবাদ । আমাদের টিম শীঘ্রই আপনার সাথে যোগাযোগ
+        করবে। ধন্যবাদ!
       </motion.p>
-      
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.8 }}
         className="flex justify-center"
       >
-        <Button 
+        <Button
           onClick={handleGoHome}
           size="lg"
-          className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white shadow-lg shadow-cyan-500/30 rounded-xl px-8 h-12 font-bold"
+          className="bg-gradient-to-r from-[#25D366] to-[#25D366] hover:from-[#20BD5A] hover:to-[#20BD5A] text-white shadow-lg shadow-[#25D366]/30 rounded-xl px-8 h-12 font-bold"
         >
           <HomeIcon className="h-5 w-5 mr-2" />
           হোমপেজে ফিরে যান
@@ -360,60 +414,82 @@ function SuccessScreen({ staffId }: { staffId: string }) {
 export default function StaffForm() {
   const currentStep = useCurrentStep();
   const step3Data = useStep3Data();
-  const { step1Data, step2Data, step3Data: step3, step4Data, step5Data, step6Data, nextStep, prevStep, setSubmitting, setSubmittedStaffId, submittedStaffId } = useStaffFormStore();
-  const [uploadPhase, setUploadPhase] = useState<string>("idle");
+  const {
+    step1Data,
+    step2Data,
+    step3Data: step3,
+    step4Data,
+    step5Data,
+    step6Data,
+    nextStep,
+    prevStep,
+    setSubmitting,
+    setSubmittedStaffId,
+    submittedStaffId,
+  } = useStaffFormStore();
+  const [uploadPhase, setUploadPhase] = useState<string>('idle');
   const mutation = useMutation({
     mutationFn: createApplication,
-    onError: (error) => {
-      console.error("Mutation error:", error);
+    onError: error => {
+      const errorMessage = error.message || 'অজানা ত্রুটি';
 
-      // Handle user-friendly error messages
-      const errorMessage = error.message || "অজানা ত্রুটি";
-
-      // Check for specific error types
-      if (errorMessage.startsWith("DUPLICATE_APPLICATION:")) {
-        // Duplicate application - extract the message and show as warning
-        const actualMessage = errorMessage.replace("DUPLICATE_APPLICATION:", "");
-        toast.warning("ডুপ্লিকেট আবেদন", {
-          description: actualMessage + "\n\nফর্ম রিসেট করে নতুন তথ্য দিয়ে আবার চেষ্টা করুন।",
+      if (errorMessage.startsWith('DUPLICATE_APPLICATION:')) {
+        const actualMessage = errorMessage.replace(
+          'DUPLICATE_APPLICATION:',
+          ''
+        );
+        toast.warning('ডুপ্লিকেট আবেদন', {
+          description:
+            actualMessage +
+            '\n\nফর্ম রিসেট করে নতুন তথ্য দিয়ে আবার চেষ্টা করুন।',
           duration: 10000,
           action: {
-            label: "ফর্ম রিসেট করুন",
+            label: 'ফর্ম রিসেট করুন',
             onClick: () => {
               useStaffFormStore.getState().reset();
-              toast.success("ফর্ম রিসেট হয়েছে! নতুন তথ্য দিয়ে আবেদন করুন।");
+              toast.success('ফর্ম রিসেট হয়েছে! নতুন তথ্য দিয়ে আবেদন করুন।');
             },
           },
         });
-      } else if (error.name === "DuplicateApplicationError") {
-        // Fallback for custom error type
-        const actualMessage = errorMessage.replace("DUPLICATE_APPLICATION:", "");
-        toast.warning("ডুপ্লিকেট আবেদন", {
-          description: actualMessage + "\n\nফর্ম রিসেট করে নতুন তথ্য দিয়ে আবার চেষ্টা করুন।",
+      } else if (error.name === 'DuplicateApplicationError') {
+        const actualMessage = errorMessage.replace(
+          'DUPLICATE_APPLICATION:',
+          ''
+        );
+        toast.warning('ডুপ্লিকেট আবেদন', {
+          description:
+            actualMessage +
+            '\n\nফর্ম রিসেট করে নতুন তথ্য দিয়ে আবার চেষ্টা করুন।',
           duration: 10000,
           action: {
-            label: "ফর্ম রিসেট করুন",
+            label: 'ফর্ম রিসেট করুন',
             onClick: () => {
               useStaffFormStore.getState().reset();
-              toast.success("ফর্ম রিসেট হয়েছে! নতুন তথ্য দিয়ে আবেদন করুন।");
+              toast.success('ফর্ম রিসেট হয়েছে! নতুন তথ্য দিয়ে আবেদন করুন।');
             },
           },
         });
-      } else if (errorMessage.includes("bucket") || errorMessage.includes("storage")) {
-        // Storage/configuration error
-        toast.error("স্টোরেজ কনফিগারেশন ত্রুটি", {
-          description: "ফাইল আপলোড সিস্টেম সেটআপ করা হয়নি। আবেদন সেভ হয়েছে কিন্তু ফাইলগুলো আপলোড হয়নি।",
+      } else if (
+        errorMessage.includes('bucket') ||
+        errorMessage.includes('storage')
+      ) {
+        toast.error('স্টোরেজ কনফিগারেশন ত্রুটি', {
+          description:
+            'ফাইল আপলোড সিস্টেম সেটআপ করা হয়নি। আবেদন সেভ হয়েছে কিন্তু ফাইলগুলো আপলোড হয়নি।',
           duration: 6000,
         });
       } else {
-        // Generic error - show as error toast instead of 500
-        toast.error("সাবমিশন ব্যর্থ হয়েছে", {
+        toast.error('সাবমিশন ব্যর্থ হয়েছে', {
           description: errorMessage,
           duration: 5000,
         });
       }
     },
-    onSuccess: (data) => {
+    onSuccess: data => {
+      useStaffFormStore.getState().reset();
+      if (typeof window !== 'undefined') {
+        sessionStorage.removeItem('mms-staff-form-v2');
+      }
       setSubmittedStaffId(data.applicationId);
     },
   });
@@ -422,8 +498,7 @@ export default function StaffForm() {
   const colors = STEP_COLORS[STEPS[currentStep - 1].color];
 
   const handleSubmit = useCallback(async () => {
-    console.log("handleSubmit called"); console.log("step1Data:", !!step1Data, "step2Data:", !!step2Data, "step3Data:", !!step3Data, "step4Data:", !!step4Data, "step5Data:", !!step5Data, "step6Data:", !!step6Data); console.log("step4Data keys:", step4Data ? Object.keys(step4Data) : "null");
-    setUploadPhase("submitting");
+    setUploadPhase('submitting');
 
     const cleanData: any = {
       ...step1Data,
@@ -434,50 +509,48 @@ export default function StaffForm() {
       ...step6Data,
     };
 
-    // Strip blob: URLs (useless on server) but KEEP data: base64 URLs (server uploads them)
-    if (typeof cleanData.photoUrl === "string" && cleanData.photoUrl.startsWith("blob:")) {
+    if (
+      typeof cleanData.photoUrl === 'string' &&
+      cleanData.photoUrl.startsWith('blob:')
+    ) {
       delete cleanData.photoUrl;
     }
-    if (typeof cleanData.nidFrontCopyUrl === "string" && cleanData.nidFrontCopyUrl.startsWith("blob:")) {
+    if (
+      typeof cleanData.nidFrontCopyUrl === 'string' &&
+      cleanData.nidFrontCopyUrl.startsWith('blob:')
+    ) {
       delete cleanData.nidFrontCopyUrl;
     }
-    if (typeof cleanData.nidBackCopyUrl === "string" && cleanData.nidBackCopyUrl.startsWith("blob:")) {
+    if (
+      typeof cleanData.nidBackCopyUrl === 'string' &&
+      cleanData.nidBackCopyUrl.startsWith('blob:')
+    ) {
       delete cleanData.nidBackCopyUrl;
     }
 
-    // Keep base64 URLs for server upload - they will be converted to File objects server-side
-    // photoBase64, nidFrontBase64, nidBackBase64 are only used for client-side preview
-
-
-
-    // Handle empty optional fields to prevent Appwrite validation errors
     if (!cleanData.email || cleanData.email.trim() === '') {
       cleanData.email = null;
     }
-
-    // Add debug logging before submission
-    console.log('🔍 DEBUG: About to submit with data fields:', {
-      hasPhotoFile: !!cleanData.photoFile,
-      hasPhotoBase64: !!cleanData.photoBase64 && cleanData.photoBase64.startsWith('data:'),
-      photoUrlType: typeof cleanData.photoUrl,
-      photoUrlPreview: cleanData.photoUrl?.substring(0, 50) + '...',
-      hasNidFrontFile: !!cleanData.nidFrontCopyFile,
-      hasNidFrontBase64: !!cleanData.nidFrontBase64 && cleanData.nidFrontBase64.startsWith('data:'),
-      step1DataKeys: Object.keys(step1Data)
-    });
 
     if (mutation.isPending) {
       return;
     }
 
-    console.log('Submitting cleaned data:', cleanData);
     mutation.mutate(cleanData as any);
-  }, [step1Data, step2Data, step3Data, step4Data, step5Data, step6Data, mutation]);
+  }, [
+    step1Data,
+    step2Data,
+    step3Data,
+    step4Data,
+    step5Data,
+    step6Data,
+    mutation,
+  ]);
 
   if (submittedStaffId) {
     return (
       <div className="max-w-4xl mx-auto p-4 md:p-8">
-        <div className="bg-gradient-to-br from-white via-white/95 to-white/90 dark:from-zinc-900 dark:via-zinc-900/95 dark:to-zinc-800/90 p-8 rounded-[2rem] border border-white/30 dark:border-zinc-700/50 shadow-2xl shadow-cyan-500/5 backdrop-blur-xl">
+        <div className="bg-gradient-to-br from-white via-white/95 to-white/90 dark:from-zinc-900 dark:via-zinc-900/95 dark:to-zinc-800/90 p-8 rounded-[2rem] border border-white/30 dark:border-zinc-700/50 shadow-2xl shadow-[#25D366]/10 backdrop-blur-xl">
           <SuccessScreen staffId={submittedStaffId} />
         </div>
       </div>
@@ -487,44 +560,63 @@ export default function StaffForm() {
   return (
     <div className="kalpurush-font max-w-4xl mx-auto px-2 sm:px-4 py-4 sm:py-6 space-y-4 sm:space-y-6 lg:space-y-8">
       {/* Enhanced Header Card */}
-      <div className="bg-gradient-to-br from-white via-white/95 to-white/90 dark:from-zinc-900 dark:via-zinc-900/95 dark:to-zinc-800/90 p-4 sm:p-6 md:p-8 rounded-2xl lg:rounded-[2rem] border border-white/30 dark:border-zinc-700/50 shadow-2xl shadow-cyan-500/5 backdrop-blur-xl">
-        <StepIndicator current={currentStep} onStepClick={(step) => useStaffFormStore.getState().goToStep(step as any)} />
+      <div className="bg-gradient-to-br from-white via-white/95 to-white/90 dark:from-zinc-900 dark:via-zinc-900/95 dark:to-zinc-800/90 p-4 sm:p-6 md:p-8 rounded-2xl lg:rounded-[2rem] border border-white/30 dark:border-zinc-700/50 shadow-2xl shadow-[#25D366]/10 backdrop-blur-xl">
+        <StepIndicator
+          current={currentStep}
+          onStepClick={step =>
+            useStaffFormStore.getState().goToStep(step as any)
+          }
+        />
       </div>
 
       {/* Enhanced Content Card */}
-      <div className="bg-gradient-to-br from-white via-white/95 to-white/90 dark:from-zinc-900 dark:via-zinc-900/95 dark:to-zinc-800/90 p-4 sm:p-6 md:p-8 rounded-2xl lg:rounded-[2rem] border border-white/30 dark:border-zinc-700/50 shadow-2xl shadow-cyan-500/5 backdrop-blur-xl">
-        
+      <div className="bg-gradient-to-br from-white via-white/95 to-white/90 dark:from-zinc-900 dark:via-zinc-900/95 dark:to-zinc-800/90 p-4 sm:p-6 md:p-8 rounded-2xl lg:rounded-[2rem] border border-white/30 dark:border-zinc-700/50 shadow-2xl shadow-[#25D366]/10 backdrop-blur-xl">
         {/* Step Header */}
-        <div className={cn(
-          "flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mb-6 sm:mb-8 p-3 sm:p-4 rounded-xl lg:rounded-2xl transition-all duration-300",
-          colors.light, colors.dark
-        )}>
-          <div className={cn(
-            "h-12 w-12 sm:h-14 sm:w-14 rounded-xl lg:rounded-2xl flex items-center justify-center shadow-lg shrink-0",
-            colors.bg, "text-white"
-          )}>
+        <div
+          className={cn(
+            'flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mb-6 sm:mb-8 p-3 sm:p-4 rounded-xl lg:rounded-2xl transition-all duration-300',
+            colors.light,
+            colors.dark
+          )}
+        >
+          <div
+            className={cn(
+              'h-12 w-12 sm:h-14 sm:w-14 rounded-xl lg:rounded-2xl flex items-center justify-center shadow-lg shrink-0',
+              colors.bg,
+              'text-white'
+            )}
+          >
             {currentStep === 1 && <User className="h-6 w-6 sm:h-7 sm:w-7" />}
             {currentStep === 2 && <MapPin className="h-6 w-6 sm:h-7 sm:w-7" />}
-            {currentStep === 3 && <BookOpen className="h-6 w-6 sm:h-7 sm:w-7" />}
+            {currentStep === 3 && (
+              <BookOpen className="h-6 w-6 sm:h-7 sm:w-7" />
+            )}
             {currentStep === 4 && <Star className="h-6 w-6 sm:h-7 sm:w-7" />}
             {currentStep === 5 && <Phone className="h-6 w-6 sm:h-7 sm:w-7" />}
             {currentStep === 6 && <Wallet className="h-6 w-6 sm:h-7 sm:w-7" />}
           </div>
           <div className="flex-1 w-full">
-            <h2 className={cn(
-              "text-lg sm:text-xl md:text-2xl font-black",
-              colors.text
-            )}>
+            <h2
+              className={cn(
+                'text-lg sm:text-xl md:text-2xl font-black',
+                colors.text
+              )}
+            >
               {STEPS[currentStep - 1].label}
             </h2>
             <p className="text-xs sm:text-sm text-zinc-500 font-medium">
-              ধাপ {currentStep} / {STEPS.length} — {STEPS[currentStep - 1].labelEn}
+              ধাপ {currentStep} / {STEPS.length} —{' '}
+              {STEPS[currentStep - 1].labelEn}
             </p>
           </div>
-          <Badge variant="outline" className={cn(
-            "sm:flex px-3 py-1.5 sm:px-4 sm:py-2 font-bold border-2 text-sm",
-            colors.border, colors.text
-          )}>
+          <Badge
+            variant="outline"
+            className={cn(
+              'sm:flex px-3 py-1.5 sm:px-4 sm:py-2 font-bold border-2 text-sm',
+              colors.border,
+              colors.text
+            )}
+          >
             {currentStep}/{STEPS.length}
           </Badge>
         </div>
@@ -536,14 +628,29 @@ export default function StaffForm() {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
+            transition={{ duration: 0.3, ease: 'easeOut' }}
           >
             {currentStep === 1 && <Step1PersonalFamily onNext={nextStep} />}
-            {currentStep === 2 && <Step2AddressID onNext={nextStep} onPrev={prevStep} />}
-            {currentStep === 3 && <Step3DynamicProfessional onNext={nextStep} onPrev={prevStep} />}
-            {currentStep === 4 && <Step4ExperienceSkills onNext={nextStep} onPrev={prevStep} />}
-            {currentStep === 5 && <Step5ContactReference onNext={nextStep} onPrev={prevStep} />}
-            {currentStep === 6 && <Step6PaymentAgreement onPrev={prevStep} onSubmit={handleSubmit} isLoading={mutation.isPending} designation={step3Data?.designation} />}
+            {currentStep === 2 && (
+              <Step2AddressID onNext={nextStep} onPrev={prevStep} />
+            )}
+            {currentStep === 3 && (
+              <Step3DynamicProfessional onNext={nextStep} onPrev={prevStep} />
+            )}
+            {currentStep === 4 && (
+              <Step4ExperienceSkills onNext={nextStep} onPrev={prevStep} />
+            )}
+            {currentStep === 5 && (
+              <Step5ContactReference onNext={nextStep} onPrev={prevStep} />
+            )}
+            {currentStep === 6 && (
+              <Step6PaymentAgreement
+                onPrev={prevStep}
+                onSubmit={handleSubmit}
+                isLoading={mutation.isPending}
+                designation={step3Data?.designation}
+              />
+            )}
           </motion.div>
         </AnimatePresence>
       </div>

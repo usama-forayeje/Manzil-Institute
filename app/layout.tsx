@@ -8,7 +8,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import StructuredData from '@/components/seo/StructuredData';
 import ServiceWorkerRegister from '@/components/service-worker-register';
 
-
 const inter = Inter({
   subsets: ['latin'],
   display: 'swap',
@@ -145,9 +144,7 @@ export const metadata: Metadata = {
     title: 'মানজিল ইনস্টিটিউট - মাদরাসা জেনারেল কারিগরি শিক্ষার সমন্বয়',
     description:
       'মানজিল ইনস্টিটিউট বাংলাদেশে একীভূত কারিকুলাম, মাদ্রাসা শিক্ষা, জেনারেল শিক্ষা এবং প্রযুক্তিগত শিক্ষা প্রদান করে।',
-    images: [
-      'https://institute.manzilgroupbd.com/manzil-institute.png',
-    ],
+    images: ['https://institute.manzilgroupbd.com/manzil-institute.png'],
     creator: '@manzilinstitute',
   },
   robots: {
@@ -179,7 +176,11 @@ export const viewport: Viewport = {
   ],
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   // Structured data for the organization
   const organizationData = {
     name: 'Manzil Institute',
@@ -223,7 +224,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     priceRange: '$$',
   };
   const isDevelopment = process.env.NODE_ENV === 'development';
-  const csp = `default-src 'self'; script-src 'self' 'unsafe-inline' ${isDevelopment ? "'unsafe-eval' " : ""}https://fonts.googleapis.com https://www.google.com https://www.googleapis.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com https://www.google.com https://www.googleapis.com; img-src 'self' blob: data: https:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://www.google.com https://www.googleapis.com https://www.google-analytics.com https://www.googletagmanager.com; frame-src 'self' https://www.google.com https://www.youtube.com; object-src 'none'; base-uri 'self'; form-action 'self';`;
+  const csp = `default-src 'self'; script-src 'self' 'unsafe-inline' ${isDevelopment ? "'unsafe-eval' " : ''}https://fonts.googleapis.com https://www.google.com https://www.googleapis.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com https://www.google.com https://www.googleapis.com; img-src 'self' blob: data: https:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://www.google.com https://www.googleapis.com https://www.google-analytics.com https://www.googletagmanager.com; frame-src 'self' https://www.google.com https://www.youtube.com; object-src 'none'; base-uri 'self'; form-action 'self';`;
 
   return (
     <html lang="bn" suppressHydrationWarning={true}>
@@ -251,26 +252,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
 
         {/* DNS prefetch for external resources */}
-        <link
-          rel="dns-prefetch"
-          href="//fonts.googleapis.com"
-        />
-        <link
-          rel="dns-prefetch"
-          href="//fonts.gstatic.com"
-        />
-        <link
-          rel="dns-prefetch"
-          href="//www.facebook.com"
-        />
-        <link
-          rel="dns-prefetch"
-          href="//www.instagram.com"
-        />
-        <link
-          rel="dns-prefetch"
-          href="//www.linkedin.com"
-        />
+        <link rel="dns-prefetch" href="//fonts.googleapis.com" />
+        <link rel="dns-prefetch" href="//fonts.gstatic.com" />
+        <link rel="dns-prefetch" href="//www.facebook.com" />
+        <link rel="dns-prefetch" href="//www.instagram.com" />
+        <link rel="dns-prefetch" href="//www.linkedin.com" />
 
         {/* Google Analytics */}
         <Script
@@ -322,43 +308,28 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           />
         </noscript>
 
-        {/* Prefetch likely next pages */}
-        <link
-          rel="prefetch"
-          href="/admission"
-        />
-        <link
-          rel="prefetch"
-          href="/curriculum"
-        />
-        <link
-          rel="prefetch"
-          href="/campus"
-        />
-
-        {/* Preload critical CSS */}
-        <link
-          rel="preload"
-          href="/globals.css"
-          as="style"
-        />
-
         {/* Module preload for critical JS */}
-        <link
-          rel="modulepreload"
-          href="/_next/static/chunks/webpack.js"
-        />
+        <link rel="modulepreload" href="/_next/static/chunks/webpack.js" />
 
         {/* Content Security Policy */}
-        <meta
-          httpEquiv="Content-Security-Policy"
-          content={csp}
-        />
+        <meta httpEquiv="Content-Security-Policy" content={csp} />
 
         {/* Bengali metadata */}
-        <meta name="title" lang="bn" content="মানজিল ইনস্টিটিউট - মাদরাসা জেনারেল কারিগরি শিক্ষার সমন্বয়" />
-        <meta name="description" lang="bn" content="মানজিল ইনস্টিটিউট বাংলাদেশে একীভূত কারিকুলাম, মাদ্রাসা শিক্ষা, সাধারণ শিক্ষা এবং প্রযুক্তিগত শিক্ষা প্রদান করে। ছাত্রদের জন্য ব্যাপক ইসলামী এবং আধুনিক শিক্ষা প্রদান করে।" />
-        <meta name="keywords" lang="bn" content="মানজিল ইনস্টিটিউট, ইসলামী শিক্ষা, মাদ্রাসা শিক্ষা, বাংলাদেশ শিক্ষা, ধর্মীয় শিক্ষা, আধুনিক শিক্ষা, প্রযুক্তিগত শিক্ষা, গুণগত শিক্ষা, ইসলামী অধ্যয়ন" />
+        <meta
+          name="title"
+          lang="bn"
+          content="মানজিল ইনস্টিটিউট - মাদরাসা জেনারেল কারিগরি শিক্ষার সমন্বয়"
+        />
+        <meta
+          name="description"
+          lang="bn"
+          content="মানজিল ইনস্টিটিউট বাংলাদেশে একীভূত কারিকুলাম, মাদ্রাসা শিক্ষা, সাধারণ শিক্ষা এবং প্রযুক্তিগত শিক্ষা প্রদান করে। ছাত্রদের জন্য ব্যাপক ইসলামী এবং আধুনিক শিক্ষা প্রদান করে।"
+        />
+        <meta
+          name="keywords"
+          lang="bn"
+          content="মানজিল ইনস্টিটিউট, ইসলামী শিক্ষা, মাদ্রাসা শিক্ষা, বাংলাদেশ শিক্ষা, ধর্মীয় শিক্ষা, আধুনিক শিক্ষা, প্রযুক্তিগত শিক্ষা, গুণগত শিক্ষা, ইসলামী অধ্যয়ন"
+        />
       </head>
       <body className={`${inter.variable} font-sans`}>
         <StructuredData

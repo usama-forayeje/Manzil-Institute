@@ -17,7 +17,28 @@ import {
   DollarSign,
   Receipt,
   Home,
-  BarChart3
+  BarChart3,
+  CreditCard,
+  Library,
+  Wallet,
+  CalendarOff,
+  ClipboardList,
+  Clock,
+  MessageSquare,
+  UserCircle,
+  Baby,
+  Wrench,
+  FileSearch,
+  FileText,
+  Activity,
+  FileCheck,
+  BookMarked,
+  ScrollText,
+  Briefcase,
+  School,
+  CalendarCheck,
+  Banknote,
+  Building2,
 } from 'lucide-react';
 
 import {
@@ -73,14 +94,32 @@ const SIDEBAR_ICONS: Record<string, React.ElementType> = {
   dashboard: LayoutDashboard,
   students: GraduationCap,
   staff: Users,
-  classes: BookOpen,
-  attendance: Calendar,
-  fees: DollarSign,
+  teacher: BookOpen,
+  classes: School,
+  attendance: CalendarCheck,
+  fees: Banknote,
   expenses: Receipt,
-  boarding: Home,
+  boarding: Building2,
   notices: Bell,
   reports: BarChart3,
   settings: Settings,
+  nfc: CreditCard,
+  library: Library,
+  salary: Wallet,
+  leave: CalendarOff,
+  exam: ClipboardList,
+  timetable: Clock,
+  messages: MessageSquare,
+  profile: UserCircle,
+  child: Baby,
+  tools: Wrench,
+  audit: FileSearch,
+  policies: FileText,
+  health: Activity,
+  receipt: FileCheck,
+  accounts: BookMarked,
+  terms: ScrollText,
+  designations: Briefcase,
 };
 
 export function AppSidebar({
@@ -96,7 +135,7 @@ export function AppSidebar({
       await signOut();
       window.location.href = '/login';
     } catch (error) {
-      console.error('Logout failed:', error);
+      // Silent error handling
     }
   };
 
@@ -216,7 +255,11 @@ export function AppSidebar({
                   className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                 >
                   <Avatar className="h-8 w-8 rounded-lg">
-                    <AvatarImage src={userAvatar} alt={userName} referrerPolicy="no-referrer" />
+                    <AvatarImage
+                      src={userAvatar}
+                      alt={userName}
+                      referrerPolicy="no-referrer"
+                    />
                     <AvatarFallback className="rounded-lg bg-sidebar-primary/10 text-sidebar-primary text-xs">
                       {userName?.charAt(0).toUpperCase()}
                     </AvatarFallback>
@@ -255,7 +298,11 @@ export function AppSidebar({
                   <div className="px-1 py-1.5">
                     <div className="flex items-center gap-2">
                       <Avatar className="h-8 w-8 rounded-lg">
-                    <AvatarImage src={userAvatar} alt={userName} referrerPolicy="no-referrer" />
+                        <AvatarImage
+                          src={userAvatar}
+                          alt={userName}
+                          referrerPolicy="no-referrer"
+                        />
                         <AvatarFallback className="rounded-lg bg-sidebar-primary/10 text-sidebar-primary text-xs">
                           {userName?.charAt(0).toUpperCase()}
                         </AvatarFallback>

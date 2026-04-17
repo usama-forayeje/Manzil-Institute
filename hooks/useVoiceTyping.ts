@@ -1,99 +1,77 @@
-import { useState, useCallback, useRef, useEffect } from "react";
+'use client';
 
-interface UseVoiceTypingProps {
-  language: string;
-  onFinalTranscript: (text: string) => void;
-}
+import { useCallback, useEffect, useRef, useState } from 'react';
 
-/**
- * Custom hook to handle Web Speech API (SpeechRecognition).
- * Manages listening state, interim results, and final transcriptions.
- */
-export function useVoiceTyping({ language, onFinalTranscript }: UseVoiceTypingProps) {
+export function useVoiceTyping({
+  language = 'bn-BD',
+  onFinalTranscript,
+  onInterimTranscript,
+} = {}) {
   const [isListening, setIsListening] = useState(false);
-  const [interimText, setInterimText] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  
-  // Use 'any' because SpeechRecognition is not part of standard TypeScript types yet
-  const recognitionRef = useRef<any>(null);
+  const [interimText, setInterimText] = useState('');
+  const [error, setError] = useState(null);
+  const recognitionRef = useRef(null);
+  const isSupported =
+    typeof window !== 'undefined' &&
+    ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
 
-  // Check support for browser (Chrome, Edge, Safari supported)
-  const isSupported = typeof window !== "undefined" && 
-    (!!(window as any).SpeechRecognition || !!(window as any).webkitSpeechRecognition);
+  const stopListening = useCallback(() => {
+    recognitionRef.current?.stop();
+    recognitionRef.current = null;
+    setIsListening(false);
+    setInterimText('');
+  }, []);
 
-  useEffect(() => {
-    if (!isSupported) return;
-
-    // Cleanup previous instance if language changes
-    if (recognitionRef.current) {
-      recognitionRef.current.abort();
+  const startListening = useCallback(() => {
+    if (!isSupported) {
+      setError('আপনার ব্রাউজার ভয়েস টাইপিং সাপোর্ট করে না।');
+      return;
     }
+    setError(null);
 
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    const recognition = new SpeechRecognition();
-    
-    recognition.lang = language;
-    recognition.continuous = false; // We use manual start/stop for better control
-    recognition.interimResults = true;
+    const SR =
+      (window as any).SpeechRecognition ??
+      (window as any).webkitSpeechRecognition;
+    if (!SR) return;
 
-    recognition.onstart = () => {
-      setIsListening(true);
-      setError(null);
-    };
+    const rec = new SR();
+    rec.lang = language;
+    rec.continuous = true;
+    rec.interimResults = true;
+    rec.maxAlternatives = 1;
 
-    recognition.onresult = (event: any) => {
-      let interim = "";
-      for (let i = event.resultIndex; i < event.results.length; ++i) {
-        const transcript = event.results[i][0].transcript;
-        if (event.results[i].isFinal) {
-          onFinalTranscript(transcript);
+    rec.onstart = () => setIsListening(true);
+
+    rec.onresult = (e: any) => {
+      let interim = '';
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        const result = e.results[i];
+        if (result.isFinal) {
+          onFinalTranscript?.(result[0].transcript);
         } else {
-          interim += transcript;
+          interim += result[0].transcript;
         }
       }
       setInterimText(interim);
+      onInterimTranscript?.(interim);
     };
 
-    recognition.onerror = (event: any) => {
-      // 'no-speech' is common and not really an error to show to user
-      if (event.error === 'no-speech') {
-        setIsListening(false);
-        return;
-      }
-      console.error("Speech Recognition Error:", event.error);
-      setError(`ত্রুটি: ${event.error}`);
+    rec.onerror = (e: any) => {
+      if (e.error !== 'aborted') setError(`ত্রুটি: ${e.error}`);
       setIsListening(false);
+      setInterimText('');
     };
 
-    recognition.onend = () => {
+    rec.onend = () => {
       setIsListening(false);
-      setInterimText("");
+      setInterimText('');
     };
 
-    recognitionRef.current = recognition;
+    recognitionRef.current = rec;
+    rec.start();
+  }, [isSupported, language, onFinalTranscript, onInterimTranscript]);
 
-    return () => {
-      if (recognitionRef.current) {
-        recognitionRef.current.abort();
-      }
-    };
-  }, [language, onFinalTranscript, isSupported]);
-
-  const startListening = useCallback(() => {
-    if (recognitionRef.current && !isListening) {
-      try {
-        recognitionRef.current.start();
-      } catch (err) {
-        console.error("Failed to start recognition:", err);
-      }
-    }
-  }, [isListening]);
-
-  const stopListening = useCallback(() => {
-    if (recognitionRef.current && isListening) {
-      recognitionRef.current.stop();
-    }
-  }, [isListening]);
+  useEffect(() => () => recognitionRef.current?.stop(), []);
 
   return {
     isListening,

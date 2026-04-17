@@ -139,7 +139,7 @@ const HeroHeaderClient: React.FC<HeroHeaderClientProps> = ({
       router.push('/');
       router.refresh();
     } catch (error) {
-      console.error('Logout failed:', error);
+      // Silent error handling
     }
   };
 

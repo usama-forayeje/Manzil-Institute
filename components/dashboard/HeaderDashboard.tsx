@@ -48,7 +48,7 @@ export function HeaderDashboard({
       await signOut();
       router.push('/login');
     } catch (error) {
-      console.error('Logout failed:', error);
+      // Silent error handling
     }
   };
 

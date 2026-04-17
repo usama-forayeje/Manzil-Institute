@@ -28,9 +28,6 @@ function makeQueryClient() {
       },
       mutations: {
         retry: 1,
-        onError: error => {
-          console.error('Mutation error:', error);
-        },
       },
     },
   });

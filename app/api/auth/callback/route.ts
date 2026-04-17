@@ -2,7 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { createAdminClient } from '@/lib/appwrite/admin';
 import { createSessionFromToken } from '@/lib/auth/actions';
-import { DATABASE_ID, USERS_COLLECTION_ID, ROLE_DASHBOARD, UserRole } from '@/config/appwrite';
+import {
+  DATABASE_ID,
+  USERS_COLLECTION_ID,
+  ROLE_DASHBOARD,
+  UserRole,
+} from '@/config/appwrite';
 import { ID, Query } from 'node-appwrite';
 
 export async function GET(request: NextRequest) {
@@ -11,7 +16,9 @@ export async function GET(request: NextRequest) {
   const secret = searchParams.get('secret');
 
   if (!userId || !secret) {
-    return NextResponse.redirect(new URL('/login?error=missing_params', request.url));
+    return NextResponse.redirect(
+      new URL('/login?error=missing_params', request.url)
+    );
   }
 
   try {
@@ -36,12 +43,19 @@ export async function GET(request: NextRequest) {
 
       const userAccount = new Account(userClient);
       const identities = await userAccount.listIdentities();
-      const googleIdentity = identities.identities?.find(id => id.provider === 'google');
+      const googleIdentity = identities.identities?.find(
+        id => id.provider === 'google'
+      );
 
       if (googleIdentity?.providerAccessToken) {
-        const googleRes = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
-          headers: { Authorization: `Bearer ${googleIdentity.providerAccessToken}` },
-        });
+        const googleRes = await fetch(
+          'https://www.googleapis.com/oauth2/v2/userinfo',
+          {
+            headers: {
+              Authorization: `Bearer ${googleIdentity.providerAccessToken}`,
+            },
+          }
+        );
         if (googleRes.ok) {
           const googleData = await googleRes.json();
           avatarUrl = googleData.picture || null;
@@ -70,7 +84,7 @@ export async function GET(request: NextRequest) {
         {
           email: appwriteUser.email,
           name: appwriteUser.name || '',
-          avatarUrl: avatarUrl || '',            // store avatar URL
+          avatarUrl: avatarUrl || '', // store avatar URL
           role: 'student',
           isActive: true,
         }
@@ -87,7 +101,8 @@ export async function GET(request: NextRequest) {
         avatarUrl?: string;
       } = {};
       if (doc.name !== appwriteUser.name) updateData.name = appwriteUser.name;
-      if (doc.email !== appwriteUser.email) updateData.email = appwriteUser.email;
+      if (doc.email !== appwriteUser.email)
+        updateData.email = appwriteUser.email;
       if (avatarUrl && !doc.avatarUrl) updateData.avatarUrl = avatarUrl; // only set if missing
       if (Object.keys(updateData).length > 0) {
         await databases.updateDocument(
@@ -129,20 +144,27 @@ export async function GET(request: NextRequest) {
     });
 
     // 8. Redirect based on role
-    const redirectPath = ROLE_DASHBOARD[role as UserRole] ?? '/dashboard/student';
+    const redirectPath =
+      ROLE_DASHBOARD[role as UserRole] ?? '/dashboard/student';
     return NextResponse.redirect(new URL(redirectPath, request.url));
   } catch (error: any) {
     // Handle specific OAuth errors
     if (error.message?.includes('invalid_grant') || error.code === 400) {
-      return NextResponse.redirect(new URL('/login?error=invalid_grant&retry=true', request.url));
+      return NextResponse.redirect(
+        new URL('/login?error=invalid_grant&retry=true', request.url)
+      );
     }
 
     // Handle other authentication errors
     if (error.message?.includes('unauthorized') || error.code === 401) {
-      return NextResponse.redirect(new URL('/login?error=auth_failed', request.url));
+      return NextResponse.redirect(
+        new URL('/login?error=auth_failed', request.url)
+      );
     }
 
     // Generic fallback
-    return NextResponse.redirect(new URL('/login?error=callback_failed', request.url));
+    return NextResponse.redirect(
+      new URL('/login?error=callback_failed', request.url)
+    );
   }
 }

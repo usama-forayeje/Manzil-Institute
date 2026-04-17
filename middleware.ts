@@ -21,7 +21,9 @@ export async function middleware(request: NextRequest) {
     if (session?.value) {
       const role = request.cookies.get('appwrite-user-role')?.value;
       if (role && ROLE_DASHBOARD[role as UserRole]) {
-        return NextResponse.redirect(new URL(ROLE_DASHBOARD[role as UserRole], request.url));
+        return NextResponse.redirect(
+          new URL(ROLE_DASHBOARD[role as UserRole], request.url)
+        );
       }
       return NextResponse.redirect(new URL('/dashboard/student', request.url));
     }
@@ -46,16 +48,30 @@ export async function middleware(request: NextRequest) {
     const matchedPath = Object.keys(allowedRolesForPath).find(path =>
       pathname.startsWith(path)
     );
-    if (matchedPath && role && !allowedRolesForPath[matchedPath].includes(role)) {
+    if (
+      matchedPath &&
+      role &&
+      !allowedRolesForPath[matchedPath].includes(role)
+    ) {
       if (ROLE_DASHBOARD[role]) {
-        return NextResponse.redirect(new URL(ROLE_DASHBOARD[role], request.url));
+        return NextResponse.redirect(
+          new URL(ROLE_DASHBOARD[role], request.url)
+        );
       }
       return NextResponse.redirect(new URL('/dashboard/student', request.url));
     }
   }
 
   // Allow public routes
-  const publicPaths = ['/', '/api/auth/callback', '/apply/staff'];
+  const publicPaths = [
+    '/',
+    '/api/auth/callback',
+    '/apply/staff',
+    '/curriculum',
+    '/curriculum/mnc',
+    '/curriculum/mic',
+    '/campus',
+  ];
   if (publicPaths.includes(pathname)) {
     return NextResponse.next();
   }
@@ -65,5 +81,5 @@ export async function middleware(request: NextRequest) {
 
 // Config export for matcher
 export const config = {
-  matcher: '/((?!api|_next/static|_next/image|favicon.ico).*)'
+  matcher: '/((?!api|_next/static|_next/image|favicon.ico).*)',
 };

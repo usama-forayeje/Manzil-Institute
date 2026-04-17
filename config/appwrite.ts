@@ -71,17 +71,16 @@ export const EXPENSES_COLLECTION_ID          = COLLECTIONS.EXPENSES;
 export const ATTENDANCE_STUDENTS_COLLECTION_ID = COLLECTIONS.ATTENDANCE_STUDENTS;
 export const ATTENDANCE_STAFF_COLLECTION_ID  = COLLECTIONS.ATTENDANCE_STAFF;
 
-// ─── Storage Buckets ───────────────────────────────────────
 export const BUCKETS = {
-  STUDENT_PHOTOS:    process.env.NEXT_PUBLIC_BUCKET_STUDENT_PHOTOS    ?? "",
-  STAFF_PHOTOS:      process.env.NEXT_PUBLIC_BUCKET_STAFF_PHOTOS      ?? "",
-  RECEIPT_IMAGES:    process.env.NEXT_PUBLIC_BUCKET_RECEIPT_IMAGES    ?? "",
-  EXPENSE_RECEIPTS:  process.env.NEXT_PUBLIC_BUCKET_EXPENSE_RECEIPTS  ?? "",
-  DOCUMENTS:         process.env.NEXT_PUBLIC_BUCKET_DOCUMENTS         ?? "",
-  NOTICE_ATTACHMENTS:process.env.NEXT_PUBLIC_BUCKET_NOTICE_ATTACHMENTS ?? "",
-  MADRASA_ASSETS:    process.env.NEXT_PUBLIC_BUCKET_MADRASA_ASSETS    ?? "",
-  BOOK_COVERS:       process.env.NEXT_PUBLIC_BUCKET_BOOK_COVERS       ?? "",
-  POLICY_DOCS:       process.env.NEXT_PUBLIC_BUCKET_POLICY_DOCS       ?? "",
+  STUDENT_PHOTOS:     "student-photos",
+  STAFF_PHOTOS:       "staff-photos",
+  RECEIPT_IMAGES:     "receipts",
+  EXPENSE_RECEIPTS:   "expense-receipts",
+  DOCUMENTS:          "staff-documents",
+  NOTICE_ATTACHMENTS: "notices",
+  MADRASA_ASSETS:     "assets",
+  BOOK_COVERS:        "book-covers",
+  POLICY_DOCS:        "policies",
 } as const;
 
 // ─── Role constants ────────────────────────────────────────

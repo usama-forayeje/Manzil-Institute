@@ -27,10 +27,7 @@ import Step4ExperienceSkills from './steps/Step4ExperienceSkills';
 import Step5ContactReference from './steps/Step5ContactReference';
 import Step6PaymentAgreement from './steps/Step6PaymentAgreement';
 
-import {
-  createApplication,
-  checkDuplicateApplication,
-} from '@/lib/actions/application';
+import { createApplication } from '@/lib/actions/application';
 import {
   useStaffFormStore,
   useCurrentStep,
@@ -38,11 +35,6 @@ import {
   useStep3Data,
 } from '@/store/staffFormStore';
 import { Badge } from '../ui/badge';
-import {
-  validateAllFiles,
-  uploadAllFiles,
-  type UploadProgress,
-} from '@/lib/utils/upload';
 
 // New restructured steps based on suggestions
 const STEPS = [
@@ -433,25 +425,10 @@ export default function StaffForm() {
     onError: error => {
       const errorMessage = error.message || 'অজানা ত্রুটি';
 
-      if (errorMessage.startsWith('DUPLICATE_APPLICATION:')) {
-        const actualMessage = errorMessage.replace(
-          'DUPLICATE_APPLICATION:',
-          ''
-        );
-        toast.warning('ডুপ্লিকেট আবেদন', {
-          description:
-            actualMessage +
-            '\n\nফর্ম রিসেট করে নতুন তথ্য দিয়ে আবার চেষ্টা করুন।',
-          duration: 10000,
-          action: {
-            label: 'ফর্ম রিসেট করুন',
-            onClick: () => {
-              useStaffFormStore.getState().reset();
-              toast.success('ফর্ম রিসেট হয়েছে! নতুন তথ্য দিয়ে আবেদন করুন।');
-            },
-          },
-        });
-      } else if (error.name === 'DuplicateApplicationError') {
+      if (
+        errorMessage.startsWith('DUPLICATE_APPLICATION:') ||
+        error.name === 'DuplicateApplicationError'
+      ) {
         const actualMessage = errorMessage.replace(
           'DUPLICATE_APPLICATION:',
           ''

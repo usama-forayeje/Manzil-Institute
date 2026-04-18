@@ -5,6 +5,7 @@ import type {
   AddressIDData,
   ProfessionalEducationData,
   PaymentReferenceData,
+  ContactReferenceData,
 } from '@/validations/staff';
 
 export type StaffFormStep = 1 | 2 | 3 | 4 | 5 | 6;
@@ -52,17 +53,7 @@ export type ExperienceSkillsData = Pick<
   | 'experienceLetterUrl'
 > & { isHafiz?: boolean; tazkiyahFile?: File; tazkiyahUrl?: string };
 
-export type ContactReferenceData = {
-  phonePrimary: string;
-  phoneSecondary?: string;
-  email?: string;
-  whatsappNo?: string;
-  emergencyContactNo: string;
-  emergencyRelationship: string;
-  referenceName: string;
-  referencePhone: string;
-  referenceOccupation?: string;
-};
+export { type ContactReferenceData };
 
 export type PaymentAgreementData = Pick<
   PaymentReferenceData,
@@ -77,6 +68,8 @@ export type PaymentAgreementData = Pick<
   | 'mobileBankingNumber'
   | 'declaration'
   | 'termsAccepted'
+  | 'signatureFile'
+  | 'signatureUrl'
   | 'additionalNotes'
 >;
 
@@ -105,6 +98,13 @@ interface StaffFormState {
   setStep5Data: (data: Partial<ContactReferenceData>) => void;
   setStep5Complete: (val: boolean) => void;
   setStep6Data: (data: Partial<PaymentAgreementData>) => void;
+
+  // Patch methods (auto-save only) – do NOT mark step complete
+  patchStep1Data: (data: Partial<ProfilePersonalData>) => void;
+  patchStep2Data: (data: Partial<AddressIdentityData>) => void;
+  patchStep3Data: (data: Partial<EducationQualificationData>) => void;
+  patchStep4Data: (data: Partial<ExperienceSkillsData>) => void;
+  patchStep5Data: (data: Partial<ContactReferenceData>) => void;
 
   nextStep: () => void;
   prevStep: () => void;
@@ -180,6 +180,29 @@ export const useStaffFormStore = create<StaffFormState>()(
         })),
 
       setStep5Complete: val => set({ step5Complete: val }),
+
+      // ─── Patch methods (auto-save only) ─────────────────────
+      // These update step data WITHOUT marking the step complete.
+      patchStep1Data: data =>
+        set(s => ({
+          step1Data: { ...s.step1Data, ...data },
+        })),
+      patchStep2Data: data =>
+        set(s => ({
+          step2Data: { ...s.step2Data, ...data },
+        })),
+      patchStep3Data: data =>
+        set(s => ({
+          step3Data: { ...s.step3Data, ...data },
+        })),
+      patchStep4Data: data =>
+        set(s => ({
+          step4Data: { ...s.step4Data, ...data },
+        })),
+      patchStep5Data: data =>
+        set(s => ({
+          step5Data: { ...s.step5Data, ...data },
+        })),
 
       setStep6Data: data =>
         set(s => ({ step6Data: { ...s.step6Data, ...data } })),
@@ -273,7 +296,11 @@ export const useStaffFormStore = create<StaffFormState>()(
         },
 
         step5Data: state.step5Data, // no files, keep as-is
-        step6Data: state.step6Data, // no files, keep as-is
+        step6Data: {
+          ...state.step6Data,
+          signatureFile: undefined, // ← File: strip (not serializable)
+          // signatureUrl:         KEEP (string base64)
+        },
       }),
     }
   )

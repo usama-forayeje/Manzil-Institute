@@ -34,86 +34,84 @@ import {
   RELIGION_LABELS,
 } from '@/validations/staff';
 import { useStaffFormStore, useStep1Data } from '@/store/staffFormStore';
-import { compressImage } from '@/lib/utils';
+import { compressImage, cn, normalizeGender } from '@/lib/utils';
+import { fileToBase64, validateFile } from '@/lib/utils/file';
 import { VoiceInputBn, VoiceInputEn } from '@/components/ui/voice-input';
 
 interface StepProps {
   onNext: () => void;
 }
 
-const fileToBase64 = (file: File): Promise<string> =>
-  new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = reject;
-  });
-
 export default function Step1PersonalFamily({ onNext }: StepProps) {
   const savedData = useStep1Data();
-  const { setStep1Data, markIncomplete } = useStaffFormStore();
+  const { setStep1Data, patchStep1Data, markIncomplete } = useStaffFormStore();
 
   // ── Photo state ────────────────────────────────────────────
-  // Prefer persisted base64 so it survives reloads
   const [photoPreview, setPhotoPreview] = useState<string | null>(
-    (savedData as any).photoBase64 ?? null
+    savedData?.photoBase64 ?? null
   );
+  const previousPhotoRef = useRef<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // ── Form ───────────────────────────────────────────────────
   const form = useForm<PersonalFamilyData>({
-    resolver: zodResolver(personalFamilySchema) as any,
+    resolver: zodResolver(personalFamilySchema),
     defaultValues: {
-      nameEn: savedData.nameEn ?? '',
-      nameBn: savedData.nameBn ?? '',
-      fatherNameBn: savedData.fatherNameBn ?? '',
-      fatherNameEn: savedData.fatherNameEn ?? '',
-      motherNameBn: savedData.motherNameBn ?? '',
-      motherNameEn: savedData.motherNameEn ?? '',
-      gender: savedData.gender ?? undefined,
-      maritalStatus: savedData.maritalStatus ?? undefined,
-      religion: savedData.religion ?? undefined,
-      nationality: savedData.nationality ?? 'বাংলাদেশী',
-    } as PersonalFamilyData,
+      nameEn: savedData?.nameEn ?? '',
+      nameBn: savedData?.nameBn ?? '',
+      fatherNameBn: savedData?.fatherNameBn ?? '',
+      fatherNameEn: savedData?.fatherNameEn ?? '',
+      motherNameBn: savedData?.motherNameBn ?? '',
+      motherNameEn: savedData?.motherNameEn ?? '',
+      gender: savedData?.gender ?? undefined,
+      maritalStatus: savedData?.maritalStatus ?? undefined,
+      religion: savedData?.religion ?? undefined,
+      nationality: savedData?.nationality ?? 'বাংলাদেশী',
+    },
   });
+
+  const hasRestored = useRef(false);
 
   // Restore on mount
   useEffect(() => {
-    if (!savedData || !Object.keys(savedData).length) return;
-    form.reset({
-      nameEn: savedData.nameEn ?? '',
-      nameBn: savedData.nameBn ?? '',
-      fatherNameBn: savedData.fatherNameBn ?? '',
-      fatherNameEn: savedData.fatherNameEn ?? '',
-      motherNameBn: savedData.motherNameBn ?? '',
-      motherNameEn: savedData.motherNameEn ?? '',
-      gender: savedData.gender ?? undefined,
-      maritalStatus: savedData.maritalStatus ?? undefined,
-      religion: savedData.religion ?? undefined,
-      nationality: savedData.nationality ?? 'বাংলাদেশী',
-    } as PersonalFamilyData);
-    // Restore photo from persisted base64
-    const b64 = (savedData as any).photoBase64;
-    if (b64 && b64.startsWith('data:')) setPhotoPreview(b64);
-  }, []);
+    if (hasRestored.current) return;
+
+    if (savedData && Object.keys(savedData).length > 0) {
+      form.reset({
+        nameEn: savedData.nameEn ?? '',
+        nameBn: savedData.nameBn ?? '',
+        fatherNameBn: savedData.fatherNameBn ?? '',
+        fatherNameEn: savedData.fatherNameEn ?? '',
+        motherNameBn: savedData.motherNameBn ?? '',
+        motherNameEn: savedData.motherNameEn ?? '',
+        gender: normalizeGender(savedData.gender) ?? undefined,
+        maritalStatus: savedData.maritalStatus ?? undefined,
+        religion: savedData.religion ?? undefined,
+        nationality: savedData.nationality ?? 'বাংলাদেশী',
+      });
+      const b64 = savedData.photoBase64;
+      if (b64 && b64.startsWith('data:')) setPhotoPreview(b64);
+    }
+    hasRestored.current = true;
+  }, [form, savedData]);
 
   // Auto-save text fields (debounced, 800ms)
-  const timerRef = useRef<ReturnType<typeof setTimeout>>();
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
     const sub = form.watch(value => {
-      clearTimeout(timerRef.current);
+      if (timerRef.current) clearTimeout(timerRef.current);
       timerRef.current = setTimeout(() => {
-        setStep1Data({
-          ...(useStaffFormStore.getState().step1Data as any),
-          ...(value as Partial<PersonalFamilyData>),
-        } as any);
+        patchStep1Data({
+          ...useStaffFormStore.getState().step1Data,
+          ...value,
+        });
       }, 800);
     });
     return () => {
       sub.unsubscribe();
-      clearTimeout(timerRef.current);
+      if (timerRef.current) clearTimeout(timerRef.current);
     };
-  }, [form, setStep1Data]);
+  }, [form, patchStep1Data]);
 
   // ── Photo handlers ─────────────────────────────────────────
   const handlePhotoChange = useCallback(
@@ -121,39 +119,69 @@ export default function Step1PersonalFamily({ onNext }: StepProps) {
       const file = e.target.files?.[0];
       if (!file) return;
 
-      if (file.size > 5 * 1024 * 1024) {
-        toast.error('ছবির সাইজ ৫ MB এর বেশি হবে না');
+      const validation = validateFile(file, {
+        maxSizeMB: 5,
+        allowedTypes: ['image/jpeg', 'image/png', 'image/webp'],
+      });
+      if (!validation.valid) {
+        toast.error(validation.error || 'ছবির সাইজ ৫ MB এর বেশি হবে না');
         return;
       }
 
+      let blobUrl: string | null = null;
       try {
-        const compressed = await compressImage(file, 0.7);
+        const compressed = await compressImage(file, 0.85);
+        blobUrl = URL.createObjectURL(compressed);
         const base64 = await fileToBase64(compressed);
 
         setPhotoPreview(base64);
-        setStep1Data({
-          ...(useStaffFormStore.getState().step1Data as any),
+        patchStep1Data({
+          ...useStaffFormStore.getState().step1Data,
           photoBase64: base64,
           photoUrl: base64,
           photoFile: compressed,
-        } as any);
+        });
+        if (blobUrl) URL.revokeObjectURL(blobUrl);
       } catch {
         toast.error('❌ ছবি প্রসেসিং এ সমস্যা হয়েছে');
+        if (blobUrl) URL.revokeObjectURL(blobUrl);
       }
     },
-    [setStep1Data]
+    [patchStep1Data]
   );
 
   const removePhoto = useCallback(() => {
+    // Store current photo for potential undo
+    previousPhotoRef.current = photoPreview;
+
     setPhotoPreview(null);
     if (fileInputRef.current) fileInputRef.current.value = '';
-    setStep1Data({
-      ...(useStaffFormStore.getState().step1Data as any),
+    patchStep1Data({
+      ...useStaffFormStore.getState().step1Data,
       photoBase64: undefined,
       photoUrl: undefined,
       photoFile: undefined,
-    } as any);
-  }, [setStep1Data]);
+    });
+
+    // Show undo toast
+    toast.success('ছবি অপসারানো হয়েছে', {
+      duration: 5000,
+      action: {
+        label: 'ফিরিয়ে আনুন',
+        onClick: () => {
+          if (previousPhotoRef.current) {
+            setPhotoPreview(previousPhotoRef.current);
+            patchStep1Data({
+              ...useStaffFormStore.getState().step1Data,
+              photoBase64: previousPhotoRef.current,
+              photoUrl: previousPhotoRef.current,
+            });
+            toast.success('ছবি ফিরিয়ে এসেছে');
+          }
+        },
+      },
+    });
+  }, [patchStep1Data, photoPreview]);
 
   // ── Submit ─────────────────────────────────────────────────
   const onSubmit: SubmitHandler<PersonalFamilyData> = data => {
@@ -162,12 +190,12 @@ export default function Step1PersonalFamily({ onNext }: StepProps) {
       toast.error('⚠️ আবেদনকারীর ছবি আপলোড করুন');
       return;
     }
-    const base64 = (useStaffFormStore.getState().step1Data as any).photoBase64;
+    const base64 = useStaffFormStore.getState().step1Data.photoBase64;
     if (!base64) {
       toast.error('⚠️ ছবি ডেটা পাওয়া যায়নি, আবার আপলোড করুন');
       return;
     }
-    setStep1Data({ ...data, photoBase64: base64, photoUrl: base64 } as any);
+    setStep1Data({ ...data, photoBase64: base64, photoUrl: base64 });
     onNext();
   };
 
@@ -180,10 +208,7 @@ export default function Step1PersonalFamily({ onNext }: StepProps) {
       className="kalpurush-font"
     >
       <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit as any)}
-          className="space-y-10"
-        >
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-10">
           {/* ── Photo upload ─────────────────────────────────── */}
           <div className="flex flex-col items-center space-y-4">
             <div className="relative group">
@@ -242,7 +267,7 @@ export default function Step1PersonalFamily({ onNext }: StepProps) {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <FormField
-                control={form.control as any}
+                control={form.control}
                 name="nameBn"
                 render={({ field }) => (
                   <FormItem>
@@ -261,7 +286,7 @@ export default function Step1PersonalFamily({ onNext }: StepProps) {
                 )}
               />
               <FormField
-                control={form.control as any}
+                control={form.control}
                 name="nameEn"
                 render={({ field }) => (
                   <FormItem>
@@ -293,7 +318,7 @@ export default function Step1PersonalFamily({ onNext }: StepProps) {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <FormField
-                control={form.control as any}
+                control={form.control}
                 name="fatherNameBn"
                 render={({ field }) => (
                   <FormItem>
@@ -312,7 +337,7 @@ export default function Step1PersonalFamily({ onNext }: StepProps) {
                 )}
               />
               <FormField
-                control={form.control as any}
+                control={form.control}
                 name="fatherNameEn"
                 render={({ field }) => (
                   <FormItem>
@@ -332,7 +357,7 @@ export default function Step1PersonalFamily({ onNext }: StepProps) {
                 )}
               />
               <FormField
-                control={form.control as any}
+                control={form.control}
                 name="motherNameBn"
                 render={({ field }) => (
                   <FormItem>
@@ -351,7 +376,7 @@ export default function Step1PersonalFamily({ onNext }: StepProps) {
                 )}
               />
               <FormField
-                control={form.control as any}
+                control={form.control}
                 name="motherNameEn"
                 render={({ field }) => (
                   <FormItem>
@@ -378,7 +403,7 @@ export default function Step1PersonalFamily({ onNext }: StepProps) {
           {/* ── Gender / Marital / Religion ───────────────────── */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
             <FormField
-              control={form.control as any}
+              control={form.control}
               name="gender"
               render={({ field }) => (
                 <FormItem>
@@ -404,7 +429,7 @@ export default function Step1PersonalFamily({ onNext }: StepProps) {
               )}
             />
             <FormField
-              control={form.control as any}
+              control={form.control}
               name="maritalStatus"
               render={({ field }) => (
                 <FormItem>
@@ -433,7 +458,7 @@ export default function Step1PersonalFamily({ onNext }: StepProps) {
               )}
             />
             <FormField
-              control={form.control as any}
+              control={form.control}
               name="religion"
               render={({ field }) => (
                 <FormItem>

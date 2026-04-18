@@ -39,6 +39,7 @@ import {
 } from '@/components/ui/select';
 
 import { cn, compressImage } from '@/lib/utils';
+import { fileToBase64, validateFile } from '@/lib/utils/file';
 import {
   professionalEducationSchema,
   type ProfessionalEducationData,
@@ -47,14 +48,6 @@ import {
 import { useStaffFormStore, useStep3Data } from '@/store/staffFormStore';
 import { getDesignations } from '@/lib/actions/terms';
 import { VoiceInputBn } from '@/components/ui/voice-input';
-
-const fileToBase64 = (file: File): Promise<string> =>
-  new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = reject;
-  });
 
 interface StepProps {
   onNext: () => void;
@@ -71,18 +64,16 @@ export default function Step3DynamicProfessional({
   onPrev,
 }: StepProps) {
   const savedData = useStep3Data();
-  const { setStep3Data, markIncomplete } = useStaffFormStore();
+  const { setStep3Data, patchStep3Data, markIncomplete } = useStaffFormStore();
 
   // Designations from DB
   const [dbDesignations, setDbDesignations] = useState<any[]>([]);
   const [isLoadingDesignations, setIsLoadingDesignations] = useState(true);
 
   // Certificate state
-  // certificateFiles: current-session File objects (for upload)
-  // certificatePreviews: base64 strings (persisted in store)
   const [certFiles, setCertFiles] = useState<File[]>([]);
   const [certPreviews, setCertPreviews] = useState<string[]>(
-    (savedData.certificateUrls as string[]) ?? []
+    savedData?.certificateUrls ?? []
   );
   const [isCompressing, setIsCompressing] = useState(false);
   const certRef = useRef<HTMLInputElement>(null);
@@ -96,27 +87,26 @@ export default function Step3DynamicProfessional({
         employmentType: true,
         education: true,
       })
-    ) as any,
+    ),
     defaultValues: {
-      designation: savedData.designation ?? '',
-      designationCustom: savedData.designationCustom ?? '',
-      employmentType: savedData.employmentType ?? 'permanent',
-      education: savedData.education ?? [
+      designation: savedData?.designation ?? '',
+      designationCustom: savedData?.designationCustom ?? '',
+      employmentType: savedData?.employmentType ?? 'permanent',
+      education: savedData?.education ?? [
         { degree: '', institution: '', year: '' },
       ],
-    } as any,
+    },
   });
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
-    name: 'education' as any,
+    name: 'education',
   });
 
   // Load designations from DB
   useEffect(() => {
     getDesignations()
       .then((result: any) => {
-        // DB returns { documents: [...] } object
         const docs = result?.documents || [];
         setDbDesignations(docs);
       })
@@ -124,66 +114,87 @@ export default function Step3DynamicProfessional({
       .finally(() => setIsLoadingDesignations(false));
   }, []);
 
-  // Restore on mount
-  useEffect(() => {
-    if (!savedData || !Object.keys(savedData).length) return;
-    form.reset({
-      designation: savedData.designation ?? '',
-      designationCustom: savedData.designationCustom ?? '',
-      employmentType: savedData.employmentType ?? 'permanent',
-      education: savedData.education ?? [
-        { degree: '', institution: '', year: '' },
-      ],
-    } as any);
-    // Restore certificate previews from store
-    if (
-      Array.isArray(savedData.certificateUrls) &&
-      savedData.certificateUrls.length > 0
-    ) {
-      setCertPreviews(savedData.certificateUrls as string[]);
-    }
-  }, []);
+  const hasRestored = useRef(false);
 
-  // Auto-save (debounced)
-  const timerRef = useRef<ReturnType<typeof setTimeout>>();
+  // Restore on mount (ONCE)
+  useEffect(() => {
+    if (hasRestored.current) return;
+
+    if (savedData && Object.keys(savedData).length > 0) {
+      form.reset({
+        designation: savedData.designation ?? '',
+        designationCustom: savedData.designationCustom ?? '',
+        employmentType: savedData.employmentType ?? 'permanent',
+        education: savedData.education ?? [
+          { degree: '', institution: '', year: '' },
+        ],
+      });
+      if (
+        Array.isArray(savedData.certificateUrls) &&
+        savedData.certificateUrls.length > 0
+      ) {
+        setCertPreviews(savedData.certificateUrls);
+      }
+    }
+    hasRestored.current = true;
+  }, [form, savedData]);
+
+  // FIXED: Single consolidated auto-save effect (race condition fixed)
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
     const sub = form.watch(value => {
-      clearTimeout(timerRef.current);
+      if (timerRef.current) clearTimeout(timerRef.current);
       timerRef.current = setTimeout(() => {
-        setStep3Data({
+        patchStep3Data({
           ...value,
           certificateFiles: certFiles,
           certificateUrls: certPreviews,
-        } as any);
+        });
       }, 600);
     });
     return () => {
       sub.unsubscribe();
-      clearTimeout(timerRef.current);
+      if (timerRef.current) clearTimeout(timerRef.current);
     };
-  }, [form, setStep3Data, certFiles, certPreviews]);
-
-  // Sync cert previews to store whenever they change
-  useEffect(() => {
-    setStep3Data({
-      ...form.getValues(),
-      certificateFiles: certFiles,
-      certificateUrls: certPreviews,
-    } as any);
-  }, [certPreviews]); // eslint-disable-line
+  }, [form, patchStep3Data, certFiles, certPreviews]);
 
   // ── Certificate handlers ───────────────────────────────────
   const handleCertFiles = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? []);
     if (!files.length) return;
+
+    // Validate all files first
+    for (const file of files) {
+      const validation = validateFile(file, {
+        maxSizeMB: 5,
+        allowedTypes: [
+          'image/jpeg',
+          'image/png',
+          'image/webp',
+          'application/pdf',
+        ],
+      });
+      if (!validation.valid) {
+        toast.error(validation.error || 'ফাইল সাইজ বা টাইপ সঠিক নয়');
+        return;
+      }
+    }
+
     setIsCompressing(true);
     try {
-      const compressed = await Promise.all(
-        files.map(f => compressImage(f, 0.7))
+      // Process files: compress images, pass PDFs as-is
+      const processed = await Promise.all(
+        files.map(async file => {
+          const processedFile = file.type.startsWith('image/')
+            ? await compressImage(file, 0.85)
+            : file;
+          const preview = await fileToBase64(processedFile);
+          return { file: processedFile, preview };
+        })
       );
-      const previews = await Promise.all(compressed.map(fileToBase64));
-      setCertFiles(prev => [...prev, ...compressed]);
-      setCertPreviews(prev => [...prev, ...previews]);
+
+      setCertFiles(prev => [...prev, ...processed.map(p => p.file)]);
+      setCertPreviews(prev => [...prev, ...processed.map(p => p.preview)]);
       toast.success(`✅ ${files.length} টি সনদ আপলোড হয়েছে`);
     } catch {
       toast.error('❌ ফাইল প্রসেসিং এ সমস্যা হয়েছে');
@@ -205,7 +216,7 @@ export default function Step3DynamicProfessional({
       toast.error('⚠️ পদবী নির্বাচন করুন');
       return;
     }
-    const hasEdu = (data.education as any[])?.some(
+    const hasEdu = data.education?.some(
       e => e.degree && e.institution && e.year
     );
     if (!hasEdu) {
@@ -264,7 +275,7 @@ export default function Step3DynamicProfessional({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5 p-5 rounded-2xl bg-violet-50/30 dark:bg-violet-950/10 border border-violet-100/50">
               <FormField
                 control={form.control}
-                name={'designation' as any}
+                name="designation"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-violet-800 dark:text-violet-300 flex items-center gap-2">
@@ -314,7 +325,7 @@ export default function Step3DynamicProfessional({
 
               <FormField
                 control={form.control}
-                name={'employmentType' as any}
+                name="employmentType"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-violet-800 dark:text-violet-300">
@@ -386,7 +397,7 @@ export default function Step3DynamicProfessional({
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <FormField
                       control={form.control}
-                      name={`education.${index}.degree` as any}
+                      name={`education.${index}.degree`}
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel className="text-violet-800 dark:text-violet-300">
@@ -410,7 +421,7 @@ export default function Step3DynamicProfessional({
                     />
                     <FormField
                       control={form.control}
-                      name={`education.${index}.year` as any}
+                      name={`education.${index}.year`}
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel className="text-violet-800 dark:text-violet-300">
@@ -429,7 +440,7 @@ export default function Step3DynamicProfessional({
                     />
                     <FormField
                       control={form.control}
-                      name={`education.${index}.institution` as any}
+                      name={`education.${index}.institution`}
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel className="text-violet-800 dark:text-violet-300">
@@ -459,9 +470,7 @@ export default function Step3DynamicProfessional({
             <Button
               type="button"
               variant="outline"
-              onClick={() =>
-                append({ degree: '', institution: '', year: '' } as any)
-              }
+              onClick={() => append({ degree: '', institution: '', year: '' })}
               className="w-full border-2 border-dashed border-violet-300 dark:border-violet-700 text-violet-600 hover:bg-violet-50 rounded-xl h-12 font-bold"
             >
               <Plus className="h-5 w-5 mr-2" /> নতুন শিক্ষাগত যোগ্যতা যোগ করুন

@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn, compressImage } from '@/lib/utils';
+import { fileToBase64, validateFile } from '@/lib/utils/file';
 import {
   FaFacebook,
   FaInstagram,
@@ -49,14 +50,6 @@ import {
   useStep4Data,
 } from '@/store/staffFormStore';
 import { VoiceInputBn } from '@/components/ui/voice-input';
-
-const fileToBase64 = (file: File): Promise<string> =>
-  new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = reject;
-  });
 
 interface StepProps {
   onNext: () => void;
@@ -216,7 +209,7 @@ function FileUploadSlot({
 export default function Step4ExperienceSkills({ onNext, onPrev }: StepProps) {
   const savedData = useStep4Data();
   const step3Data = useStep3Data();
-  const { setStep4Data } = useStaffFormStore();
+  const { setStep4Data, patchStep4Data } = useStaffFormStore();
 
   // File state — File objects are session-only, previews (base64) persist
   const [cvFile, setCvFile] = useState<File | null>(null);
@@ -224,10 +217,10 @@ export default function Step4ExperienceSkills({ onNext, onPrev }: StepProps) {
 
   // Previews from store (persist across reloads)
   const [cvPreview, setCvPreview] = useState<string | null>(
-    (savedData as any).cvUrl ?? null
+    savedData?.cvUrl ?? null
   );
   const [expPreview, setExpPreview] = useState<string | null>(
-    (savedData as any).experienceLetterUrl ?? null
+    savedData?.experienceLetterUrl ?? null
   );
 
   const [isCompressing, setIsCompressing] = useState(false);
@@ -243,10 +236,10 @@ export default function Step4ExperienceSkills({ onNext, onPrev }: StepProps) {
     defaultValues: {
       previousWorkplace: savedData?.previousWorkplace ?? '',
       previousWorkDuration: savedData?.previousWorkDuration ?? '',
-      totalExperienceYears: (savedData?.totalExperienceYears as number) ?? 0,
+      totalExperienceYears: savedData?.totalExperienceYears ?? 0,
       isHafiz: savedData?.isHafiz ?? false,
       specialSkills: savedData?.specialSkills ?? '',
-      socialLinks: (savedData?.socialLinks as any) ?? {
+      socialLinks: savedData?.socialLinks ?? {
         facebook: '',
         instagram: '',
         twitter: '',
@@ -256,37 +249,26 @@ export default function Step4ExperienceSkills({ onNext, onPrev }: StepProps) {
     },
   });
 
-  // Auto-save (debounced 800ms)
-  const timerRef = useRef<ReturnType<typeof setTimeout>>();
+  // FIXED: Single consolidated auto-save effect (race condition fixed)
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
     const sub = form.watch(value => {
-      clearTimeout(timerRef.current);
+      if (timerRef.current) clearTimeout(timerRef.current);
       timerRef.current = setTimeout(() => {
-        setStep4Data({
+        patchStep4Data({
           ...value,
           cvFile,
           experienceLetterFile: expFile,
           cvUrl: cvPreview,
           experienceLetterUrl: expPreview,
-        } as any);
+        });
       }, 800);
     });
     return () => {
       sub.unsubscribe();
-      clearTimeout(timerRef.current);
+      if (timerRef.current) clearTimeout(timerRef.current);
     };
-  }, [form, setStep4Data, cvFile, expFile, cvPreview, expPreview]);
-
-  // Sync previews to store when they change
-  useEffect(() => {
-    setStep4Data({
-      ...form.getValues(),
-      cvFile,
-      experienceLetterFile: expFile,
-      cvUrl: cvPreview,
-      experienceLetterUrl: expPreview,
-    } as any);
-  }, [cvPreview, expPreview]); // eslint-disable-line
+  }, [form, patchStep4Data, cvFile, expFile, cvPreview, expPreview]);
 
   // ── File handlers ──────────────────────────────────────────
   async function handleFile(
@@ -297,15 +279,26 @@ export default function Step4ExperienceSkills({ onNext, onPrev }: StepProps) {
   ) {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    const validation = validateFile(file, { maxSizeMB: 5 });
+    if (!validation.valid) {
+      toast.error(validation.error || 'ফাইল সাইজ বা টাইপ সঠিক নয়');
+      return;
+    }
+
     setIsCompressing(true);
+    let blobUrl: string | null = null;
     try {
-      const compressed = await compressImage(file, 0.7);
+      const compressed = await compressImage(file, 0.85);
+      blobUrl = URL.createObjectURL(compressed);
       const base64 = await fileToBase64(compressed);
+      if (blobUrl) URL.revokeObjectURL(blobUrl);
       setter(compressed);
       previewSetter(base64);
       toast.success(`${label} আপলোড সম্পন্ন হয়েছে`);
     } catch {
       toast.error('ফাইল প্রসেসিং এ সমস্যা হয়েছে');
+      if (blobUrl) URL.revokeObjectURL(blobUrl);
     } finally {
       setIsCompressing(false);
       if (e.target) e.target.value = '';
@@ -324,7 +317,7 @@ export default function Step4ExperienceSkills({ onNext, onPrev }: StepProps) {
       experienceLetterFile: expFile,
       cvUrl: cvPreview,
       experienceLetterUrl: expPreview,
-    } as any);
+    });
     onNext();
   };
 
@@ -585,7 +578,7 @@ export default function Step4ExperienceSkills({ onNext, onPrev }: StepProps) {
                 <FormField
                   key={name}
                   control={form.control}
-                  name={name as any}
+                  name={name}
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="flex items-center gap-2 text-zinc-700 dark:text-zinc-300">

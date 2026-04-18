@@ -1,7 +1,12 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback, memo } from 'react';
-import { useForm, type SubmitHandler, type Control } from 'react-hook-form';
+import {
+  useForm,
+  type SubmitHandler,
+  type Control,
+  UseFormReturn,
+} from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Image from 'next/image';
 import { MapPin, IdCard, X, FileUp } from 'lucide-react';
@@ -48,19 +53,12 @@ import {
 } from '@/lib/bangladesh-address';
 import { useStaffFormStore, useStep2Data } from '@/store/staffFormStore';
 import { VoiceInputBn } from '@/components/ui/voice-input';
+import { fileToBase64, validateFile } from '@/lib/utils/file';
 
 interface StepProps {
   onNext: () => void;
   onPrev: () => void;
 }
-
-const fileToBase64 = (file: File): Promise<string> =>
-  new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = reject;
-  });
 
 // ══════════════════════════════════════════════════════════════
 // AddressSection — MUST be defined OUTSIDE Step2AddressID.
@@ -77,7 +75,7 @@ interface AddressSectionProps {
   division: string;
   district: string;
   title: string;
-  control: Control<AddressIDData>;
+  control: Control<AddressIDData, any>;
 }
 
 const AddressSection = memo(function AddressSection({
@@ -96,7 +94,7 @@ const AddressSection = memo(function AddressSection({
         {/* Division */}
         <FormField
           control={control}
-          name={`${prefix}.division` as any}
+          name={`${prefix}.division`}
           render={({ field }) => (
             <FormItem>
               <FormLabel>
@@ -109,8 +107,8 @@ const AddressSection = memo(function AddressSection({
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {DIVISIONS.map(d => (
-                    <SelectItem key={d} value={d}>
+                  {DIVISIONS.map((d, i) => (
+                    <SelectItem key={`division-${d}-${i}`} value={d}>
                       {DIVISION_LABELS[d]}
                     </SelectItem>
                   ))}
@@ -124,7 +122,7 @@ const AddressSection = memo(function AddressSection({
         {/* District */}
         <FormField
           control={control}
-          name={`${prefix}.district` as any}
+          name={`${prefix}.district`}
           render={({ field }) => (
             <FormItem>
               <FormLabel>
@@ -144,8 +142,8 @@ const AddressSection = memo(function AddressSection({
                 </FormControl>
                 <SelectContent>
                   {division &&
-                    DISTRICTS_BY_DIVISION[division]?.map(d => (
-                      <SelectItem key={d} value={d}>
+                    DISTRICTS_BY_DIVISION[division]?.map((d, i) => (
+                      <SelectItem key={`${d}-${i}`} value={d}>
                         {d}
                       </SelectItem>
                     ))}
@@ -159,7 +157,7 @@ const AddressSection = memo(function AddressSection({
         {/* Thana */}
         <FormField
           control={control}
-          name={`${prefix}.thana` as any}
+          name={`${prefix}.thana`}
           render={({ field }) => (
             <FormItem>
               <FormLabel>
@@ -177,8 +175,8 @@ const AddressSection = memo(function AddressSection({
                 </FormControl>
                 <SelectContent>
                   {district &&
-                    UPAZILAS_BY_DISTRICT[district]?.map(t => (
-                      <SelectItem key={t} value={t}>
+                    UPAZILAS_BY_DISTRICT[district]?.map((t, i) => (
+                      <SelectItem key={`${district}-${t}-${i}`} value={t}>
                         {t}
                       </SelectItem>
                     ))}
@@ -192,7 +190,7 @@ const AddressSection = memo(function AddressSection({
         {/* Union/Ward - Dhaka Metro shows Ward, others show Union */}
         <FormField
           control={control}
-          name={`${prefix}.union` as any}
+          name={`${prefix}.union`}
           render={({ field }) => {
             const isDhakaMetro = isDhakaMetroDistrict(district);
             const wards = isDhakaMetro ? getWardsForDhakaMetro(district) : [];
@@ -221,8 +219,11 @@ const AddressSection = memo(function AddressSection({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {wards.map(w => (
-                        <SelectItem key={w} value={`ওয়ার্ড ${w}`}>
+                      {wards.map((w, i) => (
+                        <SelectItem
+                          key={`ward-${w}-${i}`}
+                          value={`ওয়ার্ড ${w}`}
+                        >
                           {`ওয়ার্ড ${w}`}
                         </SelectItem>
                       ))}
@@ -248,10 +249,18 @@ const AddressSection = memo(function AddressSection({
                     <SelectContent>
                       {district &&
                         UPAZILAS_BY_DISTRICT[district]
-                          ?.flatMap(t => UNIONS_BY_UPAZILA_BN[t] || [])
-                          .map(u => (
-                            <SelectItem key={u} value={u}>
-                              {u}
+                          ?.flatMap((upazila, ui) =>
+                            (UNIONS_BY_UPAZILA_BN[upazila] || []).map(
+                              (union, ni) => ({
+                                key: `${district}-${upazila}-${union}-${ui}-${ni}`,
+                                upazila,
+                                union,
+                              })
+                            )
+                          )
+                          .map((item, idx) => (
+                            <SelectItem key={`u-${idx}`} value={item.union}>
+                              {item.union}
                             </SelectItem>
                           ))}
                     </SelectContent>
@@ -266,7 +275,7 @@ const AddressSection = memo(function AddressSection({
         {/* Post Office — voice input enabled */}
         <FormField
           control={control}
-          name={`${prefix}.postOffice` as any}
+          name={`${prefix}.postOffice`}
           render={({ field }) => (
             <FormItem>
               <FormLabel>
@@ -287,7 +296,7 @@ const AddressSection = memo(function AddressSection({
         {/* Post Code */}
         <FormField
           control={control}
-          name={`${prefix}.postCode` as any}
+          name={`${prefix}.postCode`}
           render={({ field }) => (
             <FormItem>
               <FormLabel>পোস্ট কোড</FormLabel>
@@ -306,11 +315,11 @@ const AddressSection = memo(function AddressSection({
         {/* Village — voice input enabled */}
         <FormField
           control={control}
-          name={`${prefix}.village` as any}
+          name={`${prefix}.village`}
           render={({ field }) => (
             <FormItem className="sm:col-span-2 lg:col-span-3">
               <FormLabel>
-                গ্রাম / ইউনিয়ন / এলাকা <span className="text-cyan-500">*</span>
+                গ্রাম / রাস্তা / এলাকা <span className="text-cyan-500">*</span>
               </FormLabel>
               <FormControl>
                 <VoiceInputBn
@@ -403,14 +412,14 @@ const NidUploadCard = memo(function NidUploadCard({
 // ══════════════════════════════════════════════════════════════
 export default function Step2AddressID({ onNext, onPrev }: StepProps) {
   const savedData = useStep2Data();
-  const { setStep2Data, markIncomplete } = useStaffFormStore();
+  const { setStep2Data, patchStep2Data, markIncomplete } = useStaffFormStore();
 
   // NID previews from persisted base64
   const [nidFrontPreview, setNidFrontPreview] = useState<string | null>(
-    (savedData as any).nidFrontBase64 ?? null
+    savedData?.nidFrontBase64 ?? null
   );
   const [nidBackPreview, setNidBackPreview] = useState<string | null>(
-    (savedData as any).nidBackBase64 ?? null
+    savedData?.nidBackBase64 ?? null
   );
 
   const nidFrontRef = useRef<HTMLInputElement>(null);
@@ -418,41 +427,41 @@ export default function Step2AddressID({ onNext, onPrev }: StepProps) {
 
   // ── Form ───────────────────────────────────────────────────
   const form = useForm<AddressIDData>({
-    resolver: zodResolver(addressIDSchema) as any,
+    resolver: zodResolver(addressIDSchema),
     defaultValues: {
       currentAddress: {
-        division: savedData.currentAddress?.division ?? '',
-        district: savedData.currentAddress?.district ?? '',
-        thana: savedData.currentAddress?.thana ?? '',
-        postOffice: savedData.currentAddress?.postOffice ?? '',
-        village: savedData.currentAddress?.village ?? '',
-        postCode: savedData.currentAddress?.postCode ?? '',
+        division: savedData?.currentAddress?.division ?? '',
+        district: savedData?.currentAddress?.district ?? '',
+        thana: savedData?.currentAddress?.thana ?? '',
+        postOffice: savedData?.currentAddress?.postOffice ?? '',
+        village: savedData?.currentAddress?.village ?? '',
+        postCode: savedData?.currentAddress?.postCode ?? '',
       },
-      permanentSameAsCurrent: savedData.permanentSameAsCurrent ?? false,
-      permanentAddress: savedData.permanentSameAsCurrent
+      permanentSameAsCurrent: savedData?.permanentSameAsCurrent ?? false,
+      permanentAddress: savedData?.permanentSameAsCurrent
         ? { ...savedData.currentAddress }
         : {
-            division: savedData.permanentAddress?.division ?? '',
-            district: savedData.permanentAddress?.district ?? '',
-            thana: savedData.permanentAddress?.thana ?? '',
-            postOffice: savedData.permanentAddress?.postOffice ?? '',
-            village: savedData.permanentAddress?.village ?? '',
-            postCode: savedData.permanentAddress?.postCode ?? '',
+            division: savedData?.permanentAddress?.division ?? '',
+            district: savedData?.permanentAddress?.district ?? '',
+            thana: savedData?.permanentAddress?.thana ?? '',
+            postOffice: savedData?.permanentAddress?.postOffice ?? '',
+            village: savedData?.permanentAddress?.village ?? '',
+            postCode: savedData?.permanentAddress?.postCode ?? '',
           },
-      nidNumber: savedData.nidNumber ?? '',
-      dateOfBirth: savedData.dateOfBirth ?? '',
-      bloodGroup: savedData.bloodGroup ?? 'unknown',
+      nidNumber: savedData?.nidNumber ?? '',
+      dateOfBirth: savedData?.dateOfBirth ?? '',
+      bloodGroup: savedData?.bloodGroup ?? 'unknown',
     },
   });
 
   // Restore on mount
   useEffect(() => {
     if (!savedData || !Object.keys(savedData).length) return;
-    const front = (savedData as any).nidFrontBase64 ?? null;
-    const back = (savedData as any).nidBackBase64 ?? null;
+    const front = savedData.nidFrontBase64 ?? null;
+    const back = savedData.nidBackBase64 ?? null;
     if (front) setNidFrontPreview(front);
     if (back) setNidBackPreview(back);
-  }, []);
+  }, [savedData]);
 
   // Address cascade resets
   useEffect(() => {
@@ -477,25 +486,25 @@ export default function Step2AddressID({ onNext, onPrev }: StepProps) {
   }, [form]);
 
   // Auto-save (debounced 800ms)
-  const timerRef = useRef<ReturnType<typeof setTimeout>>();
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const saveToStore = useCallback(() => {
-    clearTimeout(timerRef.current);
+    if (timerRef.current) clearTimeout(timerRef.current);
     timerRef.current = setTimeout(() => {
-      setStep2Data({
+      patchStep2Data({
         ...form.getValues(),
         nidFrontBase64: nidFrontPreview,
         nidBackBase64: nidBackPreview,
         nidFrontCopyUrl: nidFrontPreview,
         nidBackCopyUrl: nidBackPreview,
-      } as any);
+      });
     }, 800);
-  }, [form, nidFrontPreview, nidBackPreview, setStep2Data]);
+  }, [form, nidFrontPreview, nidBackPreview, patchStep2Data]);
 
   useEffect(() => {
     const sub = form.watch(() => saveToStore());
     return () => {
       sub.unsubscribe();
-      clearTimeout(timerRef.current);
+      if (timerRef.current) clearTimeout(timerRef.current);
     };
   }, [form, saveToStore]);
 
@@ -504,33 +513,45 @@ export default function Step2AddressID({ onNext, onPrev }: StepProps) {
     async (e: React.ChangeEvent<HTMLInputElement>, side: 'front' | 'back') => {
       const file = e.target.files?.[0];
       if (!file) return;
+
+      const validation = validateFile(file, { maxSizeMB: 5 });
+      if (!validation.valid) {
+        toast.error(validation.error || 'ফাইল সাইজ বা টাইপ সঠিক নয়');
+        return;
+      }
+
+      let blobUrl: string | null = null;
       try {
-        const compressed = await compressImage(file, 0.7);
+        const compressed = await compressImage(file, 0.85);
+        blobUrl = URL.createObjectURL(compressed);
         const base64 = await fileToBase64(compressed);
+
+        if (blobUrl) URL.revokeObjectURL(blobUrl);
 
         if (side === 'front') {
           setNidFrontPreview(base64);
-          setStep2Data({
-            ...(useStaffFormStore.getState().step2Data as any),
+          patchStep2Data({
+            ...useStaffFormStore.getState().step2Data,
             nidFrontBase64: base64,
             nidFrontCopyUrl: base64,
-          } as any);
+          });
         } else {
           setNidBackPreview(base64);
-          setStep2Data({
-            ...(useStaffFormStore.getState().step2Data as any),
+          patchStep2Data({
+            ...useStaffFormStore.getState().step2Data,
             nidBackBase64: base64,
             nidBackCopyUrl: base64,
-          } as any);
+          });
         }
         toast.success(
           `✅ NID ${side === 'front' ? 'সামনের' : 'পিছনের'} অংশ আপলোড হয়েছে`
         );
       } catch {
         toast.error('❌ ফাইল প্রসেসিং এ সমস্যা হয়েছে');
+        if (blobUrl) URL.revokeObjectURL(blobUrl);
       }
     },
-    [setStep2Data]
+    [patchStep2Data]
   );
 
   const removeNid = useCallback(
@@ -538,22 +559,22 @@ export default function Step2AddressID({ onNext, onPrev }: StepProps) {
       if (side === 'front') {
         setNidFrontPreview(null);
         if (nidFrontRef.current) nidFrontRef.current.value = '';
-        setStep2Data({
-          ...(useStaffFormStore.getState().step2Data as any),
+        patchStep2Data({
+          ...useStaffFormStore.getState().step2Data,
           nidFrontBase64: null,
           nidFrontCopyUrl: null,
-        } as any);
+        });
       } else {
         setNidBackPreview(null);
         if (nidBackRef.current) nidBackRef.current.value = '';
-        setStep2Data({
-          ...(useStaffFormStore.getState().step2Data as any),
+        patchStep2Data({
+          ...useStaffFormStore.getState().step2Data,
           nidBackBase64: null,
           nidBackCopyUrl: null,
-        } as any);
+        });
       }
     },
-    [setStep2Data]
+    [patchStep2Data]
   );
 
   // Watched values for address section
@@ -587,7 +608,7 @@ export default function Step2AddressID({ onNext, onPrev }: StepProps) {
       nidBackBase64: nidBackPreview,
       nidFrontCopyUrl: nidFrontPreview,
       nidBackCopyUrl: nidBackPreview,
-    } as any);
+    });
     onNext();
   };
 
@@ -600,10 +621,7 @@ export default function Step2AddressID({ onNext, onPrev }: StepProps) {
       className="kalpurush-font"
     >
       <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit as any)}
-          className="space-y-10"
-        >
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-10">
           {/* Address section */}
           <div className="space-y-6">
             <div className="flex items-center gap-2 text-cyan-600 dark:text-cyan-400 font-semibold">
@@ -635,7 +653,7 @@ export default function Step2AddressID({ onNext, onPrev }: StepProps) {
                         if (val)
                           form.setValue(
                             'permanentAddress',
-                            form.getValues('currentAddress') as any
+                            form.getValues('currentAddress')
                           );
                         else
                           form.setValue('permanentAddress', {
@@ -764,8 +782,8 @@ export default function Step2AddressID({ onNext, onPrev }: StepProps) {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {BLOOD_GROUPS.map(bg => (
-                          <SelectItem key={bg} value={bg}>
+                        {BLOOD_GROUPS.map((bg, i) => (
+                          <SelectItem key={`blood-${bg}-${i}`} value={bg}>
                             {bg === 'unknown' ? 'জানা নেই' : bg}
                           </SelectItem>
                         ))}

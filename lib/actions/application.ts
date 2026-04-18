@@ -22,7 +22,7 @@ import {
   buildR2Url,
   R2_BUCKET,
 } from '@/config/r2';
-import { convertBengaliToEnglish } from '@/lib/utils';
+import { convertBengaliToEnglish, normalizeGender } from '@/lib/utils';
 import type { FullStaffData } from '@/validations/staff';
 
 interface UploadResult {
@@ -285,6 +285,8 @@ export async function createApplication(
     experienceLetterUrl?: string;
     cvFile?: File;
     cvUrl?: string;
+    signatureFile?: File;
+    signatureUrl?: string;
   }
 ): Promise<{ applicationId: string; success: true }> {
   const dup = await checkDuplicateApplication(
@@ -404,6 +406,16 @@ export async function createApplication(
     'document'
   );
 
+  const signatureUrl = await up(
+    formData.signatureFile ??
+      (formData.signatureUrl?.startsWith('data:')
+        ? formData.signatureUrl
+        : null),
+    BUCKETS.DOCUMENTS,
+    fid('signature'),
+    'document'
+  );
+
   const addrStr = (a: typeof formData.currentAddress) =>
     [a?.village, a?.postOffice, a?.thana, a?.upazila, a?.district, a?.division]
       .filter(Boolean)
@@ -429,7 +441,15 @@ export async function createApplication(
         fatherNameEn: formData.fatherNameEn,
         motherNameBn: formData.motherNameBn,
         motherNameEn: formData.motherNameEn,
-        gender: formData.gender,
+        gender:
+          normalizeGender(formData.gender) ??
+          (() => {
+            console.error('❌ GENDER NORMALIZATION FAILED:', {
+              raw: formData.gender,
+              type: typeof formData.gender,
+            });
+            throw new Error('Gender is required and must be male or female');
+          })(),
         maritalStatus: formData.maritalStatus,
         religion: formData.religion,
         nationality: formData.nationality ?? 'বাংলাদেশী',
@@ -499,6 +519,7 @@ export async function createApplication(
         certificateUrls: certificateUrls.filter(isStorableUrl),
         experienceLetterUrl: cleanUrl(expLetterUrl),
         cvUrl: cleanUrl(cvUrl),
+        signatureUrl: cleanUrl(signatureUrl),
 
         appliedAt: new Date().toISOString(),
       }
@@ -609,6 +630,7 @@ export async function approveApplication(
     certificateUrls: app.certificateUrls,
     experienceLetterUrl: app.experienceLetterUrl ?? '',
     cvUrl: app.cvUrl ?? '',
+    signatureUrl: app.signatureUrl ?? '',
     paymentMethod: app.paymentMethod,
     bankName: app.bankName ?? '',
     bankBranch: app.bankBranch ?? '',

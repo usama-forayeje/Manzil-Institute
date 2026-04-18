@@ -94,7 +94,7 @@ function SectionHeader({
 export default function Step5ContactReference({ onNext, onPrev }: StepProps) {
   const savedData = useStep5Data();
   const step5Complete = useStep5Complete();
-  const { setStep5Data, markIncomplete } = useStaffFormStore();
+  const { setStep5Data, patchStep5Data, markIncomplete } = useStaffFormStore();
 
   const [isCompressing, setIsCompressing] = useState(false);
 
@@ -131,45 +131,23 @@ export default function Step5ContactReference({ onNext, onPrev }: StepProps) {
   }, []);
 
   // Auto-save form data with debounce
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const subscription = form.watch(value => {
       if (timerRef.current) clearTimeout(timerRef.current);
       timerRef.current = setTimeout(() => {
-        setStep5Data(value as any);
+        patchStep5Data(value);
       }, 500);
     });
     return () => {
       subscription.unsubscribe();
       if (timerRef.current) clearTimeout(timerRef.current);
     };
-  }, [form, setStep5Data]);
+  }, [form, patchStep5Data]);
 
   const onSubmit: SubmitHandler<ContactReferenceData> = data => {
-    // Validation checks
-    if (!data.phonePrimary || data.phonePrimary.length < 11) {
-      markIncomplete(5);
-      toast.error('⚠️ অনুগ্রহ করে সঠিক মোবাইল নম্বর দিন');
-      return;
-    }
-    if (!data.emergencyContactNo || data.emergencyContactNo.length < 11) {
-      markIncomplete(5);
-      toast.error('⚠️ অনুগ্রহ করে জরুরি যোগাযোগের নম্বর দিন');
-      return;
-    }
-    if (!data.emergencyRelationship) {
-      markIncomplete(5);
-      toast.error('⚠️ অনুগ্রহ করে সম্পর্ক নির্বাচন করুন');
-      return;
-    }
-    if (!data.referenceName || !data.referencePhone) {
-      markIncomplete(5);
-      toast.error('⚠️ অনুগ্রহ করে রেফারেন্স তথ্য পূরণ করুন');
-      return;
-    }
-
-    setStep5Data(data as any);
+    setStep5Data(data);
     onNext();
   };
 

@@ -475,34 +475,50 @@ const addressSchema = z.object({
     .min(1, 'গ্রাম/এলাকা অবশ্যই দিতে হবে')
     .optional()
     .or(z.literal('')),
-  postCode: z.string().max(10).optional().or(z.literal('')),
+  postCode: z
+    .string()
+    .max(10, { message: 'পোস্টকোড সর্বোচ্চ ১০টি অক্ষরের হতে পারে' })
+    .optional()
+    .or(z.literal('')),
 });
 
 // ─── Step 1: Personal & Family Information ─────────────────
 export const personalFamilySchema = z.object({
   nameEn: z
     .string()
-    .min(3, 'English name must be at least 3 characters')
-    .max(100),
-  nameBn: z.string().min(2, 'বাংলায় পূর্ণ নাম দিতে হবে').max(100),
-  fatherNameBn: z.string().min(2, 'পিতার নাম বাংলায় দিতে হবে').max(100),
+    .min(3, { message: 'ইংরেজি নাম কমপক্ষে ৩টি অক্ষরের হতে হবে' })
+    .max(100, { message: 'ইংরেজি নাম সর্বোচ্চ ১০০টি অক্ষরের হতে পারে' }),
+  nameBn: z
+    .string()
+    .min(2, { message: 'বাংলায় পূর্ণ নাম দিতে হবে' })
+    .max(100, { message: 'বাংলা নাম সর্বোচ্চ ১০০ অক্ষর' }),
+  fatherNameBn: z
+    .string()
+    .min(2, { message: 'পিতার নাম বাংলায় দিতে হবে' })
+    .max(100, { message: 'পিতার নাম সর্বোচ্চ ১০০ অক্ষর' }),
   fatherNameEn: z
     .string()
-    .min(3, "Father's name in English is required")
-    .max(100),
-  motherNameBn: z.string().min(2, 'মাতার নাম বাংলায় দিতে হবে').max(100),
+    .min(3, { message: 'পিতার ইংরেজি নাম কমপক্ষে ৩টি অক্ষরের হবে' })
+    .max(100, { message: 'পিতার নাম সর্বোচ্চ ১০০ অক্ষর' }),
+  motherNameBn: z
+    .string()
+    .min(2, { message: 'মাতার নাম বাংলায় দিতে হবে' })
+    .max(100, { message: 'মাতার নাম সর্বোচ্চ ১০০ অক্ষর' }),
   motherNameEn: z
     .string()
-    .min(3, "Mother's name in English is required")
-    .max(100),
-  gender: z.string().min(1, 'লিঙ্গ নির্বাচন করুন'),
+    .min(3, { message: 'মাতার ইংরেজি নাম কমপক্ষে ৩টি অক্ষরের হবে' })
+    .max(100, { message: 'মাতার নাম সর্বোচ্চ ১০০ অক্ষর' }),
+  gender: z.string().min(1, { message: 'লিঙ্গ নির্বাচন করুন' }),
   maritalStatus: z.enum(['unmarried', 'married', 'widowed', 'divorced'], {
     message: 'বৈবাহিক অবস্থা নির্বাচন করুন',
   }),
   religion: z.enum(['islam', 'hinduism', 'christianity', 'buddhism', 'other'], {
     message: 'ধর্ম নির্বাচন করুন',
   }),
-  nationality: z.string().min(2, 'জাতীয়তা দিতে হবে').default('বাংলাদেশী'),
+  nationality: z
+    .string()
+    .min(2, { message: 'জাতীয়তা দিতে হবে' })
+    .default('বাংলাদেশী'),
   photoUrl: z.string().optional(),
   photoFile: z.any().optional(),
 });
@@ -533,7 +549,9 @@ export const addressIDSchema = z
       .pipe(
         z
           .string()
-          .regex(/^(\d{10}|\d{17})$/)
+          .regex(/^(\d{10}|\d{17})$/, {
+            message: 'সঠিক NID নম্বর দিন (১০ বা ১৭ ডিজিট)',
+          })
           .optional()
       ),
     dateOfBirth: z
@@ -688,7 +706,13 @@ export const professionalEducationSchema = z.object({
     }),
   // Role specific fields
   isHafiz: z.boolean().optional().default(false),
-  specialSkills: z.string().max(500).optional().or(z.literal('')),
+  specialSkills: z
+    .string()
+    .max(500, {
+      message: 'বিশেষ দক্ষতার বর্ণনা সর্বোচ্চ ৫০০টি অক্ষরের হতে পারে',
+    })
+    .optional()
+    .or(z.literal('')),
   certificateFiles: z.any().optional(),
   experienceLetterFile: z.any().optional(),
   cvFile: z.any().refine(files => files?.length > 0 || files instanceof File, {
@@ -726,9 +750,12 @@ export const contactReferenceSchema = z.object({
     .pipe(
       z
         .string()
-        .min(11)
-        .max(14)
-        .regex(/^(\+880|880|0)1[3-9]\d{8}$/)
+        .min(11, { message: 'ফোন নম্বর অবশ্যঃ ১১ ডিজিটের হতে হবে' })
+        .max(14, { message: 'ফোন নম্বর সর্বোচ্চ ১৪ ডিজিটের হতে পারে' })
+        .regex(/^(\+880|880|0)1[3-9]\d{8}$/, {
+          message:
+            'সঠিক বাংলাদেশী মোবাইল নম্বর দিন (যেমন: 1712345678 বা +8801712345678)',
+        })
     ),
   phoneSecondary: z
     .string()
@@ -736,20 +763,25 @@ export const contactReferenceSchema = z.object({
     .pipe(
       z
         .string()
-        .regex(/^(\+880|880|0)1[3-9]\d{8}$/)
+        .regex(/^(\+880|880|0)1[3-9]\d{8}$/, {
+          message: 'সঠিক বাংলাদেশী মোবাইল নম্বর দিন',
+        })
         .optional()
     ),
   email: z.string().email('সঠিক ইমেইল ঠিকানা দিন').optional().or(z.literal('')),
-  // Emergency Contact - Bengali digit support
+  // Emergency Contact - Bengali digit support (optional)
   emergencyContactNo: z
     .string()
-    .transform(val => convertPhoneToEnglish(val))
+    .transform(val => (val ? convertPhoneToEnglish(val) : ''))
     .pipe(
       z
         .string()
-        .min(11)
-        .max(14)
-        .regex(/^(\+880|880|0)1[3-9]\d{8}$/)
+        .min(11, { message: 'ফোন নম্বর অবশ্যঃ ১১ ডিজিটের হতে হবে' })
+        .max(14, { message: 'ফোন নম্বর সর্বোচ্চ ১৪ ডিজিটের হতে পারে' })
+        .regex(/^(\+880|880|0)1[3-9]\d{8}$/, {
+          message: 'সঠিক বাংলাদেশী মোবাইল নম্বর দিন',
+        })
+        .optional()
     ),
   emergencyRelationship: z.string().min(1, 'সম্পর্ক নির্বাচন করুন'),
   // WhatsApp - Bengali digit support
@@ -759,17 +791,28 @@ export const contactReferenceSchema = z.object({
     .pipe(
       z
         .string()
-        .min(11)
-        .max(14)
-        .regex(/^(\+880|880|0)1[3-9]\d{8}$/)
+        .min(11, { message: 'WhatsApp নম্বর অবশ্যয়: ১১ ডিজিটের হবে' })
+        .max(14, { message: 'WhatsApp নম্বর সর্বোচ্চ: ১৪ ডিজিট' })
+        .regex(/^(\+880|880|0)1[3-9]\d{8}$/, {
+          message: 'সঠিক WhatsApp নম্বর দিন',
+        })
         .optional()
     ),
   // Reference - Bengali digit support
   referenceName: z.string().min(2, 'সুপারিশকারীর নাম দিতে হবে'),
   referencePhone: z
     .string()
-    .transform(val => convertPhoneToEnglish(val))
-    .pipe(z.string().min(11)),
+    .transform(val => (val ? convertPhoneToEnglish(val) : ''))
+    .pipe(
+      z
+        .string()
+        .min(11, { message: 'রেফারেন্স ফোন নম্বর অবশ্যঃ ১১ ডিজিটের হবে' })
+        .max(14, { message: 'রেফারেন্স ফোন নম্বর সর্বোচ্চ: ১৪ ডিজিট' })
+        .regex(/^(\+880|880|0)1[3-9]\d{8}$/, {
+          message: 'সঠিক রেফারেন্স ফোন নম্বর দিন',
+        })
+        .optional()
+    ),
   referenceOccupation: z.string().optional().or(z.literal('')),
 });
 
@@ -804,19 +847,27 @@ export const paymentReferenceSchema = z.object({
     .pipe(
       z
         .string()
-        .regex(/^(\+880|880|0)1[3-9]\d{8}$/)
+        .min(11, { message: 'মোবাইল ব্যাংকিং নম্বর অবশ্যঃ ১১ ডিজিটের হবে' })
+        .max(14, { message: 'মোবাইল ব্যাংকিং নম্বর সর্বোচ্চ: ১৪ ডিজিট' })
+        .regex(/^(\+880|880|0)1[3-9]\d{8}$/, {
+          message: 'সঠিক মোবাইল ব্যাংকিং নম্বর দিন',
+        })
         .optional()
     ),
   // Declaration
   declaration: z.boolean().refine(val => val === true, {
     message: 'ঘোষণাপত্রটি গ্রহণ করা আবশ্যিক',
   }),
-  // Terms Acceptance
   termsAccepted: z.boolean().refine(val => val === true, {
     message: 'নিয়ম ও শর্তাবলী স্বীকার করুন',
   }),
-  // Additional Notes
-  additionalNotes: z.string().max(1000).optional().or(z.literal('')),
+  signatureFile: z.any().optional(),
+  signatureUrl: z.string().optional(),
+  additionalNotes: z
+    .string()
+    .max(1000, { message: 'অতিরিক্ত নোট সর্বোচ্চ ১০০০টি অক্ষরের হতে পারে' })
+    .optional()
+    .or(z.literal('')),
 });
 
 export type PaymentReferenceData = z.infer<typeof paymentReferenceSchema>;

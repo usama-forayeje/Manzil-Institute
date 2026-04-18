@@ -451,11 +451,13 @@ export default function Step6PaymentAgreement({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {Object.entries(PAYMENT_METHOD_LABELS).map(([v, l]) => (
-                        <SelectItem key={v} value={v}>
-                          {l}
-                        </SelectItem>
-                      ))}
+                      {Object.entries(PAYMENT_METHOD_LABELS).map(
+                        ([v, l], i) => (
+                          <SelectItem key={`payment-${v}-${i}`} value={v}>
+                            {l}
+                          </SelectItem>
+                        )
+                      )}
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -558,8 +560,8 @@ export default function Step6PaymentAgreement({
                           </FormControl>
                           <SelectContent>
                             {Object.entries(MOBILE_BANKING_PROVIDERS).map(
-                              ([v, l]) => (
-                                <SelectItem key={v} value={v}>
+                              ([v, l], i) => (
+                                <SelectItem key={`mobile-${v}-${i}`} value={v}>
                                   {l}
                                 </SelectItem>
                               )

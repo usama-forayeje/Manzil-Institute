@@ -311,11 +311,16 @@ export default function Step3DynamicProfessional({
                                   {d.label_bn}
                                 </SelectItem>
                               ))
-                          : Object.entries(DESIGNATION_LABELS).map(([v, l]) => (
-                              <SelectItem key={v} value={v}>
-                                {l}
-                              </SelectItem>
-                            ))}
+                          : Object.entries(DESIGNATION_LABELS).map(
+                              ([v, l], i) => (
+                                <SelectItem
+                                  key={`designation-${v}-${i}`}
+                                  value={v}
+                                >
+                                  {l}
+                                </SelectItem>
+                              )
+                            )}
                       </SelectContent>
                     </Select>
                     <FormMessage />

@@ -17,6 +17,17 @@ export function convertBengaliToEnglish(text: string): string {
   });
 }
 
+// ─── Gender Normalization ───────────────────────────────────
+export function normalizeGender(
+  gender: string | undefined | null
+): 'male' | 'female' | undefined {
+  if (!gender) return undefined;
+  const g = gender.toLowerCase().trim();
+  if (g === 'পুরুষ' || g === 'male') return 'male';
+  if (g === 'মহিলা' || g === 'female') return 'female';
+  return undefined;
+}
+
 // ─── Image Compression Utility ──────────────────────────────
 export async function compressImage(file: File, quality = 0.85): Promise<File> {
   // Default 85% quality compression

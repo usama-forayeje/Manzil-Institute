@@ -446,11 +446,13 @@ export default function Step1PersonalFamily({ onNext }: StepProps) {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {Object.entries(MARITAL_STATUS_LABELS).map(([v, l]) => (
-                        <SelectItem key={v} value={v}>
-                          {l}
-                        </SelectItem>
-                      ))}
+                      {Object.entries(MARITAL_STATUS_LABELS).map(
+                        ([v, l], i) => (
+                          <SelectItem key={`marital-${v}-${i}`} value={v}>
+                            {l}
+                          </SelectItem>
+                        )
+                      )}
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -475,8 +477,8 @@ export default function Step1PersonalFamily({ onNext }: StepProps) {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {Object.entries(RELIGION_LABELS).map(([v, l]) => (
-                        <SelectItem key={v} value={v}>
+                      {Object.entries(RELIGION_LABELS).map(([v, l], i) => (
+                        <SelectItem key={`religion-${v}-${i}`} value={v}>
                           {l}
                         </SelectItem>
                       ))}

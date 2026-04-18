@@ -107,8 +107,8 @@ const AddressSection = memo(function AddressSection({
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {DIVISIONS.map(d => (
-                    <SelectItem key={d} value={d}>
+                  {DIVISIONS.map((d, i) => (
+                    <SelectItem key={`division-${d}-${i}`} value={d}>
                       {DIVISION_LABELS[d]}
                     </SelectItem>
                   ))}
@@ -142,8 +142,8 @@ const AddressSection = memo(function AddressSection({
                 </FormControl>
                 <SelectContent>
                   {division &&
-                    DISTRICTS_BY_DIVISION[division]?.map(d => (
-                      <SelectItem key={d} value={d}>
+                    DISTRICTS_BY_DIVISION[division]?.map((d, i) => (
+                      <SelectItem key={`${d}-${i}`} value={d}>
                         {d}
                       </SelectItem>
                     ))}
@@ -175,8 +175,8 @@ const AddressSection = memo(function AddressSection({
                 </FormControl>
                 <SelectContent>
                   {district &&
-                    UPAZILAS_BY_DISTRICT[district]?.map(t => (
-                      <SelectItem key={t} value={t}>
+                    UPAZILAS_BY_DISTRICT[district]?.map((t, i) => (
+                      <SelectItem key={`${district}-${t}-${i}`} value={t}>
                         {t}
                       </SelectItem>
                     ))}
@@ -219,8 +219,11 @@ const AddressSection = memo(function AddressSection({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {wards.map(w => (
-                        <SelectItem key={w} value={`ওয়ার্ড ${w}`}>
+                      {wards.map((w, i) => (
+                        <SelectItem
+                          key={`ward-${w}-${i}`}
+                          value={`ওয়ার্ড ${w}`}
+                        >
                           {`ওয়ার্ড ${w}`}
                         </SelectItem>
                       ))}
@@ -246,16 +249,17 @@ const AddressSection = memo(function AddressSection({
                     <SelectContent>
                       {district &&
                         UPAZILAS_BY_DISTRICT[district]
-                          ?.flatMap(upazila =>
+                          ?.flatMap((upazila, ui) =>
                             (UNIONS_BY_UPAZILA_BN[upazila] || []).map(
-                              union => ({
+                              (union, ni) => ({
+                                key: `${district}-${upazila}-${union}-${ui}-${ni}`,
                                 upazila,
                                 union,
                               })
                             )
                           )
                           .map((item, idx) => (
-                            <SelectItem key={idx} value={item.union}>
+                            <SelectItem key={`u-${idx}`} value={item.union}>
                               {item.union}
                             </SelectItem>
                           ))}
@@ -315,7 +319,7 @@ const AddressSection = memo(function AddressSection({
           render={({ field }) => (
             <FormItem className="sm:col-span-2 lg:col-span-3">
               <FormLabel>
-                গ্রাম / ইউনিয়ন / এলাকা <span className="text-cyan-500">*</span>
+                গ্রাম / রাস্তা / এলাকা <span className="text-cyan-500">*</span>
               </FormLabel>
               <FormControl>
                 <VoiceInputBn
@@ -778,8 +782,8 @@ export default function Step2AddressID({ onNext, onPrev }: StepProps) {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {BLOOD_GROUPS.map(bg => (
-                          <SelectItem key={bg} value={bg}>
+                        {BLOOD_GROUPS.map((bg, i) => (
+                          <SelectItem key={`blood-${bg}-${i}`} value={bg}>
                             {bg === 'unknown' ? 'জানা নেই' : bg}
                           </SelectItem>
                         ))}

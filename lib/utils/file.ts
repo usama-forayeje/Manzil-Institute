@@ -1,4 +1,5 @@
-import { convertBengaliToEnglish } from './utils';
+﻿import { convertBengaliToEnglish, compressImage } from '../utils';
+export { compressImage };
 
 // --- File to Base64 Conversion -----------------------------
 export async function fileToBase64(file: File): Promise<string> {
@@ -94,7 +95,7 @@ export async function processImageFile(
     return { file: compressed, base64 };
   } catch (error) {
     console.error('Image processing failed:', error);
-    return { file, base64: '', error: '???? ???????? ?????? happened' };
+    return { file, base64: '', error: 'প্রক্রিয়া চলাকালীন সমস্যা হয়েছে' };
   }
 }
 

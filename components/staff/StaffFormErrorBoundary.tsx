@@ -50,8 +50,8 @@ export class StaffFormErrorBoundary extends Component<Props, State> {
       }
       return (
         <div className="max-w-4xl mx-auto p-8 text-center">
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl p-8">
-            <h2 className="text-2xl font-bold text-red-600 dark:text-red-400 mb-4">
+          <div className="bg-primary/5 dark:bg-primary/10/20 border border-primary/20 dark:border-primary rounded-2xl p-8">
+            <h2 className="text-2xl font-bold text-red-600 dark:text-primary mb-4">
               something went wrong
             </h2>
             <p className="text-gray-600 dark:text-gray-300 mb-6">

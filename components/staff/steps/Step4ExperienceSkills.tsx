@@ -105,16 +105,16 @@ function FileUploadSlot({
 }: FileSlotProps) {
   const colors = {
     rose: {
-      border: 'border-rose-200 dark:border-rose-800',
-      hover: 'hover:border-rose-400',
-      bg: 'bg-rose-100 dark:bg-rose-950',
-      text: 'text-rose-600',
+      border: 'border-primary/20 dark:border-primary',
+      hover: 'hover:border-primary',
+      bg: 'bg-primary/5 dark:bg-primary/10',
+      text: 'text-primary',
     },
     amber: {
-      border: 'border-amber-200 dark:border-amber-800',
-      hover: 'hover:border-amber-400',
-      bg: 'bg-amber-100 dark:bg-amber-950',
-      text: 'text-amber-600',
+      border: 'border-primary/20 dark:border-primary',
+      hover: 'hover:border-primary',
+      bg: 'bg-primary/5 dark:bg-primary/10',
+      text: 'text-primary',
     },
   }[color];
 
@@ -136,9 +136,9 @@ function FileUploadSlot({
           'relative group h-36 rounded-2xl border-2 border-dashed flex flex-col items-center justify-center transition-all overflow-hidden cursor-pointer',
           hasContent
             ? isNew
-              ? 'border-green-500 bg-green-50/30 dark:bg-green-950/20'
-              : 'border-amber-500 bg-amber-50/30 dark:bg-amber-950/20'
-            : cn(colors.border, colors.hover, 'bg-white/50 dark:bg-zinc-950/50')
+              ? 'border-primary bg-primary/5/30 dark:bg-primary/10/20'
+              : 'border-primary bg-primary/5/30 dark:bg-primary/10/20'
+            : cn(colors.border, colors.hover, 'bg-background/50 backdrop-blur-sm')
         )}
       >
         {hasContent ? (
@@ -146,13 +146,13 @@ function FileUploadSlot({
             <CheckCircle2
               className={cn(
                 'h-10 w-10',
-                isNew ? 'text-green-500' : 'text-amber-500'
+                isNew ? 'text-primary' : 'text-primary'
               )}
             />
             <span
               className={cn(
                 'text-sm font-bold truncate max-w-full',
-                isNew ? 'text-green-600' : 'text-amber-600'
+                isNew ? 'text-primary' : 'text-primary'
               )}
             >
               {isNew ? (fileName ?? 'আপলোড সম্পন্ন') : 'সংরক্ষিত আছে'}
@@ -160,7 +160,7 @@ function FileUploadSlot({
             <span
               className={cn(
                 'text-xs',
-                isNew ? 'text-green-500' : 'text-amber-500'
+                isNew ? 'text-primary' : 'text-primary'
               )}
             >
               {isNew ? '' : '(পরিবর্তন করতে ক্লিক করুন)'}
@@ -340,9 +340,9 @@ export default function Step4ExperienceSkills({ onNext, onPrev }: StepProps) {
                 exit={{ opacity: 0 }}
                 className="fixed inset-0 z-[100] bg-white/20 dark:bg-black/20 backdrop-blur-[2px] flex items-center justify-center pointer-events-none"
               >
-                <div className="bg-white/90 dark:bg-zinc-900/90 p-5 rounded-2xl shadow-2xl flex items-center gap-4 border border-cyan-500/30">
-                  <Loader2 className="h-6 w-6 animate-spin text-cyan-600" />
-                  <span className="text-sm font-bold text-cyan-700">
+                <div className="bg-white/90 dark:bg-zinc-900/90 p-5 rounded-2xl shadow-2xl flex items-center gap-4 border border-primary/30">
+                  <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                  <span className="text-sm font-bold text-primary">
                     ফাইল প্রসেসিং হচ্ছে...
                   </span>
                 </div>
@@ -352,29 +352,29 @@ export default function Step4ExperienceSkills({ onNext, onPrev }: StepProps) {
 
           {/* Experience */}
           <div className="space-y-5">
-            <div className="flex items-center gap-3 p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200/50">
-              <div className="p-2 rounded-lg bg-amber-100 dark:bg-amber-900/50">
-                <Briefcase className="h-5 w-5 text-amber-600" />
+            <div className="flex items-center gap-3 p-3 rounded-xl bg-primary/5 dark:bg-primary/10/20 border border-primary/20/50">
+              <div className="p-2 rounded-lg bg-primary/5 dark:bg-primary/10/50">
+                <Briefcase className="h-5 w-5 text-primary" />
               </div>
-              <h3 className="font-bold text-amber-800 dark:text-amber-300">
+              <h3 className="font-bold text-primary dark:text-primary/70">
                 পেশাদার অভিজ্ঞতা
               </h3>
             </div>
 
-            <div className="p-5 rounded-2xl bg-amber-50/30 dark:bg-amber-950/10 border border-amber-100/50 space-y-4">
+            <div className="p-5 rounded-2xl bg-primary/5/30 dark:bg-primary/10/10 border border-primary/20/50 space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
                   name="previousWorkplace"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-amber-800 dark:text-amber-300">
+                      <FormLabel className="text-primary dark:text-primary/70">
                         সর্বশেষ কর্মস্থল
                       </FormLabel>
                       <FormControl>
                         <VoiceInputBn
                           placeholder="প্রতিষ্ঠানের নাম"
-                          className="bg-white/70 dark:bg-zinc-950/50 border-amber-200"
+                          className="bg-background/80 backdrop-blur-sm border-primary/20"
                           {...field}
                         />
                       </FormControl>
@@ -386,13 +386,13 @@ export default function Step4ExperienceSkills({ onNext, onPrev }: StepProps) {
                   name="previousWorkDuration"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-amber-800 dark:text-amber-300">
+                      <FormLabel className="text-primary dark:text-primary/70">
                         কর্মকাল
                       </FormLabel>
                       <FormControl>
                         <VoiceInputBn
                           placeholder="যেমন: ২ বছর ৬ মাস"
-                          className="bg-white/70 dark:bg-zinc-950/50 border-amber-200"
+                          className="bg-background/80 backdrop-blur-sm border-primary/20"
                           {...field}
                         />
                       </FormControl>
@@ -404,7 +404,7 @@ export default function Step4ExperienceSkills({ onNext, onPrev }: StepProps) {
                   name="totalExperienceYears"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-amber-800 dark:text-amber-300">
+                      <FormLabel className="text-primary dark:text-primary/70">
                         মোট অভিজ্ঞতার বছর
                       </FormLabel>
                       <FormControl>
@@ -412,7 +412,7 @@ export default function Step4ExperienceSkills({ onNext, onPrev }: StepProps) {
                           type="text"
                           inputMode="numeric"
                           placeholder="বছর সংখ্যা"
-                          className="bg-white/70 dark:bg-zinc-950/50 border-amber-200 h-11"
+                          className="bg-background/80 backdrop-blur-sm border-primary/20 h-11"
                           value={field.value || ''}
                           onChange={e => {
                             const bn: Record<string, string> = {
@@ -441,7 +441,7 @@ export default function Step4ExperienceSkills({ onNext, onPrev }: StepProps) {
               </div>
 
               {/* Hafiz + Skills */}
-              <div className="p-4 rounded-xl border-2 border-amber-200 dark:border-amber-800 bg-amber-50/30">
+              <div className="p-4 rounded-xl border-2 border-primary/20 dark:border-primary bg-primary/5/30">
                 <FormField
                   control={form.control}
                   name="isHafiz"
@@ -451,10 +451,10 @@ export default function Step4ExperienceSkills({ onNext, onPrev }: StepProps) {
                         <Checkbox
                           checked={field.value}
                           onCheckedChange={field.onChange}
-                          className="h-5 w-5 border-amber-500 data-[state=checked]:bg-amber-500"
+                          className="h-5 w-5 border-primary data-[state=checked]:bg-primary"
                         />
                       </FormControl>
-                      <FormLabel className="text-amber-800 dark:text-amber-300 font-bold cursor-pointer">
+                      <FormLabel className="text-primary dark:text-primary/70 font-bold cursor-pointer">
                         🎓 আপনি কি হাফেজ-এ-কুরআন?
                       </FormLabel>
                     </FormItem>
@@ -467,14 +467,14 @@ export default function Step4ExperienceSkills({ onNext, onPrev }: StepProps) {
                 name="specialSkills"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-amber-800 dark:text-amber-300 flex items-center gap-2">
+                    <FormLabel className="text-primary dark:text-primary/70 flex items-center gap-2">
                       <Star className="h-4 w-4" /> বিশেষ দক্ষতা
                       <HelpTooltip content="বিশেষ কোনো দক্ষতা থাকলে লিখুন" />
                     </FormLabel>
                     <FormControl>
                       <Textarea
                         placeholder="যেমন: কম্পিউটার, ক্যালিগ্রাফি..."
-                        className="bg-white/70 dark:bg-zinc-950/50 border-amber-200 min-h-[80px]"
+                        className="bg-background/80 backdrop-blur-sm border-primary/20 min-h-[80px]"
                         {...field}
                       />
                     </FormControl>
@@ -488,11 +488,11 @@ export default function Step4ExperienceSkills({ onNext, onPrev }: StepProps) {
 
           {/* Documents */}
           <div className="space-y-4">
-            <div className="flex items-center gap-3 p-3 rounded-xl bg-rose-50 dark:bg-rose-900/20 border border-rose-200/50">
-              <div className="p-2 rounded-lg bg-rose-100 dark:bg-rose-900/50">
-                <FileText className="h-5 w-5 text-rose-600" />
+            <div className="flex items-center gap-3 p-3 rounded-xl bg-primary/5 dark:bg-primary/10/20 border border-primary/20/50">
+              <div className="p-2 rounded-lg bg-primary/5 dark:bg-primary/10/50">
+                <FileText className="h-5 w-5 text-primary" />
               </div>
-              <h3 className="font-bold text-rose-800 dark:text-rose-300">
+              <h3 className="font-bold text-primary dark:text-primary/70">
                 প্রয়োজনীয় কাগজপত্র
               </h3>
             </div>
@@ -543,16 +543,16 @@ export default function Step4ExperienceSkills({ onNext, onPrev }: StepProps) {
 
           {/* Social links */}
           <div className="space-y-4">
-            <div className="flex items-center gap-3 p-3 rounded-xl bg-cyan-50 dark:bg-cyan-900/20 border border-cyan-200/50">
-              <div className="p-2 rounded-lg bg-cyan-100 dark:bg-cyan-900/50">
-                <Globe className="h-5 w-5 text-cyan-600" />
+            <div className="flex items-center gap-3 p-3 rounded-xl bg-primary/5 dark:bg-primary/20 border border-primary/20">
+              <div className="p-2 rounded-lg bg-primary/20 dark:bg-primary/50">
+                <Globe className="h-5 w-5 text-primary" />
               </div>
-              <h3 className="font-bold text-cyan-800 dark:text-cyan-300">
+              <h3 className="font-bold text-primary dark:text-primary/70">
                 সামাজিক যোগাযোগ মাধ্যম (ঐচ্ছিক)
               </h3>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-5 rounded-2xl bg-cyan-50/30 dark:bg-cyan-950/10 border border-cyan-100/50">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-5 rounded-2xl bg-primary/5 dark:bg-primary/20 border border-primary/20">
               {[
                 {
                   name: 'socialLinks.facebook',
@@ -587,7 +587,7 @@ export default function Step4ExperienceSkills({ onNext, onPrev }: StepProps) {
                       <FormControl>
                         <Input
                           placeholder={placeholder}
-                          className="bg-white/70 dark:bg-zinc-950/50 h-11"
+                          className="bg-background/80 backdrop-blur-sm h-11"
                           {...field}
                         />
                       </FormControl>
@@ -601,12 +601,12 @@ export default function Step4ExperienceSkills({ onNext, onPrev }: StepProps) {
                 render={({ field }) => (
                   <FormItem className="md:col-span-2">
                     <FormLabel className="flex items-center gap-2 text-zinc-700 dark:text-zinc-300">
-                      <FaGlobe className="h-4 w-4 text-cyan-500" /> ওয়েবসাইট
+                      <FaGlobe className="h-4 w-4 text-primary" /> ওয়েবসাইট
                     </FormLabel>
                     <FormControl>
                       <Input
                         placeholder="https://yourwebsite.com"
-                        className="bg-white/70 dark:bg-zinc-950/50 h-11"
+                        className="bg-background/80 backdrop-blur-sm h-11"
                         {...field}
                       />
                     </FormControl>
@@ -622,14 +622,14 @@ export default function Step4ExperienceSkills({ onNext, onPrev }: StepProps) {
               type="button"
               variant="ghost"
               onClick={onPrev}
-              className="text-zinc-500 hover:text-amber-600 rounded-xl px-6 h-12 font-bold"
+              className="text-zinc-500 hover:text-primary rounded-xl px-6 h-12 font-bold"
             >
               ← ফিরে যান
             </Button>
             <Button
               type="submit"
               size="lg"
-              className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg rounded-xl font-bold px-8 h-12"
+              className="bg-gradient-to-r from-primary to-primary/90 hover:from-primary hover:to-primary text-white shadow-lg shadow-primary/30 hover:shadow-primary/50 min-w-[180px] rounded-xl font-bold px-8 h-12 transition-all duration-300 hover:scale-[1.02] active:scale-95"
             >
               পরবর্তী ধাপ →
             </Button>

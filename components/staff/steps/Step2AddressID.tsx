@@ -87,7 +87,7 @@ const AddressSection = memo(function AddressSection({
 }: AddressSectionProps) {
   return (
     <div className="space-y-4">
-      <h4 className="text-sm font-bold text-cyan-700 dark:text-cyan-300">
+      <h4 className="text-sm font-bold text-primary dark:text-primary/70">
         {title}
       </h4>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -98,7 +98,7 @@ const AddressSection = memo(function AddressSection({
           render={({ field }) => (
             <FormItem>
               <FormLabel>
-                বিভাগ <span className="text-cyan-500">*</span>
+                বিভাগ <span className="text-primary">*</span>
               </FormLabel>
               <Select onValueChange={field.onChange} value={field.value || ''}>
                 <FormControl>
@@ -126,7 +126,7 @@ const AddressSection = memo(function AddressSection({
           render={({ field }) => (
             <FormItem>
               <FormLabel>
-                জেলা <span className="text-cyan-500">*</span>
+                জেলা <span className="text-primary">*</span>
               </FormLabel>
               <Select
                 onValueChange={field.onChange}
@@ -161,7 +161,7 @@ const AddressSection = memo(function AddressSection({
           render={({ field }) => (
             <FormItem>
               <FormLabel>
-                থানা/উপজেলা <span className="text-cyan-500">*</span>
+                থানা/উপজেলা <span className="text-primary">*</span>
               </FormLabel>
               <Select
                 onValueChange={field.onChange}
@@ -199,7 +199,7 @@ const AddressSection = memo(function AddressSection({
               <FormItem>
                 <FormLabel>
                   {isDhakaMetro ? 'ওয়ার্ড' : 'ইউনিয়ন'}{' '}
-                  <span className="text-cyan-500">*</span>
+                  <span className="text-primary">*</span>
                 </FormLabel>
                 {isDhakaMetro ? (
                   <Select
@@ -279,7 +279,7 @@ const AddressSection = memo(function AddressSection({
           render={({ field }) => (
             <FormItem>
               <FormLabel>
-                পোস্ট অফিস <span className="text-cyan-500">*</span>
+                পোস্ট অফিস <span className="text-primary">*</span>
               </FormLabel>
               <FormControl>
                 <VoiceInputBn
@@ -319,7 +319,7 @@ const AddressSection = memo(function AddressSection({
           render={({ field }) => (
             <FormItem className="sm:col-span-2 lg:col-span-3">
               <FormLabel>
-                গ্রাম / রাস্তা / এলাকা <span className="text-cyan-500">*</span>
+                গ্রাম / রাস্তা / এলাকা <span className="text-primary">*</span>
               </FormLabel>
               <FormControl>
                 <VoiceInputBn
@@ -357,7 +357,7 @@ const NidUploadCard = memo(function NidUploadCard({
   return (
     <div className="space-y-3">
       <FormLabel className="flex items-center gap-2">
-        {label} <span className="text-cyan-500">*</span>
+        {label} <span className="text-primary">*</span>
         <HelpTooltip
           content={`জাতীয় পরিচয়পত্রের ${side === 'front' ? 'সামনের' : 'পিছনের'} পাতার ছবি আপলোড করুন।`}
         />
@@ -367,8 +367,8 @@ const NidUploadCard = memo(function NidUploadCard({
         className={cn(
           'relative group h-40 rounded-2xl border-2 border-dashed flex flex-col items-center justify-center transition-all overflow-hidden cursor-pointer',
           preview
-            ? 'border-cyan-500'
-            : 'border-zinc-200 dark:border-zinc-800 hover:border-cyan-400 bg-white/30 dark:bg-zinc-950/20 hover:bg-cyan-50/10'
+            ? 'border-primary'
+            : 'border-primary/20 dark:border-primary/20 hover:border-primary bg-white/30 dark:bg-zinc-950/20 hover:bg-primary/5'
         )}
       >
         {preview ? (
@@ -387,10 +387,10 @@ const NidUploadCard = memo(function NidUploadCard({
           </div>
         ) : (
           <div className="flex flex-col items-center gap-2 group-hover:scale-110 transition-transform">
-            <div className="h-12 w-12 rounded-xl bg-cyan-100 dark:bg-cyan-950 flex items-center justify-center">
-              <FileUp className="h-6 w-6 text-cyan-600 dark:text-cyan-400" />
+            <div className="h-12 w-12 rounded-xl bg-primary/20 dark:bg-primary/20 flex items-center justify-center">
+              <FileUp className="h-6 w-6 text-primary dark:text-primary" />
             </div>
-            <span className="text-xs font-bold text-cyan-600">
+            <span className="text-xs font-bold text-primary">
               ছবি আপলোড করুন
             </span>
           </div>
@@ -624,12 +624,12 @@ export default function Step2AddressID({ onNext, onPrev }: StepProps) {
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-10">
           {/* Address section */}
           <div className="space-y-6">
-            <div className="flex items-center gap-2 text-cyan-600 dark:text-cyan-400 font-semibold">
+            <div className="flex items-center gap-2 text-primary dark:text-primary font-semibold">
               <MapPin className="h-5 w-5" />
               <span>ঠিকানা</span>
             </div>
 
-            <div className="p-5 rounded-2xl bg-cyan-50/30 dark:bg-cyan-900/10 border border-cyan-100/50 shadow-inner">
+            <div className="p-5 rounded-2xl bg-primary/5 dark:bg-primary/10 border border-primary/20 shadow-inner">
               <AddressSection
                 prefix="currentAddress"
                 division={currentDivision}
@@ -644,7 +644,7 @@ export default function Step2AddressID({ onNext, onPrev }: StepProps) {
               control={form.control}
               name="permanentSameAsCurrent"
               render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0 p-4 rounded-xl border border-dashed border-cyan-200 dark:border-cyan-800 bg-cyan-50/10">
+                <FormItem className="flex flex-row items-start space-x-3 space-y-0 p-4 rounded-xl border border-dashed border-primary/20 dark:border-primary bg-primary/5">
                   <FormControl>
                     <Checkbox
                       checked={field.value}
@@ -665,7 +665,7 @@ export default function Step2AddressID({ onNext, onPrev }: StepProps) {
                             postCode: '',
                           });
                       }}
-                      className="border-cyan-500 data-[state=checked]:bg-cyan-500"
+                      className="border-primary data-[state=checked]:bg-primary"
                     />
                   </FormControl>
                   <FormLabel className="cursor-pointer font-medium">
@@ -679,7 +679,7 @@ export default function Step2AddressID({ onNext, onPrev }: StepProps) {
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
-                className="p-5 rounded-2xl bg-zinc-50/50 dark:bg-zinc-800/10 border border-zinc-200 dark:border-zinc-800"
+                className="p-5 rounded-2xl bg-zinc-50/50 dark:bg-zinc-800/10 border border-primary/20 dark:border-primary/20"
               >
                 <AddressSection
                   prefix="permanentAddress"
@@ -696,7 +696,7 @@ export default function Step2AddressID({ onNext, onPrev }: StepProps) {
 
           {/* Identity section */}
           <div className="space-y-6">
-            <div className="flex items-center gap-2 text-cyan-600 dark:text-cyan-400 font-semibold">
+            <div className="flex items-center gap-2 text-primary dark:text-primary font-semibold">
               <IdCard className="h-5 w-5" />
               <span>পরিচয়পত্র ও অন্যান্য</span>
             </div>
@@ -708,7 +708,7 @@ export default function Step2AddressID({ onNext, onPrev }: StepProps) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>
-                      NID নম্বর <span className="text-cyan-500">*</span>
+                      NID নম্বর <span className="text-primary">*</span>
                     </FormLabel>
                     <FormControl>
                       <Input
@@ -728,7 +728,7 @@ export default function Step2AddressID({ onNext, onPrev }: StepProps) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>
-                      জন্ম তারিখ <span className="text-cyan-500">*</span>
+                      জন্ম তারিখ <span className="text-primary">*</span>
                     </FormLabel>
                     <FormControl>
                       <DatePicker
@@ -801,14 +801,14 @@ export default function Step2AddressID({ onNext, onPrev }: StepProps) {
               type="button"
               variant="ghost"
               onClick={onPrev}
-              className="text-zinc-500 hover:text-cyan-600 rounded-xl px-6 h-12 font-bold"
+              className="text-zinc-500 hover:text-primary rounded-xl px-6 h-12 font-bold"
             >
               ← ফিরে যান
             </Button>
             <Button
               type="submit"
               size="lg"
-              className="bg-cyan-500 hover:bg-cyan-600 text-white min-w-[150px] shadow-lg rounded-xl font-bold h-12"
+              className="bg-primary hover:bg-primary text-white min-w-[150px] shadow-lg rounded-xl font-bold h-12"
             >
               পরবর্তী ধাপ →
             </Button>

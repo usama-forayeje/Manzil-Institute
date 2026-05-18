@@ -333,33 +333,33 @@ export default function Step6PaymentAgreement({
           {/* Section: Expected Terms */}
           {!hideTerms && (
             <div className="space-y-6">
-              <div className="flex items-center gap-2 text-cyan-600 dark:text-cyan-400 font-semibold">
+              <div className="flex items-center gap-2 text-primary dark:text-primary font-semibold">
                 <Banknote className="h-5 w-5" />
                 <span>বেতন ও যোগদানের তথ্য (Terms)</span>
               </div>
 
               {/* Terms Skeleton while loading */}
               {termsLoading ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5 p-6 rounded-2xl bg-cyan-50/20 dark:bg-cyan-950/10 border border-cyan-100/50 animate-pulse">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5 p-6 rounded-2xl bg-primary/5 dark:bg-primary/20 border border-primary/20 animate-pulse">
                   <div className="space-y-3">
-                    <div className="h-4 w-24 bg-cyan-200/50 rounded" />
-                    <div className="h-12 w-full bg-cyan-100/50 rounded-xl" />
+                    <div className="h-4 w-24 bg-primary/20 rounded" />
+                    <div className="h-12 w-full bg-primary/20 rounded-xl" />
                   </div>
                   <div className="space-y-3">
-                    <div className="h-4 w-32 bg-cyan-200/50 rounded" />
-                    <div className="h-12 w-full bg-cyan-100/50 rounded-xl" />
+                    <div className="h-4 w-32 bg-primary/20 rounded" />
+                    <div className="h-12 w-full bg-primary/20 rounded-xl" />
                   </div>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5 p-6 rounded-2xl bg-cyan-50/20 dark:bg-cyan-950/10 border border-cyan-100/50">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5 p-6 rounded-2xl bg-primary/5 dark:bg-primary/20 border border-primary/20">
                   <FormField
                     control={form.control}
                     name="expectedJoiningDate"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-cyan-800 dark:text-cyan-300 font-bold">
+                        <FormLabel className="text-primary dark:text-primary/70 font-bold">
                           প্রত্যাশিত যোগদানের তারিখ{' '}
-                          <span className="text-cyan-500">*</span>
+                          <span className="text-primary">*</span>
                         </FormLabel>
                         <FormControl>
                           <DatePicker
@@ -383,14 +383,14 @@ export default function Step6PaymentAgreement({
                     name="expectedSalary"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-cyan-800 dark:text-cyan-300 font-bold">
+                        <FormLabel className="text-primary dark:text-primary/70 font-bold">
                           প্রত্যাশিত মাসিক বেতন (৳){' '}
-                          <span className="text-cyan-500">*</span>
+                          <span className="text-primary">*</span>
                         </FormLabel>
                         <FormControl>
                           <VoiceInputBn
                             placeholder="যেমন: ২০০০০ বা 20000"
-                            className="h-12 bg-white/70 dark:bg-zinc-950/50 border-cyan-200 dark:border-cyan-800"
+                            className="h-12 bg-background/80 backdrop-blur-sm border-primary/20 dark:border-primary"
                             value={field.value ? String(field.value) : ''}
                             onChange={e => {
                               const val = e.target.value;
@@ -428,7 +428,7 @@ export default function Step6PaymentAgreement({
 
           {/* Section: Payment Method */}
           <div className="space-y-6">
-            <div className="flex items-center gap-2 text-cyan-600 dark:text-cyan-400 font-semibold">
+            <div className="flex items-center gap-2 text-primary dark:text-primary font-semibold">
               <Wallet className="h-5 w-5" />
               <span>পেমেন্ট তথ্য (Payment Details)</span>
             </div>
@@ -439,14 +439,14 @@ export default function Step6PaymentAgreement({
                 <FormItem>
                   <FormLabel>
                     পেমেন্ট মেথড নির্বাচন করুন{' '}
-                    <span className="text-cyan-500">*</span>
+                    <span className="text-primary">*</span>
                   </FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     value={field.value || ''}
                   >
                     <FormControl>
-                      <SelectTrigger className="h-12 bg-white/50 dark:bg-zinc-950/50">
+                      <SelectTrigger className="h-12 bg-background/50 backdrop-blur-sm">
                         <SelectValue placeholder="সিলেক্ট মেথড" />
                       </SelectTrigger>
                     </FormControl>
@@ -469,7 +469,7 @@ export default function Step6PaymentAgreement({
                 <motion.div
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
-                  className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-5 rounded-xl border border-dashed border-cyan-200 dark:border-cyan-800"
+                  className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-5 rounded-xl border border-dashed border-primary/20 dark:border-primary"
                 >
                   <FormField
                     control={form.control}
@@ -480,7 +480,7 @@ export default function Step6PaymentAgreement({
                         <FormControl>
                           <VoiceInputBn
                             placeholder="ইসলামী ব্যাংক"
-                            className="bg-white/50 dark:bg-zinc-950/50"
+                            className="bg-background/50 backdrop-blur-sm"
                             {...field}
                           />
                         </FormControl>
@@ -496,7 +496,7 @@ export default function Step6PaymentAgreement({
                         <FormControl>
                           <VoiceInputBn
                             placeholder="শাখার নাম"
-                            className="bg-white/50 dark:bg-zinc-950/50"
+                            className="bg-background/50 backdrop-blur-sm"
                             {...field}
                           />
                         </FormControl>
@@ -512,7 +512,7 @@ export default function Step6PaymentAgreement({
                         <FormControl>
                           <VoiceInputBn
                             placeholder="হোল্ডারের নাম"
-                            className="bg-white/50 dark:bg-zinc-950/50"
+                            className="bg-background/50 backdrop-blur-sm"
                             {...field}
                           />
                         </FormControl>
@@ -528,7 +528,7 @@ export default function Step6PaymentAgreement({
                         <FormControl>
                           <Input
                             placeholder="নম্বর লিখুন"
-                            className="bg-white/50 dark:bg-zinc-950/50"
+                            className="bg-background/50 backdrop-blur-sm"
                             {...field}
                           />
                         </FormControl>
@@ -541,7 +541,7 @@ export default function Step6PaymentAgreement({
                 <motion.div
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
-                  className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-5 rounded-xl border border-dashed border-cyan-200 dark:border-cyan-800"
+                  className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-5 rounded-xl border border-dashed border-primary/20 dark:border-primary"
                 >
                   <FormField
                     control={form.control}
@@ -554,7 +554,7 @@ export default function Step6PaymentAgreement({
                           value={field.value || ''}
                         >
                           <FormControl>
-                            <SelectTrigger className="bg-white/50 dark:bg-zinc-950/50">
+                            <SelectTrigger className="bg-background/50 backdrop-blur-sm">
                               <SelectValue placeholder="সিলেক্ট" />
                             </SelectTrigger>
                           </FormControl>
@@ -580,7 +580,7 @@ export default function Step6PaymentAgreement({
                         <FormControl>
                           <Input
                             placeholder="01XXXXXXXXX"
-                            className="bg-white/50 dark:bg-zinc-950/50"
+                            className="bg-background/50 backdrop-blur-sm"
                             {...field}
                           />
                         </FormControl>
@@ -596,7 +596,7 @@ export default function Step6PaymentAgreement({
 
           {/* Section: Additional Notes */}
           <div className="space-y-6">
-            <div className="flex items-center gap-2 text-cyan-600 dark:text-cyan-400 font-semibold">
+            <div className="flex items-center gap-2 text-primary dark:text-primary font-semibold">
               <FileText className="h-5 w-5" />
               <span>অতিরিক্ত তথ্য / নোট (Additional Info)</span>
             </div>
@@ -613,7 +613,7 @@ export default function Step6PaymentAgreement({
                     <FormControl>
                       <VoiceInputBn
                         placeholder="যেমন: থাকার ব্যবস্থা, বেতন সম্পর্কে শর্ত, বা অন্য কোনো বিশেষ বিষয়..."
-                        className="min-h-[100px] w-full p-3 rounded-xl bg-white/50 dark:bg-zinc-950/50 border border-zinc-200 dark:border-zinc-800 text-sm resize-none"
+                        className="min-h-[100px] w-full p-3 rounded-xl bg-background/50 backdrop-blur-sm border border-primary/20 dark:border-primary/20 text-sm resize-none"
                         value={field.value || ''}
                         onChange={field.onChange}
                       />
@@ -633,8 +633,8 @@ export default function Step6PaymentAgreement({
                 className="space-y-4"
               >
                 <Separator className="opacity-30" />
-                <div className="p-6 rounded-xl bg-cyan-50 dark:bg-cyan-950/20 border border-cyan-200 dark:border-cyan-800 text-center">
-                  <p className="text-cyan-700 dark:text-cyan-300 font-medium">
+                <div className="p-6 rounded-xl bg-primary/5 dark:bg-primary/20 border border-primary/20 dark:border-primary text-center">
+                  <p className="text-primary dark:text-primary/70 font-medium">
                     নিয়ম ও শর্তাবলী লোড হচ্ছে...
                   </p>
                 </div>
@@ -647,7 +647,7 @@ export default function Step6PaymentAgreement({
               >
                 <Separator className="opacity-30" />
                 <div className="flex items-center justify-between flex-wrap gap-2">
-                  <div className="flex items-center gap-2 text-cyan-600 dark:text-cyan-400 font-semibold">
+                  <div className="flex items-center gap-2 text-primary dark:text-primary font-semibold">
                     <FileText className="h-5 w-5" />
                     <span>নিয়ম ও শর্তাবলী (Terms & Conditions)</span>
                   </div>
@@ -659,7 +659,7 @@ export default function Step6PaymentAgreement({
                       onClick={() =>
                         generateTermsPrint(currentTerms, currentDesignation)
                       }
-                      className="text-cyan-600 border-cyan-200 hover:bg-cyan-50"
+                      className="text-primary border-primary/20 hover:bg-primary/5"
                     >
                       <Printer className="h-4 w-4 mr-1" />
                       প্রিন্ট
@@ -672,7 +672,7 @@ export default function Step6PaymentAgreement({
                         toast.success('Download শুরু হয়েছে');
                         generateTermsDownload(currentTerms, currentDesignation);
                       }}
-                      className="text-cyan-600 border-cyan-200 hover:bg-cyan-50"
+                      className="text-primary border-primary/20 hover:bg-primary/5"
                     >
                       <Download className="h-4 w-4 mr-1" />
                       ডাউনলোড
@@ -682,7 +682,7 @@ export default function Step6PaymentAgreement({
                       variant="outline"
                       size="sm"
                       onClick={() => setIsTermsExpanded(!isTermsExpanded)}
-                      className="text-cyan-600 border-cyan-200 hover:bg-cyan-50"
+                      className="text-primary border-primary/20 hover:bg-primary/5"
                     >
                       {isTermsExpanded ? (
                         <>
@@ -702,10 +702,10 @@ export default function Step6PaymentAgreement({
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: 'auto' }}
                       exit={{ opacity: 0, height: 0 }}
-                      className="rounded-2xl border border-cyan-200 dark:border-cyan-800 bg-white/50 dark:bg-zinc-900/50 overflow-hidden"
+                      className="rounded-2xl border border-primary/20 dark:border-primary bg-white/50 dark:bg-zinc-900/50 overflow-hidden"
                     >
                       <div className="p-6 space-y-4 max-h-[400px] overflow-y-auto">
-                        <h3 className="text-lg font-bold text-cyan-700 dark:text-cyan-400 text-center border-b border-cyan-100 dark:border-cyan-800 pb-3">
+                        <h3 className="text-lg font-bold text-primary dark:text-primary text-center border-b border-primary/20 dark:border-primary pb-3">
                           {currentTerms.title}
                         </h3>
                         {currentTerms.sections.map((section, idx) => (
@@ -719,7 +719,7 @@ export default function Step6PaymentAgreement({
                                   key={itemIdx}
                                   className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed flex gap-2"
                                 >
-                                  <span className="text-cyan-500 mt-0.5">
+                                  <span className="text-primary mt-0.5">
                                     •
                                   </span>
                                   <span>{item}</span>
@@ -732,18 +732,18 @@ export default function Step6PaymentAgreement({
                     </motion.div>
                   )}
                 </AnimatePresence>
-                <div className="flex items-center gap-3 p-4 rounded-xl bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800">
+                <div className="flex items-center gap-3 p-4 rounded-xl bg-primary/5 dark:bg-primary/10/20 border border-primary/20 dark:border-primary">
                   <Checkbox
                     id="termsAccepted"
                     checked={form.watch('termsAccepted') || false}
                     onCheckedChange={checked =>
                       form.setValue('termsAccepted', checked as boolean)
                     }
-                    className="h-5 w-5 border-amber-500"
+                    className="h-5 w-5 border-primary"
                   />
                   <label
                     htmlFor="termsAccepted"
-                    className="text-sm font-medium text-amber-800 dark:text-amber-300 cursor-pointer"
+                    className="text-sm font-medium text-primary dark:text-primary/70 cursor-pointer"
                   >
                     আমি উপরের সকল{' '}
                     <span className="font-bold underline">
@@ -758,7 +758,7 @@ export default function Step6PaymentAgreement({
 
           {/* Signature Upload */}
           <div className="space-y-3">
-            <FormLabel className="flex items-center gap-2 font-semibold text-rose-600 dark:text-rose-400">
+            <FormLabel className="flex items-center gap-2 font-semibold text-primary dark:text-primary">
               <FileSignature className="h-5 w-5" />
               <span>স্বাক্ষর (Signature)</span>
               <span className="text-red-500">*</span>
@@ -767,12 +767,12 @@ export default function Step6PaymentAgreement({
 
             <div
               onClick={() => signatureRef.current?.click()}
-              className="relative group h-40 rounded-2xl border-2 border-dashed border-rose-200 dark:border-rose-800 hover:border-rose-400 transition-all overflow-hidden cursor-pointer flex flex-col items-center justify-center bg-white/50 dark:bg-zinc-950/50 hover:bg-rose-50/30 dark:hover:bg-rose-950/20"
+              className="relative group h-40 rounded-2xl border-2 border-dashed border-primary/20 dark:border-primary hover:border-primary transition-all overflow-hidden cursor-pointer flex flex-col items-center justify-center bg-background/50 backdrop-blur-sm hover:bg-primary/5/30 dark:hover:bg-primary/10/20"
             >
               {isCompressing ? (
                 <div className="flex flex-col items-center gap-2">
-                  <div className="h-8 w-8 border-3 border-rose-500 border-t-transparent rounded-full animate-spin" />
-                  <span className="text-sm font-bold text-rose-600">
+                  <div className="h-8 w-8 border-3 border-primary border-t-transparent rounded-full animate-spin" />
+                  <span className="text-sm font-bold text-primary">
                     প্রসেসিং...
                   </span>
                 </div>
@@ -783,10 +783,10 @@ export default function Step6PaymentAgreement({
                     alt="Signature preview"
                     className="max-h-32 rounded-lg shadow-md"
                   />
-                  <span className="text-sm font-bold text-rose-600 dark:text-rose-400">
+                  <span className="text-sm font-bold text-primary dark:text-primary">
                     স্বাক্ষর আপলোড সম্পন্ন
                   </span>
-                  <span className="text-xs text-rose-500 dark:text-rose-300">
+                  <span className="text-xs text-primary dark:text-primary/70">
                     (পুনরায় আপলোড করতে ক্লিক করুন)
                   </span>
                   <button
@@ -802,13 +802,13 @@ export default function Step6PaymentAgreement({
                 </div>
               ) : (
                 <div className="flex flex-col items-center gap-3 group-hover:scale-105 transition-transform">
-                  <div className="h-16 w-16 rounded-2xl bg-rose-100 dark:bg-rose-950 flex items-center justify-center">
-                    <Upload className="h-8 w-8 text-rose-600 dark:text-rose-400" />
+                  <div className="h-16 w-16 rounded-2xl bg-primary/5 dark:bg-primary/10 flex items-center justify-center">
+                    <Upload className="h-8 w-8 text-primary dark:text-primary" />
                   </div>
-                  <span className="text-sm font-bold text-rose-600 dark:text-rose-400">
+                  <span className="text-sm font-bold text-primary dark:text-primary">
                     ক্লিক করে সিগনেচার আপলোড করুন
                   </span>
-                  <span className="text-xs text-rose-500 dark:text-rose-300">
+                  <span className="text-xs text-primary dark:text-primary/70">
                     PNG / JPEG (সর্বোচ্চ ২MB)
                   </span>
                 </div>
@@ -822,7 +822,7 @@ export default function Step6PaymentAgreement({
                 capture="environment"
               />
             </div>
-            <p className="text-xs text-rose-600/70 dark:text-rose-400/70">
+            <p className="text-xs text-primary dark:text-primary/70">
               আপনার স্বাক্ষরকৃত হস্তাক্ষরের ছবি ফাইল আপলোড করুন
             </p>
           </div>
@@ -832,16 +832,16 @@ export default function Step6PaymentAgreement({
             control={form.control}
             name="declaration"
             render={({ field }) => (
-              <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-2xl border-2 border-cyan-100 dark:border-cyan-900/50 bg-white/50 dark:bg-zinc-900/50 p-6 shadow-xl shadow-cyan-500/5 transition-all hover:bg-white dark:hover:bg-zinc-900">
+              <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-2xl border-2 border-primary/20 dark:border-primary/50 bg-white/50 dark:bg-zinc-900/50 p-6 shadow-xl shadow-primary/5 transition-all hover:bg-white dark:hover:bg-zinc-900">
                 <FormControl>
                   <Checkbox
                     checked={field.value}
                     onCheckedChange={field.onChange}
-                    className="h-5 w-5 border-cyan-500"
+                    className="h-5 w-5 border-primary"
                   />
                 </FormControl>
                 <div className="space-y-2 leading-none">
-                  <FormLabel className="text-lg font-bold text-cyan-800 dark:text-cyan-300">
+                  <FormLabel className="text-lg font-bold text-primary dark:text-primary/70">
                     ঘোষণাপত্র (Declaration)
                   </FormLabel>
                   <FormDescription className="text-sm font-medium leading-relaxed">
@@ -869,7 +869,7 @@ export default function Step6PaymentAgreement({
                   window.location.reload();
                 }
               }}
-              className="group relative overflow-hidden bg-gradient-to-r from-red-500 via-rose-500 to-red-600 hover:from-red-600 hover:via-rose-600 hover:to-red-700 text-white shadow-lg shadow-red-500/30 hover:shadow-red-500/50 rounded-xl px-6 h-12 font-bold transition-all duration-300 hover:scale-105 active:scale-95"
+              className="text-zinc-500 hover:text-primary hover:bg-primary/5 dark:hover:bg-primary/20 rounded-xl px-6 h-12 font-medium transition-all"
             >
               <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-500" />
               <RotateCcw className="h-5 w-5 mr-2" />
@@ -882,7 +882,7 @@ export default function Step6PaymentAgreement({
                 variant="ghost"
                 onClick={onPrev}
                 disabled={isLoading}
-                className="text-zinc-500 hover:text-cyan-600 hover:bg-cyan-50 dark:hover:bg-cyan-950/30 rounded-xl px-6 h-12 font-medium transition-all"
+                className="text-zinc-500 hover:text-primary hover:bg-primary/5 dark:hover:bg-primary/20 rounded-xl px-6 h-12 font-medium transition-all"
               >
                 ← ফিরে যান
               </Button>
@@ -898,7 +898,7 @@ export default function Step6PaymentAgreement({
                   const data = form.getValues();
                   handleFinalSubmit(data);
                 }}
-                className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white shadow-lg shadow-cyan-500/30 hover:shadow-cyan-500/50 min-w-[180px] rounded-xl font-bold h-12 text-lg transition-all duration-300 hover:scale-[1.02] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                className="bg-gradient-to-r from-primary to-primary/90 hover:from-primary hover:to-primary text-white shadow-lg shadow-primary/30 hover:shadow-primary/50 min-w-[180px] rounded-xl font-bold h-12 text-lg transition-all duration-300 hover:scale-[1.02] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
                 {isLoading ? (
                   <span className="flex items-center gap-2">

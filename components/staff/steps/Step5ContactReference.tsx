@@ -50,25 +50,25 @@ function SectionHeader({
   icon: Icon,
   title,
   subtitle,
-  color = 'cyan',
+  color = 'primary',
 }: {
   icon: any;
   title: string;
   subtitle?: string;
-  color?: 'cyan' | 'amber' | 'violet' | 'rose';
+  color?: 'primary' | 'amber' | 'violet' | 'rose';
 }) {
   const colorMap = {
-    cyan: 'bg-cyan-500 text-white',
-    amber: 'bg-amber-500 text-white',
-    violet: 'bg-violet-500 text-white',
-    rose: 'bg-rose-500 text-white',
+    primary: 'bg-primary text-white',
+    amber: 'bg-primary text-white',
+    violet: 'bg-primary text-white',
+    rose: 'bg-primary text-white',
   };
 
   const subtitleColorMap = {
-    cyan: 'text-cyan-600 dark:text-cyan-400',
-    amber: 'text-amber-600 dark:text-amber-400',
-    violet: 'text-violet-600 dark:text-violet-400',
-    rose: 'text-rose-600 dark:text-rose-400',
+    primary: 'text-primary dark:text-primary',
+    amber: 'text-primary dark:text-primary',
+    violet: 'text-primary dark:text-primary',
+    rose: 'text-primary dark:text-primary',
   };
 
   return (
@@ -169,9 +169,9 @@ export default function Step5ContactReference({ onNext, onPrev }: StepProps) {
                 exit={{ opacity: 0 }}
                 className="fixed inset-0 z-[100] bg-white/20 dark:bg-black/20 backdrop-blur-[2px] flex items-center justify-center pointer-events-none"
               >
-                <div className="bg-white/90 dark:bg-zinc-900/90 p-5 rounded-2xl shadow-2xl flex items-center gap-4 border border-rose-500/30">
-                  <Loader2 className="h-6 w-6 animate-spin text-rose-600" />
-                  <span className="text-sm font-bold text-rose-700 dark:text-rose-400">
+                <div className="bg-white/90 dark:bg-zinc-900/90 p-5 rounded-2xl shadow-2xl flex items-center gap-4 border border-primary/30">
+                  <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                  <span className="text-sm font-bold text-primary dark:text-primary">
                     ফাইল প্রসেসিং হচ্ছে...
                   </span>
                 </div>
@@ -188,20 +188,20 @@ export default function Step5ContactReference({ onNext, onPrev }: StepProps) {
               color="rose"
             />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 p-6 rounded-2xl bg-gradient-to-br from-rose-50/30 to-pink-50/20 dark:from-rose-950/20 dark:to-pink-950/10 border border-rose-100/50 dark:border-rose-900/30">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 p-6 rounded-2xl bg-gradient-to-br from-primary/5/30 to-primary/5/20 dark:from-primary/10/20 dark:to-primary/10/10 border border-primary/20/50 dark:border-primary/20/30">
               <FormField
                 control={form.control}
                 name="phonePrimary"
                 render={({ field }) => (
                   <FormItem className="md:col-span-2">
-                    <FormLabel className="text-rose-800 dark:text-rose-300">
+                    <FormLabel className="text-primary dark:text-primary/70">
                       মোবাইল নম্বর <span className="text-red-500">*</span>
                       <HelpTooltip content="আপনার সকল যোগাযোগ এই নম্বরে হবে" />
                     </FormLabel>
                     <FormControl>
                       <Input
                         placeholder="০১XXXXXXXXX"
-                        className="h-12 bg-white/70 dark:bg-zinc-950/50 border-rose-200 dark:border-rose-800"
+                        className="h-12 bg-background/80 backdrop-blur-sm border-primary/20 dark:border-primary"
                         {...field}
                       />
                     </FormControl>
@@ -215,14 +215,14 @@ export default function Step5ContactReference({ onNext, onPrev }: StepProps) {
                 name="whatsappNo"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-rose-800 dark:text-rose-300">
+                    <FormLabel className="text-primary dark:text-primary/70">
                       হোয়াটসঅ্যাপ নম্বর
                       <HelpTooltip content="যদি আলাদা হয় তাহলে দিন" />
                     </FormLabel>
                     <FormControl>
                       <Input
                         placeholder="০১XXXXXXXXX"
-                        className="h-11 bg-white/70 dark:bg-zinc-950/50 border-rose-200 dark:border-rose-800"
+                        className="h-11 bg-background/80 backdrop-blur-sm border-primary/20 dark:border-primary"
                         {...field}
                       />
                     </FormControl>
@@ -236,13 +236,13 @@ export default function Step5ContactReference({ onNext, onPrev }: StepProps) {
                 name="phoneSecondary"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-rose-800 dark:text-rose-300">
+                    <FormLabel className="text-primary dark:text-primary/70">
                       অতিরিক্ত নম্বর
                     </FormLabel>
                     <FormControl>
                       <Input
                         placeholder="০১XXXXXXXXX"
-                        className="h-11 bg-white/70 dark:bg-zinc-950/50 border-rose-200 dark:border-rose-800"
+                        className="h-11 bg-background/80 backdrop-blur-sm border-primary/20 dark:border-primary"
                         {...field}
                       />
                     </FormControl>
@@ -256,14 +256,14 @@ export default function Step5ContactReference({ onNext, onPrev }: StepProps) {
                 name="email"
                 render={({ field }) => (
                   <FormItem className="md:col-span-2">
-                    <FormLabel className="text-rose-800 dark:text-rose-300">
+                    <FormLabel className="text-primary dark:text-primary/70">
                       ইমেইল ঠিকানা
                     </FormLabel>
                     <FormControl>
                       <Input
                         placeholder="email@example.com"
                         type="email"
-                        className="h-11 bg-white/70 dark:bg-zinc-950/50 border-rose-200 dark:border-rose-800"
+                        className="h-11 bg-background/80 backdrop-blur-sm border-primary/20 dark:border-primary"
                         {...field}
                       />
                     </FormControl>
@@ -285,20 +285,20 @@ export default function Step5ContactReference({ onNext, onPrev }: StepProps) {
               color="amber"
             />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 p-6 rounded-2xl bg-gradient-to-br from-amber-50/30 to-orange-50/20 dark:from-amber-950/20 dark:to-orange-950/10 border border-amber-100/50 dark:border-amber-900/30">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 p-6 rounded-2xl bg-gradient-to-br from-primary/5/30 to-orange-50/20 dark:from-primary/10/20 dark:to-orange-950/10 border border-primary/20/50 dark:border-primary/20/30">
               <FormField
                 control={form.control}
                 name="emergencyContactNo"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-amber-800 dark:text-amber-300">
+                    <FormLabel className="text-primary dark:text-primary/70">
                       জরুরি নম্বর <span className="text-red-500">*</span>
                       <HelpTooltip content="পরিবারের কারো নম্বর দিন" />
                     </FormLabel>
                     <FormControl>
                       <Input
                         placeholder="০১XXXXXXXXX"
-                        className="h-11 bg-white/70 dark:bg-zinc-950/50 border-amber-200 dark:border-amber-800"
+                        className="h-11 bg-background/80 backdrop-blur-sm border-primary/20 dark:border-primary"
                         {...field}
                       />
                     </FormControl>
@@ -312,7 +312,7 @@ export default function Step5ContactReference({ onNext, onPrev }: StepProps) {
                 name="emergencyRelationship"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-amber-800 dark:text-amber-300">
+                    <FormLabel className="text-primary dark:text-primary/70">
                       সম্পর্ক <span className="text-red-500">*</span>
                     </FormLabel>
                     <Select
@@ -320,7 +320,7 @@ export default function Step5ContactReference({ onNext, onPrev }: StepProps) {
                       value={field.value || ''}
                     >
                       <FormControl>
-                        <SelectTrigger className="h-11 bg-white/70 dark:bg-zinc-950/50 border-amber-200 dark:border-amber-800">
+                        <SelectTrigger className="h-11 bg-background/80 backdrop-blur-sm border-primary/20 dark:border-primary">
                           <SelectValue placeholder="সিলেক্ট করুন" />
                         </SelectTrigger>
                       </FormControl>
@@ -351,23 +351,23 @@ export default function Step5ContactReference({ onNext, onPrev }: StepProps) {
               icon={UserPlus}
               title="রেফারেন্স"
               subtitle="জানা-পরিচিত ব্যক্তির তথ্য"
-              color="cyan"
+              color="primary"
             />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 p-6 rounded-2xl bg-gradient-to-br from-cyan-50/30 to-blue-50/20 dark:from-cyan-950/20 dark:to-blue-950/10 border border-cyan-100/50 dark:border-cyan-900/30">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 p-6 rounded-2xl bg-gradient-to-br from-primary/30 to-primary/5 dark:from-primary/20 dark:to-primary/20 border border-primary/20 dark:border-primary/30">
               <FormField
                 control={form.control}
                 name="referenceName"
                 render={({ field }) => (
                   <FormItem className="md:col-span-2">
-                    <FormLabel className="text-cyan-800 dark:text-cyan-300">
+                    <FormLabel className="text-primary dark:text-primary/70">
                       রেফারেন্স নাম <span className="text-red-500">*</span>
                       <HelpTooltip content="যিনি আপনাকে সম্পর্কে জানেন" />
                     </FormLabel>
                     <FormControl>
                       <VoiceInputBn
                         placeholder="রেফারেন্স ব্যক্তির নাম"
-                        className="h-12 bg-white/70 dark:bg-zinc-950/50 border-cyan-200 dark:border-cyan-800"
+                        className="h-12 bg-background/80 backdrop-blur-sm border-primary/20 dark:border-primary"
                         {...field}
                       />
                     </FormControl>
@@ -381,13 +381,13 @@ export default function Step5ContactReference({ onNext, onPrev }: StepProps) {
                 name="referencePhone"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-cyan-800 dark:text-cyan-300">
+                    <FormLabel className="text-primary dark:text-primary/70">
                       রেফারেন্স নম্বর <span className="text-red-500">*</span>
                     </FormLabel>
                     <FormControl>
                       <Input
                         placeholder="০১XXXXXXXXX"
-                        className="h-11 bg-white/70 dark:bg-zinc-950/50 border-cyan-200 dark:border-cyan-800"
+                        className="h-11 bg-background/80 backdrop-blur-sm border-primary/20 dark:border-primary"
                         {...field}
                       />
                     </FormControl>
@@ -401,13 +401,13 @@ export default function Step5ContactReference({ onNext, onPrev }: StepProps) {
                 name="referenceOccupation"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-cyan-800 dark:text-cyan-300">
+                    <FormLabel className="text-primary dark:text-primary/70">
                       পেশা
                     </FormLabel>
                     <FormControl>
                       <VoiceInputBn
                         placeholder="চাকরি/ব্যবসা"
-                        className="h-11 bg-white/70 dark:bg-zinc-950/50 border-cyan-200 dark:border-cyan-800"
+                        className="h-11 bg-background/80 backdrop-blur-sm border-primary/20 dark:border-primary"
                         {...field}
                       />
                     </FormControl>
@@ -424,14 +424,14 @@ export default function Step5ContactReference({ onNext, onPrev }: StepProps) {
               type="button"
               variant="ghost"
               onClick={onPrev}
-              className="text-zinc-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-xl px-6 h-12 font-bold transition-all"
+              className="text-zinc-500 hover:text-primary hover:bg-primary/5 dark:hover:bg-primary/10/30 rounded-xl px-6 h-12 font-bold transition-all"
             >
               ← ফিরে যান
             </Button>
             <Button
               type="submit"
               size="lg"
-              className="bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white shadow-lg shadow-rose-500/30 rounded-xl transition-all hover:scale-105 active:scale-95 font-bold px-8 h-12"
+              className="bg-gradient-to-r from-primary to-primary hover:from-primary hover:to-primary text-white shadow-lg shadow-primary/30 rounded-xl transition-all hover:scale-105 active:scale-95 font-bold px-8 h-12"
             >
               পরবর্তী ধাপ →
             </Button>

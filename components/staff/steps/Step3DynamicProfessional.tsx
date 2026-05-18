@@ -251,9 +251,9 @@ export default function Step3DynamicProfessional({
                 exit={{ opacity: 0 }}
                 className="fixed inset-0 z-[100] bg-white/20 dark:bg-black/20 backdrop-blur-[2px] flex items-center justify-center pointer-events-none"
               >
-                <div className="bg-white/90 dark:bg-zinc-900/90 p-5 rounded-2xl shadow-2xl flex items-center gap-4 border border-violet-500/30">
-                  <Loader2 className="h-6 w-6 animate-spin text-violet-600" />
-                  <span className="text-sm font-bold text-violet-700 dark:text-violet-400">
+                <div className="bg-white/90 dark:bg-zinc-900/90 p-5 rounded-2xl shadow-2xl flex items-center gap-4 border border-primary/30">
+                  <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                  <span className="text-sm font-bold text-primary dark:text-primary">
                     ফাইল প্রসেসিং হচ্ছে...
                   </span>
                 </div>
@@ -263,22 +263,22 @@ export default function Step3DynamicProfessional({
 
           {/* Designation & Employment */}
           <div className="space-y-4">
-            <div className="flex items-center gap-3 p-3 rounded-xl bg-violet-50 dark:bg-violet-900/20 border border-violet-200/50">
-              <div className="p-2 rounded-lg bg-violet-100 dark:bg-violet-900/50">
-                <Award className="h-5 w-5 text-violet-600 dark:text-violet-400" />
+            <div className="flex items-center gap-3 p-3 rounded-xl bg-primary/5 dark:bg-primary/10/20 border border-primary/20/50">
+              <div className="p-2 rounded-lg bg-primary/5 dark:bg-primary/10/50">
+                <Award className="h-5 w-5 text-primary dark:text-primary" />
               </div>
-              <h3 className="font-bold text-violet-800 dark:text-violet-300">
+              <h3 className="font-bold text-primary dark:text-primary/70">
                 পদবী ও কর্মসংস্থান
               </h3>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 p-5 rounded-2xl bg-violet-50/30 dark:bg-violet-950/10 border border-violet-100/50">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 p-5 rounded-2xl bg-primary/5/30 dark:bg-primary/10/10 border border-primary/20/50">
               <FormField
                 control={form.control}
                 name="designation"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-violet-800 dark:text-violet-300 flex items-center gap-2">
+                    <FormLabel className="text-primary dark:text-primary/70 flex items-center gap-2">
                       পদবী নির্বাচন করুন <span className="text-red-500">*</span>
                       <HelpTooltip content="যে পদের জন্য আবেদন করছেন" />
                     </FormLabel>
@@ -288,7 +288,7 @@ export default function Step3DynamicProfessional({
                       disabled={isLoadingDesignations}
                     >
                       <FormControl>
-                        <SelectTrigger className="h-12 bg-white/70 dark:bg-zinc-950/50 border-violet-200 dark:border-violet-800">
+                        <SelectTrigger className="h-12 bg-background/80 backdrop-blur-sm border-primary/20 dark:border-primary">
                           {isLoadingDesignations ? (
                             <span className="flex items-center gap-2">
                               <Loader2 className="h-4 w-4 animate-spin" />
@@ -333,7 +333,7 @@ export default function Step3DynamicProfessional({
                 name="employmentType"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-violet-800 dark:text-violet-300">
+                    <FormLabel className="text-primary dark:text-primary/70">
                       চাকরির ধরন <span className="text-red-500">*</span>
                     </FormLabel>
                     <Select
@@ -341,7 +341,7 @@ export default function Step3DynamicProfessional({
                       value={field.value || ''}
                     >
                       <FormControl>
-                        <SelectTrigger className="h-12 bg-white/70 dark:bg-zinc-950/50 border-violet-200 dark:border-violet-800">
+                        <SelectTrigger className="h-12 bg-background/80 backdrop-blur-sm border-primary/20 dark:border-primary">
                           <SelectValue placeholder="সিলেক্ট করুন" />
                         </SelectTrigger>
                       </FormControl>
@@ -365,11 +365,11 @@ export default function Step3DynamicProfessional({
 
           {/* Education */}
           <div className="space-y-6">
-            <div className="flex items-center gap-3 p-3 rounded-xl bg-violet-50 dark:bg-violet-900/20 border border-violet-200/50">
-              <div className="p-2 rounded-lg bg-violet-100 dark:bg-violet-900/50">
-                <GraduationCap className="h-5 w-5 text-violet-600 dark:text-violet-400" />
+            <div className="flex items-center gap-3 p-3 rounded-xl bg-primary/5 dark:bg-primary/10/20 border border-primary/20/50">
+              <div className="p-2 rounded-lg bg-primary/5 dark:bg-primary/10/50">
+                <GraduationCap className="h-5 w-5 text-primary dark:text-primary" />
               </div>
-              <h3 className="font-bold text-violet-800 dark:text-violet-300">
+              <h3 className="font-bold text-primary dark:text-primary/70">
                 শিক্ষাগত যোগ্যতা
               </h3>
             </div>
@@ -380,22 +380,22 @@ export default function Step3DynamicProfessional({
                   key={item.id}
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  className="group relative p-5 rounded-2xl border border-violet-100/50 dark:border-violet-900/30 bg-white/60 dark:bg-zinc-800/40 shadow-sm"
+                  className="group relative p-5 rounded-2xl border border-primary/20/50 dark:border-primary/20/30 bg-white/60 dark:bg-zinc-800/40 shadow-sm"
                 >
                   {fields.length > 1 && (
                     <button
                       type="button"
                       onClick={() => remove(index)}
-                      className="absolute -top-3 -right-3 p-2 bg-red-100 dark:bg-red-900/30 text-red-500 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all z-10"
+                      className="absolute -top-3 -right-3 p-2 bg-primary/5 dark:bg-primary/10/30 text-red-500 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all z-10"
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
                   )}
                   <div className="flex items-center gap-2 mb-4">
-                    <div className="h-7 w-7 rounded-lg bg-violet-500 text-white flex items-center justify-center text-xs font-bold">
+                    <div className="h-7 w-7 rounded-lg bg-primary text-white flex items-center justify-center text-xs font-bold">
                       {index + 1}
                     </div>
-                    <span className="text-sm font-bold text-violet-600 dark:text-violet-400">
+                    <span className="text-sm font-bold text-primary dark:text-primary">
                       {index === 0 ? 'সর্বোচ্চ শিক্ষা' : `শিক্ষা ${index + 1}`}
                     </span>
                   </div>
@@ -405,7 +405,7 @@ export default function Step3DynamicProfessional({
                       name={`education.${index}.degree`}
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-violet-800 dark:text-violet-300">
+                          <FormLabel className="text-primary dark:text-primary/70">
                             ডিগ্রী / পরীক্ষা{' '}
                             <span className="text-red-500">*</span>
                           </FormLabel>
@@ -416,7 +416,7 @@ export default function Step3DynamicProfessional({
                                   ? 'অনার্স (স্নাতক)'
                                   : 'মাস্টার্স / এম.এ'
                               }
-                              className="bg-white/70 dark:bg-zinc-950/50 border-violet-200"
+                              className="bg-background/80 backdrop-blur-sm border-primary/20"
                               {...field}
                             />
                           </FormControl>
@@ -429,13 +429,13 @@ export default function Step3DynamicProfessional({
                       name={`education.${index}.year`}
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-violet-800 dark:text-violet-300">
+                          <FormLabel className="text-primary dark:text-primary/70">
                             পাসের সন <span className="text-red-500">*</span>
                           </FormLabel>
                           <FormControl>
                             <Input
                               placeholder="২০২৩"
-                              className="bg-white/70 dark:bg-zinc-950/50 border-violet-200"
+                              className="bg-background/80 backdrop-blur-sm border-primary/20"
                               {...field}
                             />
                           </FormControl>
@@ -448,7 +448,7 @@ export default function Step3DynamicProfessional({
                       name={`education.${index}.institution`}
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-violet-800 dark:text-violet-300">
+                          <FormLabel className="text-primary dark:text-primary/70">
                             শিক্ষাপ্রতিষ্ঠান{' '}
                             <span className="text-red-500">*</span>
                           </FormLabel>
@@ -459,7 +459,7 @@ export default function Step3DynamicProfessional({
                                   ? 'ঢাকা বিশ্ববিদ্যালয়'
                                   : 'জামিয়া রাহমানিয়া'
                               }
-                              className="bg-white/70 dark:bg-zinc-950/50 border-violet-200"
+                              className="bg-background/80 backdrop-blur-sm border-primary/20"
                               {...field}
                             />
                           </FormControl>
@@ -476,7 +476,7 @@ export default function Step3DynamicProfessional({
               type="button"
               variant="outline"
               onClick={() => append({ degree: '', institution: '', year: '' })}
-              className="w-full border-2 border-dashed border-violet-300 dark:border-violet-700 text-violet-600 hover:bg-violet-50 rounded-xl h-12 font-bold"
+              className="w-full border-2 border-dashed border-primary/20 dark:border-primary text-primary hover:bg-primary/5 rounded-xl h-12 font-bold"
             >
               <Plus className="h-5 w-5 mr-2" /> নতুন শিক্ষাগত যোগ্যতা যোগ করুন
             </Button>
@@ -486,11 +486,11 @@ export default function Step3DynamicProfessional({
 
           {/* Certificates */}
           <div className="space-y-4">
-            <div className="flex items-center gap-3 p-3 rounded-xl bg-cyan-50 dark:bg-cyan-900/20 border border-cyan-200/50">
-              <div className="p-2 rounded-lg bg-cyan-100 dark:bg-cyan-900/50">
-                <BookOpen className="h-5 w-5 text-cyan-600 dark:text-cyan-400" />
+            <div className="flex items-center gap-3 p-3 rounded-xl bg-primary/5 dark:bg-primary/20 border border-primary/20">
+              <div className="p-2 rounded-lg bg-primary/20 dark:bg-primary/50">
+                <BookOpen className="h-5 w-5 text-primary dark:text-primary" />
               </div>
-              <h3 className="font-bold text-cyan-800 dark:text-cyan-300">
+              <h3 className="font-bold text-primary dark:text-primary/70">
                 শিক্ষাগত সনদসমূহ (ঐচ্ছিক)
               </h3>
             </div>
@@ -500,11 +500,11 @@ export default function Step3DynamicProfessional({
               {certPreviews.map((preview, idx) => (
                 <div
                   key={idx}
-                  className="relative p-3 rounded-xl border border-cyan-200 dark:border-cyan-800 bg-cyan-50/20 flex items-center gap-3 shadow-sm group"
+                  className="relative p-3 rounded-xl border border-primary/20 dark:border-primary bg-primary/5 flex items-center gap-3 shadow-sm group"
                 >
                   {/* Thumbnail if it's an image */}
                   {preview.startsWith('data:image/') ? (
-                    <div className="relative h-12 w-12 rounded-lg overflow-hidden shrink-0 border border-cyan-200">
+                    <div className="relative h-12 w-12 rounded-lg overflow-hidden shrink-0 border border-primary/20">
                       <Image
                         src={preview}
                         alt={`Certificate ${idx + 1}`}
@@ -513,15 +513,15 @@ export default function Step3DynamicProfessional({
                       />
                     </div>
                   ) : (
-                    <div className="h-12 w-12 rounded-lg bg-cyan-100 dark:bg-cyan-900/50 flex items-center justify-center shrink-0">
-                      <FileArchive className="h-6 w-6 text-cyan-600" />
+                    <div className="h-12 w-12 rounded-lg bg-primary/20 dark:bg-primary/50 flex items-center justify-center shrink-0">
+                      <FileArchive className="h-6 w-6 text-primary" />
                     </div>
                   )}
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-bold text-cyan-800 dark:text-cyan-300 truncate">
+                    <p className="text-xs font-bold text-primary dark:text-primary/70 truncate">
                       {certFiles[idx]?.name ?? `সনদ ${idx + 1}`}
                     </p>
-                    <p className="text-[10px] text-cyan-600/70">
+                    <p className="text-[10px] text-primary/70">
                       {certFiles[idx]
                         ? `${(certFiles[idx].size / 1024).toFixed(1)} KB`
                         : '✓ সংরক্ষিত'}
@@ -530,7 +530,7 @@ export default function Step3DynamicProfessional({
                   <button
                     type="button"
                     onClick={() => removeCert(idx)}
-                    className="h-7 w-7 rounded-md bg-red-100 dark:bg-red-900/30 text-red-500 flex items-center justify-center hover:bg-red-200 shrink-0"
+                    className="h-7 w-7 rounded-md bg-primary/5 dark:bg-primary/10/30 text-red-500 flex items-center justify-center hover:bg-primary/5 shrink-0"
                   >
                     <X className="h-3.5 w-3.5" />
                   </button>
@@ -541,10 +541,10 @@ export default function Step3DynamicProfessional({
               <button
                 type="button"
                 onClick={() => certRef.current?.click()}
-                className="h-[74px] rounded-xl border-2 border-dashed border-cyan-200 dark:border-cyan-800 hover:border-cyan-400 flex items-center justify-center gap-2 transition-all hover:bg-cyan-50/20 group"
+                className="h-[74px] rounded-xl border-2 border-dashed border-primary/20 dark:border-primary hover:border-primary flex items-center justify-center gap-2 transition-all hover:bg-primary/5 group"
               >
-                <Plus className="h-5 w-5 text-cyan-400 group-hover:text-cyan-600" />
-                <span className="text-sm font-bold text-cyan-500 group-hover:text-cyan-700">
+                <Plus className="h-5 w-5 text-primary group-hover:text-primary" />
+                <span className="text-sm font-bold text-primary group-hover:text-primary">
                   সনদ যুক্ত করুন
                 </span>
               </button>
@@ -565,14 +565,14 @@ export default function Step3DynamicProfessional({
               type="button"
               variant="ghost"
               onClick={onPrev}
-              className="text-zinc-500 hover:text-violet-600 rounded-xl px-6 h-12 font-bold"
+              className="text-zinc-500 hover:text-primary rounded-xl px-6 h-12 font-bold"
             >
               ← ফিরে যান
             </Button>
             <Button
               type="submit"
               size="lg"
-              className="bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600 text-white shadow-lg rounded-xl font-bold px-8 h-12"
+              className="bg-gradient-to-r from-primary to-primary hover:from-primary hover:to-primary text-white shadow-lg rounded-xl font-bold px-8 h-12"
             >
               পরবর্তী ধাপ →
             </Button>

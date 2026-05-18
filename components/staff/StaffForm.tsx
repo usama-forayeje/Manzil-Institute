@@ -43,42 +43,42 @@ const STEPS = [
     label: 'প্রোফাইল',
     labelEn: 'Profile',
     icon: User,
-    color: 'whatsapp',
+    color: 'primary',
   },
   {
     number: 2,
     label: 'ঠিকানা ও পরিচয়',
     labelEn: 'Address & ID',
     icon: MapPin,
-    color: 'whatsapp',
+    color: 'primary',
   },
   {
     number: 3,
     label: 'শিক্ষাগত যোগ্যতা',
     labelEn: 'Education',
     icon: BookOpen,
-    color: 'whatsapp',
+    color: 'primary',
   },
   {
     number: 4,
     label: 'অভিজ্ঞতা ও দক্ষতা',
     labelEn: 'Experience',
     icon: Star,
-    color: 'whatsapp',
+    color: 'primary',
   },
   {
     number: 5,
     label: 'যোগাযোগ ও রেফারেন্স',
     labelEn: 'Contact',
     icon: Phone,
-    color: 'whatsapp',
+    color: 'primary',
   },
   {
     number: 6,
     label: 'পেমেন্ট ও চুক্তি',
     labelEn: 'Payment',
     icon: Wallet,
-    color: 'whatsapp',
+    color: 'primary',
   },
 ] as const;
 
@@ -87,12 +87,12 @@ const STEP_COLORS: Record<
   string,
   { bg: string; text: string; border: string; light: string; dark: string }
 > = {
-  whatsapp: {
-    bg: 'bg-[#25D366]',
-    text: 'text-[#25D366]',
-    border: 'border-[#25D366]',
-    light: 'bg-[#25D366]/10',
-    dark: 'bg-[#25D366]/20',
+  primary: {
+    bg: 'bg-primary',
+    text: 'text-primary',
+    border: 'border-primary',
+    light: 'bg-primary/10',
+    dark: 'bg-primary/20',
   },
 };
 
@@ -128,9 +128,9 @@ function StepIndicator({
       </div>
 
       {/* Enhanced Progress Bar */}
-      <div className="relative h-1.5 sm:h-2 w-full bg-zinc-200/60 dark:bg-zinc-700/60 rounded-full overflow-hidden border border-zinc-300/50 dark:border-zinc-600/50">
+      <div className="relative h-1.5 sm:h-2 w-full bg-zinc-200/60 dark:bg-zinc-700/60 rounded-lg overflow-hidden border border-zinc-300/50 dark:border-zinc-600/50">
         <motion.div
-          className={cn('absolute top-0 left-0 h-full rounded-full', colors.bg)}
+          className={cn('absolute top-0 left-0 h-full rounded-lg', colors.bg)}
           initial={{ width: 0 }}
           animate={{ width: `${(current / STEPS.length) * 100}%` }}
           transition={{ duration: 0.5, ease: 'easeOut' }}
@@ -162,7 +162,7 @@ function StepIndicator({
                 initial={false}
                 animate={{
                   backgroundColor: isActive
-                    ? '#25D366'
+                    ? 'var(--color-primary)'
                     : isDone
                       ? 'var(--zinc-500)'
                       : 'var(--background)',
@@ -198,7 +198,7 @@ function StepIndicator({
               <span
                 className={cn(
                   'hidden lg:block text-xs font-bold mt-2 transition-colors',
-                  isActive && 'text-[#25D366] dark:text-[#25D366]',
+                  isActive && 'text-primary',
                   isDone && 'text-zinc-500',
                   !isDone && !isActive && 'text-zinc-400'
                 )}
@@ -301,12 +301,12 @@ function SuccessScreen({ staffId }: { staffId: string }) {
         transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
         className="relative inline-block mb-6 sm:mb-8"
       >
-        <div className="h-24 w-24 sm:h-32 sm:w-32 rounded-full bg-gradient-to-br from-[#25D366] to-[#20BD5A] flex items-center justify-center shadow-2xl shadow-[#25D366]/30">
+        <div className="h-24 w-24 sm:h-32 sm:w-32 rounded-full bg-primary flex items-center justify-center shadow-2xl shadow-primary/30">
           <CheckCircle2 className="h-12 w-12 sm:h-16 sm:w-16 text-white" />
         </div>
         {/* Ripple effect */}
         <motion.div
-          className="absolute inset-0 rounded-full border-4 border-[#25D366]"
+          className="absolute inset-0 rounded-full border-4 border-primary"
           initial={{ scale: 1, opacity: 1 }}
           animate={{ scale: 1.5, opacity: 0 }}
           transition={{ duration: 1.5, repeat: Infinity }}
@@ -335,9 +335,9 @@ function SuccessScreen({ staffId }: { staffId: string }) {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.6 }}
-        className="inline-block px-6 py-3 bg-gradient-to-r from-[#25D366]/10 to-[#25D366]/10 dark:from-[#25D366]/20 dark:to-[#25D366]/20 rounded-xl border border-[#25D366]/30 dark:border-[#25D366]/30 mb-6"
+        className="inline-block px-6 py-3 bg-primary/10 dark:bg-primary/20 rounded-xl border border-primary/30 mb-6"
       >
-        <span className="text-2xl font-black text-[#25D366]">{staffId}</span>
+        <span className="text-2xl font-black text-primary">{staffId}</span>
       </motion.div>
 
       {/* Office Contact Info */}
@@ -345,28 +345,28 @@ function SuccessScreen({ staffId }: { staffId: string }) {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.65 }}
-        className="mb-6 p-4 rounded-xl bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 max-w-md mx-auto kalpurush-font"
+        className="mb-6 p-4 rounded-xl bg-primary/5 dark:bg-primary/10/20 border border-primary/20 dark:border-primary max-w-md mx-auto kalpurush-font"
       >
         <div className="flex items-center justify-center gap-2 mb-2">
-          <PhoneCall className="h-5 w-5 text-amber-600" />
-          <span className="font-bold text-amber-800 dark:text-amber-200">
+          <PhoneCall className="h-5 w-5 text-primary" />
+          <span className="font-bold text-primary dark:text-primary/70">
             যোগাযোগের জন্য
           </span>
         </div>
-        <p className="text-sm text-amber-700 dark:text-amber-300">
+        <p className="text-sm text-primary dark:text-primary/70">
           যোগাযোগের জন্য অফিসে সরাসরি যোগাযোগ করুন বা নিচের নম্বরে কল করুন:
         </p>
         <div className="mt-3 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6">
           <a
             href="tel:+88014070460000"
-            className="flex items-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-bold transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary text-white rounded-lg font-bold transition-colors"
           >
             <PhoneCall className="h-4 w-4" />
             014070460000
           </a>
           <a
             href="tel:+8801822478883"
-            className="flex items-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-bold transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary text-white rounded-lg font-bold transition-colors"
           >
             <PhoneCall className="h-4 w-4" />
             01822478883
@@ -393,7 +393,7 @@ function SuccessScreen({ staffId }: { staffId: string }) {
         <Button
           onClick={handleGoHome}
           size="lg"
-          className="bg-gradient-to-r from-[#25D366] to-[#25D366] hover:from-[#20BD5A] hover:to-[#20BD5A] text-white shadow-lg shadow-[#25D366]/30 rounded-xl px-8 h-12 font-bold"
+          className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/30 rounded-xl px-8 h-12 font-bold"
         >
           <HomeIcon className="h-5 w-5 mr-2" />
           হোমপেজে ফিরে যান
@@ -527,7 +527,7 @@ export default function StaffForm() {
   if (submittedStaffId) {
     return (
       <div className="max-w-4xl mx-auto p-4 md:p-8">
-        <div className="bg-gradient-to-br from-white via-white/95 to-white/90 dark:from-zinc-900 dark:via-zinc-900/95 dark:to-zinc-800/90 p-8 rounded-[2rem] border border-white/30 dark:border-zinc-700/50 shadow-2xl shadow-[#25D366]/10 backdrop-blur-xl">
+        <div className="bg-gradient-to-br from-white via-white/95 to-white/90 dark:from-zinc-900 dark:via-zinc-900/95 dark:to-zinc-800/90 p-8 rounded-xl border border-white/30 dark:border-zinc-700/50 shadow-2xl shadow-primary/10 backdrop-blur-xl">
           <SuccessScreen staffId={submittedStaffId} />
         </div>
       </div>
@@ -537,7 +537,7 @@ export default function StaffForm() {
   return (
     <div className="kalpurush-font max-w-4xl mx-auto px-2 sm:px-4 py-4 sm:py-6 space-y-4 sm:space-y-6 lg:space-y-8">
       {/* Enhanced Header Card */}
-      <div className="bg-gradient-to-br from-white via-white/95 to-white/90 dark:from-zinc-900 dark:via-zinc-900/95 dark:to-zinc-800/90 p-4 sm:p-6 md:p-8 rounded-2xl lg:rounded-[2rem] border border-white/30 dark:border-zinc-700/50 shadow-2xl shadow-[#25D366]/10 backdrop-blur-xl">
+      <div className="bg-gradient-to-br from-white via-white/95 to-white/90 dark:from-zinc-900 dark:via-zinc-900/95 dark:to-zinc-800/90 p-4 sm:p-6 md:p-8 rounded-xl border border-white/30 dark:border-zinc-700/50 shadow-2xl shadow-primary/10 backdrop-blur-xl">
         <StepIndicator
           current={currentStep}
           onStepClick={step =>
@@ -547,18 +547,18 @@ export default function StaffForm() {
       </div>
 
       {/* Enhanced Content Card */}
-      <div className="bg-gradient-to-br from-white via-white/95 to-white/90 dark:from-zinc-900 dark:via-zinc-900/95 dark:to-zinc-800/90 p-4 sm:p-6 md:p-8 rounded-2xl lg:rounded-[2rem] border border-white/30 dark:border-zinc-700/50 shadow-2xl shadow-[#25D366]/10 backdrop-blur-xl">
+      <div className="bg-gradient-to-br from-white via-white/95 to-white/90 dark:from-zinc-900 dark:via-zinc-900/95 dark:to-zinc-800/90 p-4 sm:p-6 md:p-8 rounded-xl border border-white/30 dark:border-zinc-700/50 shadow-2xl shadow-primary/10 backdrop-blur-xl">
         {/* Step Header */}
         <div
           className={cn(
-            'flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mb-6 sm:mb-8 p-3 sm:p-4 rounded-xl lg:rounded-2xl transition-all duration-300',
+            'flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mb-6 sm:mb-8 p-3 sm:p-4 rounded-xl transition-all duration-300',
             colors.light,
             colors.dark
           )}
         >
           <div
             className={cn(
-              'h-12 w-12 sm:h-14 sm:w-14 rounded-xl lg:rounded-2xl flex items-center justify-center shadow-lg shrink-0',
+              'h-12 w-12 sm:h-14 sm:w-14 rounded-xl flex items-center justify-center shadow-lg shrink-0',
               colors.bg,
               'text-white'
             )}

@@ -449,7 +449,7 @@ export const DHAKA_THANA_PHONES: Record<
   },
 };
 
-export type PaymentReferenceData = z.infer<typeof paymentReferenceSchema>;
+
 
 // ─── Helper Schemas ─────────────────────────────────────────
 const addressSchema = z.object({

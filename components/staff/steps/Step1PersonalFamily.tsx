@@ -55,7 +55,7 @@ export default function Step1PersonalFamily({ onNext }: StepProps) {
 
   // ── Form ───────────────────────────────────────────────────
   const form = useForm<PersonalFamilyData>({
-    resolver: zodResolver(personalFamilySchema),
+    resolver: zodResolver(personalFamilySchema) as any,
     defaultValues: {
       nameEn: savedData?.nameEn ?? '',
       nameBn: savedData?.nameBn ?? '',
@@ -63,9 +63,9 @@ export default function Step1PersonalFamily({ onNext }: StepProps) {
       fatherNameEn: savedData?.fatherNameEn ?? '',
       motherNameBn: savedData?.motherNameBn ?? '',
       motherNameEn: savedData?.motherNameEn ?? '',
-      gender: savedData?.gender ?? undefined,
-      maritalStatus: savedData?.maritalStatus ?? undefined,
-      religion: savedData?.religion ?? undefined,
+      gender: savedData?.gender ?? '',
+      maritalStatus: savedData?.maritalStatus ?? 'unmarried',
+      religion: savedData?.religion ?? 'islam',
       nationality: savedData?.nationality ?? 'বাংলাদেশী',
     },
   });
@@ -212,7 +212,7 @@ export default function Step1PersonalFamily({ onNext }: StepProps) {
           {/* ── Photo upload ─────────────────────────────────── */}
           <div className="flex flex-col items-center space-y-4">
             <div className="relative group">
-              <div className="h-32 w-32 rounded-2xl rotate-3 group-hover:rotate-0 transition-transform duration-300 overflow-hidden border-4 border-white dark:border-zinc-800 shadow-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center ring-4 ring-cyan-500/20">
+              <div className="h-32 w-32 rounded-xl rotate-3 group-hover:rotate-0 transition-transform duration-300 overflow-hidden border-4 border-white dark:border-zinc-800 shadow-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center ring-4 ring-primary/20">
                 {photoPreview ? (
                   <Image
                     src={photoPreview}
@@ -227,7 +227,7 @@ export default function Step1PersonalFamily({ onNext }: StepProps) {
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="absolute -bottom-2 -right-2 h-10 w-10 rounded-xl bg-cyan-500 text-white flex items-center justify-center shadow-lg hover:bg-cyan-600 transition-all hover:scale-110"
+                className="absolute -bottom-2 -right-2 h-10 w-10 rounded-lg bg-primary text-white flex items-center justify-center shadow-lg hover:bg-primary transition-all hover:scale-110"
               >
                 <Camera className="h-5 w-5" />
               </button>
@@ -243,7 +243,7 @@ export default function Step1PersonalFamily({ onNext }: StepProps) {
             </div>
             <div className="text-center">
               <h3 className="text-lg font-bold text-zinc-800 dark:text-zinc-200 flex items-center justify-center gap-2">
-                আবেদনকারীর ছবি <span className="text-cyan-500">*</span>
+                আবেদনকারীর ছবি <span className="text-primary">*</span>
                 <HelpTooltip content="সাম্প্রতিক পাসপোর্ট সাইজের রঙিন ছবি আপলোড করুন।" />
               </h3>
               <p className="text-xs text-zinc-500 mt-1">
@@ -261,18 +261,18 @@ export default function Step1PersonalFamily({ onNext }: StepProps) {
 
           {/* ── Personal Info ─────────────────────────────────── */}
           <div className="space-y-6">
-            <div className="flex items-center gap-2 text-cyan-600 dark:text-cyan-400 font-semibold">
+            <div className="flex items-center gap-2 text-primary dark:text-primary font-semibold">
               <User className="h-5 w-5" />
               <span>প্রাথমিক তথ্য</span>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <FormField
-                control={form.control}
+                control={form.control as any}
                 name="nameBn"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>
-                      পূর্ণ নাম (বাংলা) <span className="text-cyan-500">*</span>
+                      পূর্ণ নাম (বাংলা) <span className="text-primary">*</span>
                     </FormLabel>
                     <FormControl>
                       <VoiceInputBn
@@ -286,13 +286,13 @@ export default function Step1PersonalFamily({ onNext }: StepProps) {
                 )}
               />
               <FormField
-                control={form.control}
+                control={form.control as any}
                 name="nameEn"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="english-text">
                       Full Name (English){' '}
-                      <span className="text-cyan-500">*</span>
+                      <span className="text-primary">*</span>
                     </FormLabel>
                     <FormControl>
                       <VoiceInputEn
@@ -312,18 +312,18 @@ export default function Step1PersonalFamily({ onNext }: StepProps) {
 
           {/* ── Family Info ───────────────────────────────────── */}
           <div className="space-y-6">
-            <div className="flex items-center gap-2 text-cyan-600 dark:text-cyan-400 font-semibold">
+            <div className="flex items-center gap-2 text-primary dark:text-primary font-semibold">
               <Users className="h-5 w-5" />
               <span>পারিবারিক তথ্য</span>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <FormField
-                control={form.control}
+                control={form.control as any}
                 name="fatherNameBn"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>
-                      পিতার নাম (বাংলা) <span className="text-cyan-500">*</span>
+                      পিতার নাম (বাংলা) <span className="text-primary">*</span>
                     </FormLabel>
                     <FormControl>
                       <VoiceInputBn
@@ -337,13 +337,13 @@ export default function Step1PersonalFamily({ onNext }: StepProps) {
                 )}
               />
               <FormField
-                control={form.control}
+                control={form.control as any}
                 name="fatherNameEn"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="english-text">
                       Father's Name (English){' '}
-                      <span className="text-cyan-500">*</span>
+                      <span className="text-primary">*</span>
                     </FormLabel>
                     <FormControl>
                       <VoiceInputEn
@@ -357,12 +357,12 @@ export default function Step1PersonalFamily({ onNext }: StepProps) {
                 )}
               />
               <FormField
-                control={form.control}
+                control={form.control as any}
                 name="motherNameBn"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>
-                      মাতার নাম (বাংলা) <span className="text-cyan-500">*</span>
+                      মাতার নাম (বাংলা) <span className="text-primary">*</span>
                     </FormLabel>
                     <FormControl>
                       <VoiceInputBn
@@ -376,13 +376,13 @@ export default function Step1PersonalFamily({ onNext }: StepProps) {
                 )}
               />
               <FormField
-                control={form.control}
+                control={form.control as any}
                 name="motherNameEn"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="english-text">
                       Mother's Name (English){' '}
-                      <span className="text-cyan-500">*</span>
+                      <span className="text-primary">*</span>
                     </FormLabel>
                     <FormControl>
                       <VoiceInputEn
@@ -408,7 +408,7 @@ export default function Step1PersonalFamily({ onNext }: StepProps) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>
-                    লিঙ্গ <span className="text-cyan-500">*</span>
+                    লিঙ্গ <span className="text-primary">*</span>
                   </FormLabel>
                   <Select
                     onValueChange={field.onChange}
@@ -434,7 +434,7 @@ export default function Step1PersonalFamily({ onNext }: StepProps) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>
-                    বৈবাহিক অবস্থা <span className="text-cyan-500">*</span>
+                    বৈবাহিক অবস্থা <span className="text-primary">*</span>
                   </FormLabel>
                   <Select
                     onValueChange={field.onChange}
@@ -465,7 +465,7 @@ export default function Step1PersonalFamily({ onNext }: StepProps) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>
-                    ধর্ম <span className="text-cyan-500">*</span>
+                    ধর্ম <span className="text-primary">*</span>
                   </FormLabel>
                   <Select
                     onValueChange={field.onChange}
@@ -494,7 +494,7 @@ export default function Step1PersonalFamily({ onNext }: StepProps) {
             <Button
               type="submit"
               size="lg"
-              className="bg-cyan-500 hover:bg-cyan-600 text-white min-w-[150px] shadow-lg rounded-xl font-bold"
+              className="bg-primary hover:bg-primary text-white min-w-[150px] shadow-lg rounded-lg font-bold"
             >
               পরবর্তী ধাপ →
             </Button>

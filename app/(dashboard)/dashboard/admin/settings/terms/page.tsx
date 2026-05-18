@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -18,6 +18,9 @@ import {
   ChevronRight,
   RefreshCw,
   Search,
+  CheckCircle2,
+  AlertCircle,
+  Settings2
 } from 'lucide-react';
 import {
   useDesignations,
@@ -31,7 +34,6 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
@@ -43,6 +45,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { cn } from '@/lib/utils';
 
 interface Designation {
   $id?: string;
@@ -54,21 +57,14 @@ interface Designation {
 }
 
 export default function TermsManagementPage() {
-  // React Query hooks for automatic caching and real-time updates
-  const { data: designationsData, isLoading: designationsLoading } =
-    useDesignations();
+  const { data: designationsData, isLoading: designationsLoading } = useDesignations();
   const designations = designationsData?.documents || [];
-
-  // Transform terms data to object keyed by designation_id for easy lookup
-  // Also parse sections from JSON string to array
-  const { data: termsRaw = { documents: [] }, isLoading: termsLoading } =
-    useAllTerms();
+  const { data: termsRaw = { documents: [] }, isLoading: termsLoading } = useAllTerms();
 
   const termsData: Record<string, any> = {};
   try {
     for (const doc of termsRaw.documents || []) {
       if (doc?.designation_id && doc.$id) {
-        // Parse sections if it's a JSON string
         let sections: any[] = [];
         if (typeof doc.sections === 'string' && doc.sections) {
           try {
@@ -79,7 +75,6 @@ export default function TermsManagementPage() {
         } else if (Array.isArray(doc.sections)) {
           sections = doc.sections;
         }
-        // Store only needed fields to save memory
         termsData[doc.designation_id] = {
           $id: doc.$id,
           title: doc.title,
@@ -91,19 +86,14 @@ export default function TermsManagementPage() {
   } catch (e) {
     console.error('Error processing terms:', e);
   }
+  
   const saveTermsMutation = useSaveTerms();
   const invalidateCache = useInvalidateTermsCache();
 
-  const [expandedSections, setExpandedSections] = useState<
-    Record<string, boolean>
-  >({});
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
   const [searchTerm, setSearchTerm] = useState('');
-
-  // Modal states
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingDesignation, setEditingDesignation] = useState<string | null>(
-    null
-  );
+  const [editingDesignation, setEditingDesignation] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     designationId: '',
     designationName: '',
@@ -114,19 +104,13 @@ export default function TermsManagementPage() {
 
   const loading = designationsLoading || termsLoading;
 
-  // Helper to get designation ID
-  const getDesId = (des: Designation): string =>
-    des.$id || des.designation_id || '';
+  const getDesId = (des: Designation): string => des.$id || des.designation_id || '';
 
-  // Set expanded section when designations load
   useEffect(() => {
     if (designations.length > 0 && !loading) {
       setExpandedSections({ [getDesId(designations[0])]: true });
     }
   }, [designations, loading]);
-
-  // React Query automatically handles data loading and caching
-  // No need for manual loadAllData function
 
   const toggleSection = (designationId: string) => {
     setExpandedSections(prev => ({
@@ -167,11 +151,7 @@ export default function TermsManagementPage() {
     }));
   };
 
-  const updateSection = (
-    index: number,
-    field: 'title' | 'content',
-    value: string | string[]
-  ) => {
+  const updateSection = (index: number, field: 'title' | 'content', value: string | string[]) => {
     setFormData(prev => ({
       ...prev,
       sections: prev.sections.map((s, i) =>
@@ -189,19 +169,12 @@ export default function TermsManagementPage() {
     }));
   };
 
-  const updateContentLine = (
-    sectionIndex: number,
-    lineIndex: number,
-    value: string
-  ) => {
+  const updateContentLine = (sectionIndex: number, lineIndex: number, value: string) => {
     setFormData(prev => ({
       ...prev,
       sections: prev.sections.map((s, i) =>
         i === sectionIndex
-          ? {
-              ...s,
-              content: s.content.map((c, li) => (li === lineIndex ? value : c)),
-            }
+          ? { ...s, content: s.content.map((c, li) => (li === lineIndex ? value : c)) }
           : s
       ),
     }));
@@ -231,7 +204,7 @@ export default function TermsManagementPage() {
       return;
     }
     if (!formData.title.trim()) {
-      toast.error('Title আবশ্যক!');
+      toast.error('শিরোনাম আবশ্যক!');
       return;
     }
 
@@ -243,24 +216,20 @@ export default function TermsManagementPage() {
         isActive: formData.isActive,
       });
 
-      toast.success(`Terms ডাটাবেসে সেভ হয়েছে! ✅`);
+      toast.success(`সাফল্যের সাথে সেভ করা হয়েছে! ✅`);
       setIsModalOpen(false);
-
-      // React Query automatically invalidates and refetches data
     } catch (error) {
       console.error('Error saving terms:', error);
-      toast.error('সমস্যা হয়েছে!');
+      toast.error('সেভ করতে সমস্যা হয়েছে!');
     }
   };
 
-  // Filter designations by search
   const filteredDesignations = designations.filter(
     des =>
       des.label_bn?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       des.label_en?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Group by category
   const groupedDesignations = filteredDesignations.reduce(
     (acc, des) => {
       const cat = des.category || 'other';
@@ -272,132 +241,146 @@ export default function TermsManagementPage() {
   );
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-zinc-900 dark:text-white kalpurush-font">
-            নিয়ম ও শর্তাবলী ব্যবস্থাপনা
-          </h1>
-          <p className="text-zinc-500 dark:text-zinc-400 kalpurush-font">
-            প্রতিটি পদ/পদমর্যাদার জন্য আলাদা Terms & Conditions পরিচালনা করুন
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={invalidateCache}
-            className="gap-2 kalpurush-font"
-          >
-            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-            রিফ্রেশ
-          </Button>
-          <Button
-            size="sm"
-            onClick={() => openAddModal()}
-            className="gap-2 kalpurush-font bg-cyan-600 hover:bg-cyan-700"
-          >
-            <Plus className="h-4 w-4" />
-            নতুন Terms যোগ করুন
-          </Button>
+    <div className="space-y-8 animate-in fade-in duration-700 solaimanlipi-font pb-20">
+      
+      {/* ══════════════ HEADER ══════════════ */}
+      <div className="relative overflow-hidden bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-6 md:p-10 shadow-sm">
+        <div className="pointer-events-none absolute -top-24 -right-24 h-64 w-64 rounded-full bg-[#00AEEF]/10 blur-3xl" />
+        
+        <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="flex items-center gap-6">
+            <div className="relative h-16 w-16 shrink-0 rounded-2xl bg-gradient-to-br from-[#00AEEF] to-blue-700 flex items-center justify-center shadow-lg shadow-blue-500/20">
+              <ScrollText className="h-8 w-8 text-white" strokeWidth={1.5} />
+              <span className="absolute -top-1 -right-1 flex h-4 w-4">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-60" />
+                <span className="relative inline-flex rounded-full h-4 w-4 bg-white" />
+              </span>
+            </div>
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <Badge variant="outline" className="text-[10px] font-black uppercase text-[#00AEEF] border-[#00AEEF]/30 bg-[#00AEEF]/5">Compliance Suite</Badge>
+              </div>
+              <h1 className="text-3xl font-black text-zinc-900 dark:text-zinc-50 tracking-tight leading-none">
+                নিয়ম ও শর্তাবলী
+              </h1>
+              <p className="mt-2 text-[11px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest max-w-lg">
+                প্রতিটি পদের জন্য আলাদা টিভিসি এবং প্রশাসনিক নীতিমালা পরিচালনা করুন।
+              </p>
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-3 relative z-10">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={invalidateCache}
+              className="h-10 rounded-lg bg-zinc-50 dark:bg-zinc-800 font-bold border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 gap-2"
+            >
+              <RefreshCw className={cn("h-4 w-4", loading && "animate-spin")} />
+              রিফ্রেশ
+            </Button>
+            <Button
+              onClick={() => openAddModal()}
+              className="h-10 rounded-lg bg-[#00AEEF] hover:bg-blue-600 text-white font-black text-xs uppercase tracking-widest gap-2 shadow-lg shadow-blue-500/20"
+            >
+              <Plus className="h-4 w-4" /> নতুন যোগ করুন
+            </Button>
+          </div>
         </div>
       </div>
 
-      {/* Search */}
-      <div className="relative">
+      {/* ══════════════ SEARCH ══════════════ */}
+      <div className="relative group">
         <Input
-          placeholder="পদ খুঁজুন... (Search)"
+          placeholder="নির্দিষ্ট পদ খুঁজুন... (যেমন: শিক্ষক, স্টাফ)"
           value={searchTerm}
           onChange={e => setSearchTerm(e.target.value)}
-          className="pl-10 kalpurush-font"
+          className="pl-12 h-14 rounded-xl bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-lg font-medium shadow-sm group-hover:border-[#00AEEF]/50 transition-all focus:ring-2 focus:ring-[#00AEEF]/20"
         />
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-400 group-hover:text-[#00AEEF] transition-colors" />
       </div>
 
-      {/* Terms List */}
-      <div className="space-y-4">
+      {/* ══════════════ TERMS LIST ══════════════ */}
+      <div className="space-y-6">
         {loading ? (
           [...Array(3)].map((_, i) => (
-            <Card key={i}>
-              <CardHeader>
-                <Skeleton className="h-6 w-48" />
-              </CardHeader>
-              <CardContent>
-                <Skeleton className="h-20 w-full" />
-              </CardContent>
-            </Card>
+            <Skeleton key={i} className="h-24 w-full rounded-xl" />
           ))
         ) : Object.keys(groupedDesignations).length === 0 ? (
-          <Card className="border-dashed">
-            <CardContent className="p-12 text-center">
-              <ScrollText className="h-12 w-12 mx-auto text-zinc-300" />
-              <p className="mt-4 text-zinc-500 kalpurush-font">
-                কোনো পদ পাওয়া যায়নি
-              </p>
-              <p className="text-sm text-zinc-400 kalpurush-font">
-                Designations page e পদ যোগ করুন
-              </p>
-            </CardContent>
-          </Card>
+          <div className="flex flex-col items-center justify-center py-20 bg-zinc-50 dark:bg-zinc-900/40 rounded-3xl border-2 border-dashed border-zinc-200 dark:border-zinc-800">
+             <ScrollText className="h-16 w-16 text-zinc-200 dark:text-zinc-800 mb-4" />
+             <p className="text-zinc-500 font-bold">কোনো শর্তাবলী পাওয়া যায়নি</p>
+          </div>
         ) : (
           Object.entries(groupedDesignations).map(([category, desList]) => {
             return (
-              <div key={category} className="space-y-2">
-                <h3 className="text-sm font-semibold text-zinc-500 uppercase tracking-wider kalpurush-font">
-                  {category}
-                </h3>
+              <div key={category} className="space-y-3">
+                <div className="flex items-center gap-3 px-1">
+                  <div className="h-1.5 w-6 rounded-full bg-[#00AEEF]/50" />
+                  <h3 className="text-xs font-black text-zinc-400 uppercase tracking-widest">
+                    {category}
+                  </h3>
+                </div>
+                
                 {desList.map(des => {
                   const desId = getDesId(des);
                   const terms = termsData[desId];
                   const isExpanded = expandedSections[desId];
 
                   return (
-                    <Card key={desId} className="overflow-hidden">
-                      <div className="h-1 bg-gradient-to-r from-cyan-500 to-transparent"></div>
-                      <CardHeader className="pb-0">
-                        <div className="flex items-center justify-between">
-                          <button
-                            onClick={() => toggleSection(desId)}
-                            className="flex items-center gap-3 hover:bg-zinc-50 dark:hover:bg-zinc-800 p-2 -m-2 rounded-lg transition-colors kalpurush-font flex-1"
-                          >
-                            {isExpanded ? (
-                              <ChevronDown className="h-5 w-5 text-cyan-600" />
-                            ) : (
-                              <ChevronRight className="h-5 w-5 text-cyan-600" />
-                            )}
-                            <div className="w-8 h-8 rounded-lg bg-cyan-100 dark:bg-cyan-900/30 flex items-center justify-center">
-                              <ScrollText className="h-4 w-4 text-cyan-600" />
+                    <Card key={desId} className={cn(
+                      "overflow-hidden border transition-all duration-300 group",
+                      isExpanded 
+                        ? "border-[#00AEEF]/30 shadow-xl shadow-[#00AEEF]/5 bg-white dark:bg-zinc-900" 
+                        : "border-zinc-200 dark:border-zinc-800 bg-white/50 dark:bg-zinc-900/30 hover:border-zinc-300 dark:hover:border-zinc-700"
+                    )}>
+                      <div className="relative flex flex-col sm:flex-row sm:items-center justify-between px-6 py-5 gap-4">
+                        <button
+                          onClick={() => toggleSection(desId)}
+                          className="flex items-center gap-4 flex-1 text-left"
+                        >
+                          <div className={cn(
+                            "h-12 w-12 rounded-xl flex items-center justify-center transition-all",
+                            terms ? "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600" : "bg-zinc-100 dark:bg-zinc-800 text-zinc-400"
+                          )}>
+                            {isExpanded ? <ChevronDown className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
+                          </div>
+                          
+                          <div>
+                            <div className="flex items-center gap-2 mb-1">
+                              <h4 className="text-xl font-black text-zinc-900 dark:text-zinc-100 tracking-tight">
+                                {des.label_bn}
+                              </h4>
+                              {terms ? (
+                                <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                              ) : (
+                                <AlertCircle className="h-4 w-4 text-zinc-300" />
+                              )}
                             </div>
-                            <span className="font-medium text-lg">
-                              {des.label_bn}
-                            </span>
-                            {terms ? (
-                              <Badge
-                                variant="secondary"
-                                className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 kalpurush-font"
-                              >
-                                ✅ কনফিগ করা আছে
-                              </Badge>
-                            ) : (
-                              <Badge
-                                variant="secondary"
-                                className="bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400 kalpurush-font"
-                              >
-                                ❌ নেই
-                              </Badge>
-                            )}
-                          </button>
+                            <div className="flex items-center gap-3">
+                               <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{des.label_en}</span>
+                               <span className="h-1 w-1 rounded-full bg-zinc-300" />
+                               <span className={cn(
+                                 "text-[10px] font-black uppercase tracking-tight",
+                                 terms ? "text-emerald-600 dark:text-emerald-400" : "text-zinc-500"
+                               )}>
+                                 {terms ? 'কনফিগ করা আছে' : 'শর্তাবলী যুক্ত নেই'}
+                               </span>
+                            </div>
+                          </div>
+                        </button>
+
+                        <div className="flex items-center gap-2">
                           <Button
+                            variant="ghost"
                             size="sm"
-                            onClick={() => openAddModal(des)}
-                            className="gap-2 kalpurush-font bg-cyan-600 hover:bg-cyan-700 ml-2"
+                            onClick={(e) => { e.stopPropagation(); openAddModal(des); }}
+                            className="h-10 rounded-lg text-xs font-black uppercase tracking-widest gap-2 bg-zinc-100 dark:bg-zinc-800 hover:bg-[#00AEEF] hover:text-white transition-all shadow-sm"
                           >
-                            <Edit className="h-4 w-4" />
-                            {terms ? 'সম্পাদনা করুন' : 'যোগ করুন'}
+                            <Edit className="h-4 w-4" /> {terms ? 'সম্পাদনা' : 'তৈরি করুন'}
                           </Button>
                         </div>
-                      </CardHeader>
+                      </div>
 
                       <AnimatePresence>
                         {isExpanded && terms && (
@@ -405,46 +388,43 @@ export default function TermsManagementPage() {
                             initial={{ height: 0, opacity: 0 }}
                             animate={{ height: 'auto', opacity: 1 }}
                             exit={{ height: 0, opacity: 0 }}
-                            transition={{ duration: 0.2 }}
-                            className="overflow-hidden"
+                            className="bg-zinc-50/50 dark:bg-zinc-950/20"
                           >
-                            <CardContent className="pt-4 space-y-4">
-                              <div className="bg-cyan-50 dark:bg-cyan-950/20 p-3 rounded-lg">
-                                <Badge className="bg-cyan-600 kalpurush-font">
-                                  {terms.title}
-                                </Badge>
+                            <CardContent className="pt-0 px-8 pb-8 space-y-6">
+                              <div className="h-px w-full bg-zinc-200 dark:bg-zinc-800 mb-6" />
+                              
+                              <div className="bg-[#00AEEF]/10 border border-[#00AEEF]/20 p-4 rounded-xl flex items-center justify-between">
+                                <span className="text-[10px] font-black text-[#00AEEF] uppercase tracking-[0.2em]">Active Policy Title</span>
+                                <span className="text-[15px] font-black text-zinc-900 dark:text-zinc-50">{terms.title}</span>
                               </div>
 
-                              {terms.sections?.map(
-                                (section: any, idx: number) => (
-                                  <div
-                                    key={idx}
-                                    className="space-y-2 border-l-2 border-cyan-200 dark:border-cyan-800 pl-4"
-                                  >
-                                    <h4 className="font-bold text-cyan-700 dark:text-cyan-400 kalpurush-font">
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {terms.sections?.map((section: any, idx: number) => (
+                                  <div key={idx} className="space-y-3 bg-white dark:bg-zinc-900/50 p-5 rounded-xl border border-zinc-100 dark:border-zinc-800 shadow-sm transition-all hover:border-[#00AEEF]/30">
+                                    <h5 className="font-black text-zinc-900 dark:text-[#00AEEF] flex items-center gap-2">
+                                      <div className="h-1.5 w-1.5 rounded-full bg-[#00AEEF]" />
                                       {section.title}
-                                    </h4>
-                                    <ul className="space-y-1.5">
-                                      {section.content?.map(
-                                        (item: string, itemIdx: number) => (
-                                          <li
-                                            key={itemIdx}
-                                            className="flex gap-2 text-sm text-zinc-600 dark:text-zinc-400"
-                                          >
-                                            <span className="text-cyan-500">
-                                              •
-                                            </span>
-                                            <span className="kalpurush-font">
-                                              {item}
-                                            </span>
-                                          </li>
-                                        )
-                                      )}
+                                    </h5>
+                                    <ul className="space-y-2.5">
+                                      {section.content?.map((item: string, itemIdx: number) => (
+                                        <li key={itemIdx} className="flex gap-3 text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed font-medium">
+                                          <span className="text-[#00AEEF]/40">•</span>
+                                          <span>{item}</span>
+                                        </li>
+                                      ))}
                                     </ul>
                                   </div>
-                                )
-                              )}
+                                ))}
+                              </div>
                             </CardContent>
+                          </motion.div>
+                        )}
+                        {isExpanded && !terms && (
+                          <motion.div className="px-8 pb-8">
+                             <div className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-zinc-200 dark:border-zinc-800 rounded-2xl bg-zinc-50/50 dark:bg-zinc-950/30">
+                               <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-4">এই পদের জন্য কোনো শর্তাবলী নেই</p>
+                               <Button onClick={() => openAddModal(des)} className="bg-[#00AEEF] text-white font-bold px-8">প্রস্তুত করুন</Button>
+                             </div>
                           </motion.div>
                         )}
                       </AnimatePresence>
@@ -457,180 +437,130 @@ export default function TermsManagementPage() {
         )}
       </div>
 
-      {/* Add/Edit Modal */}
+      {/* ══════════════ EDITOR MODAL ══════════════ */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="w-[95vw] max-w-[700px] max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="kalpurush-font">
-              {editingDesignation === 'new'
-                ? 'নতুন Terms যোগ করুন'
-                : `${formData.designationName || formData.designationId} - Terms সম্পাদনা করুন`}
-            </DialogTitle>
-            <DialogDescription className="kalpurush-font">
-              Terms & Conditions যোগ বা আপডেট করুন
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="space-y-4 py-4">
-            {/* Designation Selection (only for new) */}
-            {editingDesignation === 'new' && (
-              <div className="grid gap-2">
-                <Label className="kalpurush-font">পদ নির্বাচন করুন *</Label>
-                <Select
-                  value={formData.designationId}
-                  onValueChange={value =>
-                    setFormData({ ...formData, designationId: value })
-                  }
-                >
-                  <SelectTrigger className="kalpurush-font">
-                    <SelectValue placeholder="পদ নির্বাচন করুন" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {designations.map(des => (
-                      <SelectItem
-                        key={getDesId(des)}
-                        value={getDesId(des)}
-                        className="kalpurush-font"
-                      >
-                        {des.label_bn}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+        <DialogContent className={cn(
+          "w-[95vw] max-w-[800px] max-h-[90vh] overflow-y-auto solaimanlipi-font rounded-2xl border-none shadow-2xl p-0",
+          "bg-white dark:bg-zinc-950"
+        )}>
+          <div className="sticky top-0 z-20 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md px-8 py-6 border-b border-zinc-100 dark:border-zinc-800">
+            <DialogHeader>
+              <div className="flex items-center gap-4">
+                <div className="h-12 w-12 rounded-xl bg-[#00AEEF]/10 flex items-center justify-center">
+                  <Settings2 className="h-6 w-6 text-[#00AEEF]" />
+                </div>
+                <div>
+                  <DialogTitle className="text-2xl font-black text-zinc-900 dark:text-zinc-50 tracking-tighter">
+                    {editingDesignation === 'new' ? 'নতুন নীতিমালা' : 'নীতিমালা সম্পাদনা'}
+                  </DialogTitle>
+                  <DialogDescription className="text-xs font-bold text-zinc-400 uppercase tracking-widest mt-1">
+                    {formData.designationName || 'পদ নির্বাচন করুন'}
+                  </DialogDescription>
+                </div>
               </div>
-            )}
+            </DialogHeader>
+          </div>
 
-            {/* Title */}
-            <div className="grid gap-2">
-              <Label className="kalpurush-font">Title *</Label>
-              <Input
-                placeholder="যেমন: অধ্যক্ষ / প্রিন্সিপাল এর দায়িত্ব"
-                value={formData.title}
-                onChange={e =>
-                  setFormData({ ...formData, title: e.target.value })
-                }
-                className="kalpurush-font"
-              />
+          <div className="p-8 space-y-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {editingDesignation === 'new' && (
+                <div className="space-y-3">
+                  <Label className="text-xs font-black uppercase text-zinc-400 tracking-widest">টার্গেট পদ *</Label>
+                  <Select
+                    value={formData.designationId}
+                    onValueChange={value => setFormData({ ...formData, designationId: value })}
+                  >
+                    <SelectTrigger className="h-12 rounded-xl bg-zinc-50 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 font-bold">
+                      <SelectValue placeholder="পদ নির্বাচন করুন" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {designations.map(des => (
+                        <SelectItem key={getDesId(des)} value={getDesId(des)} className="font-bold">
+                          {des.label_bn}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
+              <div className="space-y-3 md:col-span-2">
+                <Label className="text-xs font-black uppercase text-zinc-400 tracking-widest">নীতিমালার প্রধান শিরোনাম *</Label>
+                <Input
+                  placeholder="যেমন: আবাসিক ব্যবস্থাপনা সংক্রান্ত নীতিমালা"
+                  value={formData.title}
+                  onChange={e => setFormData({ ...formData, title: e.target.value })}
+                  className="h-12 rounded-xl bg-zinc-50 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-lg font-black tracking-tight"
+                />
+              </div>
             </div>
 
-            {/* Sections */}
-            <div className="space-y-4">
+            <div className="space-y-6">
               <div className="flex items-center justify-between">
-                <Label className="kalpurush-font">সেকশন (Sections)</Label>
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="outline"
-                  onClick={addSection}
-                  className="gap-2 kalpurush-font"
-                >
-                  <Plus className="h-4 w-4" />
-                  সেকশন যোগ করুন
+                <h5 className="text-sm font-black text-zinc-900 dark:text-zinc-100 uppercase tracking-widest">অনুচ্ছেদ সমূহ</h5>
+                <Button type="button" size="sm" variant="outline" onClick={addSection} className="h-9 rounded-lg border-[#00AEEF] text-[#00AEEF] hover:bg-[#00AEEF] hover:text-white transition-all gap-2 font-bold">
+                  <Plus className="h-4 w-4" /> অনুচ্ছেদ যোগ করুন
                 </Button>
               </div>
 
-              {formData.sections.map((section, sectionIdx) => (
-                <Card key={sectionIdx} className="overflow-hidden">
-                  <div className="h-1 bg-gradient-to-r from-blue-500 to-transparent"></div>
-                  <CardHeader className="pb-2">
-                    <div className="flex items-center gap-2">
-                      <Input
-                        placeholder={`সেকশন ${sectionIdx + 1} এর শিরোনাম`}
-                        value={section.title}
-                        onChange={e =>
-                          updateSection(sectionIdx, 'title', e.target.value)
-                        }
-                        className="flex-1 kalpurush-font"
-                      />
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => removeSection(sectionIdx)}
-                        className="text-red-500 hover:text-red-600 hover:bg-red-50"
-                      >
+              <div className="grid grid-cols-1 gap-6">
+                {formData.sections.map((section, sectionIdx) => (
+                  <Card key={sectionIdx} className="overflow-hidden border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
+                    <div className="bg-zinc-100/50 dark:bg-zinc-800/50 px-5 py-3 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
+                      <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">section #{sectionIdx + 1}</span>
+                      <Button type="button" size="sm" variant="ghost" onClick={() => removeSection(sectionIdx)} className="text-rose-500 hover:bg-rose-50 hover:text-rose-600">
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
-                  </CardHeader>
-                  <CardContent className="space-y-2">
-                    <Label className="text-xs text-zinc-500 kalpurush-font">
-                      বিষয়বস্তু (Content)
-                    </Label>
-                    {section.content.map((line, lineIdx) => (
-                      <div key={lineIdx} className="flex items-center gap-2">
-                        <Input
-                          placeholder={`বিষয় ${lineIdx + 1}`}
-                          value={line}
-                          onChange={e =>
-                            updateContentLine(
-                              sectionIdx,
-                              lineIdx,
-                              e.target.value
-                            )
-                          }
-                          className="flex-1 kalpurush-font text-sm"
-                        />
-                        <Button
-                          type="button"
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => removeContentLine(sectionIdx, lineIdx)}
-                          className="text-red-500 hover:text-red-600"
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
+                    <CardContent className="p-5 space-y-4">
+                      <Input
+                        placeholder="অনুচ্ছেদের শিরোনাম"
+                        value={section.title}
+                        onChange={e => updateSection(sectionIdx, 'title', e.target.value)}
+                        className="h-10 border-none bg-zinc-50 dark:bg-zinc-950 font-black text-[#00AEEF] placeholder:text-zinc-300"
+                      />
+                      
+                      <div className="space-y-3">
+                        {section.content.map((line, lineIdx) => (
+                          <div key={lineIdx} className="flex items-center gap-3 group">
+                            <div className="h-6 w-1 rounded-full bg-zinc-200 dark:bg-zinc-800 group-focus-within:bg-[#00AEEF] transition-colors" />
+                            <Input
+                              placeholder="বিষয়ের বর্ণনা লিখুন"
+                              value={line}
+                              onChange={e => updateContentLine(sectionIdx, lineIdx, e.target.value)}
+                              className="h-9 border-none bg-transparent shadow-none font-medium px-0 text-zinc-600 dark:text-zinc-400 focus-visible:ring-0 text-[13px]"
+                            />
+                            <Button type="button" size="sm" variant="ghost" onClick={() => removeContentLine(sectionIdx, lineIdx)} className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <X className="h-3.5 w-3.5 text-zinc-400 hover:text-rose-500" />
+                            </Button>
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="outline"
-                      onClick={() => addContentLine(sectionIdx)}
-                      className="w-full gap-2 kalpurush-font"
-                    >
-                      <Plus className="h-4 w-4" />
-                      বিষয় যোগ করুন
-                    </Button>
-                  </CardContent>
-                </Card>
-              ))}
+                      
+                      <Button type="button" size="sm" variant="link" onClick={() => addContentLine(sectionIdx)} className="p-0 text-[#00AEEF] font-bold text-xs gap-1 hover:no-underline hover:text-blue-600">
+                        <Plus className="h-3 w-3" /> পয়েন্ট যোগ করুন
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
             </div>
 
-            {/* Active Toggle */}
-            <div className="flex items-center gap-3 py-3 px-4 bg-zinc-50 dark:bg-zinc-800/50 rounded-lg">
-              <Switch
-                id="isActive"
-                checked={formData.isActive}
-                onCheckedChange={checked =>
-                  setFormData({ ...formData, isActive: checked })
-                }
-              />
-              <Label
-                htmlFor="isActive"
-                className="kalpurush-font cursor-pointer"
-              >
-                সক্রিয় / Active
-              </Label>
+            <div className="flex items-center gap-4 p-5 rounded-2xl bg-[#00AEEF]/5 border border-[#00AEEF]/10">
+              <Switch checked={formData.isActive} onCheckedChange={checked => setFormData({ ...formData, isActive: checked })} />
+              <div>
+                <Label className="text-sm font-black text-zinc-900 dark:text-zinc-100 block">নীতিমালা সক্রিয় করুন</Label>
+                <p className="text-[10px] font-bold text-zinc-500 uppercase mt-0.5 tracking-tight">Active policies will be visible on enrollment forms</p>
+              </div>
             </div>
           </div>
 
-          <DialogFooter className="flex-col sm:flex-row gap-2">
-            <Button
-              variant="outline"
-              onClick={() => setIsModalOpen(false)}
-              className="kalpurush-font w-full sm:w-auto"
-            >
-              বাতিল
+          <div className="sticky bottom-0 z-20 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md px-8 py-6 border-t border-zinc-100 dark:border-zinc-800 flex justify-end gap-3">
+            <Button variant="outline" onClick={() => setIsModalOpen(false)} className="h-12 px-8 rounded-xl font-bold border-zinc-200 dark:border-zinc-800 text-zinc-500">বাতিল</Button>
+            <Button onClick={handleSave} className="h-12 px-8 rounded-xl bg-[#00AEEF] hover:bg-blue-600 text-white font-black uppercase tracking-widest shadow-lg shadow-blue-500/20 gap-2">
+              <Save className="h-4 w-4" /> নীতিমালা সেভ করুন
             </Button>
-            <Button
-              onClick={handleSave}
-              className="kalpurush-font bg-cyan-600 hover:bg-cyan-700 w-full sm:w-auto"
-            >
-              <Save className="h-4 w-4 mr-2" />
-              সেভ করুন
-            </Button>
-          </DialogFooter>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

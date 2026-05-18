@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -12,10 +12,17 @@ import {
   Plus,
   Edit,
   Trash2,
-  Check,
-  X,
   Users,
   RefreshCw,
+  Search,
+  CheckCircle2,
+  AlertCircle,
+  Settings2,
+  HelpCircle,
+  ShieldCheck,
+  GraduationCap,
+  Monitor,
+  LayoutDashboard
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
@@ -23,7 +30,6 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
@@ -40,7 +46,7 @@ import {
   getDesignations,
   updateDesignation,
 } from '@/lib/actions/terms';
-import { HelpCircle } from 'lucide-react';
+import { cn, convertEnglishToBengali } from '@/lib/utils';
 
 // Types
 interface Designation {
@@ -58,80 +64,34 @@ interface GroupedDesignations {
   [category: string]: {
     title: string;
     items: Designation[];
+    icon: any;
+    color: string;
   };
 }
 
-const categoryLabels: Record<string, string> = {
-  leadership: 'নেতৃত্ব / Leadership',
-  madrasha_teachers: 'মাদ্রাসা শিক্ষক / Madrasa Teachers',
-  general_teachers: 'জেনারেল শিক্ষক / General Teachers',
-  it: 'আইটি ও কারিগরি / IT & Technical',
-  admin: 'প্রশাসনিক / Administrative',
-  support: 'সহায়ক / Support Staff',
-  staff: 'স্টাফ / Staff',
-  other: 'অন্যান্য / Others',
+const categoryConfig: Record<string, { title: string; icon: any; color: string }> = {
+  leadership: { title: 'নেতৃত্ব', icon: ShieldCheck, color: 'text-amber-500' },
+  madrasha_teachers: { title: 'মাদ্রাসা শিক্ষক', icon: GraduationCap, color: 'text-emerald-500' },
+  general_teachers: { title: 'জেনারেল শিক্ষক', icon: GraduationCap, color: 'text-blue-500' },
+  it: { title: 'আইটি ও কারিগরি', icon: Monitor, color: 'text-purple-500' },
+  admin: { title: 'প্রশাসনিক', icon: LayoutDashboard, color: 'text-[#00AEEF]' },
+  support: { title: 'সহায়ক স্টাফ', icon: Users, color: 'text-rose-500' },
+  staff: { title: 'সাধারণ স্টাফ', icon: Users, color: 'text-zinc-500' },
+  other: { title: 'অন্যান্য', icon: HelpCircle, color: 'text-zinc-400' },
 };
 
-const categoryOptions = [
-  { value: 'leadership', label: 'নেতৃত্ব / Leadership' },
-  { value: 'madrasha_teachers', label: 'মাদ্রাসা শিক্ষক / Teachers' },
-  { value: 'general_teachers', label: 'জেনারেল শিক্ষক / Teachers' },
-  { value: 'it', label: 'আইটি ও কারিগরি / IT' },
-  { value: 'admin', label: 'প্রশাসনিক / Admin' },
-  { value: 'support', label: 'সহায়ক / Support' },
-  { value: 'staff', label: 'স্টাফ / Staff' },
-  { value: 'other', label: 'অন্যান্য / Other' },
-];
-
-// Skeleton Component
-function DesignationCardSkeleton() {
-  return (
-    <div className="flex items-center gap-3 p-3 rounded-lg border bg-white dark:bg-zinc-900">
-      <div className="flex-1 space-y-2">
-        <Skeleton className="h-4 w-3/4" />
-        <Skeleton className="h-3 w-1/2" />
-      </div>
-      <div className="flex gap-1">
-        <Skeleton className="h-8 w-8 rounded-md" />
-        <Skeleton className="h-8 w-8 rounded-md" />
-      </div>
-    </div>
-  );
-}
-
-function GroupSkeleton() {
-  return (
-    <Card>
-      <CardHeader className="pb-3">
-        <div className="flex items-center gap-2">
-          <Skeleton className="h-5 w-5 rounded" />
-          <Skeleton className="h-6 w-48" />
-          <Skeleton className="h-5 w-8 rounded-full ml-auto" />
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-          {[...Array(3)].map((_, i) => (
-            <DesignationCardSkeleton key={i} />
-          ))}
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
+const categoryOptions = Object.entries(categoryConfig).map(([value, config]) => ({
+  value,
+  label: `${config.title} / ${value.charAt(0).toUpperCase() + value.slice(1)}`
+}));
 
 export default function DesignationsManagementPage() {
-  // State - always initialize with defaults to ensure consistent hook count
   const [designations, setDesignations] = useState<Designation[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [searchTerm, setSearchTerm] = useState<string>('');
-
-  // Modal states - always initialized
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [editingDesignation, setEditingDesignation] =
-    useState<Designation | null>(null);
+  const [editingDesignation, setEditingDesignation] = useState<Designation | null>(null);
 
-  // Form state - always initialized
   const [formData, setFormData] = useState({
     labelBn: '',
     labelEn: '',
@@ -141,31 +101,30 @@ export default function DesignationsManagementPage() {
     isActive: true,
   });
 
-  // Memoized fetch function to prevent recreation
-  const fetchDesignations = useCallback(async (showLoading = true) => {
-    if (showLoading) setLoading(true);
+  const fetchDesignations = useCallback(async (silent = false) => {
+    if (!silent) setLoading(true);
     try {
       const data = await getDesignations();
-      const docs = data?.documents || [];
-      setDesignations(docs as Designation[]);
+      setDesignations((data?.documents || []) as Designation[]);
     } catch (error) {
-      console.error('Error fetching designations:', error);
-      toast.error('পদ তালিকা লোড করতে সমস্যা হয়েছে!');
+      toast.error('পদ তালিকা লোড করা যায়নি!');
     } finally {
       setLoading(false);
     }
   }, []);
 
-  useEffect(() => {
-    fetchDesignations(false);
-  }, [fetchDesignations]);
+  useEffect(() => { fetchDesignations(); }, [fetchDesignations]);
 
-  // Group designations by category
   const groupedDesignations: GroupedDesignations = designations.reduce(
     (acc, des) => {
       const cat = des.category || 'other';
       if (!acc[cat]) {
-        acc[cat] = { title: categoryLabels[cat] || cat, items: [] };
+        acc[cat] = {
+          title: categoryConfig[cat]?.title || cat,
+          items: [],
+          icon: categoryConfig[cat]?.icon || HelpCircle,
+          color: categoryConfig[cat]?.color || 'text-zinc-400'
+        };
       }
       acc[cat].items.push(des);
       return acc;
@@ -173,465 +132,307 @@ export default function DesignationsManagementPage() {
     {} as GroupedDesignations
   );
 
-  // Sort items within each group by sort_order
+  // Sorting
   Object.keys(groupedDesignations).forEach(cat => {
-    groupedDesignations[cat].items.sort(
-      (a, b) => (a.sort_order || 100) - (b.sort_order || 100)
-    );
+    groupedDesignations[cat].items.sort((a, b) => (a.sort_order || 100) - (b.sort_order || 100));
   });
 
-  // Filter by search
   const filteredGroups = Object.entries(groupedDesignations).reduce(
     (acc, [key, group]) => {
-      const filteredItems = group.items.filter(
-        item =>
-          item.label_bn?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          item.label_en?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          (item.designation_id || '')
-            ?.toLowerCase()
-            .includes(searchTerm.toLowerCase())
+      const filteredItems = group.items.filter(item =>
+        item.label_bn?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.label_en?.toLowerCase().includes(searchTerm.toLowerCase())
       );
-      if (filteredItems.length > 0) {
-        acc[key] = { ...group, items: filteredItems };
-      }
+      if (filteredItems.length > 0) acc[key] = { ...group, items: filteredItems };
       return acc;
     },
     {} as GroupedDesignations
   );
 
-  // Open modal for new designation
-  const openNewModal = () => {
-    setEditingDesignation(null);
-    setFormData({
-      labelBn: '',
-      labelEn: '',
-      category: 'other',
-      sortOrder: 100,
-      hasTerms: true,
-      isActive: true,
-    });
-    setIsModalOpen(true);
-  };
-
-  // Open modal for edit designation
-  const openEditModal = (des: Designation) => {
-    setEditingDesignation(des);
-    setFormData({
-      labelBn: des.label_bn || '',
-      labelEn: des.label_en || '',
-      category: des.category || 'other',
-      sortOrder: des.sort_order || 100,
-      hasTerms: des.has_terms ?? true,
-      isActive: des.is_active ?? true,
-    });
+  const openModal = (des?: Designation) => {
+    if (des) {
+      setEditingDesignation(des);
+      setFormData({
+        labelBn: des.label_bn,
+        labelEn: des.label_en || '',
+        category: des.category || 'other',
+        sortOrder: des.sort_order || 100,
+        hasTerms: des.has_terms ?? true,
+        isActive: des.is_active ?? true,
+      });
+    } else {
+      setEditingDesignation(null);
+      setFormData({
+        labelBn: '',
+        labelEn: '',
+        category: 'other',
+        sortOrder: 100,
+        hasTerms: true,
+        isActive: true,
+      });
+    }
     setIsModalOpen(true);
   };
 
   const handleSave = async () => {
-    if (!formData.labelBn.trim()) {
-      toast.error('বাংলা নাম আবশ্যক!');
-      return;
-    }
-
+    if (!formData.labelBn.trim()) return toast.error('পদের নাম টাইপ করুন!');
     try {
       if (editingDesignation) {
-        const desId =
-          editingDesignation.$id || editingDesignation.designation_id;
-        await updateDesignation(desId, formData);
-        toast.success(`"${formData.labelBn}" আপডেট করা হয়েছে! ✅`);
+        await updateDesignation(editingDesignation.$id, formData);
+        toast.success('আপডেট সাকসেসফুল! ✅');
       } else {
         await createDesignation(formData);
-        toast.success(`"${formData.labelBn}" ডাটাবেসে যোগ হয়েছে! ✅`);
+        toast.success('পদটি ডাটাবেসে যুক্ত হয়েছে! ✅');
       }
-
       setIsModalOpen(false);
-      fetchDesignations(false); // Silent refresh
-    } catch (error) {
-      toast.error('সমস্যা হয়েছে!');
+      fetchDesignations(true);
+    } catch (e) {
+      toast.error('সমস্যা হয়েছে!');
     }
   };
 
-  // Stats
-  const totalCount = designations.length;
-  const leadershipCount = groupedDesignations['leadership']?.items.length || 0;
-  const teacherCount =
-    (groupedDesignations['madrasha_teachers']?.items.length || 0) +
-    (groupedDesignations['general_teachers']?.items.length || 0);
-  const otherCount = totalCount - leadershipCount - teacherCount;
+  // Stats for the dashboard
+  const stats = [
+    { label: 'মোট পদ', val: convertEnglishToBengali(designations.length), color: '#00AEEF', icon: Users },
+    { label: 'নেতৃত্ব', val: convertEnglishToBengali(designations.filter(d => d.category === 'leadership').length), color: '#f59e0b', icon: ShieldCheck },
+    { label: 'শিক্ষক', val: convertEnglishToBengali(designations.filter(d => d.category.includes('teacher')).length), color: '#10b981', icon: GraduationCap },
+    { label: 'সক্রিয়', val: convertEnglishToBengali(designations.filter(d => d.is_active).length), color: '#6366f1', icon: CheckCircle2 }
+  ];
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-zinc-900 dark:text-white kalpurush-font">
-            পদ/পদমর্যাদা ব্যবস্থাপনা
-          </h1>
-          <p className="text-zinc-500 dark:text-zinc-400 kalpurush-font">
-            ডাটাবেস থেকে সকল পদ/পদমর্যাদা দেখুন, সম্পাদনা করুন এবং নতুন যোগ করুন
-          </p>
+    <div className="space-y-8 animate-in fade-in duration-700 solaimanlipi-font pb-20">
+
+      {/* ══════════════ HEADER ══════════════ */}
+      <div className="relative overflow-hidden bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-6 md:p-10 shadow-sm">
+        <div className="pointer-events-none absolute -top-24 -right-24 h-64 w-64 rounded-full bg-[#00AEEF]/10 blur-3xl" />
+
+        <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="flex items-center gap-6">
+            <div className="relative h-16 w-16 shrink-0 rounded-2xl bg-gradient-to-br from-[#00AEEF] to-blue-700 flex items-center justify-center shadow-lg shadow-blue-500/20">
+              <Briefcase className="h-8 w-8 text-white" strokeWidth={1.5} />
+            </div>
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <Badge variant="outline" className="text-[10px] font-black uppercase text-[#00AEEF] border-[#00AEEF]/30 bg-[#00AEEF]/5">HR & Roles</Badge>
+              </div>
+              <h1 className="text-3xl font-black text-zinc-900 dark:text-zinc-50 tracking-tight leading-none">
+                পদ ও পদমর্যাদা
+              </h1>
+              <p className="mt-2 text-[11px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest max-w-lg">
+                প্রতিষ্ঠানের সকল পদ এবং প্রশাসনিক রোল এখানে পরিচালনা করুন।
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => fetchDesignations()}
+              className="h-10 rounded-lg bg-zinc-50 dark:bg-zinc-800 font-bold border-zinc-200 dark:border-zinc-700 gap-2"
+            >
+              <RefreshCw className={cn("h-4 w-4", loading && "animate-spin")} />
+              রিফ্রেশ
+            </Button>
+            <Button
+              onClick={() => openModal()}
+              className="h-10 rounded-lg bg-[#00AEEF] hover:bg-blue-600 text-white font-black text-xs uppercase tracking-widest gap-2 shadow-lg shadow-blue-500/20"
+            >
+              <Plus className="h-4 w-4" /> নতুন পদ যোগ করুন
+            </Button>
+          </div>
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => fetchDesignations()}
-          className="gap-2 kalpurush-font"
-        >
-          <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-          রিফ্রেশ
-        </Button>
       </div>
 
-      {/* Search & Add */}
-      <div className="flex flex-col sm:flex-row gap-4">
-        <div className="relative flex-1">
-          <Input
-            placeholder="পদ খুঁজুন... (Search)"
-            value={searchTerm}
-            onChange={e => setSearchTerm(e.target.value)}
-            className="pl-10 kalpurush-font"
-          />
-          <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
-        </div>
-
-        <Button
-          onClick={openNewModal}
-          className="gap-2 bg-cyan-600 hover:bg-cyan-700 shadow-lg shadow-cyan-600/20 kalpurush-font"
-        >
-          <Plus className="h-4 w-4" />
-          নতুন পদ যোগ করুন
-        </Button>
-      </div>
-
-      {/* Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <Card className="overflow-hidden">
-          <div className="h-1 bg-gradient-to-r from-cyan-500 to-cyan-600"></div>
-          <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-cyan-600">
-              {loading ? <Skeleton className="h-8 w-12 mx-auto" /> : totalCount}
-            </div>
-            <p className="text-sm text-zinc-500 kalpurush-font">মোট পদ</p>
-          </CardContent>
-        </Card>
-        <Card className="overflow-hidden">
-          <div className="h-1 bg-gradient-to-r from-blue-500 to-blue-600"></div>
-          <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-blue-600">
-              {loading ? (
-                <Skeleton className="h-8 w-12 mx-auto" />
-              ) : (
-                leadershipCount
-              )}
-            </div>
-            <p className="text-sm text-zinc-500 kalpurush-font">নেতৃত্ব</p>
-          </CardContent>
-        </Card>
-        <Card className="overflow-hidden">
-          <div className="h-1 bg-gradient-to-r from-green-500 to-green-600"></div>
-          <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-green-600">
-              {loading ? (
-                <Skeleton className="h-8 w-12 mx-auto" />
-              ) : (
-                teacherCount
-              )}
-            </div>
-            <p className="text-sm text-zinc-500 kalpurush-font">শিক্ষক</p>
-          </CardContent>
-        </Card>
-        <Card className="overflow-hidden">
-          <div className="h-1 bg-gradient-to-r from-purple-500 to-purple-600"></div>
-          <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-purple-600">
-              {loading ? <Skeleton className="h-8 w-12 mx-auto" /> : otherCount}
-            </div>
-            <p className="text-sm text-zinc-500 kalpurush-font">অন্যান্য</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Designation Groups - Real DB Data with Skeleton Loading */}
-      <AnimatePresence mode="wait">
-        {loading ? (
-          <motion.div
-            key="loading"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="space-y-6"
-          >
-            {[...Array(3)].map((_, i) => (
-              <GroupSkeleton key={i} />
-            ))}
-          </motion.div>
-        ) : Object.keys(filteredGroups).length === 0 ? (
-          <motion.div
-            key="empty"
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-          >
-            <Card className="border-dashed">
-              <CardContent className="p-12 text-center">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
-                  <Briefcase className="h-8 w-8 text-zinc-400" />
+      {/* ══════════════ STATS ══════════════ */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {stats.map((s, i) => (
+          <Card key={i} className="relative overflow-hidden group">
+            <div className="absolute top-0 left-0 w-1 h-full" style={{ backgroundColor: s.color }} />
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-1">{s.label}</p>
+                  <p className="text-3xl font-black text-zinc-900 dark:text-zinc-50 tracking-tighter">
+                    {loading ? '...' : s.val}
+                  </p>
                 </div>
-                <p className="text-lg font-medium text-zinc-500 kalpurush-font">
-                  কোনো পদ পাওয়া যায়নি
-                </p>
-                <p className="text-sm text-zinc-400 mt-1 kalpurush-font">
-                  নতুন পদ যোগ করতে উপরের বাটনে ক্লিক করুন
-                </p>
-              </CardContent>
-            </Card>
-          </motion.div>
+                <div className="h-10 w-10 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
+                  <s.icon className="h-5 w-5 text-zinc-400 group-hover:scale-110 transition-transform" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* ══════════════ SEARCH ══════════════ */}
+      <div className="relative group">
+        <Input
+          placeholder="নির্দিষ্ট পদ খুঁজুন... (যেমন: শিক্ষক, প্রিন্সিপাল)"
+          value={searchTerm}
+          onChange={e => setSearchTerm(e.target.value)}
+          className="pl-12 h-14 rounded-xl bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-lg font-medium shadow-sm group-hover:border-[#00AEEF]/50 transition-all focus:ring-2 focus:ring-[#00AEEF]/20"
+        />
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-400 group-hover:text-[#00AEEF] transition-colors" />
+      </div>
+
+      {/* ══════════════ GROUPED LIST ══════════════ */}
+      <div className="space-y-8">
+        {loading ? (
+          [...Array(3)].map((_, i) => <Skeleton key={i} className="h-40 w-full rounded-2xl" />)
         ) : (
-          <motion.div
-            key="data"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="space-y-6"
-          >
-            {Object.entries(filteredGroups).map(([key, group], groupIndex) => (
-              <motion.div
-                key={key}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: groupIndex * 0.05 }}
-              >
-                <Card className="overflow-hidden">
-                  <div className="h-1 bg-gradient-to-r from-cyan-500 to-transparent"></div>
-                  <CardHeader className="pb-3">
-                    <CardTitle className="flex items-center gap-2 text-lg">
-                      <div className="w-8 h-8 rounded-lg bg-cyan-100 dark:bg-cyan-900/30 flex items-center justify-center">
-                        <Users className="h-4 w-4 text-cyan-600" />
+          Object.entries(filteredGroups).map(([key, group], groupIdx) => (
+            <motion.div
+              key={key}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: groupIdx * 0.1 }}
+              className="space-y-4"
+            >
+              <div className="flex items-center gap-3 px-1">
+                <div className={cn("h-10 w-10 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 shadow-sm flex items-center justify-center", group.color)}>
+                  <group.icon className="h-5 w-5" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-black text-zinc-900 dark:text-zinc-50 tracking-tight leading-none uppercase">{group.title}</h3>
+                  <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mt-1">{convertEnglishToBengali(group.items.length)} designations found</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                {group.items.map((des, desIdx) => (
+                  <Card key={des.$id} className="group relative overflow-hidden bg-white/50 dark:bg-zinc-900/30 border-zinc-200 dark:border-zinc-800 hover:border-[#00AEEF]/30 hover:shadow-xl hover:shadow-[#00AEEF]/5 transition-all duration-300">
+                    <CardContent className="p-5">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <h4 className="text-lg font-black text-zinc-900 dark:text-zinc-100 truncate tracking-tight">{des.label_bn}</h4>
+                            {!des.is_active && <Badge variant="secondary" className="text-[8px] bg-rose-500/10 text-rose-500 font-bold border-none uppercase h-4 px-1">Inactive</Badge>}
+                          </div>
+                          <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-3">{des.label_en}</p>
+
+                          <div className="flex items-center gap-2">
+                            <Badge variant="outline" className="text-[9px] font-bold text-zinc-500 bg-zinc-50 dark:bg-zinc-800/50">সিরিয়াল: {convertEnglishToBengali(des.sort_order)}</Badge>
+                            <Badge variant="outline" className={cn(
+                              "text-[9px] font-bold",
+                              des.has_terms ? "text-[#00AEEF] border-[#00AEEF]/20 bg-[#00AEEF]/5" : "text-zinc-400 border-zinc-200"
+                            )}>
+                              {des.has_terms ? "✅ TOS Enabled" : "No Terms"}
+                            </Badge>
+                          </div>
+                        </div>
+
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => openModal(des)}
+                          className="h-10 w-10 p-0 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-[#00AEEF] hover:text-white transition-all opacity-0 group-hover:opacity-100"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
                       </div>
-                      <span className="kalpurush-font">{group.title}</span>
-                      <Badge
-                        variant="secondary"
-                        className="ml-auto bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400 kalpurush-font"
-                      >
-                        {group.items.length}
-                      </Badge>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                      <AnimatePresence>
-                        {group.items.map((des, index) => (
-                          <motion.div
-                            key={des.$id}
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.95 }}
-                            transition={{ delay: index * 0.03 }}
-                            className="group flex items-center gap-3 p-3 rounded-lg border bg-white dark:bg-zinc-900 hover:border-cyan-300 dark:hover:border-cyan-700 hover:shadow-md hover:shadow-cyan-500/10 transition-all"
-                          >
-                            <div className="flex-1 min-w-0">
-                              <p className="font-medium text-sm truncate kalpurush-font">
-                                {des.label_bn}
-                              </p>
-                              <div className="flex items-center gap-2 mt-1">
-                                <span className="text-xs text-zinc-400 kalpurush-font">
-                                  Sort: {des.sort_order || 100}
-                                </span>
-                                <span
-                                  className={`text-xs px-1.5 py-0.5 rounded kalpurush-font ${des.is_active ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'}`}
-                                >
-                                  {des.is_active ? 'সক্রিয়' : 'নিষ্ক্রিয়'}
-                                </span>
-                                <span
-                                  className={`text-xs px-1.5 py-0.5 rounded kalpurush-font ${des.has_terms ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' : 'bg-zinc-200 text-zinc-500 dark:bg-zinc-700 dark:text-zinc-400'}`}
-                                >
-                                  {des.has_terms ? '✅ Terms' : '❌ No Terms'}
-                                </span>
-                              </div>
-                            </div>
-                            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={() => openEditModal(des)}
-                                className="h-8 w-8 p-0 text-zinc-500 hover:text-cyan-600 hover:bg-cyan-50"
-                              >
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                className="h-8 w-8 p-0 text-zinc-500 hover:text-red-600 hover:bg-red-50"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </motion.div>
-                        ))}
-                      </AnimatePresence>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </motion.div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </motion.div>
+          ))
         )}
-      </AnimatePresence>
+      </div>
 
-      {/* Create/Edit Modal */}
+      {/* ══════════════ EDITOR MODAL ══════════════ */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="w-[95vw] max-w-[500px] max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="kalpurush-font">
-              {editingDesignation
-                ? 'পদ সম্পাদনা করুন'
-                : 'নতুন পদ/পদমর্যাদা যোগ করুন'}
-            </DialogTitle>
-            <DialogDescription className="kalpurush-font">
-              {editingDesignation
-                ? 'পদের তথ্য আপডেট করতে নিচের ফর্ম পূরণ করুন'
-                : 'নতুন পদমর্যাদা যোগ করতে নিচের তথ্য পূরণ করুন'}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            {/* Name Fields Row */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="labelBn" className="kalpurush-font">
-                  পদের নাম (বাংলা) *
-                </Label>
-                <Input
-                  id="labelBn"
-                  placeholder="যেমন: নতুন শিক্ষক"
-                  value={formData.labelBn}
-                  onChange={e =>
-                    setFormData({ ...formData, labelBn: e.target.value })
-                  }
-                  className="kalpurush-font"
-                />
+        <DialogContent className={cn(
+          "w-[95vw] max-w-[550px] solaimanlipi-font rounded-2xl border-none shadow-2xl p-0",
+          "bg-white dark:bg-zinc-950"
+        )}>
+          <div className="px-8 py-6 border-b border-zinc-100 dark:border-zinc-800">
+            <DialogHeader>
+              <div className="flex items-center gap-4">
+                <div className="h-12 w-12 rounded-xl bg-[#00AEEF]/10 flex items-center justify-center">
+                  <Settings2 className="h-6 w-6 text-[#00AEEF]" />
+                </div>
+                <div>
+                  <DialogTitle className="text-2xl font-black text-zinc-900 dark:text-zinc-50 tracking-tighter">
+                    {editingDesignation ? 'পদ সম্পাদনা' : 'নতুন পদ তৈরি'}
+                  </DialogTitle>
+                  <DialogDescription className="text-xs font-bold text-zinc-400 uppercase tracking-widest mt-1">
+                    Manage designation details and roles
+                  </DialogDescription>
+                </div>
               </div>
-              <div className="grid gap-2">
-                <Label htmlFor="labelEn" className="kalpurush-font">
-                  পদের নাম (English)
-                </Label>
-                <Input
-                  id="labelEn"
-                  placeholder="e.g. New Teacher"
-                  value={formData.labelEn}
-                  onChange={e =>
-                    setFormData({ ...formData, labelEn: e.target.value })
-                  }
-                  className="kalpurush-font"
-                />
-              </div>
-            </div>
+            </DialogHeader>
+          </div>
 
-            {/* Category & Sort Order Row */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="grid gap-2">
-                <Label className="kalpurush-font">ক্যাটাগরি</Label>
-                <Select
-                  value={formData.category}
-                  onValueChange={value =>
-                    setFormData({ ...formData, category: value })
-                  }
-                >
-                  <SelectTrigger className="kalpurush-font">
-                    <SelectValue placeholder="ক্যাটাগরি নির্বাচন করুন" />
+          <div className="p-8 space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div className="space-y-2">
+                <Label className="text-xs font-black uppercase text-zinc-400 tracking-widest">পদের নাম (বাংলা) *</Label>
+                <Input
+                  value={formData.labelBn}
+                  onChange={e => setFormData({ ...formData, labelBn: e.target.value })}
+                  className="h-11 rounded-xl bg-zinc-50 dark:bg-zinc-900 font-bold"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-xs font-black uppercase text-zinc-400 tracking-widest">পদের নাম (English)</Label>
+                <Input
+                  value={formData.labelEn}
+                  onChange={e => setFormData({ ...formData, labelEn: e.target.value })}
+                  className="h-11 rounded-xl bg-zinc-50 dark:bg-zinc-900 font-bold"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-xs font-black uppercase text-zinc-400 tracking-widest">ক্যাটাগরি</Label>
+                <Select value={formData.category} onValueChange={v => setFormData({ ...formData, category: v })}>
+                  <SelectTrigger className="h-11 rounded-xl bg-zinc-50 dark:bg-zinc-900 font-bold">
+                    <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {categoryOptions.map(cat => (
-                      <SelectItem
-                        key={cat.value}
-                        value={cat.value}
-                        className="kalpurush-font"
-                      >
-                        {cat.label}
-                      </SelectItem>
-                    ))}
+                    {categoryOptions.map(o => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
-              <div className="grid gap-2">
-                <div className="flex items-center gap-1">
-                  <Label htmlFor="sortOrder" className="kalpurush-font">
-                    সর্ট অর্ডার
-                  </Label>
-                  <div className="group relative">
-                    <HelpCircle className="h-3.5 w-3.5 text-zinc-400 cursor-help" />
-                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-zinc-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
-                      তালিকায় প্রদর্শনের ক্রম (১ = উপরে)
-                      <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-zinc-900"></div>
-                    </div>
-                  </div>
-                </div>
+
+              <div className="space-y-2">
+                <Label className="text-xs font-black uppercase text-zinc-400 tracking-widest leading-none flex items-center gap-2">
+                  সর্ট অর্ডার <HelpCircle className="h-3 w-3" />
+                </Label>
                 <Input
-                  id="sortOrder"
                   type="number"
-                  placeholder="100"
                   value={formData.sortOrder}
-                  onChange={e =>
-                    setFormData({
-                      ...formData,
-                      sortOrder: parseInt(e.target.value) || 100,
-                    })
-                  }
-                  className="kalpurush-font"
+                  onChange={e => setFormData({ ...formData, sortOrder: parseInt(e.target.value) || 100 })}
+                  className="h-11 rounded-xl bg-zinc-50 dark:bg-zinc-900 font-bold"
                 />
               </div>
             </div>
 
-            {/* Toggle Switches Row - Inline */}
-            <div className="flex flex-wrap items-center gap-4 py-3 px-1 bg-zinc-50 dark:bg-zinc-800/50 rounded-lg">
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-2">
-                  <Switch
-                    id="hasTerms"
-                    checked={formData.hasTerms}
-                    onCheckedChange={checked =>
-                      setFormData({ ...formData, hasTerms: checked })
-                    }
-                  />
-                  <Label
-                    htmlFor="hasTerms"
-                    className="kalpurush-font cursor-pointer text-sm font-medium"
-                  >
-                    Terms আছে
-                  </Label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="flex items-center justify-between p-4 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800">
+                <div className="flex flex-col">
+                  <Label className="text-[13px] font-black">শর্তাবলী থাকবে?</Label>
+                  <span className="text-[10px] text-zinc-400 font-bold uppercase tracking-tight">Enable Terms of Service</span>
                 </div>
+                <Switch checked={formData.hasTerms} onCheckedChange={c => setFormData({ ...formData, hasTerms: c })} />
               </div>
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-2">
-                  <Switch
-                    id="isActive"
-                    checked={formData.isActive}
-                    onCheckedChange={checked =>
-                      setFormData({ ...formData, isActive: checked })
-                    }
-                  />
-                  <Label
-                    htmlFor="isActive"
-                    className="kalpurush-font cursor-pointer text-sm font-medium"
-                  >
-                    সক্রিয় / Active
-                  </Label>
+              <div className="flex items-center justify-between p-4 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800">
+                <div className="flex flex-col">
+                  <Label className="text-[13px] font-black">সক্রিয় স্ট্যাটাস</Label>
+                  <span className="text-[10px] text-zinc-400 font-bold uppercase tracking-tight">Is Role Active?</span>
                 </div>
+                <Switch checked={formData.isActive} onCheckedChange={c => setFormData({ ...formData, isActive: c })} />
               </div>
             </div>
           </div>
-          <DialogFooter className="flex-col sm:flex-row gap-2">
-            <Button
-              variant="outline"
-              onClick={() => setIsModalOpen(false)}
-              className="kalpurush-font w-full sm:w-auto"
-            >
-              বাতিল
+
+          <div className="px-8 py-6 border-t border-zinc-100 dark:border-zinc-800 flex justify-end gap-3">
+            <Button variant="outline" onClick={() => setIsModalOpen(false)} className="h-12 px-8 rounded-xl font-black text-zinc-500 uppercase text-xs tracking-widest">বাতিল</Button>
+            <Button onClick={handleSave} className="h-12 px-8 rounded-xl bg-[#00AEEF] hover:bg-blue-600 text-white font-black uppercase text-xs tracking-widest shadow-lg shadow-blue-500/20">
+              {editingDesignation ? 'আপডেট করুন' : 'তৈরি করুন'}
             </Button>
-            <Button
-              onClick={handleSave}
-              className="kalpurush-font bg-cyan-600 hover:bg-cyan-700 w-full sm:w-auto"
-            >
-              {editingDesignation ? 'আপডেট করুন' : 'যোগ করুন'}
-            </Button>
-          </DialogFooter>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

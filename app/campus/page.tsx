@@ -38,11 +38,11 @@ import {
   AnimatePresence,
 } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { useLanguageStore } from '@/lib/store';
+import { useLanguageStore } from '@/store/language';
 import { cn } from '@/lib/utils';
-import ErrorBoundary from '@/components/ErrorBoundary';
-import FooterSection from '@/components/footer';
-import { ClientHeader } from '@/components/header';
+import ErrorBoundary from '@/components/core/ErrorBoundary';
+import FooterSection from '@/components/layout/footer';
+import { ClientHeader } from '@/components/layout/header';
 import { useTheme } from '@/components/themes/theme-provider';
 
 // Types

@@ -32,27 +32,25 @@ export default async function DashboardLayout({
   const defaultOpen = cookieStore.get('sidebar_state')?.value === 'true';
 
   return (
-    <ThemeProvider defaultTheme="dark" storageKey="manzil-theme">
-      <SidebarProvider defaultOpen={defaultOpen}>
-        <AppSidebar 
-          navItems={roleNavItems[role] || roleNavItems.student}
+    <SidebarProvider defaultOpen={defaultOpen}>
+      <AppSidebar 
+        navItems={roleNavItems[role] || roleNavItems.student}
+        userName={user?.name || 'User'}
+        userEmail={user?.email || 'user@example.com'}
+        userAvatar={userAvatar}
+      />
+      <SidebarInset>
+        <HeaderDashboard 
           userName={user?.name || 'User'}
           userEmail={user?.email || 'user@example.com'}
           userAvatar={userAvatar}
+          role={role}
         />
-        <SidebarInset>
-          <HeaderDashboard 
-            userName={user?.name || 'User'}
-            userEmail={user?.email || 'user@example.com'}
-            userAvatar={userAvatar}
-            role={role}
-          />
-          <Separator className="bg-border" />
-          <main className="p-6">
-            {children}
-          </main>
-        </SidebarInset>
-      </SidebarProvider>
-    </ThemeProvider>
+        <Separator className="bg-border" />
+        <main className="p-6">
+          {children}
+        </main>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }

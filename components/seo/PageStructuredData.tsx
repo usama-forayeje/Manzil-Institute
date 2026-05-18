@@ -1,3 +1,58 @@
+interface SEOData {
+  title: string;
+  description: string;
+  keywords: string[];
+  url: string;
+  image: string;
+}
+
+interface CourseData {
+  name: string;
+  description: string;
+  educationalLevel: string;
+  teaches: string[];
+  educationalUse: string;
+  timeRequired: string;
+}
+
+interface OrganizationData {
+  name: string;
+  alternateName: string;
+  description: string;
+  url: string;
+  logo: string;
+  sameAs: string[];
+  address: {
+    streetAddress: string;
+    addressLocality: string;
+    addressRegion: string;
+    postalCode: string;
+    addressCountry: string;
+  };
+  contactPoint: Array<{
+    telephone: string;
+    contactType: string;
+    areaServed: string;
+    availableLanguage: string[];
+  }>;
+  email: string;
+  foundingDate: string;
+  educationalCredentialAwarded: string[];
+  hasEducationalUse: string[];
+  knowsAbout: string[];
+  areaServed: string;
+  priceRange: string;
+}
+
+interface PageStructuredDataProps {
+  seoDataEn?: SEOData;
+  seoDataBn?: SEOData;
+  coursesDataEn?: CourseData[];
+  coursesDataBn?: CourseData[];
+  organizationDataEn?: OrganizationData;
+  organizationDataBn?: OrganizationData;
+}
+
 export default function PageStructuredData({
   seoDataEn,
   seoDataBn,
@@ -5,7 +60,7 @@ export default function PageStructuredData({
   coursesDataBn,
   organizationDataEn,
   organizationDataBn,
-}) {
+}: PageStructuredDataProps) {
   return null; // This component doesn't render anything, just provides structured data
 }
 
@@ -249,9 +304,9 @@ export const getPageStructuredData = () => ({
     name: 'মানজিল ইন্টারন্যাশনাল ইনস্টিটিউট',
     alternateName: 'এমআইসি ইনস্টিটিউট',
     description:
-      'মানজিল ইন্টারন্যাশনাল ইনস্টিটিউট বাংলাদেশে একীভূত এমআইসি কারিকুলাম, মাদ্রাসা শিক্ষা, সাধারণ শিক্ষা এবং কারিগরি শিক্ষা প্রদান করে। কুরআন, হাদিস, আধুনিক একাডেমিক এবং কারিগরি দক্ষতার সাথে ভবিষ্যত নেতৃত্ব গঠনের জন্য ব্যাপক ইসলামিক শিক্ষা।',
+      'মানজিল ইন্টারন্যাশনাল ইনস্টিটিউট বাংলাদেশে একীভূত এম এন সি কারিকুলাম, মাদ্রাসা শিক্ষা, সাধারণ শিক্ষা এবং কারিগরি শিক্ষা প্রদান করে। কুরআন, হাদিস, আধুনিক একাডেমিক এবং কারিগরি দক্ষতার সাথে ভবিষ্যত নেতৃত্ব গঠনের জন্য ব্যাপক ইসলামিক শিক্ষা।',
     url: 'https://institute.manzilgroupbd.com',
-    logo: 'https://institute.manzilgroupbd.com/manzil-institute-logo-dark.png',
+    logo: 'https://institute.manzilgroupbd.com/manzil-logo/manzil-institute-logo-dark.webp',
     sameAs: [
       'https://www.facebook.com/manzilinstitute',
       'https://www.instagram.com/manzilinstitute',

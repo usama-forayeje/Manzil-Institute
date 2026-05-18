@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useLanguageStore } from '@/lib/store';
+import { useLanguageStore } from '@/store/language';
 
 export default function Error({ error, reset }: { error: Error; reset: () => void }) {
   const { language } = useLanguageStore();

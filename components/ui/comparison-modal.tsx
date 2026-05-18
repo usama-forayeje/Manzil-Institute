@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { X, ArrowRight, Check, BookText, Users, Clock, Award } from 'lucide-react';
-import { useLanguageStore } from '@/lib/store';
+import { useLanguageStore } from '@/store/language';
 import { ComparisonModalProps, Level } from '@/types/components';
 
 export default function ComparisonModal({ levels, onClose }: ComparisonModalProps) {

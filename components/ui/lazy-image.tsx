@@ -16,6 +16,7 @@ export function LazyImage({
   fill,
   className,
   quality = 75,
+  priority = false,
   ...props
 }: LazyImageProps) {
   const [imgSrc, setImgSrc] = useState(src);
@@ -42,7 +43,8 @@ export function LazyImage({
       fill={fill}
       className={className}
       onError={handleError}
-      loading="lazy"
+      loading={priority ? undefined : "lazy"}
+      priority={priority}
       decoding="async"
       quality={quality}
       placeholder="blur"

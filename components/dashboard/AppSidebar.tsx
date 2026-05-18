@@ -254,13 +254,12 @@ export function AppSidebar({
                   size="lg"
                   className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                 >
-                  <Avatar className="h-8 w-8 rounded-lg">
+                  <Avatar className="h-8 w-8 rounded-sm">
                     <AvatarImage
                       src={userAvatar}
                       alt={userName}
-                      referrerPolicy="no-referrer"
                     />
-                    <AvatarFallback className="rounded-lg bg-sidebar-primary/10 text-sidebar-primary text-xs">
+                    <AvatarFallback className="rounded-sm bg-sidebar-primary/10 text-sidebar-primary text-xs">
                       {userName?.charAt(0).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
@@ -289,7 +288,7 @@ export function AppSidebar({
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent
-                className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
+                className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-md"
                 side="bottom"
                 align="end"
                 sideOffset={4}
@@ -297,13 +296,12 @@ export function AppSidebar({
                 <DropdownMenuLabel className="p-0 font-normal">
                   <div className="px-1 py-1.5">
                     <div className="flex items-center gap-2">
-                      <Avatar className="h-8 w-8 rounded-lg">
+                      <Avatar className="h-8 w-8 rounded-sm">
                         <AvatarImage
                           src={userAvatar}
                           alt={userName}
-                          referrerPolicy="no-referrer"
                         />
-                        <AvatarFallback className="rounded-lg bg-sidebar-primary/10 text-sidebar-primary text-xs">
+                        <AvatarFallback className="rounded-sm bg-sidebar-primary/10 text-sidebar-primary text-xs">
                           {userName?.charAt(0).toUpperCase()}
                         </AvatarFallback>
                       </Avatar>

@@ -123,30 +123,39 @@ export async function GET(request: NextRequest) {
 
     // 7. Set role cookie for middleware and subsequent requests
     const cookieStore = await cookies();
+    const isProduction = process.env.NODE_ENV === 'production';
+
+    // Set Role Cookie - Crucial for proxy.ts/middleware
     cookieStore.set('appwrite-user-role', role, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: isProduction,
       sameSite: 'lax',
       path: '/',
       maxAge: 60 * 60 * 24 * 7, // 7 days
     });
+
+    // Set User Session Cookie (Already handled in createSessionFromToken, but good to ensure consistency)
     cookieStore.set('appwrite-user-name', appwriteUser.name || '', {
-      httpOnly: false, // accessible to JS
-      sameSite: 'lax',
-      path: '/',
-      maxAge: 60 * 60 * 24 * 7,
-    });
-    cookieStore.set('appwrite-user-email', appwriteUser.email || '', {
       httpOnly: false,
+      secure: isProduction,
       sameSite: 'lax',
       path: '/',
       maxAge: 60 * 60 * 24 * 7,
     });
 
-    // 8. Redirect based on role
-    const redirectPath =
-      ROLE_DASHBOARD[role as UserRole] ?? '/dashboard/student';
-    return NextResponse.redirect(new URL(redirectPath, request.url));
+    cookieStore.set('appwrite-user-email', appwriteUser.email || '', {
+      httpOnly: false,
+      secure: isProduction,
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 60 * 60 * 24 * 7,
+    });
+
+    // 8. Redirect based on role with absolute URL to avoid potential relative path issues
+    const dashboardBase = (ROLE_DASHBOARD[role as UserRole] || '/dashboard/student');
+    const redirectUrl = new URL(dashboardBase, request.url);
+    
+    return NextResponse.redirect(redirectUrl);
   } catch (error: any) {
     // Handle specific OAuth errors
     if (error.message?.includes('invalid_grant') || error.code === 400) {

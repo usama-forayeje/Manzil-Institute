@@ -37,15 +37,19 @@
       "~/lib/*": [
         "lib/*"
       ]
-    }
+    },
+    "ignoreDeprecations": "6.0"
   },
   "include": [
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts"
-, "components/VoiceInputEn.jsx", "components/VoiceInputBn.jsx", "hooks/useVoiceTyping.js"  ],
+    ".next/dev/types/**/*.ts",
+    "components/VoiceInputEn.jsx",
+    "components/VoiceInputBn.jsx",
+    "hooks/useVoiceTyping.js"
+  ],
   "exclude": [
     "node_modules"
   ]

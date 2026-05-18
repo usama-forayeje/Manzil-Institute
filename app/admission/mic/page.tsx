@@ -33,15 +33,15 @@ import {
   AlarmClock,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Button } from '../../../components/ui/button';
-import { useLanguageStore } from '../../../lib/store';
-import { cn } from '../../../lib/utils';
-import { AnimatedGroup } from '../../../components/ui/animated-group';
-import { useAdmissionData } from '../../../hooks/useData';
-import ErrorBoundary from '../../../components/ErrorBoundary';
-import LoadingSkeleton from '../../../components/LoadingSkeleton';
-import FooterSection from '../../../components/footer';
-import { ClientHeader } from '@/components/header';
+import { Button } from '@/components/ui/button';
+import { useLanguageStore } from '@/store/language';
+import { cn } from '@/lib/utils';
+import { AnimatedGroup } from '@/components/ui/animated-group';
+import { useAdmissionData } from '@/hooks/useData';
+import ErrorBoundary from '@/components/core/ErrorBoundary';
+import LoadingSkeleton from '@/components/core/LoadingSkeleton';
+import FooterSection from '@/components/layout/footer';
+import { ClientHeader } from '@/components/layout/header';
 
 // --- Constants (Data) ---
 const mealSchedule = {

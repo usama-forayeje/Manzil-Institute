@@ -76,12 +76,12 @@ export async function getSession() {
 
     const userDoc = await getUserDocument(databases, authUser);
 
-    return {
+    return JSON.parse(JSON.stringify({
       user: authUser,
       role: userDoc?.role ?? 'student',
       userDoc,
-      userAvatar: userDoc?.avatarUrl,
-    };
+      userAvatar: userDoc?.avatarUrl || null,
+    }));
   } catch (e) {
     // NoSessionError is expected for unauthenticated users - return null silently
     if (e instanceof NoSessionError) {

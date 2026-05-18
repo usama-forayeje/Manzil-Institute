@@ -189,7 +189,7 @@ function BaseVoiceInput({
             ))}
           </div>
           <span className="text-[10px] font-bold text-green-600 dark:text-green-400 truncate max-w-[150px]">
-            {interimText ? `"${interimText}"` : (language === "bn-BD" ? "শুনছি..." : "Listening...")}
+            {interimText ? `"${interimText}"` : (language === "bn-BD" ? "শুনছি..." : language === "ar-SA" ? "جاري الاستماع..." : "Listening...")}
           </span>
         </div>
       )}
@@ -212,4 +212,8 @@ export function VoiceInputBn(props: any) {
 
 export function VoiceInputEn(props: any) {
   return <BaseVoiceInput language="en-US" placeholder="Type here or press mic..." {...props} />;
+}
+
+export function VoiceInputAr(props: any) {
+  return <BaseVoiceInput language="ar-SA" placeholder="এখানে টাইপ করুন অথবা আরবী ভয়েস ব্যবহার করুন..." {...props} />;
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useLanguageStore } from '@/lib/store';
+import { useLanguageStore } from '@/store/language';
 
 export default function NotFound() {
   const { language } = useLanguageStore();

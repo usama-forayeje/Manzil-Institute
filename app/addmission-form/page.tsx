@@ -3,12 +3,12 @@
 import { useState, useEffect } from 'react';
 import { ArrowLeft, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useLanguageStore } from '@/lib/store';
+import { useLanguageStore } from '@/store/language';
 import { cn } from '@/lib/utils';
 import { AnimatedGroup } from '@/components/ui/animated-group';
-import ErrorBoundary from '@/components/ErrorBoundary';
-import FooterSection from '@/components/footer';
-import { ClientHeader } from '@/components/header';
+import ErrorBoundary from '@/components/core/ErrorBoundary';
+import FooterSection from '@/components/layout/footer';
+import { ClientHeader } from '@/components/layout/header';
 
 const transitionVariants = {
   item: {

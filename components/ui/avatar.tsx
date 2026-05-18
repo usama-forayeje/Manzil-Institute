@@ -7,7 +7,7 @@ interface AvatarProps extends React.HTMLAttributes<HTMLDivElement> {
   children?: React.ReactNode;
 }
 
-interface AvatarImageProps extends React.HTMLAttributes<HTMLImageElement> {
+interface AvatarImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   src?: string;
   alt?: string;
 }
@@ -32,15 +32,23 @@ export function Avatar({ className, children, ...props }: AvatarProps) {
 
 export function AvatarImage({ className, src, alt, ...props }: AvatarImageProps) {
   const [isLoaded, setIsLoaded] = React.useState(false);
+  const imgRef = React.useRef<HTMLImageElement>(null);
+
+  React.useEffect(() => {
+    if (imgRef.current?.complete) {
+      setIsLoaded(true);
+    }
+  }, [src]);
 
   if (!src) return null;
 
   return (
     <img
+      ref={imgRef}
       src={src}
       alt={alt}
       className={cn(
-        'aspect-square h-full w-full object-cover',
+        'aspect-square h-full w-full object-cover transition-opacity duration-300',
         isLoaded ? 'opacity-100' : 'opacity-0',
         className
       )}

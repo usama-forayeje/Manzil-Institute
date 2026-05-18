@@ -1,12 +1,12 @@
 'use client';
 
 import React, { Suspense, useEffect } from 'react';
-import { ClientHeader } from '@/components/header';
-import FooterSection from '@/components/footer';
-import LoadingSkeleton from '@/components/LoadingSkeleton';
+import { ClientHeader } from '@/components/layout/header';
+import FooterSection from '@/components/layout/footer';
+import LoadingSkeleton from '@/components/core/LoadingSkeleton';
 import { AlertCircle } from 'lucide-react';
 import { useMICCurriculum } from '@/hooks/useData';
-import { useLanguageStore } from '@/lib/store';
+import { useLanguageStore } from '@/store/language';
 import { AnimatedGroup } from '@/components/ui/animated-group';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';

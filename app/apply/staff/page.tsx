@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 export default function StaffApplyPage() {
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 py-10 px-4">
+    <div className="min-h-screen bg-background py-10 px-4">
       <div className="max-w-2xl mx-auto mb-8 text-center">
         {/* Dual Logos with X Icon */}
         <div className="flex items-center justify-center gap-2 sm:gap-3 mb-6">
@@ -29,9 +29,9 @@ export default function StaffApplyPage() {
               priority
             />
           </Link>
-          <div className="flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-cyan-500/10 backdrop-blur-md shadow-sm ring-1 ring-cyan-500/40 border border-cyan-500/10">
+          <div className="flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-primary/10 backdrop-blur-md shadow-sm ring-1 ring-primary/40 border border-primary/10">
             <svg
-              className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-cyan-500"
+              className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-primary"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -59,10 +59,10 @@ export default function StaffApplyPage() {
           </Link>
         </div>
 
-        <h2 className="text-lg sm:text-xl font-bold mb-1 kalpurush-font text-cyan-600 dark:text-cyan-400">
+        <h2 className="text-lg sm:text-xl font-bold mb-1 kalpurush-font text-primary">
           স্টাফ নিবন্ধন ফর্ম
         </h2>
-        <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 kalpurush-font">
+        <p className="text-xs sm:text-sm text-muted-foreground kalpurush-font">
           সকল তথ্য সঠিকভাবে পূরণ করুন। <span className="text-red-500">*</span>{' '}
           চিহ্নিত ঘর পূরণ করা আবশ্যক।
         </p>
@@ -72,7 +72,7 @@ export default function StaffApplyPage() {
         <StaffForm />
       </StaffFormErrorBoundary>
 
-      <p className="text-center text-[10px] sm:text-xs text-cyan-600/60 dark:text-cyan-400/60 mt-8 kalpurush-font">
+      <p className="text-center text-[10px] sm:text-xs text-primary/60 mt-8 kalpurush-font">
         কোনো সমস্যা হলে যোগাযোগ করুন — মানযিল ইনস্টিটিউট, ঢাকা
       </p>
     </div>

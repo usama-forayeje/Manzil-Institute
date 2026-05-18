@@ -53,14 +53,14 @@ export function HeaderDashboard({
   };
 
   return (
-    <header className="sticky top-0 z-50 flex h-16 shrink-0 items-center justify-between gap-2 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-[width,height] ease-linear" suppressHydrationWarning>
+    <header className="sticky top-0 z-50 flex h-16 shrink-0 items-center justify-between gap-2 border-b bg-background transition-[width,height] ease-linear" suppressHydrationWarning>
       <div className="flex items-center gap-2 px-4">
         <SidebarTrigger className="-ml-1" />
         <Separator orientation="vertical" className="h-4 mr-2" />
       </div>
 
       <div className="flex items-center gap-2 px-4">
-        <SearchInput suppressHydrationWarning />
+        <SearchInput  />
 
         <ThemeModeToggle />
         {/* <NotificationCenter /> */}

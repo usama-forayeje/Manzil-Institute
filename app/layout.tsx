@@ -3,10 +3,10 @@ import { Inter } from 'next/font/google';
 import { Metadata, Viewport } from 'next';
 import Script from 'next/script';
 import './globals.css';
-import { Providers } from '@/components/providers';
+import { Providers } from '@/components/core/providers';
 import { Skeleton } from '@/components/ui/skeleton';
 import StructuredData from '@/components/seo/StructuredData';
-import ServiceWorkerRegister from '@/components/service-worker-register';
+import ServiceWorkerRegister from '@/components/core/service-worker-register';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -94,16 +94,45 @@ function RootLoadingSkeleton() {
 export const metadata: Metadata = {
   title: 'Manzil Institute - Quality Islamic Education',
   keywords: [
+    // Standard English
     'Manzil Institute',
+    'Manzil International Institute',
+    'Manzil Group',
     'Islamic Education',
     'MIC Curriculum',
+    'MNC Curriculum',
     'Madrasa Education',
-    'Bangladesh Education',
-    'Religious Education',
-    'Modern Education',
     'Technical Education',
-    'Quality Education',
-    'Islamic Studies',
+    'Bangladesh Islamic School',
+    'Best Madrasa in Dhaka',
+    
+    // Standard Bengali
+    'মানযিল ইনস্টিটিউট',
+    'মানজিল ইনস্টিটিউট',
+    'মানযিল গ্রুপ',
+    'মানজিল গ্রুপ',
+    'মাদরাসা শিক্ষা',
+    'হিফজ মাদরাসা',
+    'জেনারেল শিক্ষা',
+    'কারিগরি শিক্ষা',
+    'এমআইসি কারিকুলাম',
+    "MNC Curriculum",
+    
+    // Spelling Mistakes / Typos (English)
+    'Monzil Institute',
+    'Manjil Institute',
+    'Monjil Institute',
+    'Manzil Institiut',
+    'Monjil Group',
+    'Manjil Madrasha',
+    'Monzil Madrasha',
+    'manzil institute jatrabari',
+    
+    // Spelling Mistakes / Typos (Bengali)
+    'মঞ্জিল ইন্স্টিটিউট',
+    'মানজিল ইনিস্টিটিউট',
+    'মাঞ্জিল মাদ্রাসা',
+    'মঞ্জিল মাদ্রাসা'
   ],
   authors: [{ name: 'Manzil Institute' }],
   creator: 'Manzil Institute',
@@ -150,11 +179,9 @@ export const metadata: Metadata = {
   robots: {
     index: true,
     follow: true,
-    nocache: true,
     googleBot: {
       index: true,
       follow: true,
-      noimageindex: false,
       'max-video-preview': -1,
       'max-image-preview': 'large',
       'max-snippet': -1,
@@ -162,9 +189,13 @@ export const metadata: Metadata = {
   },
   verification: {
     google: 'your-google-site-verification-code',
-    yandex: 'your-yandex-verification-code',
-    yahoo: 'your-yahoo-verification-code',
   },
+  appleWebApp: {
+    title: 'Manzil Institute',
+    statusBarStyle: 'default',
+    capable: true,
+  },
+  manifest: '/manifest.json', // If you have a PWA manifest
 };
 
 export const viewport: Viewport = {
@@ -183,45 +214,93 @@ export default function RootLayout({
 }) {
   // Structured data for the organization
   const organizationData = {
-    name: 'Manzil Institute',
-    alternateName: 'Manzil International Institute',
-    description:
-      'Manzil Institute offers integrated MIC Curriculum, Madrasa Education, General Education & Technical Education in Bangladesh.',
-    url: 'https://institute.manzilgroupbd.com',
-    logo: 'https://institute.manzilgroupbd.com/manzil-institute.png',
-    sameAs: [
-      'https://www.facebook.com/manzilinstitute',
-      'https://www.instagram.com/manzilinstitute',
-      'https://www.linkedin.com/company/manzil-institute',
-    ],
-    address: {
-      '@type': 'PostalAddress',
-      addressCountry: 'BD',
-      addressRegion: 'Dhaka',
-      addressLocality: 'Dhaka',
-    },
-    contactPoint: {
-      '@type': 'ContactPoint',
-      telephone: '+880-1234-567890',
-      contactType: 'customer service',
-      availableLanguage: ['English', 'Bengali'],
-    },
-    email: 'info@manzilinstitute.edu.bd',
-    foundingDate: '2020',
-    educationalCredentialAwarded: [
-      'MIC Certificate',
-      'Madrasa Certificate',
-      'Technical Certificate',
-    ],
-    hasEducationalUse: 'Islamic and Modern Education',
-    knowsAbout: [
-      'Islamic Studies',
-      'Modern Education',
-      'Technical Education',
-      'Bangladesh Education System',
-    ],
-    areaServed: 'Bangladesh',
-    priceRange: '$$',
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'EducationalOrganization',
+        '@id': 'https://institute.manzilgroupbd.com/#organization',
+        name: 'Manzil Institute',
+        alternateName: ['Manzil Institute', 'মানযিল ইনস্টিটিউট', 'মানজিল গ্রুপ'],
+        description:
+          'Manzil Institute offers integrated MIC Curriculum, Madrasa Education, General Education & Technical Education in Bangladesh.',
+        url: 'https://institute.manzilgroupbd.com',
+        logo: 'https://institute.manzilgroupbd.com/manzil-institute.png',
+        sameAs: [
+          'https://www.facebook.com/ManzilInstituteBD',
+          'https://www.youtube.com/c/ManzilTV',
+        ],
+        address: {
+          '@type': 'PostalAddress',
+          streetAddress: 'Harunur Rashid Tower (10th Floor Building), House #91, Road #2, North Rayerbag Bus Stand',
+          addressLocality: 'Jatrabari',
+          addressRegion: 'Dhaka',
+          postalCode: '1362',
+          addressCountry: 'BD',
+        },
+        contactPoint: [
+          {
+            '@type': 'ContactPoint',
+            telephone: '+8801407046003',
+            contactType: 'Admissions',
+            availableLanguage: ['English', 'Bengali'],
+          },
+          {
+            '@type': 'ContactPoint',
+            telephone: '+8801407046008',
+            contactType: 'Customer Support',
+            availableLanguage: ['English', 'Bengali'],
+          }
+        ],
+        email: 'manzilinstitute24@gmail.com',
+        foundingDate: '2020',
+        founder: {
+          '@type': 'Person',
+          name: 'Mawlana Jamal Masrur',
+        },
+        hasEducationalUse: 'Islamic and Modern Education',
+        knowsAbout: [
+          'Islamic Studies',
+          'Modern Education',
+          'Technical Education',
+          'Hifz',
+          'Dars-e-Nizami'
+        ],
+      },
+      {
+        '@type': 'LocalBusiness',
+        '@id': 'https://institute.manzilgroupbd.com/#localBusiness',
+        name: 'Manzil Institute Campus',
+        image: 'https://institute.manzilgroupbd.com/computer-class.webp',
+        telephone: '+8801407046003',
+        address: {
+          '@type': 'PostalAddress',
+          streetAddress: 'House #91, Road #2, North Rayerbag Bus Stand, Jatrabari',
+          addressLocality: 'Dhaka',
+          postalCode: '1362',
+          addressCountry: 'BD',
+        },
+        geo: {
+          '@type': 'GeoCoordinates',
+          latitude: 23.7006988,
+          longitude: 90.4566508,
+        },
+        openingHoursSpecification: [
+          {
+            '@type': 'OpeningHoursSpecification',
+            dayOfWeek: [
+              'Saturday',
+              'Sunday',
+              'Monday',
+              'Tuesday',
+              'Wednesday',
+              'Thursday'
+            ],
+            opens: '08:00',
+            closes: '18:00',
+          }
+        ],
+      }
+    ]
   };
   const isDevelopment = process.env.NODE_ENV === 'development';
   const csp = `default-src 'self'; script-src 'self' 'unsafe-inline' ${isDevelopment ? "'unsafe-eval' " : ''}https://fonts.googleapis.com https://www.google.com https://www.googleapis.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com https://www.google.com https://www.googleapis.com; img-src 'self' blob: data: https:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://www.google.com https://www.googleapis.com https://www.google-analytics.com https://www.googletagmanager.com; frame-src 'self' https://www.google.com https://www.youtube.com; object-src 'none'; base-uri 'self'; form-action 'self';`;

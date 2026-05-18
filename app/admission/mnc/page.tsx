@@ -33,10 +33,10 @@ import {
   Star,
   AlarmClock,
 } from 'lucide-react';
-import { Button } from '../../../components/ui/button';
-import { useLanguageStore } from '../../../lib/store';
-import { cn } from '../../../lib/utils';
-import { AnimatedGroup } from '../../../components/ui/animated-group';
+import { Button } from '@/components/ui/button';
+import { useLanguageStore } from '@/store/language';
+import { cn } from '@/lib/utils';
+import { AnimatedGroup } from '@/components/ui/animated-group';
 import {
   Table,
   TableHeader,
@@ -45,14 +45,14 @@ import {
   TableRow,
   TableCell,
   TableCaption,
-} from '../../../components/ui/table';
+} from '@/components/ui/table';
 import {
   useAdmissionData,
-} from '../../../hooks/useData';
-import ErrorBoundary from '../../../components/ErrorBoundary';
-import LoadingSkeleton from '../../../components/LoadingSkeleton';
-import FooterSection from '../../../components/footer';
-import { ClientHeader } from '@/components/header';
+} from '@/hooks/useData';
+import ErrorBoundary from '@/components/core/ErrorBoundary';
+import LoadingSkeleton from '@/components/core/LoadingSkeleton';
+import FooterSection from '@/components/layout/footer';
+import { ClientHeader } from '@/components/layout/header';
 
 // Component imports verified
 

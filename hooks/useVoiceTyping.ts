@@ -2,15 +2,21 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+interface VoiceTypingOptions {
+  language?: string;
+  onFinalTranscript?: (spoken: string) => void;
+  onInterimTranscript?: (interim: string) => void;
+}
+
 export function useVoiceTyping({
   language = 'bn-BD',
   onFinalTranscript,
   onInterimTranscript,
-} = {}) {
+}: VoiceTypingOptions = {}) {
   const [isListening, setIsListening] = useState(false);
   const [interimText, setInterimText] = useState('');
-  const [error, setError] = useState(null);
-  const recognitionRef = useRef(null);
+  const [error, setError] = useState<string | null>(null);
+  const recognitionRef = useRef<any>(null);
   const isSupported =
     typeof window !== 'undefined' &&
     ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);

@@ -9,21 +9,21 @@
       "type": "image/x-icon"
     },
     {
-      "src": "manzil-logo/manzil-institute-logo-dark.png",
-      "type": "image/png",
+      "src": "manzil-logo/manzil-institute-logo-dark.webp",
+      "type": "image/webp",
       "sizes": "192x192",
       "purpose": "any maskable"
     },
     {
-      "src": "manzil-logo/manzil-institute-logo-light.png",
-      "type": "image/png",
+      "src": "manzil-logo/manzil-institute-logo-light.webp",
+      "type": "image/webp",
       "sizes": "512x512",
       "purpose": "any maskable"
     }
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#1e40af",
+  "theme_color": "#00AEEF",
   "background_color": "#ffffff",
   "orientation": "portrait-primary",
   "categories": ["education", "school", "islamic"],

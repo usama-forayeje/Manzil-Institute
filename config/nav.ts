@@ -112,6 +112,18 @@ const superAdminNav: NavItem[] = [
         href: "/dashboard/admin/staff/policies",
         icon: "policies",
       },
+      {
+        title: "Designations",
+        titleBn: "পদবী / পদমর্যাদা",
+        href: "/dashboard/admin/settings/designations",
+        icon: "designations",
+      },
+      {
+        title: "Terms & Conditions",
+        titleBn: "নিয়ম ও শর্তাবলী",
+        href: "/dashboard/admin/settings/terms",
+        icon: "terms",
+      },
     ],
   },
 
@@ -124,35 +136,35 @@ const superAdminNav: NavItem[] = [
     dividerBefore: true,
     items: [
       {
+        title: "Sessions",
+        titleBn: "সেশন",
+        href: "/dashboard/admin/academics/sessions",
+        icon: "timetable",
+      },
+      {
+        title: "Departments",
+        titleBn: "বিভাগ",
+        href: "/dashboard/admin/academics/departments",
+        icon: "classes",
+      },
+      {
         title: "Classes",
         titleBn: "শ্রেণী",
         href: "/dashboard/admin/academics/classes",
         icon: "classes",
       },
       {
-        title: "Subjects",
-        titleBn: "বিষয়সমূহ",
-        href: "/dashboard/admin/academics/subjects",
+        title: "Sections",
+        titleBn: "সেকশন",
+        href: "/dashboard/admin/academics/sections",
         icon: "classes",
       },
-      {
-        title: "Timetable",
-        titleBn: "সময়সূচি",
-        href: "/dashboard/admin/academics/timetable",
-        icon: "timetable",
-      },
-      {
-        title: "Exams",
-        titleBn: "পরীক্ষা",
-        href: "/dashboard/admin/academics/exams",
-        icon: "exam",
-      },
-      {
-        title: "Results",
-        titleBn: "ফলাফল",
-        href: "/dashboard/admin/academics/results",
-        icon: "reports",
-      },
+      // {
+      //   title: "Subjects",
+      //   titleBn: "বিষয়সমূহ",
+      //   href: "/dashboard/admin/academics/subjects",
+      //   icon: "classes",
+      // },
     ],
   },
 
@@ -199,6 +211,13 @@ const superAdminNav: NavItem[] = [
         titleBn: "ফি ড্যাশবোর্ড",
         href: "/dashboard/admin/fees",
         icon: "fees",
+      },
+      {
+        title: "Generate Invoices",
+        titleBn: "ইনভয়েস জেনারেট",
+        href: "/dashboard/admin/fees/generate",
+        icon: "fees",
+        dividerBefore: true,
       },
       {
         title: "Collect Fee",
@@ -287,7 +306,7 @@ const superAdminNav: NavItem[] = [
       {
         title: "Rooms",
         titleBn: "কক্ষ ব্যবস্থাপনা",
-        href: "/dashboard/admin/boarding/rooms",
+        href: "/dashboard/admin/hall/rooms",
         icon: "boarding",
       },
       {
@@ -295,6 +314,12 @@ const superAdminNav: NavItem[] = [
         titleBn: "আবাসিক শিক্ষার্থী",
         href: "/dashboard/admin/boarding/students",
         icon: "students",
+      },
+      {
+        title: "Boarding Types",
+        titleBn: "বোর্ডিং ধরন",
+        href: "/dashboard/admin/boarding/types",
+        icon: "settings",
       },
     ],
   },
@@ -443,12 +468,7 @@ const superAdminNav: NavItem[] = [
         href: "/dashboard/admin/settings",
         icon: "settings",
       },
-      {
-        title: "Academic Settings",
-        titleBn: "একাডেমিক সেটিংস",
-        href: "/dashboard/admin/settings/academic",
-        icon: "classes",
-      },
+
       {
         title: "User Management",
         titleBn: "ব্যবহারকারী",
@@ -480,18 +500,6 @@ const superAdminNav: NavItem[] = [
         titleBn: "ব্যাকআপ",
         href: "/dashboard/admin/settings/backup",
         icon: "tools",
-      },
-      {
-        title: "Designations",
-        titleBn: "পদবী / পদমর্যাদা",
-        href: "/dashboard/admin/settings/designations",
-        icon: "designations",
-      },
-      {
-        title: "Terms & Conditions",
-        titleBn: "নিয়ম ও শর্তাবলী",
-        href: "/dashboard/admin/settings/terms",
-        icon: "terms",
       },
     ],
   },
@@ -527,6 +535,8 @@ const adminNav: NavItem[] = [
       { title: "All Staff",  titleBn: "সকল কর্মচারী", href: "/dashboard/admin/staff",     icon: "staff"    },
       { title: "Leave",      titleBn: "ছুটি",          href: "/dashboard/admin/leave",     icon: "leave"    },
       { title: "Policies",   titleBn: "নীতিমালা",      href: "/dashboard/admin/staff/policies", icon: "policies" },
+      { title: "Designations", titleBn: "পদবী / পদমর্যাদা", href: "/dashboard/admin/settings/designations", icon: "designations" },
+      { title: "Terms & Conditions", titleBn: "নিয়ম ও শর্তাবলী", href: "/dashboard/admin/settings/terms", icon: "terms" },
     ],
   },
   {
@@ -556,6 +566,55 @@ const adminNav: NavItem[] = [
     titleBn: "নোটিশ বোর্ড",
     href: "/dashboard/admin/notices",
     icon: "notices",
+  },
+  // ── অর্থ ব্যবস্থাপনা ──────────────────────────────────
+  {
+    title: "Fees",
+    titleBn: "ফি ব্যবস্থাপনা",
+    href: "/dashboard/admin/fees",
+    icon: "fees",
+    dividerBefore: true,
+    items: [
+      { title: "Fee Dashboard", titleBn: "ফি ড্যাশবোর্ড", href: "/dashboard/admin/fees",          icon: "fees"    },
+      { title: "Collect Fee",   titleBn: "ফি সংগ্রহ",     href: "/dashboard/admin/fees/collect",  icon: "fees"    },
+      { title: "Due Fees",      titleBn: "বকেয়া ফি",      href: "/dashboard/admin/fees/due",      icon: "fees", badge: "!", badgeVariant: "destructive" },
+      { title: "Fee History",   titleBn: "ফি ইতিহাস",     href: "/dashboard/admin/fees/history",  icon: "reports" },
+      { title: "Receipts",      titleBn: "রশিদ প্রিন্ট",    href: "/dashboard/admin/receipts",      icon: "receipt" },
+      { title: "Generate Invoices", titleBn: "ইনভয়েস জেনারেট", href: "/dashboard/admin/fees/generate", icon: "fees", dividerBefore: true },
+    ],
+  },
+  {
+    title: "Boarding",
+    titleBn: "আবাসন",
+    href: "/dashboard/admin/boarding",
+    icon: "boarding",
+    dividerBefore: true,
+    items: [
+      {
+        title: "Overview",
+        titleBn: "সারসংক্ষেপ",
+        href: "/dashboard/admin/boarding",
+        icon: "boarding",
+      },
+      {
+        title: "Rooms",
+        titleBn: "কক্ষ ব্যবস্থাপনা",
+        href: "/dashboard/admin/hall/rooms",
+        icon: "boarding",
+      },
+      {
+        title: "Boarding Students",
+        titleBn: "আবাসিক শিক্ষার্থী",
+        href: "/dashboard/admin/boarding/students",
+        icon: "students",
+      },
+      {
+        title: "Boarding Types",
+        titleBn: "বোর্ডিং ধরন",
+        href: "/dashboard/admin/boarding/types",
+        icon: "settings",
+      },
+    ],
   },
   {
     title: "Messages",
@@ -621,6 +680,7 @@ const managerNav: NavItem[] = [
     items: [
       { title: "Collect Fee",  titleBn: "ফি সংগ্রহ",   href: "/dashboard/manager/fees/collect",  icon: "fees"    },
       { title: "Due Fees",     titleBn: "বকেয়া ফি",    href: "/dashboard/manager/fees/due",      icon: "fees", badge: "!", badgeVariant: "destructive" as const },
+      { title: "Generate Invoices", titleBn: "ইনভয়েস জেনারেট", href: "/dashboard/admin/fees/generate", icon: "fees", dividerBefore: true },
       { title: "Fee History",  titleBn: "ফি ইতিহাস",   href: "/dashboard/manager/fees/history",  icon: "reports" },
       { title: "Receipts",     titleBn: "রশিদ",         href: "/dashboard/manager/receipts",      icon: "receipt" },
     ],

@@ -28,7 +28,6 @@ export const metadata: Metadata = {
       },
     ],
     locale: 'bn_BD',
-    alternateLocales: ['en_US'],
     type: 'website',
   },
   twitter: {

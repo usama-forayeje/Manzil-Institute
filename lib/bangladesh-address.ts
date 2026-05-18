@@ -117,7 +117,7 @@ for (const div of divisions) {
 
 for (const dist of districts) {
   const districtThanas = thanas.filter(t => t.district_id === dist.id);
-  THANAS_BY_DISTRICT[dist.name_en] = districtThanas.map(t => t.name_en);
+  THANAS_BY_DISTRICT[dist.name_en] = districtThanas.map(t => t?.name_en);
   // Fix: Add Bengali keys for both English and Bengali district names
   THANAS_BY_DISTRICT_BN[dist.name_en] = districtThanas.map(t => t.name_bn);
   THANAS_BY_DISTRICT_BN[dist.name_bn] = districtThanas.map(t => t.name_bn);

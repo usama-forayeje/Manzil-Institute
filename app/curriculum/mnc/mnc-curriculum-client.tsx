@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { ClientHeader } from '@/components/header';
-import LoadingSkeleton from '@/components/LoadingSkeleton';
+import { ClientHeader } from '@/components/layout/header';
+import LoadingSkeleton from '@/components/core/LoadingSkeleton';
 import { Suspense } from 'react';
 import {
   BookOpen,
@@ -19,7 +19,7 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { useMNCCurriculum } from '@/hooks/useData';
-import { useLanguageStore } from '@/lib/store';
+import { useLanguageStore } from '@/store/language';
 import { AnimatedGroup } from '@/components/ui/animated-group';
 
 import { MNCCurriculumData, Language } from '@/types/api';

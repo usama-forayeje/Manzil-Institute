@@ -32,9 +32,9 @@ import { cn, convertEnglishToBengali } from '@/lib/utils';
 
 // Reusable Components
 import { FeatureHeader } from '@/components/dashboard/shared/FeatureHeader';
-import { FeatureStats } from '@/components/dashboard/shared/FeatureStats';
 import { FeatureTable } from '@/components/dashboard/shared/FeatureTable';
 import { useSections } from '@/features/academic/hooks/use-sections';
+import { StatsCard } from '@/features/fees/components/StatsCard';
 
 export default function SectionsPage() {
   const {
@@ -140,12 +140,6 @@ export default function SectionsPage() {
     getFilteredRowModel: getFilteredRowModel(),
   });
 
-  const stats = [
-    { label: 'মোট শাখা', value: sections.length, icon: Layers, color: 'text-blue-600', bg: 'bg-blue-50 dark:bg-blue-500/10', isBn: true },
-    { label: 'সক্রিয় শাখা', value: sections.filter(s => s.isActive).length, icon: Check, color: 'text-cyan-600', bg: 'bg-cyan-50 dark:bg-cyan-500/10', isBn: true },
-    { label: 'সড় ধারণক্ষমতা', value: sections.reduce((acc, s) => acc + (s.capacity || 0), 0), icon: Users, color: 'text-indigo-600', bg: 'bg-indigo-50 dark:bg-indigo-500/10', isBn: true },
-  ];
-
   return (
     <div className="space-y-6 animate-in fade-in duration-500 max-w-6xl mx-auto py-6">
       <FeatureHeader 
@@ -159,7 +153,35 @@ export default function SectionsPage() {
         searchPlaceholder="শাখা খুঁজুন..."
       />
 
-      <FeatureStats stats={stats} />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <StatsCard 
+          title="মোট শাখা" 
+          value={sections.length} 
+          footerText="সিস্টেম শাখা/গ্রুপ" 
+          icon={Layers} 
+          color="blue" 
+          isLoading={isLoading} 
+          prefix=""
+        />
+        <StatsCard 
+          title="সক্রিয় শাখা" 
+          value={sections.filter(s => s.isActive).length} 
+          footerText="সচল শাখাসমূহ" 
+          icon={Check} 
+          color="emerald" 
+          isLoading={isLoading} 
+          prefix=""
+        />
+        <StatsCard 
+          title="মোট ধারণক্ষমতা" 
+          value={sections.reduce((acc, s) => acc + (s.capacity || 0), 0)} 
+          footerText="সর্বমোট আসন সংখ্যা" 
+          icon={Users} 
+          color="indigo" 
+          isLoading={isLoading} 
+          prefix=""
+        />
+      </div>
 
       <FeatureTable 
         table={table}
@@ -225,7 +247,7 @@ export default function SectionsPage() {
             <div className="flex items-center justify-between p-4 bg-zinc-50/50 dark:bg-zinc-800/30 rounded-md border border-zinc-100 dark:border-zinc-800">
                <div className="space-y-0.5">
                  <p className="text-xs font-black uppercase tracking-tight">Active Status</p>
-                 <p className="text-[9px] text-zinc-400 font-bold uppercase italic italic">সক্রিয় স্ট্যাটাস</p>
+                 <p className="text-[9px] text-zinc-400 font-bold uppercase italic">সক্রিয় স্ট্যাটাস</p>
                </div>
                <Switch checked={formData.isActive} onCheckedChange={c => setFormData(p => ({ ...p, isActive: c }))} className="scale-90 data-[state=checked]:bg-[#00AEEF]" />
             </div>

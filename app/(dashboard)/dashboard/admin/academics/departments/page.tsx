@@ -2,7 +2,6 @@
 
 import React, { useMemo } from 'react';
 import { 
-  flexRender,
   getCoreRowModel,
   useReactTable,
   getFilteredRowModel,
@@ -34,9 +33,9 @@ import { cn } from '@/lib/utils';
 
 // Reusable Components
 import { FeatureHeader } from '@/components/dashboard/shared/FeatureHeader';
-import { FeatureStats } from '@/components/dashboard/shared/FeatureStats';
 import { FeatureTable } from '@/components/dashboard/shared/FeatureTable';
 import { useDepartments } from '@/features/academic/hooks/use-departments';
+import { StatsCard } from '@/features/fees/components/StatsCard';
 
 export default function DepartmentsPage() {
   const {
@@ -133,12 +132,6 @@ export default function DepartmentsPage() {
     getFilteredRowModel: getFilteredRowModel(),
   });
 
-  const stats = [
-    { label: 'মোট বিভাগ', value: departments.length, icon: Building, color: 'text-blue-600', bg: 'bg-blue-50 dark:bg-blue-500/10', isBn: true },
-    { label: 'সক্রিয় বিভাগ', value: departments.filter(d => d.isActive).length, icon: Check, color: 'text-cyan-600', bg: 'bg-cyan-50 dark:bg-cyan-500/10', isBn: true },
-    { label: 'সিস্টেম মড্যুল', value: 'একাডেমিক', icon: LayoutGrid, color: 'text-indigo-600', bg: 'bg-indigo-50 dark:bg-indigo-500/10' },
-  ];
-
   return (
     <div className="space-y-6 animate-in fade-in duration-500 max-w-6xl mx-auto py-6">
       <FeatureHeader 
@@ -152,7 +145,35 @@ export default function DepartmentsPage() {
         searchPlaceholder="বিভাগ খুঁজুন..."
       />
 
-      <FeatureStats stats={stats} />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <StatsCard 
+          title="মোট বিভাগ" 
+          value={departments.length} 
+          footerText="সিস্টেম বিভাগ" 
+          icon={Building} 
+          color="blue" 
+          isLoading={isLoading} 
+          prefix=""
+        />
+        <StatsCard 
+          title="সক্রিয় বিভাগ" 
+          value={departments.filter(d => d.isActive).length} 
+          footerText="সক্রিয় ও সচল" 
+          icon={Check} 
+          color="emerald" 
+          isLoading={isLoading} 
+          prefix=""
+        />
+        <StatsCard 
+          title="সিস্টেম মড্যুল" 
+          value="একাডেমিক" 
+          footerText="কোর মড্যুল" 
+          icon={LayoutGrid} 
+          color="indigo" 
+          isLoading={false} 
+          prefix=""
+        />
+      </div>
 
       <FeatureTable 
         table={table}

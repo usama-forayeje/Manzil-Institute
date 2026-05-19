@@ -153,7 +153,13 @@ export default function ReceiptsPage() {
   const payments = useMemo(() => data?.pages.flatMap(page => page.payments || []) || [], [data]);
 
   const handlePrint = async (paymentId: string) => {
+    // To avoid popup blocking, some browsers require window.open to be 
+    // called directly as a result of a user action. 
+    // However, we need to fetch data first.
+    // Approach: Show a loading toast and use a small timeout or 
+    // ensure the print loop is clean.
     setIsPrinting(paymentId);
+    
     try {
       const result = await generateReceiptData(paymentId);
       if (result.success && result.receipt) {
@@ -161,14 +167,58 @@ export default function ReceiptsPage() {
         // Wait for template to render
         setTimeout(() => {
           if (!receiptRef.current) return;
-          printElement(receiptRef.current, `রসিদ - ${result.receipt?.receiptNo}`);
+          
+          // Use a more reliable printing method for production
+          const printContent = receiptRef.current.innerHTML;
+          const printWindow = window.open('', '_blank');
+          
+          if (!printWindow) {
+            toast.error('পপআপ ব্লক করা আছে! অনুগ্রহ করে পপআপ অনুমতি দিন।');
+            setIsPrinting(null);
+            return;
+          }
+
+          const styleLinks = Array.from(document.querySelectorAll('link[rel="stylesheet"]'))
+            .map((lnk) => lnk.outerHTML).join('\n');
+          const styleTags = Array.from(document.querySelectorAll('style'))
+            .map((s) => s.outerHTML).join('\n');
+
+          printWindow.document.write(`
+            <html>
+              <head>
+                <title>রসিদ - ${result.receipt?.receiptNo}</title>
+                ${styleLinks}
+                ${styleTags}
+                <style>
+                  @media print {
+                    body { margin: 0; padding: 0; }
+                    @page { margin: 0; size: auto; }
+                  }
+                  #print-wrapper { width: 100%; }
+                </style>
+              </head>
+              <body>
+                <div id="print-wrapper">${printContent}</div>
+                <script>
+                  window.onload = function() {
+                    setTimeout(function() {
+                      window.print();
+                      window.close();
+                    }, 500);
+                  };
+                </script>
+              </body>
+            </html>
+          `);
+          printWindow.document.close();
           setIsPrinting(null);
-        }, 400);
+        }, 300);
       } else {
         toast.error('রসিদ ডাটা পাওয়া যায়নি');
         setIsPrinting(null);
       }
     } catch (err: any) {
+      console.error('Print error:', err);
       toast.error('রসিদ জেনারেট করতে সমস্যা হয়েছে');
       setIsPrinting(null);
     }

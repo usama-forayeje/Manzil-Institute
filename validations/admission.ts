@@ -201,21 +201,21 @@ export const contactAddressBaseSchema = z.object({
       .string()
       .min(1, 'অভিভাবকের ফোন নম্বর দিতে হবে')
       .transform(val => convertPhoneToEnglish(val))
-      .refine(val => /^(\+880|880|0)1[3-9]\d{8}$/.test(val), {
-        message: 'সঠিক বাংলাদেশী মোবাইল নম্বর দিন (যেমন: 01712345678)',
+      .refine(val => /^\+?[0-9]{8,15}$/.test(val), {
+        message: 'সঠিক ফোন নম্বর দিন (যেমন: 01712345678)',
       }),
     phonePrimary: z
       .string()
       .optional()
       .transform(val => (val ? convertPhoneToEnglish(val) : undefined))
-      .refine(val => !val || /^((\+880|880|0)1[3-9]\d{8})$/.test(val), {
-        message: 'সঠিক বাংলাদেশী মোবাইল নম্বর দিন',
+      .refine(val => !val || /^\+?[0-9]{8,15}$/.test(val), {
+        message: 'সঠিক ফোন নম্বর দিন',
       }),
     whatsappNo: z
       .string()
       .optional()
       .transform(val => (val ? convertPhoneToEnglish(val) : undefined))
-      .refine(val => !val || /^((\+880|880|0)1[3-9]\d{8})$/.test(val), {
+      .refine(val => !val || /^\+?[0-9]{8,15}$/.test(val), {
         message: 'সঠিক WhatsApp নম্বর দিন',
       }),
     email: z

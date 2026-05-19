@@ -124,15 +124,17 @@ export async function getMonthlyFee(departmentId: string, boardingType: string, 
 
     // 4. Filter by department (match ID or Code)
     const deptFees = monthlyFees.filter(f => {
-      if (!f.applicableDepartments || f.applicableDepartments.length === 0) return true;
-      return f.applicableDepartments.includes(departmentId) || f.applicableDepartments.includes(deptCode);
+      const deptList = f.departmentIds || f.applicableDepartments || [];
+      if (deptList.length === 0) return true;
+      return deptList.includes(departmentId) || deptList.includes(deptCode);
     });
     console.log(`[Fee Sync] Matches Dept ${deptCode}: ${deptFees.length}`);
 
     // 5. Filter by boarding type
     const matchedFee = deptFees.find((f) => {
-      if (f.applicableBoardingTypes && f.applicableBoardingTypes.length > 0) {
-        return f.applicableBoardingTypes.includes(boardingType);
+      const boardList = f.boardingTypes || f.applicableBoardingTypes || [];
+      if (boardList.length > 0) {
+        return boardList.includes(boardingType);
       }
       return true;
     });
@@ -182,11 +184,11 @@ export async function getNextStudentId() {
          const lastNum = parseInt(parts[parts.length - 1] ?? '0', 10);
          const next = lastNum + 1;
          const year = new Date().getFullYear();
-         return `MNC-${year}-${String(next).padStart(4, '0')}`;
+         return `MI-${year}-${String(next).padStart(4, '0')}`;
       }
   } catch (err) {}
   
   const year = new Date().getFullYear();
-  return `MNC-${year}-0001`;
+  return `MI-${year}-0001`;
 }
 

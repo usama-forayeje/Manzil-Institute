@@ -10,13 +10,16 @@ export interface FeeType {
   nameBn: string;
   code: string;
   category: 'monthly' | 'admission' | 'session' | 'other';
+  billingCycle: 'monthly' | 'one-time' | 'yearly';
+  applicableTo: 'student' | 'staff';
   description?: string;
   defaultAmount: number;
   isActive: boolean;
   isRequired?: boolean;
   showInAdmissionForm?: boolean;
-  applicableDepartments?: string[];
-  applicableBoardingTypes?: string[];
+  departmentIds?: string[];
+  boardingTypes?: string[];
+  sortOrder?: number;
 }
 
 // ─── Fee Structure (ফি কাঠামো) ──────────────────────────────

@@ -41,6 +41,7 @@ import type { AdmissionFormValues } from '@/features/admission/schemas/form';
 export interface AdmissionResult {
   success: boolean;
   studentId: string;
+  studentDocId: string;
   admissionNo: string;
   enrollmentIds: string[];
   receiptNo: string;
@@ -231,12 +232,12 @@ export async function createAdmission(
 
     for (const col of requiredCollections) {
       if (!col.id || col.id === '') {
-        return { success: false, studentId: '', admissionNo: '', enrollmentIds: [], receiptNo: '', error: `Configuration error: Collection ID for ${col.name} is missing in .env` };
+        return { success: false, studentId: '', studentDocId: '', admissionNo: '', enrollmentIds: [], receiptNo: '', error: `Configuration error: Collection ID for ${col.name} is missing in .env` };
       }
     }
 
     if (!DATABASE_ID) {
-      return { success: false, studentId: '', admissionNo: '', enrollmentIds: [], receiptNo: '', error: 'Configuration error: DATABASE_ID is missing in .env' };
+      return { success: false, studentId: '', studentDocId: '', admissionNo: '', enrollmentIds: [], receiptNo: '', error: 'Configuration error: DATABASE_ID is missing in .env' };
     }
 
     // ── 2. Create Student Folder Name ───────────────────────
@@ -540,6 +541,7 @@ export async function createAdmission(
     return {
       success: true,
       studentId,
+      studentDocId,
       admissionNo,
       enrollmentIds,
       receiptNo,
@@ -572,6 +574,7 @@ export async function createAdmission(
     return {
       success: false,
       studentId: '',
+      studentDocId: '',
       admissionNo: '',
       enrollmentIds: [],
       receiptNo: '',
@@ -682,13 +685,35 @@ export async function getAdmissionFees(
   try {
     const { databases } = await createAdminClient();
     
-    // Fetch all active fee types
+    // 1. Resolve Department ID to Code if necessary
+    let deptCode = departmentIdOrCode;
+    try {
+      if (departmentIdOrCode && departmentIdOrCode.length > 10) { // Likely an Appwrite ID
+        const dept = await databases.getDocument(DATABASE_ID, COLLECTIONS.DEPARTMENTS, departmentIdOrCode);
+        if (dept && dept.code) deptCode = dept.code;
+      }
+    } catch (e) {
+      // Keep original value if not found
+    }
+
+    // 2. Resolve Boarding Type ID to Name/Code if necessary
+    let boardValue = boardingTypeIdOrName;
+    try {
+      if (boardingTypeIdOrName && boardingTypeIdOrName.length > 10) { // Likely an Appwrite ID
+        const board = await databases.getDocument(DATABASE_ID, COLLECTIONS.BOARDING_TYPES, boardingTypeIdOrName);
+        if (board) boardValue = board.name || board.$id;
+      }
+    } catch (e) {
+      // Keep original value
+    }
+
+    // 3. Fetch all active fee types
     const response = await databases.listDocuments({
       databaseId: DATABASE_ID,
       collectionId: COLLECTIONS.FEE_TYPES,
       queries: [
         Query.equal('isActive', true),
-        Query.orderAsc('code'),
+        Query.limit(100),
       ],
     });
 
@@ -696,24 +721,39 @@ export async function getAdmissionFees(
 
     const fees: FeeItemData[] = allFeeTypes
       .filter((ft) => {
-        // 1. Basic visibility check
+        // Basic visibility check
         if (!ft.isActive) return false;
-        if (ft.category !== 'admission' && !ft.showInAdmissionForm && ft.category !== 'monthly') return false;
+        
+        // Match only admission or monthly or flagged for admission form
+        const isCorrectCategory = 
+          ft.category === 'admission' || 
+          ft.feeCategory === 'admission' || 
+          ft.showInAdmissionForm === true || 
+          ft.category === 'monthly' || 
+          ft.feeCategory === 'monthly';
+          
+        if (!isCorrectCategory) return false;
 
-        // 2. Department Filter
-        const deptList = ft.departmentIds || ft.applicableDepartments || [];
+        // 4. Department Filter (Matches against ID or Code)
+        const deptList = ft.departmentIds || [];
         if (deptList.length > 0) {
           const matchesDept = deptList.some((d: string) => 
-            d === departmentIdOrCode || d.toLowerCase() === departmentIdOrCode.toLowerCase()
+            d === departmentIdOrCode || 
+            d.toLowerCase() === departmentIdOrCode.toLowerCase() ||
+            d === deptCode || 
+            d.toLowerCase() === deptCode.toLowerCase()
           );
           if (!matchesDept) return false;
         }
 
-        // 3. Boarding Type Filter
-        const boardList = ft.boardingTypes || ft.applicableBoardingTypes || [];
+        // 5. Boarding Type Filter (Matches against ID or Name)
+        const boardList = ft.boardingTypes || [];
         if (boardList.length > 0) {
           const matchesBoard = boardList.some((b: string) => 
-            b === boardingTypeIdOrName || b.toLowerCase() === boardingTypeIdOrName.toLowerCase()
+            b === boardingTypeIdOrName || 
+            b.toLowerCase() === boardingTypeIdOrName.toLowerCase() ||
+            b === boardValue ||
+            b.toLowerCase() === boardValue.toLowerCase()
           );
           if (!matchesBoard) return false;
         }
@@ -721,15 +761,16 @@ export async function getAdmissionFees(
         return true;
       })
       .map((ft) => ({
-        feeTypeCode: ft.code || ft.feeCode || ft.$id,
-        feeTypeName: ft.nameBn || ft.feeNameBn || ft.name || ft.feeName,
+        feeTypeCode: ft.code || ft.$id,
+        feeTypeName: ft.nameBn || ft.name,
         amount: ft.defaultAmount || 0,
         originalAmount: ft.defaultAmount || 0,
         isRequired: ft.isRequired ?? true,
         isIncluded: ft.isRequired ?? true,
         isEdited: false,
-        departmentCode: departmentIdOrCode,
+        departmentCode: deptCode,
         discount: 0,
+        billingCycle: ft.billingCycle || 'one-time',
       }));
 
     return { success: true, fees };
@@ -1119,6 +1160,7 @@ export async function getAdmissionFullDetails(idOrBusId: string) {
       success: true,
       data: {
         student: JSON.parse(JSON.stringify(student)),
+        studentDocId: student.$id,
         enrollments: JSON.parse(JSON.stringify(enrollmentDocs)),
         invoice: invoice ? JSON.parse(JSON.stringify(invoice)) : null,
         payment: payment ? JSON.parse(JSON.stringify(payment)) : null,

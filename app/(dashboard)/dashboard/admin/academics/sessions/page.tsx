@@ -36,6 +36,7 @@ import { cn } from '@/lib/utils';
 import { FeatureHeader } from '@/components/dashboard/shared/FeatureHeader';
 import { FeatureTable } from '@/components/dashboard/shared/FeatureTable';
 import { useSessions } from '@/features/academic/hooks/use-sessions';
+import { DatePicker } from '@/components/ui/DatePicker';
 
 export default function SessionsPage() {
   const {
@@ -180,10 +181,10 @@ export default function SessionsPage() {
       />
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-md kalpurush-font p-0 overflow-hidden rounded-md border-0 flex flex-col shadow-2xl bg-white dark:bg-zinc-900">
-          <DialogHeader className="p-8 bg-zinc-50/50 dark:bg-zinc-800/20 border-b border-zinc-100 dark:border-zinc-800/50">
+        <DialogContent className="max-w-3xl kalpurush-font p-0 overflow-hidden rounded-xl border-0 flex flex-col shadow-2xl bg-white dark:bg-zinc-900">
+          <DialogHeader className="p-6 md:p-8 bg-zinc-50/50 dark:bg-zinc-800/20 border-b border-zinc-100 dark:border-zinc-800/50">
             <div className="flex items-center gap-5">
-              <div className="h-12 w-12 rounded-md bg-[#00AEEF]/10 flex items-center justify-center border border-[#00AEEF]/20">
+              <div className="h-12 w-12 rounded-xl bg-[#00AEEF]/10 flex items-center justify-center border border-[#00AEEF]/20">
                 <Calendar className="h-6 w-6 text-[#00AEEF]" />
               </div>
               <div>
@@ -193,52 +194,52 @@ export default function SessionsPage() {
             </div>
           </DialogHeader>
 
-          <div className="p-8 space-y-6">
-            <div className="space-y-2">
-              <Label className="text-[10px] font-black uppercase tracking-[0.1em] text-zinc-400 pl-1">শিক্ষাবর্ষের নাম (যেমন: 2026-2027)</Label>
-              <Input 
-                placeholder="2026-2027" 
-                value={formData.sessionName}
-                onChange={e => setFormData(p => ({ ...p, sessionName: e.target.value }))}
-                className="h-12 rounded-md bg-zinc-50 dark:bg-zinc-800/50 border-transparent font-black text-base"
-              />
-            </div>
+          <div className="p-6 md:p-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              
+              <div className="space-y-2 md:col-span-2">
+                <Label className="text-[10px] font-black uppercase tracking-[0.1em] text-zinc-400 pl-1">শিক্ষাবর্ষের নাম (যেমন: 2026-2027)</Label>
+                <Input 
+                  placeholder="2026-2027" 
+                  value={formData.sessionName}
+                  onChange={e => setFormData(p => ({ ...p, sessionName: e.target.value }))}
+                  className="h-12 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 border-transparent focus:ring-[#00AEEF] focus:border-[#00AEEF]/20 font-black text-base"
+                />
+              </div>
 
-            <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label className="text-[10px] font-black uppercase tracking-[0.1em] text-zinc-400 pl-1">শুরুর তারিখ</Label>
-                <Input 
-                  type="date"
-                  value={formData.startDate}
-                  onChange={e => setFormData(p => ({ ...p, startDate: e.target.value }))}
-                  className="h-12 rounded-md font-mono"
+                <DatePicker 
+                  date={formData.startDate ? new Date(formData.startDate) : undefined}
+                  setDate={(date) => setFormData(p => ({ ...p, startDate: date ? format(date, 'yyyy-MM-dd') : '' }))}
+                  placeholder="শুরুর তারিখ..."
                 />
               </div>
               <div className="space-y-2">
                 <Label className="text-[10px] font-black uppercase tracking-[0.1em] text-zinc-400 pl-1">শেষ তারিখ</Label>
-                <Input 
-                  type="date"
-                  value={formData.endDate}
-                  onChange={e => setFormData(p => ({ ...p, endDate: e.target.value }))}
-                  className="h-12 rounded-md font-mono"
+                <DatePicker 
+                  date={formData.endDate ? new Date(formData.endDate) : undefined}
+                  setDate={(date) => setFormData(p => ({ ...p, endDate: date ? format(date, 'yyyy-MM-dd') : '' }))}
+                  placeholder="শেষের তারিখ..."
                 />
               </div>
-            </div>
 
-            <div className="flex items-center justify-between p-4 bg-cyan-50/50 dark:bg-cyan-900/10 rounded-md border border-cyan-100/50 dark:border-cyan-500/10">
-               <div className="space-y-0.5">
-                 <p className="text-xs font-black uppercase tracking-tight text-[#00AEEF]">Set Current Session</p>
-                 <p className="text-[9px] text-zinc-400 font-bold uppercase italic">বর্তমান শিক্ষাবর্ষ হিসেবে সেভ করুন</p>
-               </div>
-               <Switch checked={formData.isCurrent} onCheckedChange={c => setFormData(p => ({ ...p, isCurrent: c }))} className="scale-90 data-[state=checked]:bg-[#00AEEF]" />
-            </div>
+              <div className="flex items-center justify-between p-4 bg-cyan-50/50 dark:bg-cyan-900/10 rounded-xl border border-cyan-100/50 dark:border-cyan-500/10 transition-colors hover:bg-cyan-50/80 mt-2">
+                 <div className="space-y-0.5">
+                   <p className="text-xs font-black uppercase tracking-tight text-[#00AEEF]">Set Current Session</p>
+                   <p className="text-[9px] text-zinc-400 font-bold uppercase italic">বর্তমান শিক্ষাবর্ষ হিসেবে সেভ করুন</p>
+                 </div>
+                 <Switch checked={formData.isCurrent} onCheckedChange={c => setFormData(p => ({ ...p, isCurrent: c }))} className="scale-90 data-[state=checked]:bg-[#00AEEF]" />
+              </div>
 
-            <div className="flex items-center justify-between p-4 bg-zinc-50/50 dark:bg-zinc-800/30 rounded-md border border-zinc-100 dark:border-zinc-800">
-               <div className="space-y-0.5">
-                 <p className="text-xs font-black uppercase tracking-tight">Active Status</p>
-                 <p className="text-[9px] text-zinc-400 font-bold uppercase italic italic">সক্রিয় স্ট্যাটাস</p>
-               </div>
-               <Switch checked={formData.isActive} onCheckedChange={c => setFormData(p => ({ ...p, isActive: c }))} className="scale-90 data-[state=checked]:bg-[#00AEEF]" />
+              <div className="flex items-center justify-between p-4 bg-zinc-50/50 dark:bg-zinc-800/30 rounded-xl border border-zinc-100 dark:border-zinc-800 transition-colors hover:bg-zinc-50 mt-2">
+                 <div className="space-y-0.5">
+                   <p className="text-xs font-black uppercase tracking-tight">Active Status</p>
+                   <p className="text-[9px] text-zinc-400 font-bold uppercase italic italic">সক্রিয় স্ট্যাটাস</p>
+                 </div>
+                 <Switch checked={formData.isActive} onCheckedChange={c => setFormData(p => ({ ...p, isActive: c }))} className="scale-90 data-[state=checked]:bg-[#00AEEF]" />
+              </div>
+
             </div>
           </div>
 

@@ -29,6 +29,7 @@ export interface Thana {
   district_id: string;
   name: string;
   name_bn: string;
+  name_en?: string;
 }
 
 interface GeoDivision {
@@ -59,6 +60,90 @@ interface GeoUnion {
   name: string;
   bn_name: string;
 }
+
+// ── Dhaka Metro Data ───────────────────────────────────────────────────────
+
+export const DHAKA_METRO_DISTRICTS_BN: Record<
+  string,
+  { thanas: string[]; wards: number[] }
+> = {
+  'ঢাকা উত্তর': {
+    thanas: [
+      'উত্তরা মডেল',
+      'উত্তরা পশ্চিম',
+      'উত্তরা পূর্ব',
+      'উত্তরখান',
+      'দক্ষিণখান',
+      'তুরাগ',
+      'বিমানবন্দর',
+      'খিলক্ষেত',
+      'গুলশান',
+      'বনানী',
+      'ভাটারা',
+      'বাড্ডা',
+      'রামপুরা',
+      'তেজগাঁও',
+      'তেজগাঁও শিল্পাঞ্চল',
+      'হাতিরঝিল',
+      'মোহাম্মদপুর',
+      'আদাবর',
+      'শেরেবাংলা নগর',
+      'মিরপুর মডেল',
+      'পল্লবী',
+      'কাফরুল',
+      'ভাসানটেক',
+      'রূপনগর',
+      'দারুস সালাম',
+      'শাহআলী',
+      'ক্যান্টনমেন্ট',
+    ],
+    wards: Array.from({ length: 54 }, (_, i) => i + 1),
+  },
+  'ঢাকা দক্ষিণ': {
+    thanas: [
+      'হাজারীবাগ',
+      'ধানমন্ডি',
+      'নিউমার্কেট',
+      'কলাবাগান',
+      'শাহবাগ',
+      'রমনা',
+      'পল্টন',
+      'মতিঝিল',
+      'সবুজবাগ',
+      'খিলগাঁও',
+      'মুগদা',
+      'যাত্রাবাড়ী',
+      'সূত্রাপুর',
+      'কোতোয়ালী',
+      'বংশাল',
+      'চকবাজার',
+      'লালবাগ',
+      'কামরাঙ্গীরচর',
+      'গেণ্ডারিয়া',
+      'ওয়ারী',
+      'শ্যামপুর',
+      'কদমতলী',
+      'ডেমরা'
+    ],
+    wards: Array.from({ length: 75 }, (_, i) => i + 1),
+  },
+};
+
+export function isDhakaMetroDistrict(districtName: string): boolean {
+  return districtName === 'ঢাকা উত্তর' || districtName === 'ঢাকা দক্ষিণ';
+}
+
+export function isDhakaMetroThana(thanaName: string): boolean {
+  return Object.values(DHAKA_METRO_DISTRICTS_BN).some(d =>
+    d.thanas.includes(thanaName)
+  );
+}
+
+export function getWardsForDhakaMetro(districtName: string): number[] {
+  return (DHAKA_METRO_DISTRICTS_BN as any)[districtName]?.wards || [];
+}
+
+// ── Data Loading & Mapping ──────────────────────────────────────────────────
 
 const divisions: Division[] = geoData.divisions.map((d: GeoDivision) => ({
   id: d.id,
@@ -96,49 +181,66 @@ export const DISTRICTS: District[] = districts;
 export const THANAS: Thana[] = thanas;
 export const UNIONS: Union[] = unions;
 
-export const DIVISIONS_LIST: string[] = divisions.map(d => d.name_en);
 export const DIVISIONS_LIST_BN: string[] = divisions.map(d => d.name_bn);
 
-export const DISTRICTS_BY_DIVISION: Record<string, string[]> = {};
 export const DISTRICTS_BY_DIVISION_BN: Record<string, string[]> = {};
-export const THANAS_BY_DISTRICT: Record<string, string[]> = {};
 export const THANAS_BY_DISTRICT_BN: Record<string, string[]> = {};
-export const UNIONS_BY_UPAZILA: Record<string, string[]> = {};
 export const UNIONS_BY_UPAZILA_BN: Record<string, string[]> = {};
 
+// 1. Divisions -> Districts
 for (const div of divisions) {
   const divDistricts = districts.filter(d => d.division_id === div.id);
-  // Use English name as key
-  DISTRICTS_BY_DIVISION[div.name_en] = divDistricts.map(d => d.name_en);
   DISTRICTS_BY_DIVISION_BN[div.name_en] = divDistricts.map(d => d.name_bn);
-  // Fix: Add Bengali name as key too (matching DIVISIONS_LIST_BN)
   DISTRICTS_BY_DIVISION_BN[div.name_bn] = divDistricts.map(d => d.name_bn);
 }
 
+// 2. Districts -> Thanas
 for (const dist of districts) {
   const districtThanas = thanas.filter(t => t.district_id === dist.id);
-  THANAS_BY_DISTRICT[dist.name_en] = districtThanas.map(t => t?.name_en);
-  // Fix: Add Bengali keys for both English and Bengali district names
   THANAS_BY_DISTRICT_BN[dist.name_en] = districtThanas.map(t => t.name_bn);
   THANAS_BY_DISTRICT_BN[dist.name_bn] = districtThanas.map(t => t.name_bn);
 }
 
+// 3. Thanas -> Unions
 for (const thana of thanas) {
   const upazilaUnions = unions.filter(u => u.upazila_id === thana.id);
-  UNIONS_BY_UPAZILA[thana.name] = upazilaUnions.map(u => u.name);
+  UNIONS_BY_UPAZILA_BN[thana.name] = upazilaUnions.map(u => u.name_bn);
   UNIONS_BY_UPAZILA_BN[thana.name_bn] = upazilaUnions.map(u => u.name_bn);
 }
 
-export function getDistrictsOfDivision(division: string): string[] {
-  return DISTRICTS_BY_DIVISION[division] || [];
+// ── Dhaka Metro Integration ────────────────────────────────────────────────
+
+const dhakaDivBN = "ঢাকা";
+if (DISTRICTS_BY_DIVISION_BN[dhakaDivBN]) {
+  if (!DISTRICTS_BY_DIVISION_BN[dhakaDivBN].includes("ঢাকা উত্তর")) {
+    DISTRICTS_BY_DIVISION_BN[dhakaDivBN] = [
+      ...DISTRICTS_BY_DIVISION_BN[dhakaDivBN],
+      "ঢাকা উত্তর",
+      "ঢাকা দক্ষিণ",
+    ];
+  }
 }
+
+// Also add to English key if it exists
+if (DISTRICTS_BY_DIVISION_BN["Dhaka"]) {
+  if (!DISTRICTS_BY_DIVISION_BN["Dhaka"].includes("ঢাকা উত্তর")) {
+    DISTRICTS_BY_DIVISION_BN["Dhaka"] = [
+      ...DISTRICTS_BY_DIVISION_BN["Dhaka"],
+      "ঢাকা উত্তর",
+      "ঢাকা দক্ষিণ",
+    ];
+  }
+}
+
+// Map Metro Thanas
+for (const [metroDist, data] of Object.entries(DHAKA_METRO_DISTRICTS_BN)) {
+  THANAS_BY_DISTRICT_BN[metroDist] = (data as any).thanas;
+}
+
+// ── Exported Helpers ────────────────────────────────────────────────────────
 
 export function getDistrictsOfDivisionBN(division: string): string[] {
   return DISTRICTS_BY_DIVISION_BN[division] || [];
-}
-
-export function getThanasOfDistrict(district: string): string[] {
-  return THANAS_BY_DISTRICT[district] || [];
 }
 
 export function getThanasOfDistrictBN(district: string): string[] {
@@ -155,73 +257,4 @@ export function getDistrictById(id: string): District | undefined {
 
 export function getThanaById(id: string): Thana | undefined {
   return thanas.find(t => t.id === id);
-}
-
-// Dhaka Metro Special Districts (DNCC & DSCC)
-// Dhaka North = Dhaka North City Corporation (DNCC)
-// Dhaka South = Dhaka South City Corporation (DSCC)
-
-export const DHAKA_METRO_DISTRICTS_BN: Record<
-  string,
-  { thanas: string[]; wards: number[] }
-> = {
-  'ঢাকা উত্তর': {
-    thanas: [
-      'উত্তরা পূর্ব',
-      'উত্তরা পশ্চিম',
-      'উত্তরখান',
-      'দক্ষিণখান',
-      'তুরাগ',
-      'মিরপুর',
-      'পল্লবী',
-      'কাফরুল',
-      'শেরেবাংলা নগর',
-      'তেজগাঁও',
-      'তেজগাঁও শিল্পাঞ্চল',
-      'গুলশান',
-      'বনানী',
-      'ভাটারা',
-      'বাড্ডা',
-      'খিলক্ষেত',
-    ],
-    wards: Array.from({ length: 54 }, (_, i) => i + 1), // 54 wards DNCC
-  },
-  'ঢাকা দক্ষিণ': {
-    thanas: [
-      'কোতোয়ালী',
-      'সূত্রাপুর',
-      'বংশাল',
-      'চকবাজার',
-      'লালবাগ',
-      'হাজারীবাগ',
-      'কামরাঙ্গীরচর',
-      'শাহবাগ',
-      'রমনা',
-      'মতিঝিল',
-      'পল্টন',
-      'ওয়ারী',
-      'যাত্রাবাড়ী',
-      'শ্যামপুর',
-      'কদমতলী',
-      'ডেমরা',
-    ],
-    wards: Array.from({ length: 75 }, (_, i) => i + 1), // 75 wards DSCC
-  },
-};
-
-// Check if a district is Dhaka Metro
-export function isDhakaMetroDistrict(districtName: string): boolean {
-  return districtName === 'ঢাকা উত্তর' || districtName === 'ঢাকা দক্ষিণ';
-}
-
-// Check if a thana belongs to Dhaka Metro
-export function isDhakaMetroThana(thanaName: string): boolean {
-  return Object.values(DHAKA_METRO_DISTRICTS_BN).some(d =>
-    d.thanas.includes(thanaName)
-  );
-}
-
-// Get wards for Dhaka Metro thana
-export function getWardsForDhakaMetro(districtName: string): number[] {
-  return DHAKA_METRO_DISTRICTS_BN[districtName]?.wards || [];
 }

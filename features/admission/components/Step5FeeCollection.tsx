@@ -273,24 +273,19 @@ export default function Step5FeeCollection({
 
   const hasFetched = useRef(false);
 
+  const enrollmentData = watch('enrollment');
+  const firstEnrollment = enrollmentData?.enrollments?.[0];
+  
+  const deptId = firstEnrollment?.departmentId || '';
+  const boardType = enrollmentData?.boardingType || '';
+  const clsId = firstEnrollment?.classId || '';
+
   // ═══════════════════════════════════════════════════════════════
   // 2. Fetch Fees
   // ═══════════════════════════════════════════════════════════════
   const fetchFees = useCallback(async () => {
-    // If feeItems was cleared (e.g. enrollment changed), reset hasFetched to allow re-fetch
-    if (feeItems.length === 0) {
-      hasFetched.current = false;
-    }
-
-    // Only fetch if not already loading and haven't fetched yet
+    // Only fetch if not already loading and haven't fetched yet for these specific values
     if (isLoadingFees || hasFetched.current) return;
-
-    const enrollmentData = form.getValues('enrollment');
-    const firstEnrollment = enrollmentData?.enrollments?.[0];
-    
-    const deptId = firstEnrollment?.departmentId || '';
-    const boardType = enrollmentData?.boardingType || '';
-    const clsId = firstEnrollment?.classId || '';
 
     // CRITICAL: If no department ID, don't fetch as it will return empty from DB
     if (!deptId) {
@@ -323,7 +318,12 @@ export default function Step5FeeCollection({
     } finally {
       setIsLoadingFees(false);
     }
-  }, [isLoadingFees, form, setValue]);
+  }, [isLoadingFees, setValue, deptId, boardType, clsId]);
+
+  // Reset hasFetched if the input parameters change significantly
+  useEffect(() => {
+    hasFetched.current = false;
+  }, [deptId, boardType, clsId]);
 
   useEffect(() => {
     fetchFees();

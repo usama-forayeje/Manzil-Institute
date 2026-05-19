@@ -86,8 +86,8 @@ export default function FeeStructureManager() {
     isActive: true,
     isRequired: true,
     showInAdmissionForm: true,
-    applicableDepartments: [] as string[],
-    applicableBoardingTypes: [] as string[]
+    departmentIds: [] as string[],
+    boardingTypes: [] as string[]
   });
 
   // Queries
@@ -152,8 +152,8 @@ export default function FeeStructureManager() {
       isActive: true,
       isRequired: true,
       showInAdmissionForm: true,
-      applicableDepartments: [],
-      applicableBoardingTypes: []
+      departmentIds: [],
+      boardingTypes: []
     });
     setIsDialogOpen(true);
   };
@@ -169,8 +169,8 @@ export default function FeeStructureManager() {
       isActive: item.isActive ?? true,
       isRequired: item.isRequired ?? true,
       showInAdmissionForm: item.showInAdmissionForm ?? true,
-      applicableDepartments: item.applicableDepartments || [],
-      applicableBoardingTypes: item.applicableBoardingTypes || []
+      departmentIds: item.departmentIds || item.applicableDepartments || [],
+      boardingTypes: item.boardingTypes || item.applicableBoardingTypes || []
     });
     setIsDialogOpen(true);
   };
@@ -185,17 +185,15 @@ export default function FeeStructureManager() {
       name: formData.name,
       nameBn: formData.nameBn,
       code: formData.code,
-      feeCode: formData.code,
-      feeName: formData.name,
-      feeNameBn: formData.nameBn,
       category: formData.category,
-      feeCategory: formData.category,
       defaultAmount: Number(formData.defaultAmount),
       isActive: formData.isActive,
       isRequired: formData.isRequired,
       showInAdmissionForm: formData.showInAdmissionForm,
-      applicableDepartments: formData.applicableDepartments,
-      applicableBoardingTypes: formData.applicableBoardingTypes
+      departmentIds: formData.departmentIds,
+      boardingTypes: formData.boardingTypes,
+      billingCycle: formData.category === 'monthly' ? 'monthly' : 'one-time',
+      applicableTo: 'student'
     };
 
     upsertMutation.mutate(payload);
@@ -206,7 +204,7 @@ export default function FeeStructureManager() {
     deleteMutation.mutate(id);
   };
 
-  const toggleSelection = (list: string[], val: string, field: 'applicableDepartments' | 'applicableBoardingTypes') => {
+  const toggleSelection = (list: string[], val: string, field: 'departmentIds' | 'boardingTypes') => {
     const newList = list.includes(val) ? list.filter(x => x !== val) : [...list, val];
     setFormData(prev => ({ ...prev, [field]: newList }));
   };
@@ -490,10 +488,10 @@ export default function FeeStructureManager() {
                    <button
                     key={d.$id}
                     type="button"
-                    onClick={() => toggleSelection(formData.applicableDepartments, d.code || d.$id, 'applicableDepartments')}
+                    onClick={() => toggleSelection(formData.departmentIds, d.code || d.$id, 'departmentIds')}
                     className={cn(
                       "px-4 py-2 rounded-md border text-[11px] font-black transition-all transform active:scale-95 shadow-sm",
-                      formData.applicableDepartments.includes(d.code || d.$id)
+                      formData.departmentIds.includes(d.code || d.$id)
                         ? "bg-[#00AEEF] border-[#00AEEF] text-white shadow-[#00AEEF]/20"
                         : "bg-white dark:bg-zinc-800 border-zinc-100 dark:border-zinc-700 text-zinc-500 hover:border-[#0081B1]/50"
                     )}
@@ -514,10 +512,10 @@ export default function FeeStructureManager() {
                    <button
                     key={b.$id}
                     type="button"
-                    onClick={() => toggleSelection(formData.applicableBoardingTypes, b.$id, 'applicableBoardingTypes')}
+                    onClick={() => toggleSelection(formData.boardingTypes, b.$id, 'boardingTypes')}
                     className={cn(
                       "px-4 py-2 rounded-md border text-[11px] font-black transition-all transform active:scale-95 shadow-sm",
-                      formData.applicableBoardingTypes.includes(b.$id)
+                      formData.boardingTypes.includes(b.$id)
                         ? "bg-indigo-600 border-indigo-600 text-white shadow-indigo-500/20"
                         : "bg-white dark:bg-zinc-800 border-zinc-100 dark:border-zinc-700 text-zinc-500 hover:border-indigo-400/50"
                     )}

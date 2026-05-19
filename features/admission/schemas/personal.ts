@@ -72,7 +72,13 @@ export const personalInfoSchema = z.object({
   // Applicant Info (Who is bringing the student)
   applicantRelation: z.enum(['', 'father', 'mother', 'brother', 'sister', 'grandfather', 'grandmother', 'uncle', 'guardian', 'other']).default(''),
   applicantName: z.string().optional(),
-  applicantPhone: z.string().optional(),
+  applicantPhone: z
+    .string()
+    .optional()
+    .transform(val => (val ? convertToEnglishDigits(val) : undefined))
+    .refine(val => !val || /^\+?[0-9]{8,15}$/.test(val), {
+      message: 'সঠিক ফোন নম্বর দিন',
+    }),
   
   // Status (for Edit Mode)
   status: z.enum(['active', 'inactive', 'graduated', 'disqualified', 'suspended', 'transferred']).optional().default('active'),

@@ -12,8 +12,11 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 
 export type AdmissionFormStep = 1 | 2 | 3 | 4 | 5 | 6;
 
+
+
 export interface Step5Data {
   studentId:     string;
+  studentDocId?: string;
   admissionNo:   string;
   enrollmentIds: string[];
   receiptNo:     string;
@@ -101,9 +104,9 @@ export const useAdmissionUIStore = create<AdmissionUIState>()(
         set((s) => ({ step5Data: { ...s.step5Data, ...data } })),
 
       reset: () => {
-        // Also clear the form draft from sessionStorage
+        // Also clear the form draft from localStorage
         if (typeof window !== 'undefined') {
-          sessionStorage.removeItem('mii-admission-draft-v2');
+          localStorage.removeItem('mii-admission-draft-v2');
         }
         set(initialState);
       },
@@ -112,7 +115,7 @@ export const useAdmissionUIStore = create<AdmissionUIState>()(
     {
       name: 'mii-admission-ui-v2',
       storage: createJSONStorage(() =>
-        typeof window !== 'undefined' ? sessionStorage : ({} as Storage)
+        typeof window !== 'undefined' ? localStorage : ({} as Storage)
       ),
       // Only persist navigation + photo (not isSubmitting)
       partialize: (s) => ({

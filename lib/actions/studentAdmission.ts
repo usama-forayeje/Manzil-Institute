@@ -93,15 +93,15 @@ async function generateSequentialId(
   const fullPrefix = `${prefix}-${year}-`;
 
   try {
-    const existing = await databases.listDocuments({
-      databaseId: DATABASE_ID,
+    const existing = await databases.listDocuments(
+      DATABASE_ID,
       collectionId,
-      queries: [
+      [
         Query.startsWith(fieldName, searchPrefix),
         Query.orderDesc('$createdAt'),
         Query.limit(1),
-      ],
-    });
+      ]
+    );
 
     let next = 1;
     if (existing.total > 0) {
@@ -280,11 +280,11 @@ export async function createAdmission(
     // ── 5. Create Student Document ──────────────────────────
     const studentDocId = ID.unique();
 
-    await databases.createDocument({
-      databaseId: DATABASE_ID,
-      collectionId: COLLECTIONS.STUDENTS,
-      documentId: studentDocId,
-      data: {
+    await databases.createDocument(
+      DATABASE_ID,
+      COLLECTIONS.STUDENTS,
+      studentDocId,
+      {
         studentId,
         admissionNo,
         status: 'active',
@@ -367,8 +367,8 @@ export async function createAdmission(
         // Meta
         admissionDate: step3.admissionDate ? new Date(step3.admissionDate).toISOString() : new Date().toISOString(),
         notes: step3.notes || '',
-      },
-    });
+      }
+    );
 
     createdDocIds.push({ collectionId: COLLECTIONS.STUDENTS, documentId: studentDocId });
 
@@ -384,11 +384,11 @@ export async function createAdmission(
         4
       );
 
-      await databases.createDocument({
-        databaseId: DATABASE_ID,
-        collectionId: COLLECTIONS.STUDENT_ENROLLMENTS,
-        documentId: ID.unique(),
-        data: {
+      await databases.createDocument(
+        DATABASE_ID,
+        COLLECTIONS.STUDENT_ENROLLMENTS,
+        ID.unique(),
+        {
           enrollmentId,
           studentId: studentDocId,
           departmentId: enrollment.departmentId,
@@ -403,8 +403,8 @@ export async function createAdmission(
           hallName: step3.hallName || '',
           status: 'active',
           enrollmentDate: new Date().toISOString(),
-        },
-      }).then(doc => createdDocIds.push({ collectionId: COLLECTIONS.STUDENT_ENROLLMENTS, documentId: doc.$id }));
+        }
+      ).then(doc => createdDocIds.push({ collectionId: COLLECTIONS.STUDENT_ENROLLMENTS, documentId: doc.$id }));
       enrollmentIds.push(enrollmentId);
     }
 
@@ -426,11 +426,11 @@ export async function createAdmission(
     );
 
     const invoiceDocId = ID.unique();
-    await databases.createDocument({
-      databaseId: DATABASE_ID,
-      collectionId: COLLECTIONS.FEE_INVOICES,
-      documentId: invoiceDocId,
-      data: {
+    await databases.createDocument(
+      DATABASE_ID,
+      COLLECTIONS.FEE_INVOICES,
+      invoiceDocId,
+      {
         invoiceId,
         studentId: studentDocId,
         enrollmentId: enrollmentIds[0],
@@ -446,8 +446,8 @@ export async function createAdmission(
         status: Number(step4.paidAmount) >= Number(step4.netAmount) ? 'paid' : (Number(step4.paidAmount) > 0 ? 'partial' : 'unpaid'),
         feeItems: JSON.stringify(step4.feeItems.filter(item => item.isIncluded || item.isRequired)),
         createdBy: currentUserName,
-      },
-    });
+      }
+    );
 
     createdDocIds.push({ collectionId: COLLECTIONS.FEE_INVOICES, documentId: invoiceDocId });
 
@@ -455,11 +455,11 @@ export async function createAdmission(
       if (!item.isIncluded && !item.isRequired) continue;
       
       const transactionDocId = ID.unique();
-      await databases.createDocument({
-        databaseId: DATABASE_ID,
-        collectionId: COLLECTIONS.FEE_TRANSACTIONS,
-        documentId: transactionDocId,
-        data: {
+      await databases.createDocument(
+        DATABASE_ID,
+        COLLECTIONS.FEE_TRANSACTIONS,
+        transactionDocId,
+        {
           invoiceId: invoiceDocId,
           studentId: studentDocId,
           createdBy: currentUserName,
@@ -473,8 +473,8 @@ export async function createAdmission(
           discount: Number(item.discount || 0),
           netAmount: Number(item.amount - (item.discount || 0)),
           date: new Date().toISOString(),
-        },
-      }).then(doc => createdDocIds.push({ collectionId: COLLECTIONS.FEE_TRANSACTIONS, documentId: doc.$id }));
+        }
+      ).then(doc => createdDocIds.push({ collectionId: COLLECTIONS.FEE_TRANSACTIONS, documentId: doc.$id }));
     }
 
     // ── 7. Record Payment (if paid) ─────────────────────────
@@ -487,11 +487,11 @@ export async function createAdmission(
         5
       );
 
-      await databases.createDocument({
-        databaseId: DATABASE_ID,
-        collectionId: COLLECTIONS.FEE_PAYMENTS,
-        documentId: ID.unique(),
-        data: {
+      await databases.createDocument(
+        DATABASE_ID,
+        COLLECTIONS.FEE_PAYMENTS,
+        ID.unique(),
+        {
           paymentId,
           invoiceId: invoiceDocId,
           enrollmentId: enrollmentIds[0],
@@ -504,36 +504,38 @@ export async function createAdmission(
           notes: step4.notes || '',
           paymentDate: new Date().toISOString(),
           collectedBy: currentUserName,
-        },
-      }).then(doc => createdDocIds.push({ collectionId: COLLECTIONS.FEE_PAYMENTS, documentId: doc.$id }));
+        }
+      ).then(doc => createdDocIds.push({ collectionId: COLLECTIONS.FEE_PAYMENTS, documentId: doc.$id }));
     }
 
     // ── 8. Audit Log ────────────────────────────────────────
     try {
-      await databases.createDocument({
-        databaseId: DATABASE_ID,
-        collectionId: COLLECTIONS.AUDIT_LOGS,
-        documentId: ID.unique(),
-        data: {
-          userId: session?.user?.$id || 'admin',
-          userEmail: session?.user?.email || 'admin',
-          userRole: session?.role || 'admin',
-          action: 'STUDENT_ADMISSION',
+      if (COLLECTIONS.AUDIT_LOGS) {
+        await databases.createDocument(
+          DATABASE_ID,
+          COLLECTIONS.AUDIT_LOGS,
+          ID.unique(),
+          {
+            userId: session?.user?.$id || 'admin',
+            userEmail: session?.user?.email || 'admin',
+            userRole: session?.role || 'admin',
+            action: 'STUDENT_ADMISSION',
 
-          targetType: 'student',
-          targetId: studentId,
-          targetName: step1.nameBn || step1.nameEn,
-          oldValue: null,
-          newValue: JSON.stringify({
-            studentId,
-            admissionNo,
-            enrollmentIds,
-            receiptNo,
-          }),
-          ipAddress: '',
-          userAgent: '',
-        }
-      });
+            targetType: 'student',
+            targetId: studentId,
+            targetName: step1.nameBn || step1.nameEn,
+            oldValue: null,
+            newValue: JSON.stringify({
+              studentId,
+              admissionNo,
+              enrollmentIds,
+              receiptNo,
+            }),
+            ipAddress: '',
+            userAgent: '',
+          }
+        );
+      }
     } catch {
       // Audit log failure should not block admission
     }
@@ -552,11 +554,11 @@ export async function createAdmission(
     
     for (const doc of createdDocIds) {
       try {
-        await databases.deleteDocument({
-          databaseId: DATABASE_ID,
-          collectionId: doc.collectionId,
-          documentId: doc.documentId
-        });
+        await databases.deleteDocument(
+          DATABASE_ID,
+          doc.collectionId,
+          doc.documentId
+        );
       } catch (delErr) {
         console.error(`Rollback failed for ${doc.collectionId}:${doc.documentId}`, delErr);
       }
@@ -598,10 +600,10 @@ export async function getDepartments(): Promise<{
   try {
     const { databases } = await createAdminClient();
     console.log('[Appwrite] Fetching departments from:', COLLECTIONS.DEPARTMENTS);
-    const response = await databases.listDocuments({
-      databaseId: DATABASE_ID,
-      collectionId: COLLECTIONS.DEPARTMENTS,
-    });
+    const response = await databases.listDocuments(
+      DATABASE_ID,
+      COLLECTIONS.DEPARTMENTS
+    );
     console.log('[Appwrite] Found departments:', response.total);
     return {
       success: true,
@@ -626,14 +628,14 @@ export async function getClassesByDepartment(
   try {
     const { databases } = await createAdminClient();
     console.log('[Appwrite] Fetching classes for dept:', departmentId);
-    const response = await databases.listDocuments({
-      databaseId: DATABASE_ID,
-      collectionId: COLLECTIONS.CLASSES,
-      queries: [
+    const response = await databases.listDocuments(
+      DATABASE_ID,
+      COLLECTIONS.CLASSES,
+      [
         Query.equal('departmentId', departmentId),
         Query.orderAsc('level'),
-      ],
-    });
+      ]
+    );
     console.log('[Appwrite] Found classes:', response.total);
     return {
       success: true,
@@ -655,11 +657,11 @@ export async function getFeeTypes(): Promise<{
 }> {
   try {
     const { databases } = await createAdminClient();
-    const response = await databases.listDocuments({
-      databaseId: DATABASE_ID,
-      collectionId: COLLECTIONS.FEE_TYPES,
-      queries: [Query.equal('isActive', true), Query.orderAsc('feeCode')],
-    });
+    const response = await databases.listDocuments(
+      DATABASE_ID,
+      COLLECTIONS.FEE_TYPES,
+      [Query.equal('isActive', true), Query.orderAsc('feeCode')]
+    );
     return {
       success: true,
       feeTypes: JSON.parse(JSON.stringify(response.documents)) as unknown as FeeTypeDoc[],
@@ -708,14 +710,14 @@ export async function getAdmissionFees(
     }
 
     // 3. Fetch all active fee types
-    const response = await databases.listDocuments({
-      databaseId: DATABASE_ID,
-      collectionId: COLLECTIONS.FEE_TYPES,
-      queries: [
+    const response = await databases.listDocuments(
+      DATABASE_ID,
+      COLLECTIONS.FEE_TYPES,
+      [
         Query.equal('isActive', true),
         Query.limit(100),
-      ],
-    });
+      ]
+    );
 
     const allFeeTypes = JSON.parse(JSON.stringify(response.documents)) as unknown as any[];
 
@@ -786,11 +788,11 @@ export async function getAdmissionFees(
 export async function getStudentById(docId: string) {
   try {
     const { databases } = await createAdminClient();
-    const student = await databases.getDocument({
-      databaseId: DATABASE_ID,
-      collectionId: COLLECTIONS.STUDENTS,
-      documentId: docId,
-    });
+    const student = await databases.getDocument(
+      DATABASE_ID,
+      COLLECTIONS.STUDENTS,
+      docId
+    );
     return { success: true, student: JSON.parse(JSON.stringify(student)) };
   } catch (err: any) {
     console.error('Error fetching student:', err);
@@ -804,15 +806,15 @@ export async function getStudentById(docId: string) {
 export async function getStudentEnrollments(studentId: string) {
   try {
     const { databases } = await createAdminClient();
-    const response = await databases.listDocuments({
-      databaseId: DATABASE_ID,
-      collectionId: COLLECTIONS.STUDENT_ENROLLMENTS,
-      queries: [
+    const response = await databases.listDocuments(
+      DATABASE_ID,
+      COLLECTIONS.STUDENT_ENROLLMENTS,
+      [
         Query.equal('studentId', studentId),
         Query.equal('status', 'active'),
         Query.orderDesc('enrolledAt'),
-      ],
-    });
+      ]
+    );
     return { success: true, enrollments: JSON.parse(JSON.stringify(response.documents)) };
   } catch (err: any) {
     console.error('Error fetching enrollments:', err);
@@ -831,10 +833,10 @@ export async function getSessions(): Promise<{
   try {
     const { databases } = await createAdminClient();
     console.log('[Appwrite] Fetching sessions from:', COLLECTIONS.SESSIONS);
-    const response = await databases.listDocuments({
-      databaseId: DATABASE_ID,
-      collectionId: COLLECTIONS.SESSIONS,
-    });
+    const response = await databases.listDocuments(
+      DATABASE_ID,
+      COLLECTIONS.SESSIONS
+    );
     console.log('[Appwrite] Found sessions:', response.total);
     return {
       success: true,
@@ -857,10 +859,10 @@ export async function getSections(): Promise<{
   try {
     const { databases } = await createAdminClient();
     console.log('[Appwrite] Fetching sections from:', COLLECTIONS.SECTIONS);
-    const response = await databases.listDocuments({
-      databaseId: DATABASE_ID,
-      collectionId: COLLECTIONS.SECTIONS,
-    });
+    const response = await databases.listDocuments(
+      DATABASE_ID,
+      COLLECTIONS.SECTIONS
+    );
     console.log('[Appwrite] Found sections:', response.total);
     return {
       success: true,
@@ -883,11 +885,11 @@ export async function getBoardingTypes(): Promise<{
     const { databases } = await createAdminClient();
     if (!COLLECTIONS.BOARDING_TYPES) return { success: true, boardingTypes: [] };
     
-    const response = await databases.listDocuments({
-      databaseId: DATABASE_ID,
-      collectionId: COLLECTIONS.BOARDING_TYPES,
-      queries: [Query.equal('isActive', true)],
-    });
+    const response = await databases.listDocuments(
+      DATABASE_ID,
+      COLLECTIONS.BOARDING_TYPES,
+      [Query.equal('isActive', true)]
+    );
     return {
       success: true,
       boardingTypes: JSON.parse(JSON.stringify(response.documents)),
@@ -906,11 +908,11 @@ export async function getAllBoardingTypes() {
     const { databases } = await createAdminClient();
     if (!COLLECTIONS.BOARDING_TYPES) return { success: true, boardingTypes: [] };
     
-    const response = await databases.listDocuments({
-      databaseId: DATABASE_ID,
-      collectionId: COLLECTIONS.BOARDING_TYPES,
-      queries: [Query.orderAsc('order')],
-    });
+    const response = await databases.listDocuments(
+      DATABASE_ID,
+      COLLECTIONS.BOARDING_TYPES,
+      [Query.orderAsc('order')]
+    );
     return {
       success: true,
       boardingTypes: JSON.parse(JSON.stringify(response.documents)),

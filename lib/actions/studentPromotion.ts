@@ -18,15 +18,15 @@ async function generateSequentialId(
   const fullPrefix = `${prefix}-${year}-`;
 
   try {
-    const existing = await databases.listDocuments({
-      databaseId: DATABASE_ID,
+    const existing = await databases.listDocuments(
+      DATABASE_ID,
       collectionId,
-      queries: [
+      [
         Query.startsWith(fieldName, fullPrefix),
         Query.orderDesc(fieldName),
         Query.limit(1),
-      ],
-    });
+      ]
+    );
 
     let next = 1;
     if (existing.total > 0) {
@@ -73,14 +73,14 @@ export async function promoteStudent(payload: PromotionPayload) {
     const currentUserName = session?.userDoc?.name || session?.user?.name || 'admin';
 
     // 1. Fetch current active enrollments
-    const { documents: currentEnrollments } = await databases.listDocuments({
-      databaseId: DATABASE_ID,
-      collectionId: COLLECTIONS.STUDENT_ENROLLMENTS,
-      queries: [
+    const { documents: currentEnrollments } = await databases.listDocuments(
+      DATABASE_ID,
+      COLLECTIONS.STUDENT_ENROLLMENTS,
+      [
         Query.equal('studentId', payload.studentDocId),
         Query.equal('status', 'active'),
       ]
-    });
+    );
 
     // 2. Deactivate them (Archiving previous year/session records)
     for (const en of currentEnrollments) {
@@ -103,11 +103,11 @@ export async function promoteStudent(payload: PromotionPayload) {
         4
       );
 
-      const newEnDoc = await databases.createDocument({
-        databaseId: DATABASE_ID,
-        collectionId: COLLECTIONS.STUDENT_ENROLLMENTS,
-        documentId: ID.unique(),
-        data: {
+      const newEnDoc = await databases.createDocument(
+        DATABASE_ID,
+        COLLECTIONS.STUDENT_ENROLLMENTS,
+        ID.unique(),
+        {
           enrollmentId,
           studentId: payload.studentDocId, // This is the $id of the student document
           departmentId: en.departmentId,
@@ -121,8 +121,8 @@ export async function promoteStudent(payload: PromotionPayload) {
           enrollmentDate: new Date().toISOString(),
           promotionStatus: payload.actionType, // promoted, failed, or continued
           notes: `Updated via Promotion Dashboard - ${payload.actionType}`,
-        },
-      });
+        }
+      );
       newEnrollmentIds.push(enrollmentId);
     }
 
@@ -157,11 +157,11 @@ export async function promoteStudent(payload: PromotionPayload) {
         5
       );
 
-      await databases.createDocument({
-        databaseId: DATABASE_ID,
-        collectionId: COLLECTIONS.FEE_INVOICES,
-        documentId: ID.unique(),
-        data: {
+      await databases.createDocument(
+        DATABASE_ID,
+        COLLECTIONS.FEE_INVOICES,
+        ID.unique(),
+        {
           invoiceId,
           receiptNo,
           studentId: payload.studentDocId,
@@ -185,7 +185,7 @@ export async function promoteStudent(payload: PromotionPayload) {
             isIncluded: true
           }])
         }
-      });
+      );
     }
 
     // Invalidate dashboard caches

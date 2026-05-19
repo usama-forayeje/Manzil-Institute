@@ -194,7 +194,15 @@ export default function ReceiptsPage() {
                     body { margin: 0; padding: 0; }
                     @page { margin: 0; size: auto; }
                   }
-                  #print-wrapper { width: 100%; }
+                  body { margin: 0; background: white; }
+                  /* CRITICAL: Hide any browser extension injected elements */
+                  body > *:not(#print-wrapper) {
+                     display: none !important;
+                     visibility: hidden !important;
+                     height: 0 !important;
+                     overflow: hidden !important;
+                  }
+                  @media print { body { margin: 0; } }
                 </style>
               </head>
               <body>

@@ -128,6 +128,7 @@ export default function Step6Success() {
             // 1. Map to Step5Data (Summary Store)
             setStep5Data({
               studentId: student.studentId,
+              studentDocId: student.$id,
               admissionNo: student.admissionNo,
               enrollmentIds: enrollments.map((e: any) => e.enrollmentId),
               receiptNo: payment?.receiptNo || invoice?.receiptNo || '---',
@@ -362,15 +363,50 @@ export default function Step6Success() {
         </motion.div>
 
         {/* Footer Navigation */}
-        <motion.div variants={itemVariants} className="pt-6 flex flex-wrap justify-center gap-6 border-t border-zinc-100 dark:border-zinc-800/50">
-           <Link href="/dashboard" onClick={reset} className="flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-zinc-400 hover:text-primary transition-colors group">
-              <Home className="h-3.5 w-3.5" /> ড্যাশবোর্ডে যান <ArrowRight className="h-3 w-3 -translate-x-1 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all" />
+        <motion.div variants={itemVariants} className="pt-8 flex flex-wrap justify-center items-center gap-x-8 gap-y-4 border-t border-zinc-100 dark:border-zinc-800/50">
+           <Link 
+            href="/dashboard" 
+            onClick={() => reset()} 
+            className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-primary transition-all group"
+           >
+              <Home className="h-3.5 w-3.5" /> 
+              ড্যাশবোর্ড
+              <ArrowRight className="h-3 w-3 -translate-x-1 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all" />
            </Link>
-           {/* Bug #2 Fix: was /dashboard/admin/students (404) — correct path is /dashboard/admin/students/admission */}
-           <Link href={`/dashboard/admin/id-cards?search=${step5Data.studentId}`} onClick={reset} className="flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-zinc-400 hover:text-primary transition-colors group">
-              <CreditCard className="h-3.5 w-3.5" /> আইডি কার্ড <ArrowRight className="h-3 w-3 -translate-x-1 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all" />
+
+           <Link 
+            href={`/dashboard/admin/students/${step5Data.studentDocId || step5Data.studentId}`} 
+            onClick={() => reset()} 
+            className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-primary transition-all group"
+           >
+              <User className="h-3.5 w-3.5" /> 
+              ছাত্র প্রোফাইল
+              <ArrowRight className="h-3 w-3 -translate-x-1 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all" />
            </Link>
-            </motion.div>
+
+           <Link 
+            href={`/dashboard/admin/id-cards?search=${step5Data.studentId}`} 
+            onClick={() => reset()} 
+            className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-primary transition-all group"
+           >
+              <CreditCard className="h-3.5 w-3.5" /> 
+              আইডি কার্ড
+              <ArrowRight className="h-3 w-3 -translate-x-1 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all" />
+           </Link>
+
+           <button 
+            onClick={() => {
+              reset();
+              resetForm();
+              // Navigate to step 1 or reload/refresh
+              window.location.href = '/dashboard/admin/settings/academics/admission';
+            }} 
+            className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-[#00AEEF] hover:brightness-110 transition-all group bg-[#00AEEF]/5 px-3 py-1.5 rounded-md border border-[#00AEEF]/10"
+           >
+              <RefreshCw className="h-3.5 w-3.5" /> 
+              নতুন ভর্তি
+           </button>
+        </motion.div>
           </>
         )}
       </motion.div>

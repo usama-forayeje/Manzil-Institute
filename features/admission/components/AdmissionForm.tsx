@@ -102,7 +102,7 @@ function printElement(el: HTMLElement) {
 function loadDraft(): Partial<AdmissionFormValues> {
   if (typeof window === 'undefined') return {};
   try {
-    const raw = sessionStorage.getItem(DRAFT_KEY);
+    const raw = localStorage.getItem(DRAFT_KEY);
     return raw ? JSON.parse(raw) : {};
   } catch { return {}; }
 }
@@ -110,9 +110,9 @@ function loadDraft(): Partial<AdmissionFormValues> {
 function saveDraft(values: AdmissionFormValues & { currentStep?: number }, isEditMode: boolean) {
   if (isEditMode) return; // Don't save draft in edit mode
   try {
-    sessionStorage.setItem(DRAFT_KEY, JSON.stringify({ ...values, currentStep: values.currentStep }));
+    localStorage.setItem(DRAFT_KEY, JSON.stringify({ ...values, currentStep: values.currentStep }));
   } catch (err) {
-    console.warn('Failed to save draft to sessionStorage:', err);
+    console.warn('Failed to save draft to localStorage:', err);
   }
 }
 
@@ -431,7 +431,8 @@ export default function AdmissionForm({ initialData, isEditMode = false, student
           
           // Populate success screen data for printing
           store.setStep5Data({
-            studentId: result.student.studentId,
+            studentId: result.student?.studentId || result.student?.$id,
+            studentDocId: result.student?.$id,
             admissionNo: result.student.admissionNo,
             enrollmentIds: values.enrollment.enrollments.map(e => e.enrollmentDocId || ''),
             receiptNo: result.student.receiptNo || '---',
@@ -444,7 +445,7 @@ export default function AdmissionForm({ initialData, isEditMode = false, student
           });
 
           setDirection(1);
-          if (typeof window !== 'undefined') sessionStorage.removeItem(DRAFT_KEY);
+          if (typeof window !== 'undefined') localStorage.removeItem(DRAFT_KEY);
           store.goToStep(6);
           
           if (typeof window !== 'undefined') {
@@ -462,6 +463,7 @@ export default function AdmissionForm({ initialData, isEditMode = false, student
         if (result.success) {
           store.setStep5Data({
             studentId: result.studentId,
+            studentDocId: result.studentDocId,
             admissionNo: result.admissionNo,
             enrollmentIds: result.enrollmentIds,
             receiptNo: result.receiptNo,
@@ -473,7 +475,7 @@ export default function AdmissionForm({ initialData, isEditMode = false, student
             hallName: values.enrollment.hallName,
           });
           setDirection(1);
-          if (typeof window !== 'undefined') sessionStorage.removeItem(DRAFT_KEY);
+          if (typeof window !== 'undefined') localStorage.removeItem(DRAFT_KEY);
           store.goToStep(6);
           
           if (typeof window !== 'undefined') {

@@ -545,15 +545,11 @@ export const addressIDSchema = z
     // NID - Bengali digit support
     nidNumber: z
       .string()
-      .transform(val => convertToEnglishDigits(val))
-      .pipe(
-        z
-          .string()
-          .regex(/^(\d{10}|\d{17})$/, {
-            message: 'সঠিক NID নম্বর দিন (১০ বা ১৭ ডিজিট)',
-          })
-          .optional()
-      ),
+      .optional()
+      .transform(val => (val ? convertToEnglishDigits(val) : undefined))
+      .refine(val => !val || /^(\d{10}|\d{17})$/.test(val), {
+        message: 'সঠিক NID নম্বর দিন (১০ বা ১৭ ডিজিট)',
+      }),
     dateOfBirth: z
       .string()
       .min(1, 'জন্ম তারিখ দিতে হবে')
@@ -750,69 +746,47 @@ export const contactReferenceSchema = z.object({
     .pipe(
       z
         .string()
-        .min(11, { message: 'ফোন নম্বর অবশ্যঃ ১১ ডিজিটের হতে হবে' })
-        .max(14, { message: 'ফোন নম্বর সর্বোচ্চ ১৪ ডিজিটের হতে পারে' })
-        .regex(/^(\+880|880|0)1[3-9]\d{8}$/, {
+        .min(8, { message: 'সঠিক ফোন নম্বর দিন' })
+        .max(15, { message: 'ফোন নম্বর সর্বোচ্চ ১৫ ডিজিটের হতে পারে' })
+        .regex(/^\+?[0-9]{8,15}$/, {
           message:
-            'সঠিক বাংলাদেশী মোবাইল নম্বর দিন (যেমন: 1712345678 বা +8801712345678)',
+            'সঠিক ফোন নম্বর দিন (যেমন: 01712345678 বা +88017...)',
         })
     ),
   phoneSecondary: z
     .string()
-    .transform(val => (val ? convertPhoneToEnglish(val) : ''))
-    .pipe(
-      z
-        .string()
-        .regex(/^(\+880|880|0)1[3-9]\d{8}$/, {
-          message: 'সঠিক বাংলাদেশী মোবাইল নম্বর দিন',
-        })
-        .optional()
-    ),
+    .optional()
+    .transform(val => (val ? convertPhoneToEnglish(val) : undefined))
+    .refine(val => !val || /^\+?[0-9]{8,15}$/.test(val), {
+      message: 'সঠিক ফোন নম্বর দিন',
+    }),
   email: z.string().email('সঠিক ইমেইল ঠিকানা দিন').optional().or(z.literal('')),
   // Emergency Contact - Bengali digit support (optional)
   emergencyContactNo: z
     .string()
-    .transform(val => (val ? convertPhoneToEnglish(val) : ''))
-    .pipe(
-      z
-        .string()
-        .min(11, { message: 'ফোন নম্বর অবশ্যঃ ১১ ডিজিটের হতে হবে' })
-        .max(14, { message: 'ফোন নম্বর সর্বোচ্চ ১৪ ডিজিটের হতে পারে' })
-        .regex(/^(\+880|880|0)1[3-9]\d{8}$/, {
-          message: 'সঠিক বাংলাদেশী মোবাইল নম্বর দিন',
-        })
-        .optional()
-    ),
+    .optional()
+    .transform(val => (val ? convertPhoneToEnglish(val) : undefined))
+    .refine(val => !val || /^\+?[0-9]{8,15}$/.test(val), {
+      message: 'সঠিক ফোন নম্বর দিন',
+    }),
   emergencyRelationship: z.string().min(1, 'সম্পর্ক নির্বাচন করুন'),
   // WhatsApp - Bengali digit support
   whatsappNo: z
     .string()
-    .transform(val => (val ? convertPhoneToEnglish(val) : ''))
-    .pipe(
-      z
-        .string()
-        .min(11, { message: 'WhatsApp নম্বর অবশ্যয়: ১১ ডিজিটের হবে' })
-        .max(14, { message: 'WhatsApp নম্বর সর্বোচ্চ: ১৪ ডিজিট' })
-        .regex(/^(\+880|880|0)1[3-9]\d{8}$/, {
-          message: 'সঠিক WhatsApp নম্বর দিন',
-        })
-        .optional()
-    ),
+    .optional()
+    .transform(val => (val ? convertPhoneToEnglish(val) : undefined))
+    .refine(val => !val || /^\+?[0-9]{8,15}$/.test(val), {
+      message: 'সঠিক WhatsApp নম্বর দিন',
+    }),
   // Reference - Bengali digit support
   referenceName: z.string().min(2, 'সুপারিশকারীর নাম দিতে হবে'),
   referencePhone: z
     .string()
-    .transform(val => (val ? convertPhoneToEnglish(val) : ''))
-    .pipe(
-      z
-        .string()
-        .min(11, { message: 'রেফারেন্স ফোন নম্বর অবশ্যঃ ১১ ডিজিটের হবে' })
-        .max(14, { message: 'রেফারেন্স ফোন নম্বর সর্বোচ্চ: ১৪ ডিজিট' })
-        .regex(/^(\+880|880|0)1[3-9]\d{8}$/, {
-          message: 'সঠিক রেফারেন্স ফোন নম্বর দিন',
-        })
-        .optional()
-    ),
+    .optional()
+    .transform(val => (val ? convertPhoneToEnglish(val) : undefined))
+    .refine(val => !val || /^\+?[0-9]{8,15}$/.test(val), {
+      message: 'সঠিক রেফারেন্স ফোন নম্বর দিন',
+    }),
   referenceOccupation: z.string().optional().or(z.literal('')),
 });
 
@@ -843,17 +817,11 @@ export const paymentReferenceSchema = z.object({
   // Mobile banking number - Bengali digit support
   mobileBankingNumber: z
     .string()
-    .transform(val => convertToEnglishDigits(val))
-    .pipe(
-      z
-        .string()
-        .min(11, { message: 'মোবাইল ব্যাংকিং নম্বর অবশ্যঃ ১১ ডিজিটের হবে' })
-        .max(14, { message: 'মোবাইল ব্যাংকিং নম্বর সর্বোচ্চ: ১৪ ডিজিট' })
-        .regex(/^(\+880|880|0)1[3-9]\d{8}$/, {
-          message: 'সঠিক মোবাইল ব্যাংকিং নম্বর দিন',
-        })
-        .optional()
-    ),
+    .optional()
+    .transform(val => (val ? convertToEnglishDigits(val) : undefined))
+    .refine(val => !val || /^\+?[0-9]{8,15}$/.test(val), {
+      message: 'সঠিক মোবাইল ব্যাংকিং নম্বর দিন',
+    }),
   // Declaration
   declaration: z.boolean().refine(val => val === true, {
     message: 'ঘোষণাপত্রটি গ্রহণ করা আবশ্যিক',

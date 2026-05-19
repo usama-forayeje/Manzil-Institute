@@ -1,4 +1,4 @@
-﻿/**
+/**
  * features/admission/types.ts
  *
  * Shared types for the admission module.
@@ -61,7 +61,6 @@ export interface FeeTypeDoc extends AppwriteDocument {
   departmentIds: string[];
   classIds?: string[];
   boardingTypes: string[];
-  applicableBoardingTypes?: string[];
   applicableTo?: string;
 }
 

@@ -124,15 +124,17 @@ export async function getMonthlyFee(departmentId: string, boardingType: string, 
 
     // 4. Filter by department (match ID or Code)
     const deptFees = monthlyFees.filter(f => {
-      if (!f.applicableDepartments || f.applicableDepartments.length === 0) return true;
-      return f.applicableDepartments.includes(departmentId) || f.applicableDepartments.includes(deptCode);
+      const deptList = f.departmentIds || f.applicableDepartments || [];
+      if (deptList.length === 0) return true;
+      return deptList.includes(departmentId) || deptList.includes(deptCode);
     });
     console.log(`[Fee Sync] Matches Dept ${deptCode}: ${deptFees.length}`);
 
     // 5. Filter by boarding type
     const matchedFee = deptFees.find((f) => {
-      if (f.applicableBoardingTypes && f.applicableBoardingTypes.length > 0) {
-        return f.applicableBoardingTypes.includes(boardingType);
+      const boardList = f.boardingTypes || f.applicableBoardingTypes || [];
+      if (boardList.length > 0) {
+        return boardList.includes(boardingType);
       }
       return true;
     });

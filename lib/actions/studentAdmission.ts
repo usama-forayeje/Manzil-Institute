@@ -1288,6 +1288,40 @@ export async function updateStudentAdmission(
           } catch (e) {
             console.error('Error updating enrollment:', enr.enrollmentDocId, e);
           }
+        } else if (enr.departmentId && enr.classId) {
+           // New enrollment added during update
+           try {
+             const newEnrollmentId = await generateSequentialId(
+               databases,
+               COLLECTIONS.STUDENT_ENROLLMENTS,
+               'enrollmentId',
+               'ENR',
+               4
+             );
+             await databases.createDocument(
+               DATABASE_ID,
+               COLLECTIONS.STUDENT_ENROLLMENTS,
+               ID.unique(),
+               {
+                 enrollmentId: newEnrollmentId,
+                 studentId: docId,
+                 departmentId: enr.departmentId,
+                 classId: enr.classId,
+                 section: enr.section || '',
+                 session: enr.session,
+                 shift: enr.shift || 'day',
+                 monthlyFee: Number(enr.monthlyFee || 0),
+                 rollNo: enr.rollNo || '',
+                 boardingType: step3.boardingType,
+                 hallId: step3.hallId || '',
+                 hallName: step3.hallName || '',
+                 status: 'active',
+                 enrollmentDate: new Date().toISOString(),
+               }
+             );
+           } catch (e) {
+             console.error('Error creating new enrollment during update:', e);
+           }
         }
       }
     }

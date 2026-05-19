@@ -16,7 +16,7 @@ interface StatsCardProps {
   value: React.ReactNode;
   icon: LucideIcon;
   isLoading?: boolean;
-  color?: 'emerald' | 'rose' | 'sky' | 'indigo' | 'zinc';
+  color?: 'emerald' | 'rose' | 'sky' | 'indigo' | 'zinc' | 'blue';
   badgeText?: string;
   footerText?: string;
   progress?: number;
@@ -103,8 +103,8 @@ export function StatsCard({
         <Skeleton className="h-7 w-32 rounded" />
       ) : (
         <p className={cn("text-2xl font-black tracking-tighter", color === 'rose' ? c?.text : 'text-zinc-900 dark:text-zinc-50')}>
-          {typeof value === 'number' || (!isNaN(Number(value)) && value !== '' && value !== null) 
-            ? `${prefix}${toBn(value)}${suffix}` 
+          {typeof value === 'number' || (typeof value === 'string' && !isNaN(Number(value)) && value !== '')
+            ? `${prefix}${toBn(Number(value))}${suffix}` 
             : value}
         </p>
       )}

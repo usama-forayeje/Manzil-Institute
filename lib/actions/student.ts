@@ -85,22 +85,81 @@ export async function submitAdmission(data: StudentFormData, currentUserId?: str
 	}
 }
 
-export async function getStudents(filters: { limit?: number; cursorAfter?: string } = {}) {
+export async function getStudents(filters: { limit?: number; offset?: number; search?: string } = {}) {
 	try {
 		const { databases } = await createAdminClient();
 		
 		const queries = [];
-		queries.push(Query.limit(filters.limit || 100));
-		if (filters.cursorAfter) {
-			queries.push(Query.cursorAfter(filters.cursorAfter));
-		}
+    if (filters.limit) queries.push(Query.limit(filters.limit));
+    if (filters.offset) queries.push(Query.offset(filters.offset));
+    queries.push(Query.orderDesc('$createdAt'));
+
+    // Handle search if provided
+    if (filters.search) {
+      // In Appwrite we usually search in specific fields
+      // For now, let's keep it simple or implement search if DB supports it
+    }
 		
 		const response = await databases.listDocuments(
-        DATABASE_ID,
-		 COLLECTIONS.STUDENTS,
-		 queries
+      DATABASE_ID,
+		  COLLECTIONS.STUDENTS,
+		  queries
 		);
-		return { success: true, total: response.total, students: JSON.parse(JSON.stringify(response.documents)) };
+
+    const students = response.documents;
+    if (students.length === 0) return { success: true, total: 0, students: [] };
+
+    // Fetch batch data for classes, sections, and departments to avoid N+1 problem
+    const [classesRes, sectionsRes, departmentsRes] = await Promise.all([
+      databases.listDocuments(DATABASE_ID, COLLECTIONS.CLASSES, [Query.limit(100)]),
+      databases.listDocuments(DATABASE_ID, COLLECTIONS.SECTIONS, [Query.limit(100)]),
+      databases.listDocuments(DATABASE_ID, COLLECTIONS.DEPARTMENTS, [Query.limit(100)])
+    ]);
+
+    const classMap: Record<string, any> = {};
+    const sectionMap: Record<string, any> = {};
+    const deptMap: Record<string, any> = {};
+
+    classesRes.documents.forEach(c => { classMap[c.$id] = c; });
+    sectionsRes.documents.forEach(s => { sectionMap[s.$id] = s; });
+    departmentsRes.documents.forEach(d => { deptMap[d.$id] = d; deptMap[d.code] = d; });
+
+    // Fetch enrollments for these students to get current class/section
+    const studentIds = students.map(s => s.$id);
+    const enrollmentsRes = await databases.listDocuments(
+      DATABASE_ID,
+      COLLECTIONS.STUDENT_ENROLLMENTS,
+      [Query.equal('studentId', studentIds), Query.limit(100)]
+    );
+
+    const enrichedStudents = students.map(student => {
+      // Find all enrollments for this student
+      const studentEnrs = enrollmentsRes.documents.filter(e => e.studentId === student.$id);
+      
+      const activeEnrollments = studentEnrs.map(enr => {
+        const cls = classMap[enr.classId];
+        const sec = sectionMap[enr.section];
+        const dept = deptMap[enr.departmentId] || deptMap[enr.departmentCode];
+
+        return {
+          ...enr,
+          className: cls?.nameBn || cls?.name || enr.className || enr.admissionClass || 'অনির্ধারিত',
+          sectionName: sec?.sectionNameBn || sec?.sectionName || enr.sectionName || enr.section || 'নেই',
+          departmentName: dept?.nameBn || dept?.name || enr.departmentName || enr.departmentCode || 'সাধারণ'
+        };
+      });
+
+      return {
+        ...student,
+        activeEnrollments,
+        // Keep these for backward compatibility or filtering if needed
+        currentClass: activeEnrollments[0]?.className || 'অনির্ধারিত',
+        currentSection: activeEnrollments[0]?.sectionName || 'নেই',
+        departmentName: activeEnrollments[0]?.departmentName || 'সাধারণ'
+      };
+    });
+
+		return { success: true, total: response.total, students: JSON.parse(JSON.stringify(enrichedStudents)) };
 	} catch (error) {
 		console.error("Error fetching students", error);
 		return { success: false, total: 0, students: [], error: String(error) };
@@ -188,15 +247,37 @@ export async function updateStudent(studentId: string, data: Partial<StudentForm
 export async function deleteStudent(studentId: string) {
 	try {
 		const { databases } = await createAdminClient();
+		
+    // 1. Find and deactivate all active enrollments first
+    const enrollments = await databases.listDocuments(
+      DATABASE_ID,
+      COLLECTIONS.STUDENT_ENROLLMENTS,
+      [Query.equal('studentId', studentId), Query.equal('status', 'active')]
+    );
+
+    // Update enrollments to inactive
+    await Promise.all(
+      enrollments.documents.map(enr => 
+        databases.updateDocument(
+          DATABASE_ID,
+          COLLECTIONS.STUDENT_ENROLLMENTS,
+          enr.$id,
+          { status: 'inactive' }
+        )
+      )
+    );
+
+    // 2. Finally mark the student as inactive
 		await databases.updateDocument(
         DATABASE_ID,
 		COLLECTIONS.STUDENTS,
 		 studentId,
 			{ status: "inactive"}
-	);
+	  );
+
 		return { success: true };
 	} catch (error) {
-		console.error("Error deleting student", error);
+		console.error("Error deleting student:", error);
 		return { success: false, error: String(error) };
 	}
 }

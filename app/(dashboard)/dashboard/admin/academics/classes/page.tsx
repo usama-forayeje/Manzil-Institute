@@ -8,13 +8,11 @@ import {
   type ColumnDef
 } from '@tanstack/react-table';
 import { 
-  Plus, 
   Trash2, 
   Edit, 
   Check,
   Loader2,
   GraduationCap,
-  Users,
   LayoutGrid
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -40,9 +38,9 @@ import { cn } from '@/lib/utils';
 
 // Reusable Components
 import { FeatureHeader } from '@/components/dashboard/shared/FeatureHeader';
-import { FeatureStats } from '@/components/dashboard/shared/FeatureStats';
 import { FeatureTable } from '@/components/dashboard/shared/FeatureTable';
 import { useClasses } from '@/features/academic/hooks/use-classes';
+import { StatsCard } from '@/features/fees/components/StatsCard';
 
 export default function ClassesPage() {
   const {
@@ -140,12 +138,6 @@ export default function ClassesPage() {
     getFilteredRowModel: getFilteredRowModel(),
   });
 
-  const stats = [
-    { label: 'মোট ক্লাস', value: classes.length, icon: GraduationCap, color: 'text-blue-600', bg: 'bg-blue-50 dark:bg-blue-500/10', isBn: true },
-    { label: 'মোট বিভাগ', value: departments.length, icon: LayoutGrid, color: 'text-cyan-600', bg: 'bg-cyan-50 dark:bg-cyan-500/10', isBn: true },
-    { label: 'সিস্টেম স্ট্যাটাস', value: 'সক্রিয়', icon: Check, color: 'text-emerald-600', bg: 'bg-emerald-50 dark:bg-emerald-500/10' },
-  ];
-
   return (
     <div className="space-y-6 animate-in fade-in duration-500 max-w-6xl mx-auto py-6">
       <FeatureHeader 
@@ -159,7 +151,35 @@ export default function ClassesPage() {
         searchPlaceholder="ক্লাস খুঁজুন..."
       />
 
-      <FeatureStats stats={stats} />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <StatsCard 
+          title="মোট ক্লাস" 
+          value={classes.length} 
+          footerText="সর্বমোট জামাত" 
+          icon={GraduationCap} 
+          color="blue" 
+          isLoading={isLoading} 
+          prefix=""
+        />
+        <StatsCard 
+          title="মোট বিভাগ" 
+          value={departments.length} 
+          footerText="সিস্টেম বিভাগ" 
+          icon={LayoutGrid} 
+          color="sky" 
+          isLoading={isLoading} 
+          prefix=""
+        />
+        <StatsCard 
+          title="সক্রিয় ক্লাস" 
+          value={classes.filter(c => c.isActive).length} 
+          footerText="সচল জামাতসমূহ" 
+          icon={Check} 
+          color="emerald" 
+          isLoading={isLoading} 
+          prefix=""
+        />
+      </div>
 
       <FeatureTable 
         table={table}

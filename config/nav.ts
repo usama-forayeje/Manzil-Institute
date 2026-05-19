@@ -324,19 +324,19 @@ const superAdminNav: NavItem[] = [
     ],
   },
 
-  // ── যোগাযোগ ────────────────────────────────────────────
-  {
-    title: "Notices",
-    titleBn: "নোটিশ বোর্ড",
-    href: "/dashboard/admin/notices",
-    icon: "notices",
-  },
-  {
-    title: "Messages",
-    titleBn: "বার্তা",
-    href: "/dashboard/admin/messages",
-    icon: "messages",
-  },
+  // ── যোগাযোগ (Temporarily disabled as pages are missing) ──
+  // {
+  //   title: "Notices",
+  //   titleBn: "নোটিশ বোর্ড",
+  //   href: "/dashboard/admin/notices",
+  //   icon: "notices",
+  // },
+  // {
+  //   title: "Messages",
+  //   titleBn: "বার্তা",
+  //   href: "/dashboard/admin/messages",
+  //   icon: "messages",
+  // },
 
   // ── NFC ────────────────────────────────────────────────
   {
@@ -561,12 +561,12 @@ const adminNav: NavItem[] = [
       { title: "Student Attendance", titleBn: "শিক্ষার্থী উপস্থিতি", href: "/dashboard/admin/attendance/students", icon: "attendance" },
     ],
   },
-  {
-    title: "Notices",
-    titleBn: "নোটিশ বোর্ড",
-    href: "/dashboard/admin/notices",
-    icon: "notices",
-  },
+  // {
+  //   title: "Notices",
+  //   titleBn: "নোটিশ বোর্ড",
+  //   href: "/dashboard/admin/notices",
+  //   icon: "notices",
+  // },
   // ── অর্থ ব্যবস্থাপনা ──────────────────────────────────
   {
     title: "Fees",
@@ -616,12 +616,12 @@ const adminNav: NavItem[] = [
       },
     ],
   },
-  {
-    title: "Messages",
-    titleBn: "বার্তা",
-    href: "/dashboard/admin/messages",
-    icon: "messages",
-  },
+  // {
+  //   title: "Messages",
+  //   titleBn: "বার্তা",
+  //   href: "/dashboard/admin/messages",
+  //   icon: "messages",
+  // },
   {
     title: "Reports",
     titleBn: "রিপোর্ট",
@@ -696,19 +696,19 @@ const managerNav: NavItem[] = [
       { title: "Pending Approval",  titleBn: "অনুমোদন বাকি",  href: "/dashboard/manager/expenses?status=pending", icon: "expenses", badge: "পেন্ডিং", badgeVariant: "warning" as const },
     ],
   },
-  {
-    title: "Notices",
-    titleBn: "নোটিশ",
-    href: "/dashboard/manager/notices",
-    icon: "notices",
-    dividerBefore: true,
-  },
-  {
-    title: "Messages",
-    titleBn: "বার্তা",
-    href: "/dashboard/manager/messages",
-    icon: "messages",
-  },
+  // {
+  //   title: "Notices",
+  //   titleBn: "নোটিশ",
+  //   href: "/dashboard/manager/notices",
+  //   icon: "notices",
+  //   dividerBefore: true,
+  // },
+  // {
+  //   title: "Messages",
+  //   titleBn: "বার্তা",
+  //   href: "/dashboard/manager/messages",
+  //   icon: "messages",
+  // },
   {
     title: "Reports",
     titleBn: "রিপোর্ট",
@@ -782,18 +782,18 @@ const teacherNav: NavItem[] = [
     href: "/dashboard/teacher/policies",
     icon: "policies",
   },
-  {
-    title: "Notice Board",
-    titleBn: "নোটিশ বোর্ড",
-    href: "/dashboard/teacher/notices",
-    icon: "notices",
-  },
-  {
-    title: "Messages",
-    titleBn: "বার্তা",
-    href: "/dashboard/teacher/messages",
-    icon: "messages",
-  },
+  // {
+  //   title: "Notice Board",
+  //   titleBn: "নোটিশ বোর্ড",
+  //   href: "/dashboard/teacher/notices",
+  //   icon: "notices",
+  // },
+  // {
+  //   title: "Messages",
+  //   titleBn: "বার্তা",
+  //   href: "/dashboard/teacher/messages",
+  //   icon: "messages",
+  // },
   {
     title: "My Profile",
     titleBn: "আমার প্রোফাইল",
@@ -907,19 +907,19 @@ const parentNav: NavItem[] = [
     href: "/dashboard/parent/results",
     icon: "exam",
   },
-  {
-    title: "Notice Board",
-    titleBn: "নোটিশ বোর্ড",
-    href: "/dashboard/parent/notices",
-    icon: "notices",
-    dividerBefore: true,
-  },
-  {
-    title: "Contact",
-    titleBn: "যোগাযোগ",
-    href: "/dashboard/parent/contact",
-    icon: "messages",
-  },
+  // {
+  //   title: "Notice Board",
+  //   titleBn: "নোটিশ বোর্ড",
+  //   href: "/dashboard/parent/notices",
+  //   icon: "notices",
+  //   dividerBefore: true,
+  // },
+  // {
+  //   title: "Contact",
+  //   titleBn: "যোগাযোগ",
+  //   href: "/dashboard/parent/contact",
+  //   icon: "messages",
+  // },
 ];
 
 // ─── MASTER NAV MAP ────────────────────────────────────────

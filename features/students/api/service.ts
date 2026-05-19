@@ -125,7 +125,7 @@ export async function getStudentsInfinite({
 
         const studentEnrollments = enrollments.filter((e) => e.studentId === student.$id);
         if (studentEnrollments.length > 0) {
-          student.activeEnrollments = studentEnrollments.map((enr) => ({
+           student.activeEnrollments = studentEnrollments.map((enr) => ({
              departmentId: enr.departmentId || '',
              classId: enr.classId || '',
              className: classesMap[enr.classId] || '',
@@ -133,6 +133,8 @@ export async function getStudentsInfinite({
              session: enr.session || '',
              boardingType: boardingTypesMap[enr.boardingType] || enr.boardingType || '',
              boardingTypeId: enr.boardingType || '',
+             section: enr.section || '',
+             monthlyFee: enr.monthlyFee || 0,
              hallId: enr.hallId || '',
              hallName: enr.hallName || '',
              enrolledAt: enr.$createdAt

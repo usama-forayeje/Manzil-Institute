@@ -182,11 +182,11 @@ export async function getNextStudentId() {
          const lastNum = parseInt(parts[parts.length - 1] ?? '0', 10);
          const next = lastNum + 1;
          const year = new Date().getFullYear();
-         return `MNC-${year}-${String(next).padStart(4, '0')}`;
+         return `MI-${year}-${String(next).padStart(4, '0')}`;
       }
   } catch (err) {}
   
   const year = new Date().getFullYear();
-  return `MNC-${year}-0001`;
+  return `MI-${year}-0001`;
 }
 

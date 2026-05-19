@@ -185,10 +185,10 @@ export default function DepartmentsPage() {
       />
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-md kalpurush-font p-0 overflow-hidden rounded-md border-0 flex flex-col shadow-2xl bg-white dark:bg-zinc-900">
-          <DialogHeader className="p-8 bg-zinc-50/50 dark:bg-zinc-800/20 border-b border-zinc-100 dark:border-zinc-800/50">
+        <DialogContent className="max-w-3xl kalpurush-font p-0 overflow-hidden rounded-xl border-0 flex flex-col shadow-2xl bg-white dark:bg-zinc-900">
+          <DialogHeader className="p-6 md:p-8 bg-zinc-50/50 dark:bg-zinc-800/20 border-b border-zinc-100 dark:border-zinc-800/50">
             <div className="flex items-center gap-5">
-              <div className="h-12 w-12 rounded-md bg-[#00AEEF]/10 flex items-center justify-center border border-[#00AEEF]/20">
+              <div className="h-12 w-12 rounded-xl bg-[#00AEEF]/10 flex items-center justify-center border border-[#00AEEF]/20">
                 <Building className="h-6 w-6 text-[#00AEEF]" />
               </div>
               <div>
@@ -198,50 +198,53 @@ export default function DepartmentsPage() {
             </div>
           </DialogHeader>
 
-          <div className="p-8 space-y-6">
-            <div className="space-y-2">
-              <Label className="text-[10px] font-black uppercase tracking-[0.1em] text-zinc-400 pl-1">বিভাগ কোড (Unique)</Label>
-              <div className="relative">
-                <Barcode className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-300" />
-                <Input 
-                  placeholder="যেমন: HIFZ" 
-                  value={formData.code}
-                  onChange={e => setFormData(p => ({ ...p, code: e.target.value.toUpperCase() }))}
-                  disabled={!!selectedId}
-                  className="pl-10 h-12 rounded-md bg-zinc-50 dark:bg-zinc-800/50 border-transparent font-mono font-black text-base dark:text-[#00AEEF]"
-                />
+          <div className="p-6 md:p-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              
+              <div className="space-y-6">
+                {/* Code is generated automatically behind the scenes based on English Name */}
+                <div className="space-y-2">
+                  <Label className="text-[10px] font-black uppercase tracking-[0.1em] text-zinc-400 pl-1">Name (English)</Label>
+                  <Input 
+                    placeholder="Hifzul Quran" 
+                    value={formData.name}
+                    onChange={e => {
+                       const val = e.target.value;
+                       setFormData(p => ({ 
+                         ...p, 
+                         name: val,
+                         // Auto generate code from first 4 letters if it is a new department
+                         ...(!selectedId && { code: val.replace(/[^A-Za-z]/g, '').slice(0, 4).toUpperCase() })
+                       }))
+                    }}
+                    className="h-12 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 border-transparent font-semibold text-zinc-500 uppercase tracking-tight text-xs focus:ring-[#00AEEF] focus:border-[#00AEEF]/20"
+                  />
+                </div>
               </div>
-            </div>
 
-            <div className="space-y-2">
-              <Label className="text-[10px] font-black uppercase tracking-[0.1em] text-zinc-400 pl-1">বিভাগের নাম (বাংলা)</Label>
-              <div className="relative">
-                <BookOpen className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-300" />
-                <Input 
-                  placeholder="যেমন: হিফজুল কুরআন" 
-                  value={formData.nameBn}
-                  onChange={e => setFormData(p => ({ ...p, nameBn: e.target.value }))}
-                  className="pl-10 h-12 rounded-md font-black text-base"
-                />
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label className="text-[10px] font-black uppercase tracking-[0.1em] text-zinc-400 pl-1">বিভাগের নাম (বাংলা)</Label>
+                  <div className="relative">
+                    <BookOpen className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-300" />
+                    <Input 
+                      placeholder="যেমন: হিফজুল কুরআন" 
+                      value={formData.nameBn}
+                      onChange={e => setFormData(p => ({ ...p, nameBn: e.target.value }))}
+                      className="pl-10 h-12 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 border-transparent font-black text-base focus:ring-[#00AEEF] focus:border-[#00AEEF]/20"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between p-4 bg-zinc-50/50 dark:bg-zinc-800/30 rounded-xl border border-zinc-100 dark:border-zinc-800 mt-2 hover:bg-zinc-50 transition-colors">
+                  <div className="space-y-0.5">
+                    <p className="text-xs font-black uppercase tracking-tight">Active Status</p>
+                    <p className="text-[9px] text-zinc-400 font-bold uppercase italic">সক্রিয় স্ট্যাটাস</p>
+                  </div>
+                  <Switch checked={formData.isActive} onCheckedChange={c => setFormData(p => ({ ...p, isActive: c }))} className="scale-90 data-[state=checked]:bg-[#00AEEF]" />
+                </div>
               </div>
-            </div>
 
-            <div className="space-y-2">
-              <Label className="text-[10px] font-black uppercase tracking-[0.1em] text-zinc-400 pl-1">Name (English)</Label>
-              <Input 
-                placeholder="Hifzul Quran" 
-                value={formData.name}
-                onChange={e => setFormData(p => ({ ...p, name: e.target.value }))}
-                className="h-12 rounded-md font-semibold text-zinc-500 uppercase tracking-tight text-xs"
-              />
-            </div>
-
-            <div className="flex items-center justify-between p-4 bg-zinc-50/50 dark:bg-zinc-800/30 rounded-md border border-zinc-100 dark:border-zinc-800">
-               <div className="space-y-0.5">
-                 <p className="text-xs font-black uppercase tracking-tight">Active Status</p>
-                 <p className="text-[9px] text-zinc-400 font-bold uppercase italic">সক্রিয় স্ট্যাটাস</p>
-               </div>
-               <Switch checked={formData.isActive} onCheckedChange={c => setFormData(p => ({ ...p, isActive: c }))} className="scale-90 data-[state=checked]:bg-[#00AEEF]" />
             </div>
           </div>
 

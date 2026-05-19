@@ -326,7 +326,7 @@ export default function StudentPromotionClient() {
   const openModal = (student: StudentListItem) => {
     setActiveStudent(student);
     const defaultSession = sessions[sessions.length - 1] || '2026';
-    const activeBoarding = student?.activeEnrollments?.[0]?.boardingType || '';
+    const activeBoarding = student?.activeEnrollments?.[0]?.boardingTypeId || '';
 
     form.reset({
       actionType: 'promoted',
@@ -335,7 +335,8 @@ export default function StudentPromotionClient() {
         departmentId: student.activeEnrollments?.[0]?.departmentId || '',
         classId: student.activeEnrollments?.[0]?.classId || '',
         session: defaultSession,
-        monthlyFee: 0,
+        section: student.activeEnrollments?.[0]?.section || '',
+        monthlyFee: student.activeEnrollments?.[0]?.monthlyFee || 0,
       }],
       sessionFee: 0,
       discount: 0,
@@ -354,6 +355,8 @@ export default function StudentPromotionClient() {
         if (newEn.length > 0) {
           newEn[0].departmentId = activeStudent.activeEnrollments?.[0]?.departmentId || '';
           newEn[0].classId = activeStudent.activeEnrollments?.[0]?.classId || '';
+          newEn[0].section = activeStudent.activeEnrollments?.[0]?.section || '';
+          newEn[0].monthlyFee = activeStudent.activeEnrollments?.[0]?.monthlyFee || 0;
         }
         form.setValue('enrollments', newEn);
       }

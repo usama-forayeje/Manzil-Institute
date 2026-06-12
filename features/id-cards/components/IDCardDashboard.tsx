@@ -1,16 +1,15 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
-import { 
-  Search, 
+import { useState, useMemo } from 'react';
+import {
+  Search,
   LayoutTemplate,
-  Users,
-  CheckCircle2,
   Loader2,
   CreditCard,
   FileArchive,
   Image as ImageIcon,
   Badge,
+  RefreshCw,
 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Input } from '@/components/ui/input';
@@ -22,19 +21,24 @@ import { StudentListItem } from '@/features/students/types';
 import { IDCardPreview } from './IDCardPreview';
 import { toast } from 'sonner';
 import { useSearchParams } from 'next/navigation';
-
-import { RefreshCw } from 'lucide-react';
+import JsBarcode from 'jsbarcode';
 import { FeatureHeader } from '@/components/dashboard/shared/FeatureHeader';
 
 export default function IDCardDashboard() {
   const params = useSearchParams();
   const [searchTerm, setSearchTerm] = useState(params.get('search') || '');
   const [selectedStudents, setSelectedStudents] = useState<StudentListItem[]>([]);
-  
+
   const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteStudents({ search: searchTerm });
-  
+
   const allStudents = useMemo(() => {
-    return data?.pages.flatMap((page) => page.data?.documents ?? []) ?? [];
+    const docs = data?.pages.flatMap((page) => page.data?.documents ?? []) ?? [];
+
+    return docs.map((student: any) => {
+      return {
+        ...student,
+      };
+    });
   }, [data]);
 
   const filteredStudents = useMemo(() => {
@@ -59,16 +63,21 @@ export default function IDCardDashboard() {
 
   const [isExporting, setIsExporting] = useState(false);
 
+  // 🔢 ইংরেজি সংখ্যাকে বাংলায় কনভার্ট করার হেল্পার ফাংশন
+  const toBengaliDigits = (numStr: string): string => {
+    return numStr.replace(/\d/g, d => "০১২৩৪৫৬৭৮৯"[parseInt(d)]);
+  };
+
   const exportCards = async (format: 'pdf' | 'png') => {
     if (selectedStudents.length === 0) return;
     setIsExporting(true);
     const toastId = toast.loading(`প্রেস-রেডি ${format.toUpperCase()} তৈরি হচ্ছে...`);
-    // ... (rest of export logic remains same)
+
     const SCALE = 4;
     const W = 204 * SCALE;
     const H = 325 * SCALE;
     const BENGALI_FONT = 'SolaimanLipi';
-    
+
     let fontLoaded = false;
     document.fonts.forEach((f) => {
       if (f.family === BENGALI_FONT || f.family === `'${BENGALI_FONT}'` || f.family === `"${BENGALI_FONT}"`) {
@@ -107,130 +116,183 @@ export default function IDCardDashboard() {
       ctx.arcTo(x, y, x + r, y, r); ctx.closePath();
     };
 
+    const loadLocalImage = (url: string): Promise<HTMLImageElement> =>
+      new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = url;
+      });
+
+    const generateBarcodeImage = (value: string): Promise<HTMLImageElement> =>
+      new Promise((resolve, reject) => {
+        try {
+          const svgNode = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+          JsBarcode(svgNode, value || '0000', {
+            format: 'CODE128',
+            width: 2,
+            height: 35,
+            displayValue: false,
+            margin: 0,
+            background: '#ffffff',
+            lineColor: '#18181B',
+          });
+          const svgString = new XMLSerializer().serializeToString(svgNode);
+          const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+          const url = URL.createObjectURL(svgBlob);
+          const img = new Image();
+          img.onload = () => {
+            URL.revokeObjectURL(url);
+            resolve(img);
+          };
+          img.onerror = (e) => {
+            URL.revokeObjectURL(url);
+            reject(e);
+          };
+          img.src = url;
+        } catch (e) {
+          reject(e);
+        }
+      });
+
     const drawCard = async (student: StudentListItem): Promise<HTMLCanvasElement> => {
       const canvas = document.createElement('canvas');
-      canvas.width = W; canvas.height = H;
+      canvas.width = W;
+      canvas.height = H;
+
       const ctx = canvas.getContext('2d')!;
       const s = SCALE;
 
-      ctx.fillStyle = '#ffffff';
-      rr(ctx, 0, 0, W, H, 12 * s); ctx.fill();
-      ctx.strokeStyle = '#E4E4E7'; ctx.lineWidth = s;
-      rr(ctx, 0.5, 0.5, W - 1, H - 1, 12 * s); ctx.stroke();
+      try {
+        const bgImg = await loadLocalImage('/dashboard/manzil_student_ID_clean.svg');
+        ctx.drawImage(bgImg, 0, 0, W, H);
+      } catch (err) {
+        console.warn("Failed to load SVG background", err);
+        ctx.fillStyle = '#d61f1fff';
+        rr(ctx, 0, 0, W, H, 12 * s); ctx.fill();
+        ctx.strokeStyle = '#fff'; ctx.lineWidth = s;
+        rr(ctx, 0.5, 0.5, W - 1, H - 1, 12 * s); ctx.stroke();
+      }
 
-      const hH = 85 * s;
-      ctx.fillStyle = '#00AEEF';
-      ctx.beginPath();
-      ctx.moveTo(12 * s, 0); ctx.lineTo(W - 12 * s, 0);
-      ctx.arcTo(W, 0, W, 12 * s, 12 * s);
-      ctx.lineTo(W, hH - 18 * s);
-      ctx.bezierCurveTo(W, hH + 12 * s, 0, hH + 12 * s, 0, hH - 18 * s);
-      ctx.lineTo(0, 12 * s);
-      ctx.arcTo(0, 0, 12 * s, 0, 12 * s);
-      ctx.closePath(); ctx.fill();
+      // ৩. স্টুডেন্ট ফটো ম্যাপিং
+      const cx = (W * 0.50) + (0.35 * s);
+      const cy = 98 * s;
+      const radius = 33.5 * s;
 
-      ctx.fillStyle = '#fff';
-      ctx.font = `900 ${13 * s}px sans-serif`;
-      ctx.textAlign = 'center';
-      ctx.fillText('MANZIL', W / 2, 34 * s);
-      ctx.font = `700 ${5 * s}px sans-serif`;
-      ctx.fillStyle = 'rgba(255,255,255,0.88)';
-      ctx.fillText('INTERNATIONAL INSTITUTE', W / 2, 46 * s);
-
-      const pW = 70 * s, pH = 84 * s;
-      const pX = (W - pW) / 2, pY = 60 * s;
-      ctx.fillStyle = '#fff';
-      rr(ctx, pX - 3 * s, pY - 3 * s, pW + 6 * s, pH + 6 * s, 6 * s); ctx.fill();
       if (student.photo) {
         try {
           const img = await loadImage(student.photo);
           ctx.save();
-          rr(ctx, pX, pY, pW, pH, 4 * s); ctx.clip();
+
+          ctx.beginPath();
+          ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+          ctx.closePath();
+          ctx.clip();
+
           const aspect = img.width / img.height;
-          const tAspect = pW / pH;
+          const pW = radius * 2;
+          const pH = radius * 2;
+          const pX = cx - radius;
+          const pY = cy - radius;
+
           let sx = 0, sy = 0, sw = img.width, sh = img.height;
-          if (aspect > tAspect) { sw = img.height * tAspect; sx = (img.width - sw) / 2; }
-          else { sh = img.width / tAspect; sy = (img.height - sh) / 2; }
+
+          if (aspect > 1) {
+            sw = img.height;
+            sx = (img.width - sw) / 2;
+          } else {
+            sh = img.width;
+            sy = (img.height - sh) / 2;
+          }
           ctx.drawImage(img, sx, sy, sw, sh, pX, pY, pW, pH);
           ctx.restore();
         } catch {
-          ctx.fillStyle = '#F4F4F5'; rr(ctx, pX, pY, pW, pH, 4 * s); ctx.fill();
+          ctx.fillStyle = '#F4F4F5';
+          ctx.beginPath();
+          ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+          ctx.fill();
         }
       } else {
-        ctx.fillStyle = '#F4F4F5'; rr(ctx, pX, pY, pW, pH, 4 * s); ctx.fill();
+        ctx.fillStyle = '#fff';
+        ctx.beginPath();
+        ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+        ctx.fill();
       }
 
-      ctx.fillStyle = '#10B981';
-      ctx.beginPath(); ctx.arc(pX + pW + 2 * s, pY - 2 * s, 5 * s, 0, Math.PI * 2); ctx.fill();
-      ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5 * s; ctx.stroke();
-
-      const nY = pY + pH + 20 * s;
-      ctx.fillStyle = '#18181B';
-      ctx.font = `700 ${12 * s}px '${BENGALI_FONT}', sans-serif`;
+      // ৫. শিক্ষার্থীর নাম এবং সাব-হেডার (বাংলা ও ইংলিশ)
+      ctx.fillStyle = '#EC1C24';
+      ctx.font = `900 ${12 * s}px '${BENGALI_FONT}', sans-serif`;
       ctx.textAlign = 'center';
-      const bn = (student.nameBn || student.nameEn || '').slice(0, 22);
-      ctx.fillText(bn, W / 2, nY);
-      ctx.fillStyle = '#A1A1AA';
-      ctx.font = `600 ${6.5 * s}px sans-serif`;
-      ctx.fillText((student.nameEn || '').toUpperCase().slice(0, 26), W / 2, nY + 12 * s);
+      const nameVal = student.nameBn || student.name || 'STUDENT NAME';
+      ctx.fillText(nameVal, W / 2, 161 * s);
 
-      ctx.fillStyle = '#00AEEF'; ctx.globalAlpha = 0.5;
-      ctx.fillRect(W / 2 - 14 * s, nY + 18 * s, 28 * s, 1.5 * s); ctx.globalAlpha = 1;
+      if (student.nameEn) {
+        ctx.fillStyle = '#71717A';
+        ctx.font = `700 ${7 * s}px sans-serif`;
+        ctx.fillText(student.nameEn.toUpperCase(), W / 2, 173 * s);
+      }
 
-      const px = 12 * s, rY0 = nY + 28 * s, rH = 15 * s;
-      ctx.fillStyle = '#A1A1AA'; ctx.font = `700 ${6 * s}px sans-serif`; ctx.textAlign = 'left';
-      ctx.fillText('ID NO', px, rY0 + rH - 4 * s);
-      const idVal = student.studentId || '---';
-      const idW = ctx.measureText(idVal).width + 8 * s;
-      ctx.fillStyle = 'rgba(0,174,239,0.12)';
-      rr(ctx, W - px - idW, rY0 + 2 * s, idW, rH - 6 * s, 2 * s); ctx.fill();
-      ctx.fillStyle = '#00AEEF'; ctx.font = `900 ${7.5 * s}px monospace`; ctx.textAlign = 'right';
-      ctx.fillText(idVal, W - px, rY0 + rH - 4 * s);
+      // ৬. প্রোফাইল ডাটা টেবিল গ্রিড লেআউট
+      const startX = 24 * s;
+      const colonX = 74 * s;
+      const valueX = 82 * s;
+      const endX = 180 * s;
+      let currentY = 191 * s;
+      const rowGap = 15 * s;
 
-      const rY1 = rY0 + rH + 4 * s;
-      ctx.strokeStyle = '#F4F4F5'; ctx.lineWidth = 0.5 * s;
-      ctx.beginPath(); ctx.moveTo(px, rY1 - 2 * s); ctx.lineTo(W - px, rY1 - 2 * s); ctx.stroke();
-      ctx.fillStyle = '#A1A1AA'; ctx.font = `700 ${6 * s}px sans-serif`; ctx.textAlign = 'left';
-      ctx.fillText('BLOOD GRP', px, rY1 + rH - 4 * s);
-      ctx.fillStyle = '#F43F5E'; ctx.font = `900 ${7.5 * s}px sans-serif`; ctx.textAlign = 'right';
-      const bg = student.bloodGroup && student.bloodGroup !== 'unknown' ? student.bloodGroup : 'N/A';
-      ctx.fillText(bg, W - px, rY1 + rH - 4 * s);
+      // 🧠 জন্মতারিখ থেকে বয়স বের করে সেটিকে সরাসরি বাংলা সংখ্যায় কনভার্ট করা হচ্ছে
+      const rawAge = student.dateOfBirth ? String(new Date().getFullYear() - new Date(student.dateOfBirth).getFullYear()) : '---';
+      const ageVal = rawAge !== '---' ? toBengaliDigits(rawAge) : '---';
 
-      const rY2 = rY1 + rH + 6 * s;
-      ctx.fillStyle = '#FAFAFA'; rr(ctx, px, rY2, W - px * 2, rH, 3 * s); ctx.fill();
-      ctx.fillStyle = '#71717A'; ctx.font = `700 ${6 * s}px '${BENGALI_FONT}', sans-serif`; ctx.textAlign = 'left';
-      ctx.fillText('বিভাগ', px + 4 * s, rY2 + rH - 4 * s);
-      ctx.fillStyle = '#27272A'; ctx.font = `700 ${6.5 * s}px '${BENGALI_FONT}', sans-serif`; ctx.textAlign = 'right';
-      ctx.fillText((student.departmentName || '---').slice(0, 18), W - px - 4 * s, rY2 + rH - 4 * s);
+      const fields = [
+        { label: 'পিতা', value: student?.fatherNameBn || '---', isMono: false, hasLine: true },
+        { label: 'বয়স', value: ageVal, isMono: false, hasLine: true },
+        { label: 'শ্রেণী', value: student.className || student.class || '---', isMono: false, hasLine: true },
+        { label: 'আইডি', value: student.studentId || '---', isMono: true, hasLine: false }
+      ];
 
-      const rY3 = rY2 + rH + 4 * s;
-      ctx.fillStyle = '#FAFAFA'; rr(ctx, px, rY3, W - px * 2, rH, 3 * s); ctx.fill();
-      ctx.fillStyle = '#71717A'; ctx.font = `700 ${6 * s}px '${BENGALI_FONT}', sans-serif`; ctx.textAlign = 'left';
-      ctx.fillText('শ্রেণী', px + 4 * s, rY3 + rH - 4 * s);
-      ctx.fillStyle = '#27272A'; ctx.font = `700 ${6.5 * s}px '${BENGALI_FONT}', sans-serif`; ctx.textAlign = 'right';
-      ctx.fillText((student.className || '---').slice(0, 18), W - px - 4 * s, rY3 + rH - 4 * s);
+      fields.forEach((field) => {
+        ctx.textAlign = 'left';
 
-      const fY = H - 50 * s;
-      ctx.fillStyle = '#FAFAFA'; ctx.fillRect(0, fY, W, 50 * s);
-      ctx.strokeStyle = '#F4F4F5'; ctx.lineWidth = 0.5 * s;
-      ctx.beginPath(); ctx.moveTo(0, fY); ctx.lineTo(W, fY); ctx.stroke();
+        // 🏷️ লেবেলের ফন্ট SolaimanLipi করা হলো এবং সাইজ বাড়িয়ে 7.5 * s করা হলো
+        ctx.fillStyle = '#71717A';
+        ctx.font = `700 ${7.5 * s}px '${BENGALI_FONT}', sans-serif`;
+        ctx.fillText(field.label, startX, currentY);
 
-      const qS = 28 * s, qX = px, qY2 = fY + (50 * s - qS) / 2;
-      ctx.fillStyle = '#fff'; ctx.strokeStyle = '#E4E4E7'; ctx.lineWidth = 0.5 * s;
-      rr(ctx, qX, qY2, qS, qS, 2 * s); ctx.fill(); ctx.stroke();
-      ctx.fillStyle = '#27272A';
-      [[0,0],[1,0],[2,0],[0,1],[2,1],[0,2],[1,2],[2,2],[4,0],[5,0],[4,1],[5,1],[0,4],[1,4],[0,5],[1,5],[3,2],[2,3],[3,4],[4,3]].forEach(([dx, dy]) => {
-        ctx.fillRect(qX + 3 * s + dx * 3 * s, qY2 + 3 * s + dy * 3 * s, 2.5 * s, 2.5 * s);
+        // 🔤 কোলন চিহ্নের ফন্টও একই এলাইনমেন্ট ও ফন্টে রাখা হলো
+        ctx.fillText(':', colonX, currentY);
+
+        // 💎 ভ্যালুর সাইজ এক সাইজ বাড়িয়ে 8 * s করা হলো
+        ctx.fillStyle = '#18181B';
+        ctx.font = field.isMono
+          ? `900 ${8 * s}px monospace` // আইডি মনোপেস ফন্টেও ১ সাইজ বড় করা হলো
+          : `700 ${8 * s}px '${BENGALI_FONT}', sans-serif`;
+        ctx.fillText(field.value, valueX, currentY);
+
+        if (field.hasLine) {
+          ctx.strokeStyle = '#F4F4F5';
+          ctx.lineWidth = 1 * s;
+          ctx.beginPath();
+          ctx.moveTo(startX, currentY + (4 * s));
+          ctx.lineTo(endX, currentY + (4 * s));
+          ctx.stroke();
+        }
+
+        currentY += rowGap;
       });
 
-      ctx.fillStyle = '#00AEEF'; ctx.font = `italic 800 ${10 * s}px Georgia, serif`;
-      ctx.textAlign = 'center';
-      ctx.save(); ctx.translate(W - 55 * s, fY + 22 * s); ctx.rotate(-0.1);
-      ctx.fillText('Principal', 0, 0); ctx.restore();
-      ctx.strokeStyle = '#27272A'; ctx.lineWidth = 0.5 * s;
-      ctx.beginPath(); ctx.moveTo(W - 85 * s, fY + 30 * s); ctx.lineTo(W - 22 * s, fY + 30 * s); ctx.stroke();
-      ctx.fillStyle = '#71717A'; ctx.font = `700 ${5 * s}px sans-serif`; ctx.textAlign = 'center';
-      ctx.fillText('AUTHORITY', W - 53 * s, fY + 41 * s);
+      // ৭. বারকোড জেনারেটর এবং রেন্ডারিং সেকশন
+      try {
+        const barcodeImg = await generateBarcodeImage(student.studentId || '0000');
+        const targetH = 13 * s;
+        const targetW = (barcodeImg.width / barcodeImg.height) * targetH;
+        const bx = (W - targetW) / 2;
+        const by = 246 * s;
+
+        ctx.drawImage(barcodeImg, bx, by, targetW, targetH);
+      } catch (e) {
+        console.warn('Failed to draw barcode', e);
+      }
 
       return canvas;
     };
@@ -266,18 +328,18 @@ export default function IDCardDashboard() {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500 pb-20">
-      <FeatureHeader 
-        title="আইডি কার্ড জেনারেটর"
+      <FeatureHeader
+        title="আইডিカード জেনারেটর"
         description="শিক্ষার্থীদের জন্য উচ্চমানের প্রেস-রেডি আইডি কার্ড তৈরি এবং প্রিন্ট করুন"
         icon={CreditCard}
         extraActions={
           <div className="flex gap-2">
-             <Button variant="outline" className="h-11 rounded-md border-zinc-200" disabled={selectedStudents.length === 0 || isExporting} onClick={() => exportCards('png')}>
-                <ImageIcon className="h-4 w-4 mr-2 text-rose-500" /> PNG ডাউনলোড
-             </Button>
-             <Button className="h-11 rounded-md bg-[#00AEEF] hover:bg-[#0081B1] text-white" disabled={selectedStudents.length === 0 || isExporting} onClick={() => exportCards('pdf')}>
-                <FileArchive className="h-4 w-4 mr-2" /> PDF প্রিন্ট রেডি
-             </Button>
+            <Button variant="outline" className="h-11 rounded-md border-zinc-200" disabled={selectedStudents.length === 0 || isExporting} onClick={() => exportCards('png')}>
+              <ImageIcon className="h-4 w-4 mr-2 text-rose-500" /> PNG ডাউনলোড
+            </Button>
+            <Button className="h-11 rounded-md bg-[#00AEEF] hover:bg-[#0081B1] text-white" disabled={selectedStudents.length === 0 || isExporting} onClick={() => exportCards('pdf')}>
+              <FileArchive className="h-4 w-4 mr-2" /> PDF প্রিন্ট রেডি
+            </Button>
           </div>
         }
       />
@@ -294,15 +356,15 @@ export default function IDCardDashboard() {
             </div>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
-              <Input 
-                placeholder="নাম বা আইডি দিয়ে খুঁজুন..." 
+              <Input
+                placeholder="নাম বা আইডি দিয়ে খুঁজুন..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-9 h-11 bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 rounded-md"
               />
             </div>
             <Button variant="ghost" size="sm" onClick={selectAll} className="w-full mt-4 h-9 text-[10px] font-black uppercase tracking-widest text-[#00AEEF] hover:bg-[#00AEEF]/10 rounded-md">
-               {selectedStudents.length === filteredStudents.length ? 'সব ফিল্টার মুছুন' : 'সবাইকে নির্বাচন করুন'}
+              {selectedStudents.length === filteredStudents.length ? 'সব ফিল্টার মুছুন' : 'সবাইকে নির্বাচন করুন'}
             </Button>
           </div>
 
@@ -335,34 +397,33 @@ export default function IDCardDashboard() {
 
         {/* Preview Area */}
         <div className="bg-zinc-100/50 dark:bg-zinc-950 rounded-md border border-zinc-200 dark:border-zinc-800 overflow-hidden flex flex-col shadow-inner">
-           <div className="px-6 py-4 border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                 <LayoutTemplate className="h-4 w-4 text-indigo-500" />
-                 <span className="text-xs font-black uppercase tracking-widest opacity-60 italic">Live Preview Canvas</span>
+          <div className="px-6 py-4 border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <LayoutTemplate className="h-4 w-4 text-indigo-500" />
+              <span className="text-xs font-black uppercase tracking-widest opacity-60 italic">Live Preview Canvas</span>
+            </div>
+          </div>
+          <div className="flex-1 overflow-y-auto p-10 custom-scrollbar">
+            {selectedStudents.length === 0 ? (
+              <div className="h-full flex flex-col items-center justify-center opacity-30 text-zinc-400 gap-4">
+                <CreditCard className="h-16 w-16 stroke-[1]" />
+                <div className="text-center space-y-1">
+                  <p className="text-lg font-black kalpurush-font">শিক্ষার্থী নির্বাচন করুন</p>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.2em]">Select students to see preview</p>
+                </div>
               </div>
-           </div>
-           <div className="flex-1 overflow-y-auto p-10 custom-scrollbar">
-              {selectedStudents.length === 0 ? (
-                <div className="h-full flex flex-col items-center justify-center opacity-30 text-zinc-400 gap-4">
-                   <CreditCard className="h-16 w-16 stroke-[1]" />
-                   <div className="text-center space-y-1">
-                      <p className="text-lg font-black kalpurush-font">শিক্ষার্থী নির্বাচন করুন</p>
-                      <p className="text-[10px] font-bold uppercase tracking-[0.2em]">Select students to see preview</p>
-                   </div>
-                </div>
-              ) : (
-                <div className="flex flex-wrap justify-center gap-10">
-                   {selectedStudents.map(student => (
-                     <div key={student.$id} className="transition-all hover:scale-[1.05] hover:shadow-2xl rounded-md overflow-hidden">
-                        <IDCardPreview student={student} />
-                     </div>
-                   ))}
-                </div>
-              )}
-           </div>
+            ) : (
+              <div className="flex flex-wrap justify-center gap-10">
+                {selectedStudents.map(student => (
+                  <div key={student.$id} className="transition-all hover:scale-[1.05] hover:shadow-2xl rounded-md overflow-hidden">
+                    <IDCardPreview student={student} />
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
   );
 }
-

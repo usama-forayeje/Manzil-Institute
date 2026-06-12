@@ -5,12 +5,12 @@ export interface StudentListItem extends Student {
   departmentName?: string;
   className?: string;
   session?: string;
-  activeEnrollments?: { 
-    departmentId: string; 
-    classId: string; 
-    departmentName: string; 
-    className: string; 
-    session: string; 
+  activeEnrollments?: {
+    departmentId: string;
+    classId: string;
+    departmentName: string;
+    className: string;
+    session: string;
     boardingType?: string;
     boardingTypeId?: string;
     section?: string;

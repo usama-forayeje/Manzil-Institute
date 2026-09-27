@@ -41,9 +41,11 @@ export async function signInWithGoogle() {
     return { success: true, url: redirectUrl };
   } catch (error: any) {
     console.error('Failed to create OAuth2 token:', error);
+    const endpoint = process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT || 'missing_endpoint';
+    const projectId = process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID || 'missing_project';
     return {
       success: false,
-      error: `${error?.message || 'OAuth2 টোকেন তৈরি করতে ব্যর্থ হয়েছে'} (Target: ${baseUrl})`,
+      error: `${error?.message || 'OAuth2 টোকেন তৈরি করতে ব্যর্থ হয়েছে'} [Endpoint: ${endpoint} | Project: ${projectId} | Target: ${baseUrl}]`,
     };
   }
 }

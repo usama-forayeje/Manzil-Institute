@@ -18,7 +18,7 @@ export const addressSchema = z.object({
   postOffice: z.string().optional().or(z.literal('')),
   village: z
     .string()
-    .min(1, 'গ্রাম/এলাকা অবশ্যই দিতে হবে'),
+    .min(1, 'গ্রাম/মহল্লা, ডাকঘর ও পোস্ট কোড বিস্তারিত লিখুন'),
   postCode: z
     .string()
     .max(10, { message: 'পোস্টকোড সর্বোচ্চ ১০টি অক্ষরের হতে পারে' })

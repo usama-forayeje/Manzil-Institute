@@ -118,7 +118,7 @@ export function useUpdateTerms() {
       title: string;
       sections: any[];
       updatedBy: string;
-    }) => updateTerms(designationId, title, sections, updatedBy),
+    }) => updateTerms(designationId, { title, sections, updatedBy }),
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['terms'] });
@@ -139,7 +139,7 @@ export function useUpdateDesignation() {
       designationId: string;
       labelBn: string;
       labelEn: string;
-    }) => updateDesignation(designationId, labelBn, labelEn),
+    }) => updateDesignation(designationId, { labelBn, labelEn }),
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['terms'] });
@@ -167,14 +167,14 @@ export function useCreateDesignation() {
       isActive?: boolean;
       sortOrder?: number;
     }) =>
-      createDesignation(
+      createDesignation({
         labelBn,
         labelEn,
         category,
         hasTerms,
         isActive,
-        sortOrder
-      ),
+        sortOrder,
+      }),
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['terms'] });

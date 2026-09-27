@@ -20,6 +20,7 @@ import {
   buildR2Url,
   R2_BUCKET,
 } from '@/config/r2';
+import { getCachedReference, setCachedReference } from '@/lib/utils/academic-cache';
 import type {
   PersonalInfoData,
   ContactAddressData,
@@ -296,8 +297,10 @@ export async function createAdmission(
         nameAr: step1.nameAr || '',
         fatherNameBn: step1.fatherNameBn,
         fatherNameEn: step1.fatherNameEn || '',
+        fatherNameAr: (step1 as any).fatherNameAr || '',
         motherNameBn: step1.motherNameBn,
         motherNameEn: step1.motherNameEn || '',
+        motherNameAr: (step1 as any).motherNameAr || '',
         fatherOccupation: step1.fatherOccupation || '',
         fatherWorkplace: step1.fatherWorkplace || '',
         motherOccupation: step1.motherOccupation || '',
@@ -408,104 +411,107 @@ export async function createAdmission(
       enrollmentIds.push(enrollmentId);
     }
 
-    // ── 6. Create Fee Invoice ───────────────────────────────
-    const receiptNo = await generateSequentialId(
-      databases,
-      COLLECTIONS.FEE_INVOICES,
-      'receiptNo',
-      'RCT',
-      5
-    );
-
-    const invoiceId = await generateSequentialId(
-      databases,
-      COLLECTIONS.FEE_INVOICES,
-      'invoiceId', // Sequential business ID
-      'INV',
-      5
-    );
-
-    const invoiceDocId = ID.unique();
-    await databases.createDocument(
-      DATABASE_ID,
-      COLLECTIONS.FEE_INVOICES,
-      invoiceDocId,
-      {
-        invoiceId,
-        studentId: studentDocId,
-        enrollmentId: enrollmentIds[0],
-        departmentCode: step3.enrollments[0]?.departmentCode || step3.enrollments[0]?.departmentId,
-        invoiceType: 'admission',
-        session: new Date().getFullYear().toString(),
-        month: new Date().toLocaleString('default', { month: 'long' }),
-        totalAmount: Number(step4.totalAmount || 0),
-        discount: Number(step4.firstMonthDiscount || 0),
-        netAmount: Number(step4.netAmount || 0),
-        paidAmount: Number(step4.paidAmount || 0),
-        dueAmount: Math.max(0, Number(step4.netAmount || 0) - Number(step4.paidAmount || 0)),
-        status: Number(step4.paidAmount) >= Number(step4.netAmount) ? 'paid' : (Number(step4.paidAmount) > 0 ? 'partial' : 'unpaid'),
-        feeItems: JSON.stringify(step4.feeItems.filter(item => item.isIncluded || item.isRequired)),
-        createdBy: currentUserName,
-      }
-    );
-
-    createdDocIds.push({ collectionId: COLLECTIONS.FEE_INVOICES, documentId: invoiceDocId });
-
-    for (const item of step4.feeItems) {
-      if (!item.isIncluded && !item.isRequired) continue;
-      
-      const transactionDocId = ID.unique();
-      await databases.createDocument(
-        DATABASE_ID,
-        COLLECTIONS.FEE_TRANSACTIONS,
-        transactionDocId,
-        {
-          invoiceId: invoiceDocId,
-          studentId: studentDocId,
-          createdBy: currentUserName,
-          enrollmentId: enrollmentIds[0],
-
-          departmentCode: step3.enrollments[0]?.departmentCode || step3.enrollments[0]?.departmentId,
-          feeTypeCode: item.feeTypeCode,
-          feeTypeName: item.feeTypeName,
-          transactionType: 'admission',
-          amount: Number(item.amount),
-          discount: Number(item.discount || 0),
-          netAmount: Number(item.amount - (item.discount || 0)),
-          date: new Date().toISOString(),
-        }
-      ).then(doc => createdDocIds.push({ collectionId: COLLECTIONS.FEE_TRANSACTIONS, documentId: doc.$id }));
-    }
-
-    // ── 7. Record Payment (if paid) ─────────────────────────
-    if (step4.paidAmount > 0) {
-      const paymentId = await generateSequentialId(
+    // ── 6. Create Fee Invoice (Only if billing data was provided) ─
+    let receiptNo = 'N/A';
+    if (step4?.feeItems && step4.feeItems.length > 0 && (Number(step4.totalAmount || 0) > 0 || Number(step4.paidAmount || 0) > 0)) {
+      receiptNo = await generateSequentialId(
         databases,
-        COLLECTIONS.FEE_PAYMENTS,
-        'paymentId',
-        'PAY',
+        COLLECTIONS.FEE_INVOICES,
+        'receiptNo',
+        'RCT',
         5
       );
 
+      const invoiceId = await generateSequentialId(
+        databases,
+        COLLECTIONS.FEE_INVOICES,
+        'invoiceId', // Sequential business ID
+        'INV',
+        5
+      );
+
+      const invoiceDocId = ID.unique();
       await databases.createDocument(
         DATABASE_ID,
-        COLLECTIONS.FEE_PAYMENTS,
-        ID.unique(),
+        COLLECTIONS.FEE_INVOICES,
+        invoiceDocId,
         {
-          paymentId,
-          invoiceId: invoiceDocId,
+          invoiceId,
+          studentId: studentDocId,
           enrollmentId: enrollmentIds[0],
           departmentCode: step3.enrollments[0]?.departmentCode || step3.enrollments[0]?.departmentId,
-          receiptNo,
-          studentId: studentDocId,
-          amountPaid: Number(step4.paidAmount || 0),
-          paymentMethod: step4.paymentMethod,
-          transactionRef: step4.transactionRef || '',
-          notes: step4.notes || '',
-          paymentDate: new Date().toISOString(),
-          collectedBy: currentUserName,
+          invoiceType: 'admission',
+          session: new Date().getFullYear().toString(),
+          month: new Date().toLocaleString('default', { month: 'long' }),
+          totalAmount: Number(step4.totalAmount || 0),
+          discount: Number(step4.firstMonthDiscount || 0),
+          netAmount: Number(step4.netAmount || 0),
+          paidAmount: Number(step4.paidAmount || 0),
+          dueAmount: Math.max(0, Number(step4.netAmount || 0) - Number(step4.paidAmount || 0)),
+          status: Number(step4.paidAmount) >= Number(step4.netAmount) ? 'paid' : (Number(step4.paidAmount) > 0 ? 'partial' : 'unpaid'),
+          feeItems: JSON.stringify(step4.feeItems.filter(item => item.isIncluded || item.isRequired)),
+          createdBy: currentUserName,
         }
-      ).then(doc => createdDocIds.push({ collectionId: COLLECTIONS.FEE_PAYMENTS, documentId: doc.$id }));
+      );
+
+      createdDocIds.push({ collectionId: COLLECTIONS.FEE_INVOICES, documentId: invoiceDocId });
+
+      for (const item of step4.feeItems) {
+        if (!item.isIncluded && !item.isRequired) continue;
+        
+        const transactionDocId = ID.unique();
+        await databases.createDocument(
+          DATABASE_ID,
+          COLLECTIONS.FEE_TRANSACTIONS,
+          transactionDocId,
+          {
+            invoiceId: invoiceDocId,
+            studentId: studentDocId,
+            createdBy: currentUserName,
+            enrollmentId: enrollmentIds[0],
+
+            departmentCode: step3.enrollments[0]?.departmentCode || step3.enrollments[0]?.departmentId,
+            feeTypeCode: item.feeTypeCode,
+            feeTypeName: item.feeTypeName,
+            transactionType: 'admission',
+            amount: Number(item.amount),
+            discount: Number(item.discount || 0),
+            netAmount: Number(item.amount - (item.discount || 0)),
+            date: new Date().toISOString(),
+          }
+        ).then(doc => createdDocIds.push({ collectionId: COLLECTIONS.FEE_TRANSACTIONS, documentId: doc.$id }));
+      }
+
+      // ── 7. Record Payment (if paid) ─────────────────────────
+      if (step4.paidAmount > 0) {
+        const paymentId = await generateSequentialId(
+          databases,
+          COLLECTIONS.FEE_PAYMENTS,
+          'paymentId',
+          'PAY',
+          5
+        );
+
+        await databases.createDocument(
+          DATABASE_ID,
+          COLLECTIONS.FEE_PAYMENTS,
+          ID.unique(),
+          {
+            paymentId,
+            invoiceId: invoiceDocId,
+            enrollmentId: enrollmentIds[0],
+            departmentCode: step3.enrollments[0]?.departmentCode || step3.enrollments[0]?.departmentId,
+            receiptNo,
+            studentId: studentDocId,
+            amountPaid: Number(step4.paidAmount || 0),
+            paymentMethod: step4.paymentMethod,
+            transactionRef: step4.transactionRef || '',
+            notes: step4.notes || '',
+            paymentDate: new Date().toISOString(),
+            collectedBy: currentUserName,
+          }
+        ).then(doc => createdDocIds.push({ collectionId: COLLECTIONS.FEE_PAYMENTS, documentId: doc.$id }));
+      }
     }
 
     // ── 8. Audit Log ────────────────────────────────────────
@@ -598,16 +604,20 @@ export async function getDepartments(): Promise<{
   error?: string;
 }> {
   try {
+    const cached = getCachedReference<DepartmentDoc[]>('departments');
+    if (cached) {
+      return { success: true, departments: cached };
+    }
     const { databases } = await createAdminClient();
-    console.log('[Appwrite] Fetching departments from:', COLLECTIONS.DEPARTMENTS);
     const response = await databases.listDocuments(
       DATABASE_ID,
       COLLECTIONS.DEPARTMENTS
     );
-    console.log('[Appwrite] Found departments:', response.total);
+    const data = JSON.parse(JSON.stringify(response.documents)) as unknown as DepartmentDoc[];
+    setCachedReference('departments', data);
     return {
       success: true,
-      departments: JSON.parse(JSON.stringify(response.documents)) as unknown as DepartmentDoc[],
+      departments: data,
     };
   } catch (err: any) {
     console.error('[Appwrite Error] Fetching departments:', err);
@@ -831,16 +841,20 @@ export async function getSessions(): Promise<{
   error?: string;
 }> {
   try {
+    const cached = getCachedReference<any[]>('sessions');
+    if (cached) {
+      return { success: true, sessions: cached };
+    }
     const { databases } = await createAdminClient();
-    console.log('[Appwrite] Fetching sessions from:', COLLECTIONS.SESSIONS);
     const response = await databases.listDocuments(
       DATABASE_ID,
       COLLECTIONS.SESSIONS
     );
-    console.log('[Appwrite] Found sessions:', response.total);
+    const data = JSON.parse(JSON.stringify(response.documents));
+    setCachedReference('sessions', data);
     return {
       success: true,
-      sessions: JSON.parse(JSON.stringify(response.documents)),
+      sessions: data,
     };
   } catch (err: any) {
     console.error('[Appwrite Error] Fetching sessions:', err);
@@ -857,16 +871,20 @@ export async function getSections(): Promise<{
   error?: string;
 }> {
   try {
+    const cached = getCachedReference<any[]>('sections');
+    if (cached) {
+      return { success: true, sections: cached };
+    }
     const { databases } = await createAdminClient();
-    console.log('[Appwrite] Fetching sections from:', COLLECTIONS.SECTIONS);
     const response = await databases.listDocuments(
       DATABASE_ID,
       COLLECTIONS.SECTIONS
     );
-    console.log('[Appwrite] Found sections:', response.total);
+    const data = JSON.parse(JSON.stringify(response.documents));
+    setCachedReference('sections', data);
     return {
       success: true,
-      sections: JSON.parse(JSON.stringify(response.documents)),
+      sections: data,
     };
   } catch (err: any) {
     console.error('[Appwrite Error] Fetching sections:', err);
@@ -882,6 +900,10 @@ export async function getBoardingTypes(): Promise<{
   error?: string;
 }> {
   try {
+    const cached = getCachedReference<any[]>('boardingTypes');
+    if (cached) {
+      return { success: true, boardingTypes: cached };
+    }
     const { databases } = await createAdminClient();
     if (!COLLECTIONS.BOARDING_TYPES) return { success: true, boardingTypes: [] };
     
@@ -890,9 +912,11 @@ export async function getBoardingTypes(): Promise<{
       COLLECTIONS.BOARDING_TYPES,
       [Query.equal('isActive', true)]
     );
+    const data = JSON.parse(JSON.stringify(response.documents));
+    setCachedReference('boardingTypes', data);
     return {
       success: true,
-      boardingTypes: JSON.parse(JSON.stringify(response.documents)),
+      boardingTypes: data,
     };
   } catch (err: any) {
     console.error('[Appwrite Error] Fetching boarding types:', err);

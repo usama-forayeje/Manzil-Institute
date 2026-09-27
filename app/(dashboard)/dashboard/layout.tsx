@@ -17,7 +17,7 @@ export default async function DashboardLayout({
   children: React.ReactNode;
 }) {
   const session = await getSession();
-  if (!session) redirect('/login');
+  if (!session) redirect('/api/auth/signout');
 
   const headersList = await headers();
   const pathname = headersList.get('x-pathname') || '';
@@ -57,7 +57,7 @@ export default async function DashboardLayout({
     }
   }
 
-  const navItems = roleNavItems[role] || roleNavItems.student;
+  const navItems = roleNavItems[role as keyof typeof roleNavItems] || roleNavItems.teacher;
   const userName = user?.name || 'User';
   const userEmail = user?.email || 'user@example.com';
 
@@ -76,7 +76,6 @@ export default async function DashboardLayout({
           userName={userName}
           userEmail={userEmail}
           userAvatar={userAvatar}
-          role={role}
         />
         <SidebarInset>
           <HeaderDashboard

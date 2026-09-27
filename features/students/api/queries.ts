@@ -13,6 +13,9 @@ export const studentKeys = {
 export const studentsQueryOptions = (filters: any = {}) => queryOptions({
   queryKey: studentKeys.list(filters),
   queryFn: () => getStudents(filters),
+  staleTime: 60 * 1000,        // 60s — don't refetch on navigation
+  gcTime: 5 * 60 * 1000,       // 5min — keep in memory between visits
+  refetchOnWindowFocus: false,
 });
 
 export function useInfiniteStudents(overrides?: { search?: string; status?: string; departmentId?: string; classId?: string; boardingType?: string }) {

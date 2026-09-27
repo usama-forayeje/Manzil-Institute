@@ -416,10 +416,12 @@ export async function createApplication(
     'document'
   );
 
-  const addrStr = (a: typeof formData.currentAddress) =>
-    [a?.village, a?.postOffice, a?.thana, a?.upazila, a?.district, a?.division]
+  const addrStr = (a: typeof formData.currentAddress) => {
+    const parts = a as any;
+    return [parts?.village, parts?.postOffice, parts?.thana, parts?.upazila, parts?.district, parts?.division]
       .filter(Boolean)
       .join(', ');
+  };
 
   const currentAddressStr = addrStr(formData.currentAddress);
   const permanentAddressStr = formData.permanentSameAsCurrent
@@ -453,7 +455,7 @@ export async function createApplication(
         maritalStatus: formData.maritalStatus,
         religion: formData.religion,
         nationality: formData.nationality ?? 'বাংলাদেশী',
-        dateOfBirth: new Date(formData.dateOfBirth).toISOString(),
+        dateOfBirth: new Date(formData.dateOfBirth ?? '').toISOString(),
         bloodGroup: formData.bloodGroup ?? 'unknown',
         isHafiz: formData.isHafiz ?? false,
 
@@ -503,13 +505,15 @@ export async function createApplication(
           : null,
 
         referenceName: formData.referenceName,
-        referencePhone: convertBengaliToEnglish(formData.referencePhone),
+        referencePhone: formData.referencePhone
+          ? convertBengaliToEnglish(formData.referencePhone)
+          : null,
         referenceOccupation: formData.referenceOccupation || null,
 
         emergencyContactNo: convertBengaliToEnglish(
-          formData.emergencyContactNo
+          formData.emergencyContactNo ?? ''
         ),
-        emergencyRelationship: formData.emergencyRelationship,
+        emergencyRelationship: formData.emergencyRelationship ?? '',
 
         declaration: formData.declaration,
 

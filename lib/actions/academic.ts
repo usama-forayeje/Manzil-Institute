@@ -3,6 +3,11 @@
 import { ID, Query } from 'node-appwrite';
 import { createAdminClient } from '@/lib/appwrite/admin';
 import { DATABASE_ID, COLLECTIONS } from '@/config/appwrite';
+import {
+  getCachedReference,
+  setCachedReference,
+  invalidateAcademicCache,
+} from '@/lib/utils/academic-cache';
 
 // ═══════════════════════════════════════════════════════════════
 // ACADEMIC & SETTINGS ACTIONS
@@ -65,6 +70,7 @@ export async function upsertDepartment(data: DepartmentParams) {
           isActive: data.isActive,
         }
       );
+      invalidateAcademicCache('departments');
       return { success: true };
     } else {
       console.log('[Appwrite Debug] Creating new department');
@@ -94,6 +100,7 @@ export async function upsertDepartment(data: DepartmentParams) {
           isActive: data.isActive,
         }
       );
+      invalidateAcademicCache('departments');
       return { success: true };
     }
   } catch (error: any) {
@@ -109,6 +116,7 @@ export async function deleteDepartment(docId: string) {
 
     const { databases } = await createAdminClient();
     await databases.deleteDocument(DATABASE_ID, COLLECTIONS.DEPARTMENTS, docId);
+    invalidateAcademicCache('departments');
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.message };
@@ -122,15 +130,20 @@ export async function getAllDepartments() {
       return { success: false, departments: [], error: 'Configuration missing: DATABASE_ID or DEPARTMENTS_ID' };
     }
 
-    console.log('[Appwrite Debug] Listing Documents from:', COLLECTIONS.DEPARTMENTS);
+    const cached = getCachedReference<any[]>('departments');
+    if (cached) {
+      return { success: true, departments: cached };
+    }
+
     const { databases } = await createAdminClient();
     const result = await databases.listDocuments(
       DATABASE_ID,
       COLLECTIONS.DEPARTMENTS,
       [Query.orderAsc('code'), Query.limit(100)]
     );
-    // Plain-ify documents for Next.js Client Components
-    return { success: true, departments: JSON.parse(JSON.stringify(result.documents)) };
+    const departments = JSON.parse(JSON.stringify(result.documents));
+    setCachedReference('departments', departments);
+    return { success: true, departments };
   } catch (error: any) {
     console.error('[Appwrite Error]', error.message);
     return { success: false, departments: [], error: error.message };
@@ -188,6 +201,7 @@ export async function deleteClass(docId: string) {
 
     const { databases } = await createAdminClient();
     await databases.deleteDocument(DATABASE_ID, COLLECTIONS.CLASSES, docId);
+    invalidateAcademicCache('classes');
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.message };
@@ -201,15 +215,20 @@ export async function getAllClasses() {
       return { success: false, classes: [], error: 'Configuration missing: DATABASE_ID or CLASSES_ID' };
     }
 
-    console.log('[Appwrite Debug] Listing Documents from:', COLLECTIONS.CLASSES);
+    const cached = getCachedReference<any[]>('classes');
+    if (cached) {
+      return { success: true, classes: cached };
+    }
+
     const { databases } = await createAdminClient();
     const result = await databases.listDocuments(
       DATABASE_ID,
       COLLECTIONS.CLASSES,
       [Query.orderAsc('level'), Query.limit(100)]
     );
-    // Plain-ify documents for Next.js Client Components
-    return { success: true, classes: JSON.parse(JSON.stringify(result.documents)) };
+    const classes = JSON.parse(JSON.stringify(result.documents));
+    setCachedReference('classes', classes);
+    return { success: true, classes };
   } catch (error: any) {
     console.error('[Appwrite Error]', error.message);
     return { success: false, classes: [], error: error.message };
@@ -256,6 +275,7 @@ export async function upsertSession(data: SessionParams) {
         ...payload,
       });
     }
+    invalidateAcademicCache('sessions');
     return { success: true };
   } catch (error: any) {
     console.error('[Appwrite Error]', error.message);
@@ -267,11 +287,18 @@ export async function getAllSessions() {
   try {
     if (!DATABASE_ID || !COLLECTIONS.SESSIONS) return { success: false, sessions: [], error: 'Config missing' };
 
+    const cached = getCachedReference<any[]>('sessions');
+    if (cached) {
+      return { success: true, sessions: cached };
+    }
+
     const { databases } = await createAdminClient();
     const result = await databases.listDocuments(DATABASE_ID, COLLECTIONS.SESSIONS, [
       Query.orderDesc('sessionName'), Query.limit(100)
     ]);
-    return { success: true, sessions: JSON.parse(JSON.stringify(result.documents)) };
+    const sessions = JSON.parse(JSON.stringify(result.documents));
+    setCachedReference('sessions', sessions);
+    return { success: true, sessions };
   } catch (error: any) {
     console.error('[Appwrite Error]', error.message);
     return { success: false, sessions: [], error: error.message };
@@ -285,6 +312,7 @@ export async function deleteSession(docId: string) {
 
     const { databases } = await createAdminClient();
     await databases.deleteDocument(DATABASE_ID, COLLECTIONS.SESSIONS, docId);
+    invalidateAcademicCache('sessions');
     return { success: true };
   } catch (error: any) {
     console.error('[Appwrite Error]', error.message);
@@ -340,11 +368,18 @@ export async function getAllSections() {
   try {
     if (!DATABASE_ID || !COLLECTIONS.SECTIONS) return { success: false, sections: [], error: 'Config missing' };
 
+    const cached = getCachedReference<any[]>('sections');
+    if (cached) {
+      return { success: true, sections: cached };
+    }
+
     const { databases } = await createAdminClient();
     const result = await databases.listDocuments(DATABASE_ID, COLLECTIONS.SECTIONS, [
       Query.orderAsc('sectionName'), Query.limit(100)
     ]);
-    return { success: true, sections: JSON.parse(JSON.stringify(result.documents)) };
+    const sections = JSON.parse(JSON.stringify(result.documents));
+    setCachedReference('sections', sections);
+    return { success: true, sections };
   } catch (error: any) {
     console.error('[Appwrite Error]', error.message);
     return { success: false, sections: [], error: error.message };
@@ -358,6 +393,7 @@ export async function deleteSection(docId: string) {
 
     const { databases } = await createAdminClient();
     await databases.deleteDocument(DATABASE_ID, COLLECTIONS.SECTIONS, docId);
+    invalidateAcademicCache('sections');
     return { success: true };
   } catch (error: any) {
     console.error('[Appwrite Error]', error.message);
@@ -404,6 +440,11 @@ export async function upsertBoardingType(data: BoardingTypeParams) {
 
 export async function getAllBoardingTypes() {
   try {
+    const cached = getCachedReference<any[]>('boardingTypes');
+    if (cached) {
+      return { success: true, boardingTypes: cached };
+    }
+
     const { databases } = await createAdminClient();
     if (!DATABASE_ID || !COLLECTIONS.BOARDING_TYPES) return { success: false, boardingTypes: [], error: 'Config missing' };
     
@@ -412,9 +453,11 @@ export async function getAllBoardingTypes() {
       COLLECTIONS.BOARDING_TYPES,
       [Query.orderAsc('order'), Query.limit(100)]
     );
+    const boardingTypes = JSON.parse(JSON.stringify(response.documents));
+    setCachedReference('boardingTypes', boardingTypes);
     return {
       success: true,
-      boardingTypes: JSON.parse(JSON.stringify(response.documents)),
+      boardingTypes,
     };
   } catch (err: any) {
     return { success: false, boardingTypes: [], error: err.message };

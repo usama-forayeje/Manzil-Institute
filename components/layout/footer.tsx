@@ -11,7 +11,7 @@ import { LazyImage } from '../ui/lazy-image';
 import { Skeleton } from '../ui/skeleton';
 
 // Theme-aware logo component for footer
-function FooterLogo({ className, ...props }) {
+function FooterLogo({ className, ...props }: { className?: string; [key: string]: any } = {}) {
   const { theme } = useTheme();
   const [mounted, setMounted] = useState(false);
 

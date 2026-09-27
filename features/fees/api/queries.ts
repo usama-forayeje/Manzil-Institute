@@ -13,6 +13,7 @@ import type { FeeFilter } from '@/features/fees/types';
 export const feeKeys = {
   all: ['fees'] as const,
   structures: () => [...feeKeys.all, 'structures'] as const,
+  filterOptions: () => [...feeKeys.all, 'filter-options'] as const,
   dashboard: (session: string, feeType?: string, dateFrom?: string, dateTo?: string) =>
     [...feeKeys.all, 'dashboard', session, feeType || 'all', dateFrom || '', dateTo || ''] as const,
   invoices: (filter: FeeFilter) => [...feeKeys.all, 'invoices', filter] as const,
@@ -24,6 +25,7 @@ export const feeKeys = {
 export const feeTypesQueryOptions = queryOptions({
   queryKey: feeKeys.structures(),
   queryFn: () => getFeeTypes(),
+  staleTime: 5 * 60 * 1000,
 });
 
 // ─── Dashboard Stats ────────────────────────────────────────
@@ -31,7 +33,7 @@ export const feeDashboardQueryOptions = (session: string, feeType?: string, date
   queryOptions({
     queryKey: feeKeys.dashboard(session, feeType, dateFrom, dateTo),
     queryFn: () => fetchFeeDashboardStats(session, feeType, dateFrom, dateTo),
-    staleTime: 0,
+    staleTime: 60 * 1000, // 1 minute
   });
 
 
@@ -62,9 +64,10 @@ export const paymentHistoryQueryOptions = (filter: FeeFilter) =>
 // ─── Dynamic Filter Options ─────────────────────────────────
 export const feeFilterOptionsQueryOptions = () =>
   queryOptions({
-    queryKey: ['feeFilterOptions'],
+    queryKey: feeKeys.filterOptions(),
     queryFn: () => {
       return fetchFeeFilterOptions();
     },
-    staleTime: 0,
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
+

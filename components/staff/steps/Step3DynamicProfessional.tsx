@@ -149,7 +149,7 @@ export default function Step3DynamicProfessional({
           ...value,
           certificateFiles: certFiles,
           certificateUrls: certPreviews,
-        });
+        } as any);
       }, 600);
     });
     return () => {

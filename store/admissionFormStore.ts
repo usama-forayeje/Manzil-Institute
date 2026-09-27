@@ -10,9 +10,7 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 
 // ─── Types ──────────────────────────────────────────────────
 
-export type AdmissionFormStep = 1 | 2 | 3 | 4 | 5 | 6;
-
-
+export type AdmissionFormStep = 1 | 2 | 3 | 4 | 5;
 
 export interface Step5Data {
   studentId:     string;
@@ -74,7 +72,7 @@ export const useAdmissionUIStore = create<AdmissionUIState>()(
 
       nextStep: () =>
         set((s) => ({
-          currentStep: Math.min(s.currentStep + 1, 6) as AdmissionFormStep,
+          currentStep: Math.min(s.currentStep + 1, 5) as AdmissionFormStep,
         })),
 
       prevStep: () =>

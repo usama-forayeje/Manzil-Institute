@@ -9,12 +9,20 @@ import {
   type SessionParams 
 } from '@/lib/actions/academic';
 import { sessionsQueryOptions, academicKeys } from '@/features/academic/api/queries';
+import { useRealtimeTable } from '@/lib/appwrite/realtime';
+import { COLLECTIONS } from '@/config/appwrite';
 
 export function useSessions() {
   const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [globalFilter, setGlobalFilter] = useState('');
+
+  // Realtime updates (docs/appwrite.md §3.7)
+  useRealtimeTable({
+    tableId: COLLECTIONS.SESSIONS,
+    queryKey: academicKeys.sessions(),
+  });
 
   const [formData, setFormData] = useState({
     sessionName: '',
@@ -23,6 +31,7 @@ export function useSessions() {
     isActive: true,
     isCurrent: false,
   });
+
 
   const sessionsQuery = useQuery(sessionsQueryOptions);
   const sessions = sessionsQuery.data?.success ? (sessionsQuery.data.sessions as any[]) : [];

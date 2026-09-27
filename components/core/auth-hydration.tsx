@@ -20,7 +20,7 @@ interface AuthHydrationProps {
  * This component should be rendered once at the app root.
  */
 export function AuthHydration({ initialSession }: AuthHydrationProps) {
-  const { setUser, set } = useAuthStore.getState();
+  const { setUser } = useAuthStore.getState();
 
   useEffect(() => {
     if (initialSession?.user) {

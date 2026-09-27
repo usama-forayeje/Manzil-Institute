@@ -404,7 +404,7 @@ export default function MICCurriculumClientPage(): JSX.Element {
                 >
                   {curriculumData.overview.ageRange
                     .split('-')
-                    .map(n => toBengaliNumeral(parseInt(n), language))
+                    .map((n: string) => toBengaliNumeral(parseInt(n), language))
                     .join('-')}
                 </div>
                 <div className="text-sm text-gray-600 dark:text-gray-400 kalpurush-font">
@@ -436,7 +436,7 @@ export default function MICCurriculumClientPage(): JSX.Element {
               {curriculumData.sectionTitles.curriculumLevels}
             </h2>
 
-            {curriculumData.levels.map((level, index) => {
+            {curriculumData.levels.map((level: any, index: number) => {
               const colorClasses = getColorClasses(level.color);
               return (
                 <div
@@ -510,7 +510,7 @@ export default function MICCurriculumClientPage(): JSX.Element {
                             </h4>
                           </div>
                           <ul className="space-y-2">
-                            {level.generalEducation.map((subject, idx) => (
+                            {level.generalEducation.map((subject: string, idx: number) => (
                               <li key={idx} className="flex items-center gap-2">
                                 <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
                                 <span className="text-sm text-gray-700 dark:text-gray-300 kalpurush-font">
@@ -533,7 +533,7 @@ export default function MICCurriculumClientPage(): JSX.Element {
                           </div>
                           <ul className="space-y-2">
                             {level.internationalEducation.map(
-                              (subject, idx) => (
+                              (subject: string, idx: number) => (
                                 <li
                                   key={idx}
                                   className="flex items-center gap-2"
@@ -559,7 +559,7 @@ export default function MICCurriculumClientPage(): JSX.Element {
                             </h4>
                           </div>
                           <ul className="space-y-2">
-                            {level.technicalActivities.map((subject, idx) => (
+                            {level.technicalActivities.map((subject: string, idx: number) => (
                               <li key={idx} className="flex items-center gap-2">
                                 <div className="w-1.5 h-1.5 bg-orange-500 rounded-full"></div>
                                 <span className="text-sm text-gray-700 dark:text-gray-300 kalpurush-font">
@@ -584,7 +584,7 @@ export default function MICCurriculumClientPage(): JSX.Element {
                             </h4>
                           </div>
                           <div className="space-y-2">
-                            {level.languageSports.map((item, idx) => (
+                            {level.languageSports.map((item: string, idx: number) => (
                               <div
                                 key={idx}
                                 className="text-sm text-gray-700 dark:text-gray-300 kalpurush-font"
@@ -606,7 +606,7 @@ export default function MICCurriculumClientPage(): JSX.Element {
                             </h4>
                           </div>
                           <div className="space-y-2">
-                            {level.economyTarbiyah.map((item, idx) => (
+                            {level.economyTarbiyah.map((item: string, idx: number) => (
                               <div
                                 key={idx}
                                 className="text-sm text-gray-700 dark:text-gray-300 kalpurush-font"
@@ -628,7 +628,7 @@ export default function MICCurriculumClientPage(): JSX.Element {
                             </h4>
                           </div>
                           <div className="space-y-2">
-                            {level.foodSurvival.map((item, idx) => (
+                            {level.foodSurvival.map((item: string, idx: number) => (
                               <div
                                 key={idx}
                                 className="text-sm text-gray-700 dark:text-gray-300 kalpurush-font"
@@ -653,7 +653,7 @@ export default function MICCurriculumClientPage(): JSX.Element {
             </h2>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {curriculumData.keyFeatures.map((feature, index) => {
+              {curriculumData.keyFeatures.map((feature: any, index: number) => {
                 const fTheme = getColorClasses(feature.color);
                 return (
                   <div

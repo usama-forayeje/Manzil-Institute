@@ -50,3 +50,5 @@ config/terms_data.json
 nul
 dev.log
 .kilo/skills/changelog-generator/SKILL.md
+
+.vercel

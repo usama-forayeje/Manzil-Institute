@@ -1,34 +1,69 @@
 'use client';
 
-import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useState, useMemo } from 'react';
+import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { getStudents, deleteStudent } from '@/lib/actions/student';
-import { studentsQueryOptions, studentKeys } from '@/features/students/api/queries';
+import { deleteStudent } from '@/features/students/api/service';
+import { getStudentsInfinite } from '@/features/students/api/service';
+import { studentKeys } from '@/features/students/api/queries';
+import { useStudentsRealtime } from './use-students-realtime';
+import type { ApiResponse, StudentTableResponse } from '@/features/students/types';
 
 export function useStudents() {
   const queryClient = useQueryClient();
   const [globalFilter, setGlobalFilter] = useState('');
-  const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
+  const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 25 });
 
-  const studentsQuery = useQuery(studentsQueryOptions({
-    limit: pagination.pageSize,
-    offset: pagination.pageIndex * pagination.pageSize,
-    search: globalFilter
-  }));
+  // Connect Realtime updates
+  useStudentsRealtime();
 
-  const queryData = studentsQuery.data as any;
-  const students = queryData?.success ? (queryData.students as any[]) : [];
-  const total = queryData?.success ? (queryData.total as number) : 0;
+  // Direct infinite query — bypasses zustand store to avoid stale filter state
+  const infiniteQuery = useInfiniteQuery<ApiResponse<StudentTableResponse>, Error>({
+    queryKey: studentKeys.list({ search: globalFilter, status: 'active' }),
+    queryFn: ({ pageParam }) => getStudentsInfinite({
+      pageParam: pageParam as string | undefined,
+      search: globalFilter || undefined,
+      status: 'active',
+      limit: 100, // fetch generous batch upfront
+    }),
+    initialPageParam: undefined,
+    getNextPageParam: (lastPage) => {
+      if (lastPage.success && lastPage.data && lastPage.data.documents.length === 100) {
+        return lastPage.data.nextCursor;
+      }
+      return undefined;
+    },
+    staleTime: 30 * 1000,
+    refetchOnWindowFocus: false,
+  });
+
+  // Flatten all pages into a single array, then paginate client-side
+  const allStudents = useMemo(() => {
+    if (!infiniteQuery.data?.pages) return [];
+    return infiniteQuery.data.pages.flatMap(
+      (page) => (page.success && page.data ? page.data.documents : [])
+    );
+  }, [infiniteQuery.data]);
+
+  const students = useMemo(() => {
+    const start = pagination.pageIndex * pagination.pageSize;
+    return allStudents.slice(start, start + pagination.pageSize);
+  }, [allStudents, pagination]);
+
+  const total = useMemo(() => {
+    const pages = infiniteQuery.data?.pages;
+    if (!pages || pages.length === 0) return 0;
+    return pages[0]?.data?.total ?? 0;
+  }, [infiniteQuery.data]);
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
       const res = await deleteStudent(id);
-      if (!res.success) throw new Error(res.error || 'ডিলিট করতে সমস্যা হয়েছে');
+      if (!res.success) throw new Error(res.error || 'ডিলিট করতে সমস্যা হয়েছে');
       return res;
     },
     onSuccess: () => {
-      toast.success('শিক্ষার্থী সফলভাবে মুছে ফেলা হয়েছে');
+      toast.success('শিক্ষার্থী সফলভাবে মুছে ফেলা হয়েছে');
       queryClient.invalidateQueries({ queryKey: studentKeys.lists() });
     },
     onError: (error: any) => toast.error(error.message)
@@ -42,8 +77,8 @@ export function useStudents() {
   return {
     students,
     total,
-    isLoading: studentsQuery.isLoading,
-    isFetching: studentsQuery.isFetching,
+    isLoading: infiniteQuery.isLoading,
+    isFetching: infiniteQuery.isFetching,
     globalFilter,
     setGlobalFilter,
     pagination,

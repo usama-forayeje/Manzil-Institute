@@ -189,25 +189,24 @@ export const AdmissionApplicationForm = React.forwardRef<HTMLDivElement>(
                 <Field label="ধর্ম" value={personal.religion || '---'} />
                 <Field label="পরিচয় নম্বর (জন্ম সনদ / এনআইডি)" value={personal.identificationNo} mono />
               </TwoCol>
-              {personal.isHafiz && (
-                <div style={{ marginTop: 6 }}><span style={{ background: '#fffbeb', border: '1px solid #fde68a', color: '#92400e', padding: '3px 12px', borderRadius: 20, fontSize: 9, fontWeight: 900, letterSpacing: '0.1em' }}>✦ হাফিজে কুরআন</span></div>
-              )}
             </SectionBlock>
 
             {/* ── Section 2: Guardian Info ─────────────────── */}
             <SectionBlock color="#6366f1" title="২. অভিভাবকের তথ্য (Guardian Details)">
-              <TwoCol>
+              <ThreeCol>
                 <Field label="পিতার নাম (বাংলা)" value={personal.fatherNameBn} />
                 <Field label="Father's Name (English)" value={personal.fatherNameEn} mono />
-              </TwoCol>
+                <Field label="اسم الأب (عربي)" value={(personal as any).fatherNameAr} />
+              </ThreeCol>
               <TwoCol>
                 <Field label="পিতার পেশা" value={personal.fatherOccupation} />
                 <Field label="পিতার কর্মস্থল" value={personal.fatherWorkplace} />
               </TwoCol>
-              <TwoCol>
+              <ThreeCol>
                 <Field label="মাতার নাম (বাংলা)" value={personal.motherNameBn} />
                 <Field label="Mother's Name (English)" value={personal.motherNameEn} mono />
-              </TwoCol>
+                <Field label="اسم الأم (عربي)" value={(personal as any).motherNameAr} />
+              </ThreeCol>
               <TwoCol>
                 <Field label="মাতার পেশা" value={personal.motherOccupation || 'গৃহিনী'} />
                 <Field label="মাতার কর্মস্থল" value={personal.motherWorkplace} />

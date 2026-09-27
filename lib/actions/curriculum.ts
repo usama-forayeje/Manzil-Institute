@@ -37,7 +37,7 @@ export async function getMICCurriculum(language: string = 'en'): Promise<MICCurr
         Query.equal("type", "mic")
       ]
     );
-    return response.documents as MICCurriculumData[];
+    return response.documents as unknown as MICCurriculumData[];
   } catch (error) {
     console.error("Error fetching MIC curriculum:", error);
     // Return mock data for development
@@ -65,7 +65,7 @@ export async function getMNCCurriculum(language: string = 'en'): Promise<MNCCurr
         Query.equal("type", "mnc")
       ]
     );
-    return response.documents as MNCCurriculumData[];
+    return response.documents as unknown as MNCCurriculumData[];
   } catch (error) {
     console.error("Error fetching MNC curriculum:", error);
     // Return mock data for development

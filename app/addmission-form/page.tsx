@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { ArrowLeft, ExternalLink } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { ArrowLeft, ExternalLink, Printer, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLanguageStore } from '@/store/language';
 import { cn } from '@/lib/utils';
@@ -9,29 +9,72 @@ import { AnimatedGroup } from '@/components/ui/animated-group';
 import ErrorBoundary from '@/components/core/ErrorBoundary';
 import FooterSection from '@/components/layout/footer';
 import { ClientHeader } from '@/components/layout/header';
+import { BlankAdmissionApplicationForm } from '@/features/admission/components/BlankAdmissionApplicationForm';
 
-const transitionVariants = {
-  item: {
-    hidden: {
-      opacity: 0,
-      filter: 'blur(12px)',
-      y: 12,
-    },
-    visible: {
-      opacity: 1,
-      filter: 'blur(0px)',
-      y: 0,
-      transition: {
-        type: 'spring',
-        bounce: 0.3,
-        duration: 1.5,
-      },
-    },
-  },
-};
+function printElement(el: HTMLElement) {
+  const printWindow = window.open('', '_blank', 'width=900,height=700');
+  if (!printWindow) {
+    alert('পপআপ ব্লক করা আছে। অনুগ্রহ করে এই সাইটের পপআপ অনুমতি দিন।');
+    return;
+  }
+
+  const styleLinks = Array.from(document.querySelectorAll('link[rel="stylesheet"]'))
+    .map((lnk) => lnk.outerHTML)
+    .join('\n');
+
+  const styleTags = Array.from(document.querySelectorAll('style'))
+    .map((s) => s.outerHTML)
+    .join('\n');
+
+  printWindow.document.write(`
+    <!DOCTYPE html>
+    <html lang="bn">
+      <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <base href="${window.location.origin}">
+        <title>ভর্তি আবেদন ফরম - মানযিল ইন্টারন্যাশনাল ইনস্টিটিউট</title>
+        ${styleLinks}
+        ${styleTags}
+        <style>
+          * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+          body { margin: 0; background: white; }
+          @media print { body { margin: 0; } }
+          body > *:not(#my-print-content) { display: none !important; }
+        </style>
+      </head>
+      <body>
+        <div id="my-print-content">${el.innerHTML}</div>
+      </body>
+    </html>
+  `);
+  printWindow.document.close();
+  const triggerPrint = () => {
+    printWindow.focus();
+    if (printWindow.document.fonts) {
+      printWindow.document.fonts.ready.then(() => {
+        setTimeout(() => {
+          printWindow.print();
+        }, 150);
+      });
+    } else {
+      setTimeout(() => {
+        printWindow.print();
+      }, 300);
+    }
+    printWindow.addEventListener('afterprint', () => printWindow.close());
+  };
+
+  if (printWindow.document.readyState === 'complete') {
+    triggerPrint();
+  } else {
+    printWindow.onload = triggerPrint;
+  }
+}
 
 export default function AdmissionFormPage() {
   const { language } = useLanguageStore();
+  const blankFormRef = useRef<HTMLDivElement>(null);
 
   const breadcrumbSchema = {
     '@context': 'https://schema.org',
@@ -66,12 +109,9 @@ export default function AdmissionFormPage() {
   };
 
   const handleDownloadForm = () => {
-    alert(
-      language === 'bn'
-        ? 'ফরম ডাউনলোড শুরু হচ্ছে...'
-        : 'Form download starting...'
-    );
-    // In a real app, this would download a PDF form
+    if (blankFormRef.current) {
+      printElement(blankFormRef.current);
+    }
   };
 
   return (
@@ -96,7 +136,6 @@ export default function AdmissionFormPage() {
                   },
                 },
               },
-              ...transitionVariants,
             }}
             className="space-y-8"
           >
@@ -256,6 +295,13 @@ export default function AdmissionFormPage() {
           </AnimatedGroup>
         </main>
         <FooterSection />
+
+        {/* Hidden Printable Blank Form */}
+        <div className="fixed top-[-9999px] left-[-9999px] pointer-events-none select-none overflow-hidden">
+          <div ref={blankFormRef} className="bg-white">
+            <BlankAdmissionApplicationForm />
+          </div>
+        </div>
       </div>
     </ErrorBoundary>
   );

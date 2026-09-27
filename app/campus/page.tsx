@@ -310,7 +310,7 @@ const tiktokVideos: TikTokVideo[] = [
   },
 ];
 
-export default function CampusPage(): JSX.Element {
+export default function CampusPage() {
   const { language } = useLanguageStore();
   const { theme } = useTheme();
 
@@ -354,7 +354,7 @@ export default function CampusPage(): JSX.Element {
                   </span>
                   <span className="text-sm font-medium tracking-wide text-[#00AEEF]">
                     {language === 'bn'
-                      ? 'নেক্সট জেনারেশন ক্যাম্পাস'
+                       ? 'নেক্সট জেনারেশন ক্যাম্পাস'
                       : 'Next Gen Campus'}
                   </span>
                 </div>
@@ -388,7 +388,7 @@ export default function CampusPage(): JSX.Element {
                     onClick={() =>
                       document
                         .getElementById('tour')
-                        .scrollIntoView({ behavior: 'smooth' })
+                        ?.scrollIntoView({ behavior: 'smooth' })
                     }
                   >
                     {language === 'bn' ? 'ক্যাম্পাস দেখুন' : 'Explore Campus'}{' '}
@@ -403,7 +403,7 @@ export default function CampusPage(): JSX.Element {
                     onClick={() =>
                       document
                         .getElementById('gallery')
-                        .scrollIntoView({ behavior: 'smooth' })
+                        ?.scrollIntoView({ behavior: 'smooth' })
                     }
                   >
                     {language === 'bn' ? 'ভিডিও গ্যালারি' : 'Video Gallery'}{' '}

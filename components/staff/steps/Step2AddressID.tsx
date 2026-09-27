@@ -341,7 +341,7 @@ const AddressSection = memo(function AddressSection({
 interface NidCardProps {
   side: 'front' | 'back';
   preview: string | null;
-  inputRef: React.RefObject<HTMLInputElement>;
+  inputRef: React.RefObject<HTMLInputElement | null>;
   onUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onRemove: () => void;
 }
@@ -416,10 +416,10 @@ export default function Step2AddressID({ onNext, onPrev }: StepProps) {
 
   // NID previews from persisted base64
   const [nidFrontPreview, setNidFrontPreview] = useState<string | null>(
-    savedData?.nidFrontBase64 ?? null
+    savedData?.nidFrontCopyUrl ?? null
   );
   const [nidBackPreview, setNidBackPreview] = useState<string | null>(
-    savedData?.nidBackBase64 ?? null
+    savedData?.nidBackCopyUrl ?? null
   );
 
   const nidFrontRef = useRef<HTMLInputElement>(null);
@@ -427,7 +427,7 @@ export default function Step2AddressID({ onNext, onPrev }: StepProps) {
 
   // ── Form ───────────────────────────────────────────────────
   const form = useForm<AddressIDData>({
-    resolver: zodResolver(addressIDSchema),
+    resolver: zodResolver(addressIDSchema) as any,
     defaultValues: {
       currentAddress: {
         division: savedData?.currentAddress?.division ?? '',
@@ -457,8 +457,8 @@ export default function Step2AddressID({ onNext, onPrev }: StepProps) {
   // Restore on mount
   useEffect(() => {
     if (!savedData || !Object.keys(savedData).length) return;
-    const front = savedData.nidFrontBase64 ?? null;
-    const back = savedData.nidBackBase64 ?? null;
+    const front = savedData.nidFrontCopyUrl ?? null;
+    const back = savedData.nidBackCopyUrl ?? null;
     if (front) setNidFrontPreview(front);
     if (back) setNidBackPreview(back);
   }, [savedData]);
@@ -492,10 +492,8 @@ export default function Step2AddressID({ onNext, onPrev }: StepProps) {
     timerRef.current = setTimeout(() => {
       patchStep2Data({
         ...form.getValues(),
-        nidFrontBase64: nidFrontPreview,
-        nidBackBase64: nidBackPreview,
-        nidFrontCopyUrl: nidFrontPreview,
-        nidBackCopyUrl: nidBackPreview,
+        nidFrontCopyUrl: nidFrontPreview ?? undefined,
+        nidBackCopyUrl: nidBackPreview ?? undefined,
       });
     }, 800);
   }, [form, nidFrontPreview, nidBackPreview, patchStep2Data]);
@@ -532,14 +530,12 @@ export default function Step2AddressID({ onNext, onPrev }: StepProps) {
           setNidFrontPreview(base64);
           patchStep2Data({
             ...useStaffFormStore.getState().step2Data,
-            nidFrontBase64: base64,
             nidFrontCopyUrl: base64,
           });
         } else {
           setNidBackPreview(base64);
           patchStep2Data({
             ...useStaffFormStore.getState().step2Data,
-            nidBackBase64: base64,
             nidBackCopyUrl: base64,
           });
         }
@@ -561,16 +557,14 @@ export default function Step2AddressID({ onNext, onPrev }: StepProps) {
         if (nidFrontRef.current) nidFrontRef.current.value = '';
         patchStep2Data({
           ...useStaffFormStore.getState().step2Data,
-          nidFrontBase64: null,
-          nidFrontCopyUrl: null,
+          nidFrontCopyUrl: undefined,
         });
       } else {
         setNidBackPreview(null);
         if (nidBackRef.current) nidBackRef.current.value = '';
         patchStep2Data({
           ...useStaffFormStore.getState().step2Data,
-          nidBackBase64: null,
-          nidBackCopyUrl: null,
+          nidBackCopyUrl: undefined,
         });
       }
     },
@@ -604,10 +598,8 @@ export default function Step2AddressID({ onNext, onPrev }: StepProps) {
 
     setStep2Data({
       ...data,
-      nidFrontBase64: nidFrontPreview,
-      nidBackBase64: nidBackPreview,
-      nidFrontCopyUrl: nidFrontPreview,
-      nidBackCopyUrl: nidBackPreview,
+      nidFrontCopyUrl: nidFrontPreview ?? undefined,
+      nidBackCopyUrl: nidBackPreview ?? undefined,
     });
     onNext();
   };
@@ -632,8 +624,8 @@ export default function Step2AddressID({ onNext, onPrev }: StepProps) {
             <div className="p-5 rounded-2xl bg-primary/5 dark:bg-primary/10 border border-primary/20 shadow-inner">
               <AddressSection
                 prefix="currentAddress"
-                division={currentDivision}
-                district={currentDistrict}
+                division={currentDivision ?? ''}
+                district={currentDistrict ?? ''}
                 title="বর্তমান ঠিকানা"
                 control={form.control}
               />
@@ -650,20 +642,28 @@ export default function Step2AddressID({ onNext, onPrev }: StepProps) {
                       checked={field.value}
                       onCheckedChange={val => {
                         field.onChange(val);
-                        if (val)
-                          form.setValue(
-                            'permanentAddress',
-                            form.getValues('currentAddress')
-                          );
-                        else
+                        if (val) {
+                          const curr = form.getValues('currentAddress');
+                          form.setValue('permanentAddress', {
+                            division: curr.division ?? '',
+                            district: curr.district ?? '',
+                            thana: curr.thana ?? '',
+                            union: curr.union ?? '',
+                            postOffice: curr.postOffice ?? '',
+                            village: curr.village ?? '',
+                            postCode: curr.postCode ?? '',
+                          });
+                        } else {
                           form.setValue('permanentAddress', {
                             division: '',
                             district: '',
                             thana: '',
+                            union: '',
                             postOffice: '',
                             village: '',
                             postCode: '',
                           });
+                        }
                       }}
                       className="border-primary data-[state=checked]:bg-primary"
                     />
@@ -683,8 +683,8 @@ export default function Step2AddressID({ onNext, onPrev }: StepProps) {
               >
                 <AddressSection
                   prefix="permanentAddress"
-                  division={permanentDivision}
-                  district={permanentDistrict}
+                  division={permanentDivision ?? ''}
+                  district={permanentDistrict ?? ''}
                   title="স্থায়ী ঠিকানা"
                   control={form.control}
                 />

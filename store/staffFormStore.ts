@@ -32,7 +32,6 @@ export type EducationQualificationData = Pick<
   ProfessionalEducationData,
   | 'designation'
   | 'designationCustom'
-  | 'department'
   | 'employmentType'
   | 'education'
   | 'isHafiz'

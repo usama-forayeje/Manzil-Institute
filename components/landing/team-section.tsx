@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Globe } from 'lucide-react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay } from 'swiper/modules';
+// @ts-expect-error - Swiper CSS module declaration
 import 'swiper/css';
 import { useLanguageStore } from '@/store/language';
 import { Users, Award, Sparkles } from 'lucide-react';

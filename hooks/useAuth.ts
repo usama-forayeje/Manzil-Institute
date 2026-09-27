@@ -1,13 +1,7 @@
-import { QueryClient } from '@tanstack/react-query';
+import { getQueryClient } from '@/lib/query-client';
 
-export const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      refetchOnWindowFocus: false,
-    },
-  },
-});
+export const queryClient = getQueryClient();
+
 
 // Auth user type
 export interface AuthUser {

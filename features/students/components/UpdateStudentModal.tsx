@@ -35,7 +35,7 @@ import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 import { studentKeys } from '../api/queries';
 import { StudentListItem } from '../types';
-import { Loader2, User, Users, MapPin, Settings, GraduationCap, PhoneInfo as PhoneIcon } from 'lucide-react';
+import { Loader2, User, Users, MapPin, Settings, GraduationCap, Phone as PhoneIcon } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface UpdateStudentModalProps {
@@ -64,41 +64,42 @@ export default function UpdateStudentModal({ student, isOpen, onClose }: UpdateS
 
   React.useEffect(() => {
     if (student) {
+      const s = student as any;
       form.reset({
-        nameEn: student.nameEn || student.name || '',
-        nameBn: student.nameBn || '',
-        dateOfBirth: student.dateOfBirth?.split('T')[0] || '',
-        gender: (student.gender as any) || 'male',
-        bloodGroup: student.bloodGroup || 'unknown',
-        nationality: student.nationality || 'বাংলাদেশী',
-        religion: student.religion || 'islam',
-        identificationType: student.identificationType || 'bc',
-        identificationNo: student.identificationNo || student.barthCertNo || '',
-        isHafiz: !!student.isHafiz,
-        fatherNameEn: student.fatherNameEn || '',
-        fatherNameBn: student.fatherNameBn || student.fatherName || '',
-        fatherOccupation: student.fatherOccupation || '',
-        fatherWorkplace: student.fatherWorkplace || '',
-        motherNameEn: student.motherNameEn || '',
-        motherNameBn: student.motherNameBn || student.motherName || '',
-        motherOccupation: student.motherOccupation || '',
-        motherWorkplace: student.motherWorkplace || '',
-        guardianPhone: student.guardianPhone || '',
-        whatsappNo: student.whatsappNo || '',
-        email: student.email || '',
-        phonePrimary: student.phonePrimary || student.phone || '',
-        address: student.address || '',
-        presentVillage: student.presentVillage || student.village || '',
-        presentPostOffice: student.presentPostOffice || student.postOffice || '',
-        presentThana: student.presentThana || student.upazila || '',
-        presentDistrict: student.presentDistrict || student.district || '',
-        status: (student.status as any) || 'active',
-        boardingType: student.boardingType || 'day',
-        hallName: student.hallName || student.roomPreference || '',
-        admissionDate: student.admissionDate?.split('T')[0] || '',
-        previousSchoolName: student.previousSchoolName || student.previousSchool || '',
-        previousClassName: student.previousClassName || student.previousClass || '',
-        previousResult: student.previousResult || '',
+        nameEn: s.nameEn || s.name || '',
+        nameBn: s.nameBn || '',
+        dateOfBirth: s.dateOfBirth?.split('T')[0] || '',
+        gender: (s.gender as any) || 'male',
+        bloodGroup: s.bloodGroup || 'unknown',
+        nationality: s.nationality || 'বাংলাদেশী',
+        religion: s.religion || 'islam',
+        identificationType: s.identificationType || 'bc',
+        identificationNo: s.identificationNo || s.barthCertNo || '',
+        isHafiz: !!s.isHafiz,
+        fatherNameEn: s.fatherNameEn || '',
+        fatherNameBn: s.fatherNameBn || s.fatherName || '',
+        fatherOccupation: s.fatherOccupation || '',
+        fatherWorkplace: s.fatherWorkplace || '',
+        motherNameEn: s.motherNameEn || '',
+        motherNameBn: s.motherNameBn || s.motherName || '',
+        motherOccupation: s.motherOccupation || '',
+        motherWorkplace: s.motherWorkplace || '',
+        guardianPhone: s.guardianPhone || '',
+        whatsappNo: s.whatsappNo || '',
+        email: s.email || '',
+        phonePrimary: s.phonePrimary || s.phone || '',
+        address: s.address || '',
+        presentVillage: s.presentVillage || s.village || '',
+        presentPostOffice: s.presentPostOffice || s.postOffice || '',
+        presentThana: s.presentThana || s.upazila || '',
+        presentDistrict: s.presentDistrict || s.district || '',
+        status: (s.status as any) || 'active',
+        boardingType: s.boardingType || 'day',
+        hallName: s.hallName || s.roomPreference || '',
+        admissionDate: s.admissionDate?.split('T')[0] || '',
+        previousSchoolName: s.previousSchoolName || s.previousSchool || '',
+        previousClassName: s.previousClassName || s.previousClass || '',
+        previousResult: s.previousResult || '',
       });
     }
   }, [student, form]);

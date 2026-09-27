@@ -32,11 +32,21 @@ export const personalInfoSchema = z.object({
     .max(150)
     .optional()
     .or(z.literal('')),
+  fatherNameAr: z
+    .string()
+    .max(150)
+    .optional()
+    .or(z.literal('')),
   motherNameBn: z
     .string()
     .min(2, { message: 'মাতার নাম বাংলায় দিতে হবে' })
     .max(150),
   motherNameEn: z
+    .string()
+    .max(150)
+    .optional()
+    .or(z.literal('')),
+  motherNameAr: z
     .string()
     .max(150)
     .optional()

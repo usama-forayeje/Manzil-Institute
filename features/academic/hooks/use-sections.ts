@@ -9,6 +9,8 @@ import {
   type SectionParams 
 } from '@/lib/actions/academic';
 import { sectionsQueryOptions, academicKeys } from '@/features/academic/api/queries';
+import { useRealtimeTable } from '@/lib/appwrite/realtime';
+import { COLLECTIONS } from '@/config/appwrite';
 
 export function useSections() {
   const queryClient = useQueryClient();
@@ -16,12 +18,19 @@ export function useSections() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [globalFilter, setGlobalFilter] = useState('');
 
+  // Realtime updates (docs/appwrite.md §3.7)
+  useRealtimeTable({
+    tableId: COLLECTIONS.SECTIONS,
+    queryKey: academicKeys.sections(),
+  });
+
   const [formData, setFormData] = useState({
     sectionName: '',
     sectionNameBn: '',
     capacity: 40,
     isActive: true,
   });
+
 
   const sectionQuery = useQuery(sectionsQueryOptions);
   const sections = sectionQuery.data?.success ? (sectionQuery.data.sections as any[]) : [];

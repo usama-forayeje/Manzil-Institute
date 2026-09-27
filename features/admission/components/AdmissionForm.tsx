@@ -5,10 +5,9 @@
  * Production-Grade with focus management and scroll-to-error
  */
 
-import { useEffect, useCallback, useState, lazy, Suspense, useRef } from 'react';
+import { useEffect, useCallback, useState, useRef } from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { AnimatePresence, motion } from 'framer-motion';
 import { toast } from 'sonner';
 import {
   User,
@@ -22,6 +21,7 @@ import {
   CheckCircle2 as CheckCircle2Icon,
 } from 'lucide-react';
 import { AdmissionApplicationForm } from './AdmissionApplicationForm';
+import { BlankAdmissionApplicationForm } from './BlankAdmissionApplicationForm';
 import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -40,17 +40,18 @@ import {
   type AdmissionFormStep,
 } from '@/store/admissionFormStore';
 
+import { useQueryClient } from '@tanstack/react-query';
+import { studentKeys } from '@/features/students/api/queries';
 import { createAdmission, updateStudentAdmission } from '../api/service';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 
-// Lazy-load steps
-const Step1PersonalInfo = lazy(() => import('./Step1PersonalInfo'));
-const Step2ContactAddress = lazy(() => import('./Step2ContactAddress'));
-const Step3Documents = lazy(() => import('./Step3Documents'));
-const Step4EnrollmentInfo = lazy(() => import('./Step4EnrollmentInfo'));
-const Step5FeeCollection = lazy(() => import('./Step5FeeCollection'));
-const Step6Success = lazy(() => import('./Step6Success'));
+// Direct synchronous imports for instant zero-latency tab/step switching
+import Step1PersonalInfo from './Step1PersonalInfo';
+import Step2ContactAddress from './Step2ContactAddress';
+import Step3Documents from './Step3Documents';
+import Step4EnrollmentInfo from './Step4EnrollmentInfo';
+import Step6Success from './Step6Success';
 
 const DRAFT_KEY = 'mii-admission-draft-v2';
 
@@ -92,11 +93,27 @@ function printElement(el: HTMLElement) {
     </html>
   `);
   printWindow.document.close();
-  printWindow.onload = () => {
+  const triggerPrint = () => {
     printWindow.focus();
-    printWindow.print();
+    if (printWindow.document.fonts) {
+      printWindow.document.fonts.ready.then(() => {
+        setTimeout(() => {
+          printWindow.print();
+        }, 150);
+      });
+    } else {
+      setTimeout(() => {
+        printWindow.print();
+      }, 300);
+    }
     printWindow.addEventListener('afterprint', () => printWindow.close());
   };
+
+  if (printWindow.document.readyState === 'complete') {
+    triggerPrint();
+  } else {
+    printWindow.onload = triggerPrint;
+  }
 }
 
 function loadDraft(): Partial<AdmissionFormValues> {
@@ -128,7 +145,6 @@ const STEPS: StepMeta[] = [
   { number: 2, label: 'ঠিকানা', labelEn: 'Address', icon: MapPin },
   { number: 3, label: 'নথিপত্র', labelEn: 'Documents', icon: FileText },
   { number: 4, label: 'ভর্তি', labelEn: 'Enrollment', icon: GraduationCap },
-  { number: 5, label: 'পেমেন্ট', labelEn: 'Payment', icon: Wallet },
 ];
 
 function StepLoader() {
@@ -180,16 +196,9 @@ function StepIndicator({ current, onStepClick }: { current: number; onStepClick:
         </div>
       </div>
       <div className="relative h-1.5 w-full bg-zinc-200/60 dark:bg-zinc-700/60 rounded-lg overflow-hidden">
-        <motion.div
-          className="absolute top-0 left-0 h-full rounded-lg bg-primary"
-          initial={{ width: 0 }}
-          animate={{ width: percent }}
-          transition={{ duration: 0.5, ease: 'easeOut' }}
-        />
-        <motion.div
-          className="absolute top-0 left-0 h-full w-full bg-gradient-to-r from-transparent via-white/40 to-transparent"
-          animate={{ x: ['-100%', '200%'] }}
-          transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
+        <div
+          className="h-full rounded-lg bg-primary transition-all duration-300"
+          style={{ width: percent }}
         />
       </div>
       <div className="flex justify-between gap-1">
@@ -205,23 +214,19 @@ function StepIndicator({ current, onStepClick }: { current: number; onStepClick:
               className="flex flex-col items-center flex-1 cursor-pointer group min-w-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-lg"
               aria-current={isActive ? 'step' : undefined}
             >
-              <motion.div
-                initial={false}
-                animate={{ scale: isActive ? 1.1 : 1 }}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+              <div
                 className={cn(
                   'relative h-9 w-9 sm:h-10 sm:w-10 rounded-lg flex items-center justify-center border-2 transition-all shadow-sm',
                   isDone && 'bg-emerald-500 border-emerald-500 text-white',
-                  isActive && !isDone && 'bg-primary border-primary text-primary-foreground shadow-lg shadow-primary/20',
+                  isActive && !isDone && 'bg-primary border-primary text-primary-foreground shadow-lg shadow-primary/20 scale-105',
                   !isDone && !isActive && 'border-zinc-200 dark:border-zinc-700 text-zinc-400 group-hover:border-zinc-300'
                 )}
               >
                 {isDone ? <CheckCircle2Icon className="h-4 w-4 sm:h-5 sm:w-5" /> : <Icon className="h-4 w-4 sm:h-5 sm:w-5" />}
-              </motion.div>
+              </div>
               <span className={cn(
                 'text-[10px] sm:text-xs font-bold mt-1.5 truncate kalpurush-font',
-                isActive && 'text-primary',
+                isActive && 'text-primary font-black',
                 isDone && 'text-emerald-500',
                 !isDone && !isActive && 'text-zinc-400'
               )}>
@@ -248,21 +253,23 @@ export default function AdmissionForm({ initialData, isEditMode = false, student
   const currentStep = useCurrentStep();
   const isSubmitting = useIsSubmitting();
   const applicationRef = useRef<HTMLDivElement>(null);
+  const blankFormRef = useRef<HTMLDivElement>(null);
   const [direction, setDirection] = useState(1);
   const [mounted, setMounted] = useState(false);
   const draftLoaded = useRef(false);
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const form = useForm<AdmissionFormValues>({
     resolver: zodResolver(admissionFormSchema) as any,
-    defaultValues: initialData 
-      ? { 
-          ...ADMISSION_DEFAULT_VALUES, 
-          ...initialData,
-          personal: { ...ADMISSION_DEFAULT_VALUES.personal, ...initialData.personal },
-          contact: { ...ADMISSION_DEFAULT_VALUES.contact, ...initialData.contact },
-          enrollment: { ...ADMISSION_DEFAULT_VALUES.enrollment, ...initialData.enrollment },
-        } 
+    defaultValues: initialData
+      ? {
+        ...ADMISSION_DEFAULT_VALUES,
+        ...initialData,
+        personal: { ...ADMISSION_DEFAULT_VALUES.personal, ...initialData.personal },
+        contact: { ...ADMISSION_DEFAULT_VALUES.contact, ...initialData.contact },
+        enrollment: { ...ADMISSION_DEFAULT_VALUES.enrollment, ...initialData.enrollment },
+      }
       : ADMISSION_DEFAULT_VALUES,
     mode: 'onTouched',
     reValidateMode: 'onChange',
@@ -273,10 +280,10 @@ export default function AdmissionForm({ initialData, isEditMode = false, student
     setMounted(true);
     if (draftLoaded.current) return;
     draftLoaded.current = true;
-    
+
     if (isEditMode && initialData) {
-      form.reset({ 
-        ...ADMISSION_DEFAULT_VALUES, 
+      form.reset({
+        ...ADMISSION_DEFAULT_VALUES,
         ...initialData,
         personal: { ...ADMISSION_DEFAULT_VALUES.personal, ...initialData.personal },
         contact: { ...ADMISSION_DEFAULT_VALUES.contact, ...initialData.contact },
@@ -323,7 +330,7 @@ export default function AdmissionForm({ initialData, isEditMode = false, student
 
   // Focus first input on step change
   useEffect(() => {
-    const fieldName = STEP_FIELDS[(currentStep as number) as 1 | 2 | 3 | 4 | 5]?.[0];
+    const fieldName = (STEP_FIELDS as Record<number, any>)[currentStep]?.[0];
     const firstInput = fieldName ? document.querySelector(`[name^="${fieldName}"]`) as HTMLElement | null : null;
     firstInput?.focus();
   }, [currentStep]);
@@ -335,8 +342,8 @@ export default function AdmissionForm({ initialData, isEditMode = false, student
   }, []);
 
   const handleNext = useCallback(async () => {
-    const step = currentStep as 1 | 2 | 3 | 4 | 5;
-    
+    const step = currentStep as 1 | 2 | 3 | 4;
+
     // In edit mode, we might want to skip payment step 5 or handle it differently
     // For now, let's allow proceeding.
 
@@ -345,7 +352,7 @@ export default function AdmissionForm({ initialData, isEditMode = false, student
     if (!isValid) {
       scrollToError();
       const errors = form.formState.errors;
-      
+
       // Recursive helper to find the first error message in the errors tree
       const getFirstErrorMessage = (errObj: any): string | null => {
         if (!errObj) return null;
@@ -359,17 +366,17 @@ export default function AdmissionForm({ initialData, isEditMode = false, student
 
       const customMsg = getFirstErrorMessage(errors);
       const errorMsg = customMsg ? `⚠️ ${customMsg}` : '⚠️ অনুগ্রহ করে সব প্রয়োজনীয় তথ্য সঠিকভাবে পূরণ করুন';
-      
+
       toast.error(errorMsg, {
         description: 'দয়া করে লাল চিহ্নিত ঘরগুলো চেক করুন',
       });
       return;
     }
-    
+
     if (!isEditMode) {
       saveDraft({ ...form.getValues(), currentStep }, isEditMode);
     }
-    
+
     store.markStepComplete(currentStep);
     setDirection(1);
     store.nextStep();
@@ -398,10 +405,8 @@ export default function AdmissionForm({ initialData, isEditMode = false, student
 
   const handleSubmit = useCallback(async () => {
     if (hasSubmitted.current || isSubmitting) return;
-    
+
     const allSections: (keyof AdmissionFormValues)[] = ['personal', 'contact', 'documents', 'enrollment'];
-    // For edit mode, we might skip full payment validation if already paid
-    if (!isEditMode) allSections.push('payment');
 
     const isValid = await form.trigger(allSections);
     if (!isValid) {
@@ -412,7 +417,6 @@ export default function AdmissionForm({ initialData, isEditMode = false, student
       if (errors.contact) failedSections.push('ঠিকানা (ধাপ ২)');
       if (errors.documents) failedSections.push('নথিপত্র (ধাপ ৩)');
       if (errors.enrollment) failedSections.push('ভর্তি তথ্য (ধাপ ৪)');
-      if (!isEditMode && errors.payment) failedSections.push('পেমেন্ট (ধাপ ৫)');
       toast.error(`⚠️ নিম্নলিখিত ধাপে তথ্য অসম্পূর্ণ: ${failedSections.join(', ')}`, { duration: 5000 });
       return;
     }
@@ -425,34 +429,14 @@ export default function AdmissionForm({ initialData, isEditMode = false, student
       if (isEditMode && studentId) {
         // Handle student update logic via robust server action
         const result = await updateStudentAdmission(studentId, values);
-        
-        if (result.success && result.student) {
-          toast.success('🎉 শিক্ষার্থীর তথ্য সফলভাবে আপডেট করা হয়েছে!');
-          
-          // Populate success screen data for printing
-          store.setStep5Data({
-            studentId: result.student?.studentId || result.student?.$id,
-            studentDocId: result.student?.$id,
-            admissionNo: result.student.admissionNo,
-            enrollmentIds: values.enrollment.enrollments.map(e => e.enrollmentDocId || ''),
-            receiptNo: result.student.receiptNo || '---',
-            studentNameEn: result.student.nameEn,
-            studentNameBn: result.student.nameBn,
-            paidAmount: values.payment.paidAmount,
-            totalAmount: values.payment.netAmount,
-            admissionDate: values.enrollment.admissionDate,
-            hallName: values.enrollment.hallName,
-          });
 
-          setDirection(1);
+        if (result.success && result.student) {
           if (typeof window !== 'undefined') localStorage.removeItem(DRAFT_KEY);
-          store.goToStep(6);
-          
-          if (typeof window !== 'undefined') {
-            const url = new URL(window.location.href);
-            url.searchParams.set('successId', result.student.studentId);
-            window.history.pushState({}, '', url.toString());
-          }
+          store.reset();
+          await queryClient.invalidateQueries({ queryKey: studentKeys.all });
+          toast.success('🎉 শিক্ষার্থীর তথ্য সফলভাবে আপডেট করা হয়েছে!');
+          router.push('/dashboard/admin/students');
+          router.refresh();
         } else {
           hasSubmitted.current = false;
           toast.error(result.error || 'আপডেট করতে সমস্যা হয়েছে');
@@ -461,29 +445,13 @@ export default function AdmissionForm({ initialData, isEditMode = false, student
         // Regular Create Admission logic
         const result = await createAdmission(values);
         if (result.success) {
-          store.setStep5Data({
-            studentId: result.studentId,
-            studentDocId: result.studentDocId,
-            admissionNo: result.admissionNo,
-            enrollmentIds: result.enrollmentIds,
-            receiptNo: result.receiptNo,
-            studentNameEn: values.personal.nameEn,
-            studentNameBn: values.personal.nameBn,
-            paidAmount: values.payment.paidAmount,
-            totalAmount: values.payment.netAmount,
-            admissionDate: values.enrollment.admissionDate,
-            hallName: values.enrollment.hallName,
-          });
-          setDirection(1);
           if (typeof window !== 'undefined') localStorage.removeItem(DRAFT_KEY);
-          store.goToStep(6);
-          
-          if (typeof window !== 'undefined') {
-            const url = new URL(window.location.href);
-            url.searchParams.set('successId', result.studentId);
-            window.history.pushState({}, '', url.toString());
-          }
-          toast.success('🎉 ভর্তি সফলভাবে সম্পন্ন হয়েছে!');
+          store.reset();
+          form.reset(ADMISSION_DEFAULT_VALUES);
+          await queryClient.invalidateQueries({ queryKey: studentKeys.all });
+          toast.success('🎉 শিক্ষার্থী ভর্তি সফলভাবে সম্পন্ন হয়েছে!');
+          router.push('/dashboard/admin/students');
+          router.refresh();
         } else {
           hasSubmitted.current = false;
           toast.error(result.error || 'ভর্তি প্রক্রিয়ায় সমস্যা হয়েছে');
@@ -507,82 +475,88 @@ export default function AdmissionForm({ initialData, isEditMode = false, student
           <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] bg-blue-500/5 blur-[120px] rounded-full" />
           <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
         </div>
-        
+
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-12 space-y-8 relative">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
             <div className="space-y-2">
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-[#00AEEF]/10 text-[#00AEEF] text-[10px] font-black uppercase tracking-widest border border-[#00AEEF]/20">
-                 Admission System 2.0
-              </motion.div>
-              <motion.h1 initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="text-3xl sm:text-5xl font-black tracking-tight text-zinc-900 dark:text-zinc-50 kalpurush-font leading-tight">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-[#00AEEF]/10 text-[#00AEEF] text-[10px] font-black uppercase tracking-widest border border-[#00AEEF]/20">
+                Admission System 2.0
+              </div>
+              <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-zinc-900 dark:text-zinc-50 kalpurush-font leading-tight">
                 {isEditMode ? 'শিক্ষার্থী তথ্য আপডেট' : 'ভর্তি ফরম'}
-              </motion.h1>
-              <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }} className="text-zinc-500 dark:text-zinc-400 font-bold english-text text-sm opacity-80">
+              </h1>
+              <p className="text-zinc-500 dark:text-zinc-400 font-bold english-text text-sm opacity-80">
                 {isEditMode ? 'Update Student Information Profile' : 'Student Admission Application Form'}
-              </motion.p>
+              </p>
             </div>
 
             {currentStep < 6 && (
-              <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="flex items-center gap-3">
+              <div className="flex items-center gap-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => blankFormRef.current && printElement(blankFormRef.current)}
+                  className="h-11 rounded-md bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-xs font-bold gap-2 shadow-sm text-zinc-700 dark:text-zinc-200 hover:text-[#00AEEF] hover:border-[#00AEEF]/50 transition-colors"
+                >
+                  <Printer className="size-4 text-[#00AEEF]" />
+                  <span>ব্ল্যাংক ফরম প্রিন্ট</span>
+                </Button>
+
                 {isEditMode && (
-                  <Button 
+                  <Button
                     variant="outline"
-                    onClick={() => applicationRef.current && printElement(applicationRef.current)} 
+                    onClick={() => applicationRef.current && printElement(applicationRef.current)}
                     className="h-11 rounded-md bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-[10px] font-black uppercase tracking-widest gap-2 shadow-sm"
                   >
                     <Printer className="size-4" />
                     Print Form
                   </Button>
                 )}
-                <Button 
+                <Button
                   variant="ghost"
-                  onClick={isEditMode ? () => router.back() : handleReset} 
+                  onClick={isEditMode ? () => router.back() : handleReset}
                   className="h-11 rounded-md text-zinc-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 text-[10px] font-black uppercase tracking-widest gap-2"
                 >
                   <RotateCcw className="size-4" />
                   {isEditMode ? 'Cancel' : 'Reset'}
                 </Button>
-              </motion.div>
+              </div>
             )}
           </div>
 
-          {currentStep < 6 && (
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white/40 dark:bg-zinc-900/40 backdrop-blur-xl rounded-md border border-zinc-200 dark:border-zinc-800 p-6 sm:p-10 shadow-2xl shadow-zinc-200/50 dark:shadow-none">
+          {currentStep < 5 && (
+            <div className="bg-white/40 dark:bg-zinc-900/40 backdrop-blur-xl rounded-md border border-zinc-200 dark:border-zinc-800 p-6 sm:p-10 shadow-2xl shadow-zinc-200/50 dark:shadow-none">
               <StepIndicator current={currentStep} onStepClick={handleGoToStep} />
-            </motion.div>
+            </div>
           )}
 
           <div className="bg-white dark:bg-zinc-900 rounded-md border border-zinc-200 dark:border-zinc-800 shadow-2xl overflow-hidden relative group">
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#00AEEF]/30 to-transparent" />
             <div className="relative p-6 sm:p-12">
-              <AnimatePresence mode="wait" custom={direction}>
-                <motion.div key={currentStep} custom={direction} initial={{ opacity: 0, x: direction * 40, filter: 'blur(8px)' }} animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }} exit={{ opacity: 0, x: direction * -40, filter: 'blur(8px)' }} transition={{ duration: 0.4, type: 'spring', stiffness: 120, damping: 20 }}>
-                  <Suspense fallback={<StepLoader />}>
-                    {currentStep === 1 && <Step1PersonalInfo onNext={handleNext} isEditMode={isEditMode} />}
-                    {currentStep === 2 && <Step2ContactAddress onNext={handleNext} onPrev={handlePrev} />}
-                    {currentStep === 3 && <Step3Documents onNext={handleNext} onPrev={handlePrev} />}
-                    {currentStep === 4 && <Step4EnrollmentInfo onNext={handleNext} onPrev={handlePrev} />}
-                    {currentStep === 5 && <Step5FeeCollection onSubmit={handleSubmit} onPrev={handlePrev} isSubmitting={isSubmitting} />}
-                    {currentStep === 6 && <Step6Success />}
-                  </Suspense>
-                </motion.div>
-              </AnimatePresence>
+              {currentStep === 1 && <Step1PersonalInfo onNext={handleNext} isEditMode={isEditMode} />}
+              {currentStep === 2 && <Step2ContactAddress onNext={handleNext} onPrev={handlePrev} />}
+              {currentStep === 3 && <Step3Documents onNext={handleNext} onPrev={handlePrev} />}
+              {currentStep === 4 && <Step4EnrollmentInfo onNext={handleSubmit} onPrev={handlePrev} />}
+              {currentStep === 5 && <Step6Success />}
             </div>
           </div>
 
-          {currentStep < 6 && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="flex flex-col items-center gap-4">
+          {currentStep < 5 && (
+            <div className="flex flex-col items-center gap-4">
               <div className="flex items-center gap-3 px-5 py-2 bg-zinc-100/50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-800 rounded-full">
-                <div className="size-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+                <div className="size-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
                 <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">{isEditMode ? 'Editing Mode' : 'Autosave Enabled'}</p>
               </div>
               <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-tight opacity-50">Manzil International Institute — Secure Admission Cloud</p>
-            </motion.div>
+            </div>
           )}
 
           <div className="fixed top-[-9999px] left-[-9999px] pointer-events-none select-none overflow-hidden">
             <div ref={applicationRef} className="bg-white">
               <AdmissionApplicationForm />
+            </div>
+            <div ref={blankFormRef} className="bg-white">
+              <BlankAdmissionApplicationForm />
             </div>
           </div>
         </div>

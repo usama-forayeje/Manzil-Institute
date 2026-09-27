@@ -746,11 +746,12 @@ export async function searchStudentsForFee(term: string) {
 }
 
 // 7. FETCH UNPAID INVOICES
-export async function fetchUnpaidInvoices({ studentDocId }: { studentDocId: string }) {
+export async function fetchUnpaidInvoices({ studentDocId, studentId }: { studentDocId?: string; studentId?: string }) {
   try {
     const { databases } = await createAdminClient();
+    const targetId = studentDocId || studentId || '';
     const { documents: invoices } = await databases.listDocuments(DATABASE_ID, COLLECTIONS.FEE_INVOICES, [
-      Query.equal('studentId', studentDocId),
+      Query.equal('studentId', targetId),
       Query.notEqual('status', 'paid')
     ]);
     // Serialize to plain objects — Appwrite docs have non-plain prototypes
@@ -763,7 +764,7 @@ export async function fetchUnpaidInvoices({ studentDocId }: { studentDocId: stri
 
 // 8. COLLECT FEE PAYMENT
 export async function collectFeePayment({
-  invoiceId, studentId, studentDocId, amount, discount, paymentMethod, transactionRef, notes, recordedBy
+  invoiceId, studentId, studentDocId, amount, discount = 0, paymentMethod, transactionRef, notes, recordedBy
 }: any) {
   try {
     const { databases } = await createAdminClient();
@@ -790,7 +791,7 @@ export async function collectFeePayment({
       paymentId: paymentIdStr,
       receiptNo: paymentIdStr,
       invoiceId: invoiceId,
-      studentId: studentDocId,
+      studentId: studentDocId || studentId || '',
       enrollmentId: inv.enrollmentId || '',
       departmentCode: inv.departmentCode || '',
       amountPaid: amount,
@@ -801,7 +802,7 @@ export async function collectFeePayment({
       notes: notes || ''
     });
 
-    return { success: true, paymentId: payment.$id };
+    return { success: true, paymentId: payment.$id, receiptNo: paymentIdStr };
   } catch (error: any) {
     console.error('Payment error', error);
     return { success: false, error: 'Payment failed' };

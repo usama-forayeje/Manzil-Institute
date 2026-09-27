@@ -1,13 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
-import { getAdmissionData, type AdmissionData } from '@/lib/actions/admission';
-import { getMICCurriculum, getMNCCurriculum, type MICCurriculumData, type MNCCurriculumData } from '@/lib/actions/curriculum';
-import type { Language } from '@/types/api';
+import { getAdmissionData } from '@/lib/actions/admission';
+import { getMICCurriculum, getMNCCurriculum } from '@/lib/actions/curriculum';
+import type { Language, AdmissionData, MICCurriculumData, MNCCurriculumData } from '@/types/api';
 
 // Simulate API delay for better UX
 const delay = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms));
 
 // Default fallback data (same as in actions) - used for initial render
-const defaultAdmissionData: Record<Language, AdmissionData> = {
+const defaultAdmissionData: Record<Language, any> = {
   en: {
     overview: { title: "Admission", description: "Loading..." },
     process: [],
@@ -26,7 +26,7 @@ const defaultAdmissionData: Record<Language, AdmissionData> = {
   },
 };
 
-const defaultMICData: Record<Language, MICCurriculumData> = {
+const defaultMICData: Record<Language, any> = {
   en: {
     overview: { totalLevels: 6, levelsLabel: "Levels", totalYears: 22, yearsLabel: "Years", ageRange: "4-25", ageRangeLabel: "Years", streamsLabel: "Streams" },
     title: "Manzil International Curriculum",
@@ -45,7 +45,7 @@ const defaultMICData: Record<Language, MICCurriculumData> = {
   },
 };
 
-const defaultMNCData: Record<Language, MNCCurriculumData> = {
+const defaultMNCData: Record<Language, any> = {
   en: {
     overview: { totalLevels: 7, levelsLabel: "Stages", totalYears: 7, yearsLabel: "Years", ageRange: "10-20", ageRangeLabel: "Years", streamsLabel: "Streams" },
     sectionTitles: { curriculumLevels: "", specialPrograms: "", kitabVibag: "", seventhHour: "", technicalNctb: "", hifzSection: "", ctaTitle: "", ctaDescription: "", contactButton: "Apply Now", downloadButton: "Download" },
@@ -62,13 +62,13 @@ const defaultMNCData: Record<Language, MNCCurriculumData> = {
  * Hook to fetch admission data from Appwrite database
  */
 export function useAdmissionData(language: Language = 'en') {
-  return useQuery({
+  return useQuery<AdmissionData>({
     queryKey: ['admission-data', language],
     queryFn: async () => {
-      await delay(100);
-      return getAdmissionData(language);
+      const data = await getAdmissionData(language);
+      return (data as any) || defaultAdmissionData[language] || defaultAdmissionData.en;
     },
-    initialData: defaultAdmissionData[language] || defaultAdmissionData.en,
+    initialData: (defaultAdmissionData[language] || defaultAdmissionData.en) as AdmissionData,
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes
     retry: 1,
@@ -80,13 +80,13 @@ export function useAdmissionData(language: Language = 'en') {
  * Hook to fetch MIC (Manzil International Curriculum) data from Appwrite
  */
 export function useMICCurriculum(language: Language = 'en') {
-  return useQuery({
+  return useQuery<MICCurriculumData>({
     queryKey: ['mic-curriculum', language],
     queryFn: async () => {
-      await delay(100);
-      return getMICCurriculum(language);
+      const data = await getMICCurriculum(language);
+      return (data as any) || defaultMICData[language] || defaultMICData.en;
     },
-    initialData: defaultMICData[language] || defaultMICData.en,
+    initialData: (defaultMICData[language] || defaultMICData.en) as MICCurriculumData,
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
     retry: 1,
@@ -98,13 +98,13 @@ export function useMICCurriculum(language: Language = 'en') {
  * Hook to fetch MNC (Madrasa) curriculum data from Appwrite
  */
 export function useMNCCurriculum(language: Language = 'en') {
-  return useQuery({
+  return useQuery<MNCCurriculumData>({
     queryKey: ['mnc-curriculum', language],
     queryFn: async () => {
-      await delay(100);
-      return getMNCCurriculum(language);
+      const data = await getMNCCurriculum(language);
+      return (data as any) || defaultMNCData[language] || defaultMNCData.en;
     },
-    initialData: defaultMNCData[language] || defaultMNCData.en,
+    initialData: (defaultMNCData[language] || defaultMNCData.en) as MNCCurriculumData,
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
     retry: 1,

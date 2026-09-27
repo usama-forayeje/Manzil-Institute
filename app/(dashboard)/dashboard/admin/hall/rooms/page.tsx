@@ -1,14 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { 
-  Building2, 
-  Plus, 
-  Search, 
-  MoreHorizontal, 
-  Edit2, 
-  Trash2, 
-  DoorOpen, 
+import {
+  Building2,
+  Plus,
+  Search,
+  MoreHorizontal,
+  Edit2,
+  Trash2,
+  DoorOpen,
   Users,
   LayoutGrid,
   Loader2,
@@ -16,7 +16,6 @@ import {
   CheckCircle2,
   AlertCircle
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -25,11 +24,11 @@ import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 import {
   Dialog,
@@ -186,8 +185,8 @@ export default function HallRoomsPage() {
   };
 
   const rooms = data?.rooms || [];
-  const filteredRooms = rooms.filter((r: any) => 
-    r.roomName?.toLowerCase().includes(search.toLowerCase()) || 
+  const filteredRooms = rooms.filter((r: any) =>
+    r.roomName?.toLowerCase().includes(search.toLowerCase()) ||
     r.roomNo?.includes(search)
   );
 
@@ -210,12 +209,12 @@ export default function HallRoomsPage() {
             প্রতিষ্ঠানের সকল হল এবং রুমের তথ্য ডাটাবেস থেকে ম্যানেজ করুন।
           </p>
         </div>
-        
+
         <div className="flex items-center gap-3">
-          <Button 
-            variant="outline" 
-            size="icon" 
-            onClick={() => refetch()} 
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => refetch()}
             disabled={isLoading || isRefetching}
             className="h-11 w-11 rounded-md shadow-sm transition-all"
           >
@@ -243,7 +242,7 @@ export default function HallRoomsPage() {
                   {editingRoom ? "রুমের বর্তমান তথ্য পরিবর্তন করে সংরক্ষণ করুন।" : "সঠিক তথ্য দিয়ে নতুন একটি কক্ষ ডাটাবেসে সেভ করুন।"}
                 </DialogDescription>
               </DialogHeader>
-              
+
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="p-8 space-y-6 solaiman-lipi">
                   <div className="grid grid-cols-2 gap-5">
@@ -267,11 +266,11 @@ export default function HallRoomsPage() {
                         <FormItem>
                           <FormLabel className="text-xs font-bold text-muted-foreground uppercase tracking-wider solaiman-lipi">সিট ক্যাপাসিটি</FormLabel>
                           <FormControl>
-                            <Input 
-                              type="number" 
-                              min="1" 
-                              className="h-11 rounded-lg bg-secondary/30 border-secondary font-bold solaiman-lipi" 
-                              {...field} 
+                            <Input
+                              type="number"
+                              min="1"
+                              className="h-11 rounded-lg bg-secondary/30 border-secondary font-bold solaiman-lipi"
+                              {...field}
                               onChange={e => field.onChange(Number(e.target.value))}
                             />
                           </FormControl>
@@ -287,7 +286,7 @@ export default function HallRoomsPage() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="text-xs font-bold text-muted-foreground uppercase tracking-wider solaiman-lipi flex justify-between items-center">
-                          হলের নাম / কক্ষের নাম 
+                          হলের নাম / কক্ষের নাম
                         </FormLabel>
                         <FormControl>
                           <Input placeholder="যেমন: আবু বকর (রা.) হল" className="h-11 rounded-lg bg-secondary/30 border-secondary font-bold solaiman-lipi" {...field} />
@@ -338,8 +337,8 @@ export default function HallRoomsPage() {
                   </div>
 
                   <DialogFooter className="pt-2">
-                    <Button 
-                      type="submit" 
+                    <Button
+                      type="submit"
                       disabled={saveMutation.isPending}
                       className="w-full h-11 rounded-md text-lg font-bold shadow-lg shadow-primary/20 gap-2 transition-all active:scale-[0.98] solaiman-lipi"
                     >
@@ -379,8 +378,8 @@ export default function HallRoomsPage() {
       <div className="space-y-6">
         <div className="flex items-center gap-3 bg-card border border-border p-1.5 rounded-md shadow-sm focus-within:ring-2 focus-within:ring-primary/20 transition-all">
           <div className="pl-4"><Search className="h-5 w-5 text-muted-foreground/50" /></div>
-          <Input 
-            placeholder="রুমের নাম বা নম্বর দিয়ে খুঁজুন..." 
+          <Input
+            placeholder="রুমের নাম বা নম্বর দিয়ে খুঁজুন..."
             className="border-0 bg-transparent shadow-none focus-visible:ring-0 text-md font-bold placeholder:text-muted-foreground/50 solaiman-lipi"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -415,69 +414,60 @@ export default function HallRoomsPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <AnimatePresence>
-              {filteredRooms.map((room: any) => (
-                <motion.div
-                  layout
-                  key={room.$id}
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <Card className="group border-border bg-card hover:border-primary/30 transition-all rounded-[28px] overflow-hidden shadow-sm hover:shadow-xl hover:shadow-primary/5">
-                    <CardContent className="p-6">
-                      <div className="flex items-start justify-between">
-                        <div className="p-3 bg-secondary/80 rounded-md group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300">
-                          <DoorOpen className="h-6 w-6" />
-                        </div>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-9 w-9 p-0 rounded-full hover:bg-secondary transition-all opacity-0 group-hover:opacity-100"><MoreHorizontal className="h-4 w-4" /></Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="rounded-md p-1.5 min-w-[150px] shadow-xl solaiman-lipi">
-                            <DropdownMenuItem onClick={() => handleEdit(room)} className="rounded-lg gap-2 font-bold focus:bg-primary/10 focus:text-primary solaiman-lipi cursor-pointer"><Edit2 className="h-3.5 w-3.5" /> এডিট করুন</DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => {
-                              if(confirm('আপনি কি নিশ্চিতভাবে এই রুমটি ডিলিট করতে চান?')) {
-                                deleteMutation.mutate(room.$id);
-                              }
-                            }} className="rounded-lg gap-2 font-bold text-destructive focus:bg-destructive/10 focus:text-destructive solaiman-lipi cursor-pointer"><Trash2 className="h-3.5 w-3.5" /> ডিলিট করুন</DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+            {filteredRooms.map((room: any) => (
+              <div
+                key={room.$id}
+              >
+                <Card className="group border-border bg-card hover:border-primary/30 transition-all rounded-[28px] overflow-hidden shadow-sm hover:shadow-xl hover:shadow-primary/5">
+                  <CardContent className="p-6">
+                    <div className="flex items-start justify-between">
+                      <div className="p-3 bg-secondary/80 rounded-md group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300">
+                        <DoorOpen className="h-6 w-6" />
                       </div>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" className="h-9 w-9 p-0 rounded-full hover:bg-secondary transition-all opacity-0 group-hover:opacity-100"><MoreHorizontal className="h-4 w-4" /></Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="rounded-md p-1.5 min-w-[150px] shadow-xl solaiman-lipi">
+                          <DropdownMenuItem onClick={() => handleEdit(room)} className="rounded-lg gap-2 font-bold focus:bg-primary/10 focus:text-primary solaiman-lipi cursor-pointer"><Edit2 className="h-3.5 w-3.5" /> এডিট করুন</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => {
+                            if (confirm('আপনি কি নিশ্চিতভাবে এই রুমটি ডিলিট করতে চান?')) {
+                              deleteMutation.mutate(room.$id);
+                            }
+                          }} className="rounded-lg gap-2 font-bold text-destructive focus:bg-destructive/10 focus:text-destructive solaiman-lipi cursor-pointer"><Trash2 className="h-3.5 w-3.5" /> ডিলিট করুন</DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
 
-                      <div className="mt-6 space-y-1">
-                        <div className="flex items-center gap-2">
-                          <h3 className="text-lg font-bold tracking-tight text-foreground truncate solaiman-lipi">{room.roomName}</h3>
-                          <Badge variant={room.isActive ? "default" : "secondary"} className={cn("rounded-full text-[8px] uppercase tracking-widest font-black px-2 solaiman-lipi", !room.isActive && "opacity-50")}>
-                            {room.isActive ? 'Active' : 'Offline'}
-                          </Badge>
-                        </div>
-                        <div className="flex items-center gap-1.5 text-xs font-bold text-muted-foreground tracking-tight solaiman-lipi">
-                          <span className="solaiman-lipi">রুম: {convertEnglishToBengali(room.roomNo)}</span>
-                          <span className="w-1 h-1 bg-muted-foreground/30 rounded-full" />
-                          <span className="solaiman-lipi">{floorMap[room.floor] || room.floor}</span>
-                        </div>
+                    <div className="mt-6 space-y-1">
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-lg font-bold tracking-tight text-foreground truncate solaiman-lipi">{room.roomName}</h3>
+                        <Badge variant={room.isActive ? "default" : "secondary"} className={cn("rounded-full text-[8px] uppercase tracking-widest font-black px-2 solaiman-lipi", !room.isActive && "opacity-50")}>
+                          {room.isActive ? 'Active' : 'Offline'}
+                        </Badge>
                       </div>
+                      <div className="flex items-center gap-1.5 text-xs font-bold text-muted-foreground tracking-tight solaiman-lipi">
+                        <span className="solaiman-lipi">রুম: {convertEnglishToBengali(room.roomNo)}</span>
+                        <span className="w-1 h-1 bg-muted-foreground/30 rounded-full" />
+                        <span className="solaiman-lipi">{floorMap[room.floor] || room.floor}</span>
+                      </div>
+                    </div>
 
-                      <div className="mt-6 space-y-2.5 p-4 bg-muted/40 rounded-md ring-1 ring-inset ring-border/50 group-hover:ring-primary/20">
-                        <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 solaiman-lipi">
-                          <span className="solaiman-lipi">সিট অকুপেন্সি</span>
-                          <span className="text-foreground solaiman-lipi">{convertEnglishToBengali(room.occupiedSeats || 0)} / {convertEnglishToBengali(room.capacity)} পূর্ণ</span>
-                        </div>
-                        <div className="h-2 w-full bg-secondary rounded-full overflow-hidden">
-                          <motion.div 
-                            initial={{ width: 0 }}
-                            animate={{ width: `${((room.occupiedSeats || 0) / (room.capacity || 1)) * 100}%` }}
-                            className="h-full rounded-full bg-primary" 
-                          />
-                        </div>
+                    <div className="mt-6 space-y-2.5 p-4 bg-muted/40 rounded-md ring-1 ring-inset ring-border/50 group-hover:ring-primary/20">
+                      <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 solaiman-lipi">
+                        <span className="solaiman-lipi">সিট অকুপেন্সি</span>
+                        <span className="text-foreground solaiman-lipi">{convertEnglishToBengali(room.occupiedSeats || 0)} / {convertEnglishToBengali(room.capacity)} পূর্ণ</span>
                       </div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              ))}
-            </AnimatePresence>
+                      <div className="h-2 w-full bg-secondary rounded-full overflow-hidden">
+                        <div
+                          className="h-full rounded-full bg-primary"
+                        />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            ))}
           </div>
         )}
       </div>

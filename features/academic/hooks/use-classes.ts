@@ -9,6 +9,8 @@ import {
   type ClassParams 
 } from '@/lib/actions/academic';
 import { academicKeys, classesQueryOptions, departmentsQueryOptions } from '@/features/academic/api/queries';
+import { useRealtimeTable } from '@/lib/appwrite/realtime';
+import { COLLECTIONS } from '@/config/appwrite';
 
 export function useClasses() {
   const queryClient = useQueryClient();
@@ -16,11 +18,18 @@ export function useClasses() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [globalFilter, setGlobalFilter] = useState('');
 
+  // Realtime updates (docs/appwrite.md §3.7)
+  useRealtimeTable({
+    tableId: COLLECTIONS.CLASSES,
+    queryKey: academicKeys.classes(),
+  });
+
   const classesQuery = useQuery(classesQueryOptions);
   const departmentsQuery = useQuery(departmentsQueryOptions);
   
   const classes = classesQuery.data?.success ? (classesQuery.data.classes as any[]) : [];
   const departments = departmentsQuery.data?.success ? (departmentsQuery.data.departments as any[]) : [];
+
 
   const [formData, setFormData] = useState({
     name: '',

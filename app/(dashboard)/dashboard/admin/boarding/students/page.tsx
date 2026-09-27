@@ -1,12 +1,12 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import { 
-  Users, 
-  Search, 
-  Filter, 
-  Home, 
-  UserCheck, 
+import {
+  Users,
+  Search,
+  Filter,
+  Home,
+  UserCheck,
   UserMinus,
   LayoutGrid,
   MoreVertical,
@@ -71,7 +71,6 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { motion, AnimatePresence } from 'framer-motion';
 
 // --- Column Helper ---
 const columnHelper = createColumnHelper<any>();
@@ -86,7 +85,7 @@ export default function BoardingStudentsPage() {
   const queryClient = useQueryClient();
   const { data: btData } = useQuery(boardingTypesQueryOptions);
   const { data: roomsData } = useQuery(boardingRoomsQueryOptions);
-  
+
   const boardingTypes = useMemo(() => btData?.boardingTypes || [], [btData]);
   const rooms = useMemo(() => roomsData?.rooms || [], [roomsData]);
 
@@ -117,9 +116,9 @@ export default function BoardingStudentsPage() {
     boardingType: boardingTypeFilter !== 'all' ? boardingTypeFilter : undefined,
   });
 
-  const students = useMemo(() => 
-    data?.pages.flatMap(page => page.data?.documents || []) || [], 
-  [data]);
+  const students = useMemo(() =>
+    data?.pages.flatMap(page => page.data?.documents || []) || [],
+    [data]);
 
   const totalCount = data?.pages[0]?.data?.total || 0;
 
@@ -158,13 +157,13 @@ export default function BoardingStudentsPage() {
       try {
         const enrollment = selectedStudent.activeEnrollments?.[0];
         console.log("Syncing fee for student:", selectedStudent.nameEn, "Dept:", enrollment?.departmentId, "Type:", targetType);
-        
+
         if (enrollment?.departmentId && enrollment?.classId) {
           const res = await getMonthlyFee(enrollment.departmentId, targetType, enrollment.classId);
           console.log("Fee result:", res);
           if (res.success) setProjectedFee(res.amount);
         } else {
-           console.warn("Enrollment data incomplete for fee sync", enrollment);
+          console.warn("Enrollment data incomplete for fee sync", enrollment);
         }
       } catch (err) {
         console.error("Fee sync failed", err);
@@ -216,8 +215,8 @@ export default function BoardingStudentsPage() {
         const type = info.getValue() || 'উল্লেখ নেই';
         const isResidential = type.includes('আবাসিক') || type.toLowerCase().includes('residential');
         return (
-          <Badge 
-            variant="outline" 
+          <Badge
+            variant="outline"
             className={cn(
               "rounded-md font-medium text-[11px] px-2.5 py-0.5 border shadow-sm transition-all",
               isResidential ? "bg-emerald-50 text-emerald-600 border-emerald-200" : "bg-blue-50 text-blue-600 border-blue-200"
@@ -267,8 +266,8 @@ export default function BoardingStudentsPage() {
               {student.className || '---'}
             </div>
             <div className="flex items-center gap-1.5 text-[10px] font-bold text-zinc-500 uppercase tracking-tighter">
-               <Backpack className="h-3 w-3 text-zinc-300" />
-               {student.departmentName || '---'}
+              <Backpack className="h-3 w-3 text-zinc-300" />
+              {student.departmentName || '---'}
             </div>
           </div>
         );
@@ -295,8 +294,8 @@ export default function BoardingStudentsPage() {
         const status = info.getValue();
         const isActive = status === 'active';
         return (
-          <Badge 
-            variant={isActive ? "outline" : "destructive"} 
+          <Badge
+            variant={isActive ? "outline" : "destructive"}
             className={cn(
               "rounded-md font-bold text-[10px] uppercase tracking-wide gap-1",
               isActive ? "bg-emerald-50 text-emerald-600 border-emerald-200" : ""
@@ -321,37 +320,37 @@ export default function BoardingStudentsPage() {
                   <MoreVertical className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48 rounded-md shadow-xl border-zinc-200 dark:border-zinc-800 solaiman-lipi">
-              <DropdownMenuLabel className="text-zinc-500 font-bold text-[10px] uppercase tracking-widest px-3 py-2">বোর্ডিং অ্যাকশন</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="cursor-pointer gap-2 focus:bg-[#00AEEF]/10 focus:text-[#00AEEF] font-bold rounded-lg m-1">
-                <Eye className="h-3.5 w-3.5" /> প্রোফাইল দেখুন
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                onClick={() => {
-                  setSelectedStudent(student);
-                  // Ensure we use the raw ID for the Select component
-                  setTargetRoom(student.hallId || student.activeEnrollments?.[0]?.hallId || '');
-                  setIsRoomModalOpen(true);
-                }}
-                className="cursor-pointer gap-2 focus:bg-emerald-100 focus:text-emerald-600 font-bold rounded-lg m-1"
-              >
-                <Building2 className="h-3.5 w-3.5" /> রুম পরিবর্তন
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                onClick={() => {
-                  setSelectedStudent(student);
-                  // Use boardingTypeId for the ID-based Select component
-                  setTargetType(student.activeEnrollments?.[0]?.boardingTypeId || student.boardingTypeId || '');
-                  setIsTypeModalOpen(true);
-                }}
-                className="cursor-pointer gap-2 focus:bg-blue-100 focus:text-blue-600 font-bold rounded-lg m-1"
-              >
-                <ArrowRightLeft className="h-3.5 w-3.5" /> বোর্ডিং পরিবর্তন
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+              <DropdownMenuContent align="end" className="w-48 rounded-md shadow-xl border-zinc-200 dark:border-zinc-800 solaiman-lipi">
+                <DropdownMenuLabel className="text-zinc-500 font-bold text-[10px] uppercase tracking-widest px-3 py-2">বোর্ডিং অ্যাকশন</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="cursor-pointer gap-2 focus:bg-[#00AEEF]/10 focus:text-[#00AEEF] font-bold rounded-lg m-1">
+                  <Eye className="h-3.5 w-3.5" /> প্রোফাইল দেখুন
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => {
+                    setSelectedStudent(student);
+                    // Ensure we use the raw ID for the Select component
+                    setTargetRoom(student.hallId || student.activeEnrollments?.[0]?.hallId || '');
+                    setIsRoomModalOpen(true);
+                  }}
+                  className="cursor-pointer gap-2 focus:bg-emerald-100 focus:text-emerald-600 font-bold rounded-lg m-1"
+                >
+                  <Building2 className="h-3.5 w-3.5" /> রুম পরিবর্তন
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => {
+                    setSelectedStudent(student);
+                    // Use boardingTypeId for the ID-based Select component
+                    setTargetType(student.activeEnrollments?.[0]?.boardingTypeId || student.boardingTypeId || '');
+                    setIsTypeModalOpen(true);
+                  }}
+                  className="cursor-pointer gap-2 focus:bg-blue-100 focus:text-blue-600 font-bold rounded-lg m-1"
+                >
+                  <ArrowRightLeft className="h-3.5 w-3.5" /> বোর্ডিং পরিবর্তন
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         );
       },
     },
@@ -386,16 +385,16 @@ export default function BoardingStudentsPage() {
         </div>
 
         <div className="flex items-center gap-3">
-          <Button 
-            variant="outline" 
-            size="icon" 
-            onClick={() => refetch()} 
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => refetch()}
             className="h-12 w-12 rounded-md transition-all active:scale-95 shadow-sm"
             disabled={isRefetching}
           >
             <RefreshCw className={cn("h-5 w-5 text-zinc-500", isRefetching && "animate-spin")} />
           </Button>
-          <Button 
+          <Button
             className="h-12 px-6 rounded-md bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 font-bold shadow-lg transition-all active:scale-95 gap-2"
           >
             <LucideIcon icon={LayoutGrid} className="h-5 w-5" /> রিপোর্ট ডাউনলোড
@@ -405,33 +404,33 @@ export default function BoardingStudentsPage() {
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard 
-          label="মোট আবাসিক" 
-          value={totalCount} 
-          icon={Users} 
-          color="text-[#00AEEF]" 
-          bgIcon="bg-[#00AEEF]/10" 
+        <StatCard
+          label="মোট আবাসিক"
+          value={totalCount}
+          icon={Users}
+          color="text-[#00AEEF]"
+          bgIcon="bg-[#00AEEF]/10"
         />
-        <StatCard 
-          label="সক্রিয় শিক্ষার্থী" 
-          value={students.filter(s => s.status === 'active').length} 
-          icon={UserCheck} 
-          color="text-emerald-500" 
-          bgIcon="bg-emerald-500/10" 
+        <StatCard
+          label="সক্রিয় শিক্ষার্থী"
+          value={students.filter(s => s.status === 'active').length}
+          icon={UserCheck}
+          color="text-emerald-500"
+          bgIcon="bg-emerald-500/10"
         />
-        <StatCard 
-          label="হল/রুমে বরাদ্দ" 
-          value={students.filter(s => s.hallName).length} 
-          icon={Building2} 
-          color="text-indigo-500" 
-          bgIcon="bg-indigo-500/10" 
+        <StatCard
+          label="হল/রুমে বরাদ্দ"
+          value={students.filter(s => s.hallName).length}
+          icon={Building2}
+          color="text-indigo-500"
+          bgIcon="bg-indigo-500/10"
         />
-        <StatCard 
-          label="অব্যাহতি প্রাপ্ত" 
-          value={students.filter(s => s.status === 'inactive').length} 
-          icon={UserMinus} 
-          color="text-rose-500" 
-          bgIcon="bg-rose-500/10" 
+        <StatCard
+          label="অব্যাহতি প্রাপ্ত"
+          value={students.filter(s => s.status === 'inactive').length}
+          icon={UserMinus}
+          color="text-rose-500"
+          bgIcon="bg-rose-500/10"
         />
       </div>
 
@@ -450,7 +449,7 @@ export default function BoardingStudentsPage() {
 
           <div className="flex flex-wrap items-center gap-3 w-full lg:w-fit justify-end">
             <Filter className="h-4 w-4 text-zinc-400 mr-1 hidden sm:block" />
-            
+
             {/* Boarding Type Filter */}
             <Select value={boardingTypeFilter} onValueChange={setBoardingTypeFilter}>
               <SelectTrigger className="h-12 w-[180px] rounded-md border-zinc-200 dark:border-zinc-800 font-bold bg-white dark:bg-zinc-900 shadow-sm overflow-hidden cursor-pointer">
@@ -576,11 +575,11 @@ export default function BoardingStudentsPage() {
       <Dialog open={isRoomModalOpen} onOpenChange={setIsRoomModalOpen}>
         <DialogContent className="max-w-md rounded-md p-0 overflow-hidden border-none shadow-2xl solaiman-lipi">
           <DialogHeader className="p-8 bg-emerald-500 text-white relative overflow-hidden">
-             <Building2 className="absolute -right-8 -bottom-8 h-40 w-40 opacity-10 rotate-12" />
-             <DialogTitle className="text-2xl font-black relative z-10">রুম বরাদ্দ করুন</DialogTitle>
-             <DialogDescription className="text-emerald-50 relative z-10 font-bold">
-               {selectedStudent?.nameBn || selectedStudent?.nameEn}-এর জন্য হল এবং রুম সিলেক্ট করুন।
-             </DialogDescription>
+            <Building2 className="absolute -right-8 -bottom-8 h-40 w-40 opacity-10 rotate-12" />
+            <DialogTitle className="text-2xl font-black relative z-10">রুম বরাদ্দ করুন</DialogTitle>
+            <DialogDescription className="text-emerald-50 relative z-10 font-bold">
+              {selectedStudent?.nameBn || selectedStudent?.nameEn}-এর জন্য হল এবং রুম সিলেক্ট করুন।
+            </DialogDescription>
           </DialogHeader>
           <div className="p-8 space-y-6">
             <div className="space-y-4">
@@ -605,9 +604,9 @@ export default function BoardingStudentsPage() {
             </div>
 
             <DialogFooter className="pt-4">
-              <Button 
+              <Button
                 onClick={() => {
-                  const roomObj = rooms.find(r => r.roomNo === targetRoom);
+                  const roomObj = rooms.find((r: any) => r.roomNo === targetRoom);
                   roomMutation.mutate({
                     enrollmentId: selectedStudent.activeEnrollments?.[0]?.$id || selectedStudent.activeEnrollments?.[0]?.id,
                     hallId: targetRoom,
@@ -629,11 +628,11 @@ export default function BoardingStudentsPage() {
       <Dialog open={isTypeModalOpen} onOpenChange={setIsTypeModalOpen}>
         <DialogContent className="max-w-md rounded-md p-0 overflow-hidden border-none shadow-2xl solaiman-lipi">
           <DialogHeader className="p-8 bg-[#00AEEF] text-white relative overflow-hidden">
-             <ArrowRightLeft className="absolute -right-8 -bottom-8 h-40 w-40 opacity-10 -rotate-12" />
-             <DialogTitle className="text-2xl font-black relative z-10">বোর্ডিং ধরন পরিবর্তন</DialogTitle>
-             <DialogDescription className="text-blue-50 relative z-10 font-bold text-xs leading-relaxed">
-               {selectedStudent?.nameEn}-এর বর্তমান আবাসন ব্যবস্থা পরিবর্তন করলে মাস ভিত্তিক ফিতে প্রভাব পড়তে পারে।
-             </DialogDescription>
+            <ArrowRightLeft className="absolute -right-8 -bottom-8 h-40 w-40 opacity-10 -rotate-12" />
+            <DialogTitle className="text-2xl font-black relative z-10">বোর্ডিং ধরন পরিবর্তন</DialogTitle>
+            <DialogDescription className="text-blue-50 relative z-10 font-bold text-xs leading-relaxed">
+              {selectedStudent?.nameEn}-এর বর্তমান আবাসন ব্যবস্থা পরিবর্তন করলে মাস ভিত্তিক ফিতে প্রভাব পড়তে পারে।
+            </DialogDescription>
           </DialogHeader>
           <div className="p-8 space-y-6">
             <div className="space-y-4">
@@ -652,33 +651,29 @@ export default function BoardingStudentsPage() {
               </div>
 
               {/* Fee Impact Display */}
-              <AnimatePresence mode="wait">
-                {targetType && (
-                  <motion.div 
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="p-5 rounded-md bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-100 dark:border-zinc-800 flex items-center justify-between"
-                  >
-                    <div>
-                      <p className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">প্রক্ষেপিত মাসিক বেতন</p>
-                      <h4 className="text-2xl font-black text-[#00AEEF]">
-                        {isSyncingFee ? (
-                          <Loader2 className="h-5 w-5 animate-spin" />
-                        ) : (
-                          `৳${convertEnglishToBengali(projectedFee || 0)}`
-                        )}
-                      </h4>
-                    </div>
-                    <div className="h-10 w-10 rounded-xl bg-orange-500/10 flex items-center justify-center text-orange-500">
-                      <StickyNote className="h-5 w-5" />
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+              {targetType && (
+                <div
+                  className="p-5 rounded-md bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-100 dark:border-zinc-800 flex items-center justify-between"
+                >
+                  <div>
+                    <p className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">প্রক্ষেপিত মাসিক বেতন</p>
+                    <h4 className="text-2xl font-black text-[#00AEEF]">
+                      {isSyncingFee ? (
+                        <Loader2 className="h-5 w-5 animate-spin" />
+                      ) : (
+                        `৳${convertEnglishToBengali(projectedFee || 0)}`
+                      )}
+                    </h4>
+                  </div>
+                  <div className="h-10 w-10 rounded-xl bg-orange-500/10 flex items-center justify-center text-orange-500">
+                    <StickyNote className="h-5 w-5" />
+                  </div>
+                </div>
+              )}
             </div>
 
             <DialogFooter className="pt-4">
-              <Button 
+              <Button
                 onClick={() => {
                   typeMutation.mutate({
                     enrollmentId: selectedStudent.activeEnrollments?.[0]?.$id || selectedStudent.activeEnrollments?.[0]?.id,
@@ -702,16 +697,16 @@ export default function BoardingStudentsPage() {
 
 // --- Internal Support Components ---
 
-function StatCard({ 
-  label, 
-  value, 
-  icon: Icon, 
+function StatCard({
+  label,
+  value,
+  icon: Icon,
   color,
-  bgIcon 
-}: { 
-  label: string; 
-  value: number; 
-  icon: any; 
+  bgIcon
+}: {
+  label: string;
+  value: number;
+  icon: any;
   color: string;
   bgIcon: string;
 }) {
@@ -719,7 +714,7 @@ function StatCard({
     <Card className="relative overflow-hidden p-6 rounded-md border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-sm transition-all hover:shadow-md hover:translate-y-[-2px] group">
       {/* Decorative colored strip on the left */}
       <div className={cn("absolute left-0 top-0 bottom-0 w-1.5 transition-all group-hover:w-2", color.replace('text-', 'bg-'))} />
-      
+
       <div className="flex items-center gap-5">
         <div className={cn("p-3.5 rounded-md flex items-center justify-center transition-transform group-hover:scale-110", bgIcon)}>
           <Icon className={cn("h-6 w-6", color)} />
@@ -727,10 +722,10 @@ function StatCard({
         <div className="flex-1 space-y-1">
           <p className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-[0.1em]">{label}</p>
           <div className="flex items-baseline gap-1.5">
-             <h3 className="text-3xl font-black text-zinc-900 dark:text-zinc-50 leading-tight">
-               {convertEnglishToBengali(value)}
-             </h3>
-             <span className="text-[11px] font-bold text-zinc-400">জন</span>
+            <h3 className="text-3xl font-black text-zinc-900 dark:text-zinc-50 leading-tight">
+              {convertEnglishToBengali(value)}
+            </h3>
+            <span className="text-[11px] font-bold text-zinc-400">জন</span>
           </div>
         </div>
       </div>

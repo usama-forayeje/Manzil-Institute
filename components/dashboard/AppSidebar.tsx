@@ -211,7 +211,7 @@ export function AppSidebar({
                                 asChild
                                 isActive={pathname === subItem.href}
                               >
-                                <Link href={subItem.href}>
+                                <Link href={subItem.href} prefetch={true}>
                                   <span className="bengali-text">
                                     {subItem.titleBn}
                                   </span>
@@ -233,7 +233,7 @@ export function AppSidebar({
                     isActive={pathname === item.href}
                     tooltip={item.titleBn}
                   >
-                    <Link href={item.href}>
+                    <Link href={item.href} prefetch={true}>
                       {IconComponent && <IconComponent />}
                       <span className="bengali-text">{item.titleBn}</span>
                     </Link>

@@ -1,6 +1,6 @@
 import React from 'react';
 
-const StructuredData = ({ type, data }) => {
+const StructuredData = ({ type, data }: { type: string; data: Record<string, any> }) => {
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': type,

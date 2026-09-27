@@ -3,7 +3,7 @@
 import { createAdminClient } from '@/lib/appwrite/admin';
 import { createSessionClient, NoSessionError } from '@/lib/appwrite/server';
 import { OAuthProvider } from 'node-appwrite';
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { DATABASE_ID, USERS_COLLECTION_ID } from '@/config/appwrite';
 import { Query } from 'node-appwrite';
@@ -13,13 +13,34 @@ import { Query } from 'node-appwrite';
  * Redirects the user to Google's consent screen.
  */
 export async function signInWithGoogle() {
-  const { account } = await createAdminClient();
+  let redirectUrl: string;
+  try {
+    const { account } = await createAdminClient();
 
-  const redirectUrl = await account.createOAuth2Token(
-    OAuthProvider.Google,
-    `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/callback`,
-    `${process.env.NEXT_PUBLIC_APP_URL}/login`
-  );
+    let baseUrl = process.env.NEXT_PUBLIC_APP_URL?.trim();
+    if (!baseUrl) {
+      const headerList = await headers();
+      const host = headerList.get('x-forwarded-host') || headerList.get('host');
+      const proto =
+        headerList.get('x-forwarded-proto') ||
+        (process.env.NODE_ENV === 'production' ? 'https' : 'http');
+      if (host) {
+        baseUrl = `${proto}://${host}`;
+      } else {
+        baseUrl = 'http://localhost:3000';
+      }
+    }
+    baseUrl = baseUrl.replace(/\/$/, '');
+
+    redirectUrl = await account.createOAuth2Token(
+      OAuthProvider.Google,
+      `${baseUrl}/api/auth/callback`,
+      `${baseUrl}/login`
+    );
+  } catch (error: any) {
+    console.error('Failed to create OAuth2 token:', error);
+    throw error;
+  }
 
   redirect(redirectUrl);
 }

@@ -290,7 +290,7 @@ export async function createStaff(
     motherNameBn: formData.motherNameBn,
     motherNameEn: formData.motherNameEn,
     designation: formData.designationCustom || formData.designation,
-    department: formData.department ?? '',
+    department: (formData as any).department ?? '',
     joiningDate: formData.expectedJoiningDate
       ? new Date(formData.expectedJoiningDate).toISOString()
       : new Date().toISOString(),
@@ -304,7 +304,7 @@ export async function createStaff(
     address: currentAddressStr,
     permanentAddress: permanentAddressStr,
     nidNumber: formData.nidNumber,
-    dateOfBirth: new Date(formData.dateOfBirth).toISOString(),
+    dateOfBirth: new Date(formData.dateOfBirth ?? '').toISOString(),
     gender:
       normalizeGender(formData.gender) ??
       (() => {

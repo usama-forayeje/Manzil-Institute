@@ -28,7 +28,6 @@ import {
   useSaveTerms,
   useInvalidateTermsCache,
 } from '@/lib/hooks/use-terms';
-import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import {
   Dialog,
@@ -86,7 +85,7 @@ export default function TermsManagementPage() {
   } catch (e) {
     console.error('Error processing terms:', e);
   }
-  
+
   const saveTermsMutation = useSaveTerms();
   const invalidateCache = useInvalidateTermsCache();
 
@@ -242,11 +241,11 @@ export default function TermsManagementPage() {
 
   return (
     <div className="space-y-8 animate-in fade-in duration-700 solaimanlipi-font pb-20">
-      
+
       {/* ══════════════ HEADER ══════════════ */}
       <div className="relative overflow-hidden bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-6 md:p-10 shadow-sm">
         <div className="pointer-events-none absolute -top-24 -right-24 h-64 w-64 rounded-full bg-[#00AEEF]/10 blur-3xl" />
-        
+
         <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="flex items-center gap-6">
             <div className="relative h-16 w-16 shrink-0 rounded-2xl bg-gradient-to-br from-[#00AEEF] to-blue-700 flex items-center justify-center shadow-lg shadow-blue-500/20">
@@ -268,7 +267,7 @@ export default function TermsManagementPage() {
               </p>
             </div>
           </div>
-          
+
           <div className="flex items-center gap-3 relative z-10">
             <Button
               variant="outline"
@@ -308,11 +307,11 @@ export default function TermsManagementPage() {
           ))
         ) : Object.keys(groupedDesignations).length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 bg-zinc-50 dark:bg-zinc-900/40 rounded-3xl border-2 border-dashed border-zinc-200 dark:border-zinc-800">
-             <ScrollText className="h-16 w-16 text-zinc-200 dark:text-zinc-800 mb-4" />
-             <p className="text-zinc-500 font-bold">কোনো শর্তাবলী পাওয়া যায়নি</p>
+            <ScrollText className="h-16 w-16 text-zinc-200 dark:text-zinc-800 mb-4" />
+            <p className="text-zinc-500 font-bold">কোনো শর্তাবলী পাওয়া যায়নি</p>
           </div>
         ) : (
-          Object.entries(groupedDesignations).map(([category, desList]) => {
+          (Object.entries(groupedDesignations) as [string, Designation[]][]).map(([category, desList]) => {
             return (
               <div key={category} className="space-y-3">
                 <div className="flex items-center gap-3 px-1">
@@ -321,8 +320,8 @@ export default function TermsManagementPage() {
                     {category}
                   </h3>
                 </div>
-                
-                {desList.map(des => {
+
+                {desList.map((des: Designation) => {
                   const desId = getDesId(des);
                   const terms = termsData[desId];
                   const isExpanded = expandedSections[desId];
@@ -330,8 +329,8 @@ export default function TermsManagementPage() {
                   return (
                     <Card key={desId} className={cn(
                       "overflow-hidden border transition-all duration-300 group",
-                      isExpanded 
-                        ? "border-[#00AEEF]/30 shadow-xl shadow-[#00AEEF]/5 bg-white dark:bg-zinc-900" 
+                      isExpanded
+                        ? "border-[#00AEEF]/30 shadow-xl shadow-[#00AEEF]/5 bg-white dark:bg-zinc-900"
                         : "border-zinc-200 dark:border-zinc-800 bg-white/50 dark:bg-zinc-900/30 hover:border-zinc-300 dark:hover:border-zinc-700"
                     )}>
                       <div className="relative flex flex-col sm:flex-row sm:items-center justify-between px-6 py-5 gap-4">
@@ -345,7 +344,7 @@ export default function TermsManagementPage() {
                           )}>
                             {isExpanded ? <ChevronDown className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
                           </div>
-                          
+
                           <div>
                             <div className="flex items-center gap-2 mb-1">
                               <h4 className="text-xl font-black text-zinc-900 dark:text-zinc-100 tracking-tight">
@@ -358,14 +357,14 @@ export default function TermsManagementPage() {
                               )}
                             </div>
                             <div className="flex items-center gap-3">
-                               <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{des.label_en}</span>
-                               <span className="h-1 w-1 rounded-full bg-zinc-300" />
-                               <span className={cn(
-                                 "text-[10px] font-black uppercase tracking-tight",
-                                 terms ? "text-emerald-600 dark:text-emerald-400" : "text-zinc-500"
-                               )}>
-                                 {terms ? 'কনফিগ করা আছে' : 'শর্তাবলী যুক্ত নেই'}
-                               </span>
+                              <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{des.label_en}</span>
+                              <span className="h-1 w-1 rounded-full bg-zinc-300" />
+                              <span className={cn(
+                                "text-[10px] font-black uppercase tracking-tight",
+                                terms ? "text-emerald-600 dark:text-emerald-400" : "text-zinc-500"
+                              )}>
+                                {terms ? 'কনফিগ করা আছে' : 'শর্তাবলী যুক্ত নেই'}
+                              </span>
                             </div>
                           </div>
                         </button>
@@ -382,52 +381,47 @@ export default function TermsManagementPage() {
                         </div>
                       </div>
 
-                      <AnimatePresence>
-                        {isExpanded && terms && (
-                          <motion.div
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: 'auto', opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
-                            className="bg-zinc-50/50 dark:bg-zinc-950/20"
-                          >
-                            <CardContent className="pt-0 px-8 pb-8 space-y-6">
-                              <div className="h-px w-full bg-zinc-200 dark:bg-zinc-800 mb-6" />
-                              
-                              <div className="bg-[#00AEEF]/10 border border-[#00AEEF]/20 p-4 rounded-xl flex items-center justify-between">
-                                <span className="text-[10px] font-black text-[#00AEEF] uppercase tracking-[0.2em]">Active Policy Title</span>
-                                <span className="text-[15px] font-black text-zinc-900 dark:text-zinc-50">{terms.title}</span>
-                              </div>
+                      {isExpanded && terms && (
+                        <div
+                          className="bg-zinc-50/50 dark:bg-zinc-950/20"
+                        >
+                          <CardContent className="pt-0 px-8 pb-8 space-y-6">
+                            <div className="h-px w-full bg-zinc-200 dark:bg-zinc-800 mb-6" />
 
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                {terms.sections?.map((section: any, idx: number) => (
-                                  <div key={idx} className="space-y-3 bg-white dark:bg-zinc-900/50 p-5 rounded-xl border border-zinc-100 dark:border-zinc-800 shadow-sm transition-all hover:border-[#00AEEF]/30">
-                                    <h5 className="font-black text-zinc-900 dark:text-[#00AEEF] flex items-center gap-2">
-                                      <div className="h-1.5 w-1.5 rounded-full bg-[#00AEEF]" />
-                                      {section.title}
-                                    </h5>
-                                    <ul className="space-y-2.5">
-                                      {section.content?.map((item: string, itemIdx: number) => (
-                                        <li key={itemIdx} className="flex gap-3 text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed font-medium">
-                                          <span className="text-[#00AEEF]/40">•</span>
-                                          <span>{item}</span>
-                                        </li>
-                                      ))}
-                                    </ul>
-                                  </div>
-                                ))}
-                              </div>
-                            </CardContent>
-                          </motion.div>
-                        )}
-                        {isExpanded && !terms && (
-                          <motion.div className="px-8 pb-8">
-                             <div className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-zinc-200 dark:border-zinc-800 rounded-2xl bg-zinc-50/50 dark:bg-zinc-950/30">
-                               <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-4">এই পদের জন্য কোনো শর্তাবলী নেই</p>
-                               <Button onClick={() => openAddModal(des)} className="bg-[#00AEEF] text-white font-bold px-8">প্রস্তুত করুন</Button>
-                             </div>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
+                            <div className="bg-[#00AEEF]/10 border border-[#00AEEF]/20 p-4 rounded-xl flex items-center justify-between">
+                              <span className="text-[10px] font-black text-[#00AEEF] uppercase tracking-[0.2em]">Active Policy Title</span>
+                              <span className="text-[15px] font-black text-zinc-900 dark:text-zinc-50">{terms.title}</span>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                              {terms.sections?.map((section: any, idx: number) => (
+                                <div key={idx} className="space-y-3 bg-white dark:bg-zinc-900/50 p-5 rounded-xl border border-zinc-100 dark:border-zinc-800 shadow-sm transition-all hover:border-[#00AEEF]/30">
+                                  <h5 className="font-black text-zinc-900 dark:text-[#00AEEF] flex items-center gap-2">
+                                    <div className="h-1.5 w-1.5 rounded-full bg-[#00AEEF]" />
+                                    {section.title}
+                                  </h5>
+                                  <ul className="space-y-2.5">
+                                    {section.content?.map((item: string, itemIdx: number) => (
+                                      <li key={itemIdx} className="flex gap-3 text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed font-medium">
+                                        <span className="text-[#00AEEF]/40">•</span>
+                                        <span>{item}</span>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              ))}
+                            </div>
+                          </CardContent>
+                        </div>
+                      )}
+                      {isExpanded && !terms && (
+                        <div className="px-8 pb-8">
+                          <div className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-zinc-200 dark:border-zinc-800 rounded-2xl bg-zinc-50/50 dark:bg-zinc-950/30">
+                            <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-4">এই পদের জন্য কোনো শর্তাবলী নেই</p>
+                            <Button onClick={() => openAddModal(des)} className="bg-[#00AEEF] text-white font-bold px-8">প্রস্তুত করুন</Button>
+                          </div>
+                        </div>
+                      )}
                     </Card>
                   );
                 })}
@@ -519,7 +513,7 @@ export default function TermsManagementPage() {
                         onChange={e => updateSection(sectionIdx, 'title', e.target.value)}
                         className="h-10 border-none bg-zinc-50 dark:bg-zinc-950 font-black text-[#00AEEF] placeholder:text-zinc-300"
                       />
-                      
+
                       <div className="space-y-3">
                         {section.content.map((line, lineIdx) => (
                           <div key={lineIdx} className="flex items-center gap-3 group">
@@ -536,7 +530,7 @@ export default function TermsManagementPage() {
                           </div>
                         ))}
                       </div>
-                      
+
                       <Button type="button" size="sm" variant="link" onClick={() => addContentLine(sectionIdx)} className="p-0 text-[#00AEEF] font-bold text-xs gap-1 hover:no-underline hover:text-blue-600">
                         <Plus className="h-3 w-3" /> পয়েন্ট যোগ করুন
                       </Button>

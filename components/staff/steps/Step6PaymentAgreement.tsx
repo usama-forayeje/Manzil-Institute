@@ -188,7 +188,7 @@ export default function Step6PaymentAgreement({
   const signatureRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<PaymentReferenceData>({
-    resolver: zodResolver(paymentReferenceSchema),
+    resolver: zodResolver(paymentReferenceSchema) as any,
     defaultValues: {
       expectedSalary: savedData?.expectedSalary ?? undefined,
       expectedJoiningDate:
@@ -276,11 +276,10 @@ export default function Step6PaymentAgreement({
 
       setSignatureFile(compressed);
       setSignaturePreview(base64);
-      setStep6Data(prev => ({
-        ...prev,
+      setStep6Data({
         signatureFile: compressed,
         signatureUrl: base64,
-      }));
+      });
       toast.success('সিগনেচার আপলোড সম্পন্ন হয়েছে');
     } catch {
       toast.error('সিগনেচার প্রসেসিং এ সমস্যা হয়েছে');
@@ -294,11 +293,10 @@ export default function Step6PaymentAgreement({
   const removeSignature = () => {
     setSignatureFile(null);
     setSignaturePreview(null);
-    setStep6Data(prev => ({
-      ...prev,
+    setStep6Data({
       signatureFile: undefined,
       signatureUrl: undefined,
-    }));
+    });
   };
 
   const handleFinalSubmit = (data: PaymentReferenceData) => {
@@ -392,7 +390,7 @@ export default function Step6PaymentAgreement({
                             placeholder="যেমন: ২০০০০ বা 20000"
                             className="h-12 bg-background/80 backdrop-blur-sm border-primary/20 dark:border-primary"
                             value={field.value ? String(field.value) : ''}
-                            onChange={e => {
+                            onChange={(e: any) => {
                               const val = e.target.value;
                               const banglaToEng: Record<string, string> = {
                                 '০': '0',
@@ -408,7 +406,7 @@ export default function Step6PaymentAgreement({
                               };
                               const engVal = val.replace(
                                 /[০-৯]/g,
-                                d => banglaToEng[d] || d
+                                (d: string) => banglaToEng[d] || d
                               );
                               const num = parseInt(engVal) || 0;
                               field.onChange(num);
@@ -708,13 +706,13 @@ export default function Step6PaymentAgreement({
                         <h3 className="text-lg font-bold text-primary dark:text-primary text-center border-b border-primary/20 dark:border-primary pb-3">
                           {currentTerms.title}
                         </h3>
-                        {currentTerms.sections.map((section, idx) => (
+                        {currentTerms.sections.map((section: any, idx: number) => (
                           <div key={idx} className="space-y-2">
                             <h4 className="font-bold text-zinc-700 dark:text-zinc-300 text-sm">
                               {section.title}
                             </h4>
                             <ul className="space-y-1">
-                              {section.content.map((item, itemIdx) => (
+                              {section.content.map((item: any, itemIdx: number) => (
                                 <li
                                   key={itemIdx}
                                   className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed flex gap-2"

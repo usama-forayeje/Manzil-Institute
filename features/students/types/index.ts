@@ -15,8 +15,12 @@ export interface StudentListItem extends Student {
     boardingTypeId?: string;
     section?: string;
     monthlyFee?: number;
+    hallId?: string;
+    hallName?: string;
     enrolledAt?: string;
   }[];
+  hallId?: string;
+  hallName?: string;
   nameBn?: string;
   nameEn?: string;
   phonePrimary?: string;

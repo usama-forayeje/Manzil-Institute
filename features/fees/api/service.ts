@@ -11,8 +11,9 @@ export async function getFeeTypes() {
     const res = await databases.listDocuments(
       DATABASE_ID,
       COLLECTIONS.FEE_TYPES,
-      [Query.orderDesc('$createdAt')]
+      [Query.orderDesc('$createdAt'), Query.limit(100)]
     );
+
     return { success: true, feeTypes: JSON.parse(JSON.stringify(res.documents)) };
   } catch (err: any) {
     return { success: false, error: err.message };

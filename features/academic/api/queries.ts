@@ -19,29 +19,44 @@ export const academicKeys = {
 export const departmentsQueryOptions = queryOptions({
   queryKey: academicKeys.departments(),
   queryFn: () => getAllDepartments(),
-  staleTime: 5 * 60 * 1000,
+  staleTime: 10 * 60 * 1000,
+  gcTime: 30 * 60 * 1000,
+  refetchOnWindowFocus: false,
+  refetchOnMount: false,
 });
 
 export const classesQueryOptions = queryOptions({
   queryKey: academicKeys.classes(),
   queryFn: () => getAllClasses(),
-  staleTime: 5 * 60 * 1000,
+  staleTime: 10 * 60 * 1000,
+  gcTime: 30 * 60 * 1000,
+  refetchOnWindowFocus: false,
+  refetchOnMount: false,
 });
 
 export const sessionsQueryOptions = queryOptions({
   queryKey: academicKeys.sessions(),
   queryFn: () => getAllSessions(),
-  staleTime: 10 * 60 * 1000,
+  staleTime: 15 * 60 * 1000,
+  gcTime: 30 * 60 * 1000,
+  refetchOnWindowFocus: false,
+  refetchOnMount: false,
 });
 
 export const sectionsQueryOptions = queryOptions({
   queryKey: academicKeys.sections(),
   queryFn: () => getAllSections(),
-  staleTime: 10 * 60 * 1000,
+  staleTime: 15 * 60 * 1000,
+  gcTime: 30 * 60 * 1000,
+  refetchOnWindowFocus: false,
+  refetchOnMount: false,
 });
 
 export const boardingTypesQueryOptions = queryOptions({
   queryKey: academicKeys.boardingTypes(),
   queryFn: () => getAllBoardingTypes(),
-  staleTime: 5 * 60 * 1000,
+  staleTime: 15 * 60 * 1000,
+  gcTime: 30 * 60 * 1000,
+  refetchOnWindowFocus: false,
+  refetchOnMount: false,
 });

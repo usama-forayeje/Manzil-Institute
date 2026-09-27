@@ -329,7 +329,7 @@ export default function IDCardDashboard() {
   return (
     <div className="space-y-6 animate-in fade-in duration-500 pb-20">
       <FeatureHeader
-        title="আইডিカード জেনারেটর"
+        title="আইডি কার্ড জেনারেটর"
         description="শিক্ষার্থীদের জন্য উচ্চমানের প্রেস-রেডি আইডি কার্ড তৈরি এবং প্রিন্ট করুন"
         icon={CreditCard}
         extraActions={

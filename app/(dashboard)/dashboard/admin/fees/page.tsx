@@ -493,7 +493,7 @@ export default function FeeDashboardPage() {
 
           <div className="flex-1 min-h-[260px]">
             {isLoading ? (
-              <Skeleton className="h-48 w-48 rounded-full mx-auto" strokeWidth={10} />
+              <Skeleton className="h-48 w-48 rounded-full mx-auto" />
             ) : pieData.length > 0 ? (
               <ResponsiveContainer width="100%" height={260}>
                 <PieChart>

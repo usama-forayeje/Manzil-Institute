@@ -9,21 +9,22 @@ import { useMemo, useCallback } from 'react';
 import { useFormContext, useFieldArray } from 'react-hook-form';
 import { useQuery } from '@tanstack/react-query';
 import {
-  GraduationCap, 
-  Trash2, 
-  School, 
-  ArrowRight, 
+  GraduationCap,
+  Trash2,
+  School,
+  ArrowRight,
   ArrowLeft,
-  CheckCircle2, 
-  Plus, 
-  BookOpen, 
-  StickyNote, 
+  CheckCircle2,
+  Plus,
+  BookOpen,
+  StickyNote,
   FlaskConical,
   ChevronRight,
   ChevronLeft,
-  Briefcase
+  Briefcase,
+  CheckCheck,
+  Check
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import { DatePicker } from '@/components/ui/DatePicker';
 import { convertEnglishToBengali } from '@/lib/utils';
@@ -63,22 +64,7 @@ import {
   boardingTypesQueryOptions,
   boardingRoomsQueryOptions,
 } from '../api/queries';
-import { getMonthlyFee, getNextStudentId } from '../api/service';
-
-// ── Animations ─────────────────────────────────────────────────────────────
-
-const fadeUp: any = {
-  hidden: { opacity: 0, y: 15 },
-  visible: { 
-    opacity: 1, 
-    y: 0,
-    transition: { duration: 0.5, ease: "easeOut" as any }
-  }
-};
-
-const stagger = {
-  visible: { transition: { staggerChildren: 0.1 } }
-};
+import { getNextStudentId } from '../api/service';
 
 const floorMap: Record<string, string> = {
   'Ground Floor': 'নিচ তলা', '1st Floor': '১ম তলা', '2nd Floor': '২য় তলা',
@@ -103,10 +89,9 @@ function SectionCard({
   className?: string;
 }) {
   return (
-    <motion.div
-      variants={fadeUp}
+    <div
       className={cn(
-        'rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 transition-all duration-500 overflow-hidden shadow-sm',
+        'rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 transition-all overflow-hidden shadow-sm',
         className
       )}
     >
@@ -134,7 +119,7 @@ function SectionCard({
           {children}
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }
 
@@ -149,8 +134,8 @@ function StepDots({ current, total }: { current: number; total: number }) {
             i + 1 === current
               ? 'w-6 bg-[#00AEEF]'
               : i + 1 < current
-              ? 'w-1.5 bg-zinc-900 dark:bg-zinc-100'
-              : 'w-1.5 bg-zinc-200 dark:bg-zinc-700'
+                ? 'w-1.5 bg-zinc-900 dark:bg-zinc-100'
+                : 'w-1.5 bg-zinc-200 dark:bg-zinc-700'
           )}
         />
       ))}
@@ -191,40 +176,29 @@ function EnrollmentCard({
     setValue(`enrollment.enrollments.${index}.monthlyFee` as any, 0, { shouldValidate: true });
   };
 
-  const handleClassChange = async (val: string) => {
+  const handleClassChange = (val: string) => {
     const cls = classes.find((c: any) => c.id === val);
     if (!cls) return;
     setValue(`enrollment.enrollments.${index}.classId` as any, cls.id, { shouldValidate: true });
     setValue(`enrollment.enrollments.${index}.className` as any, cls.nameBn || cls.name, { shouldValidate: true });
-    const deptCode = watch(`enrollment.enrollments.${index}.departmentCode` as any) as string;
-    const boardingType = watch('enrollment.boardingType');
-    if (cls.monthlyFee && cls.monthlyFee > 0) {
-      setValue(`enrollment.enrollments.${index}.monthlyFee` as any, cls.monthlyFee, { shouldValidate: true });
-    } else if (deptCode && boardingType) {
-      const feeRes = await getMonthlyFee(deptCode, boardingType, cls.id);
-      if (feeRes.success) setValue(`enrollment.enrollments.${index}.monthlyFee` as any, feeRes.amount, { shouldValidate: true });
-    }
+    setValue(`enrollment.enrollments.${index}.monthlyFee` as any, cls.monthlyFee || 0, { shouldValidate: true });
     trigger(`enrollment.enrollments.${index}.monthlyFee` as any);
   };
 
   return (
-    <motion.div
-      layout
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, scale: 0.95 }}
+    <div
       className={cn(
         'group rounded-2xl border transition-all duration-300 overflow-hidden',
-        isComplete 
-          ? 'bg-zinc-50/50 dark:bg-zinc-900/30 border-zinc-200 dark:border-zinc-800' 
+        isComplete
+          ? 'bg-zinc-50/50 dark:bg-zinc-900/30 border-zinc-200 dark:border-zinc-800'
           : 'bg-white dark:bg-zinc-950 border-dashed border-zinc-200 dark:border-zinc-800'
       )}
     >
       <div className="flex items-center justify-between px-5 py-3 border-b border-zinc-200/50 dark:border-zinc-800/50 bg-white/50 dark:bg-zinc-950/50">
         <div className="flex items-center gap-3">
           <div className={cn(
-             "h-6 w-6 rounded-lg flex items-center justify-center text-[10px] font-black transition-all",
-             isComplete ? "bg-[#00AEEF] text-white shadow-lg shadow-[#00AEEF]/20" : "bg-zinc-100 dark:bg-zinc-800 text-zinc-400"
+            "h-6 w-6 rounded-lg flex items-center justify-center text-[10px] font-black transition-all",
+            isComplete ? "bg-[#00AEEF] text-white shadow-lg shadow-[#00AEEF]/20" : "bg-zinc-100 dark:bg-zinc-800 text-zinc-400"
           )}>
             {isComplete ? <CheckCircle2 className="h-3.5 w-3.5" /> : index + 1}
           </div>
@@ -291,10 +265,10 @@ function EnrollmentCard({
         <FormField control={control} name={`enrollment.enrollments.${index}.session` as any} render={({ field: f }) => (
           <FormItem>
             <FormLabel className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">সেশন *</FormLabel>
-            <Select onValueChange={(val) => { 
-                f.onChange(val); 
-                setValue(`enrollment.enrollments.${index}.session` as any, val, { shouldValidate: true });
-              }} value={f.value || ''}>
+            <Select onValueChange={(val) => {
+              f.onChange(val);
+              setValue(`enrollment.enrollments.${index}.session` as any, val, { shouldValidate: true });
+            }} value={f.value || ''}>
               <FormControl>
                 <SelectTrigger className="h-11 rounded-xl bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 font-mono cursor-pointer">
                   <SelectValue placeholder="সেশন" />
@@ -354,7 +328,7 @@ function EnrollmentCard({
           </FormItem>
         )} />
       </div>
-    </motion.div>
+    </div>
   );
 }
 
@@ -428,7 +402,7 @@ export default function Step4EnrollmentInfo({ onNext, onPrev }: { onNext: () => 
   const handleRemove = (i: number) => {
     // Get current enrollments synchronously
     const currentEnrollments = form.getValues('enrollment.enrollments') as any[];
-    
+
     // Guard: must have more than 1 to allow removal
     if (currentEnrollments.length <= 1) {
       toast.warning('কমপক্ষে একটি বিভাগ থাকতে হবে');
@@ -475,7 +449,7 @@ export default function Step4EnrollmentInfo({ onNext, onPrev }: { onNext: () => 
 
     // 3. Trigger validation only for the current state of enrollment
     const isValid = await trigger('enrollment', { shouldFocus: true });
-    
+
     if (isValid) {
       // CRITICAL: Reset feeItems so Step 5 always re-fetches based on current enrollments
       setValue('payment.feeItems', []);
@@ -483,30 +457,22 @@ export default function Step4EnrollmentInfo({ onNext, onPrev }: { onNext: () => 
     } else {
       const errors = form.formState.errors.enrollment;
       console.error('[Validation Fail] Enrollment Errors:', errors);
-      
+
       toast.error('ভর্তির তথ্য অসম্পূর্ণ', {
         description: 'লাল চিহ্নিত সব ফিল্ডগুলো নির্ভুলভাবে পূরণ করুন'
       });
-      
+
       // Scroll to the first error item
       const firstError = document.querySelector('[aria-invalid="true"]');
       if (firstError) {
-         firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
     }
   };
 
-  const handleBoardingTypeChange = useCallback(async (val: string) => {
+  const handleBoardingTypeChange = useCallback((val: string) => {
     setValue('enrollment.boardingType', val, { shouldValidate: true });
-    const enrollments = form.getValues('enrollment.enrollments') as any[];
-    for(let i=0; i<enrollments.length; i++) {
-       const en = enrollments[i];
-       if(en.departmentCode && en.classId) {
-          const res = await getMonthlyFee(en.departmentCode, val, en.classId);
-          if(res.success) setValue(`enrollment.enrollments.${i}.monthlyFee` as any, res.amount, { shouldValidate: true });
-       }
-    }
-  }, [form, setValue]);
+  }, [setValue]);
 
   if (deptQuery.isLoading || sessionQuery.isLoading || boardQuery.isLoading) {
     return (
@@ -518,16 +484,13 @@ export default function Step4EnrollmentInfo({ onNext, onPrev }: { onNext: () => 
   }
 
   return (
-    <motion.div
-      initial="hidden"
-      animate="visible"
-      variants={stagger}
+    <div
       className="kalpurush-font max-w-3xl mx-auto px-4 pb-24 pt-8"
     >
       <div className="space-y-8">
 
         {/* ── Page Header ──────────────────────────────────── */}
-        <motion.div variants={fadeUp} className="space-y-1">
+        <div className="space-y-1">
           <div className="flex items-center gap-2 mb-3">
             <StepDots current={4} total={5} />
             <span className="text-xs font-semibold text-zinc-400 dark:text-zinc-500 tracking-wide ml-1">
@@ -540,7 +503,7 @@ export default function Step4EnrollmentInfo({ onNext, onPrev }: { onNext: () => 
           <p className="text-sm text-zinc-400 dark:text-zinc-500 font-medium max-w-lg leading-relaxed">
             বিভাগ, শ্রেণী এবং আবাসন তথ্য নির্ভুলভাবে নির্বাচন করুন।
           </p>
-        </motion.div>
+        </div>
 
         {/* ── Section 1: Core Info ────────────────────────── */}
         <SectionCard
@@ -553,9 +516,9 @@ export default function Step4EnrollmentInfo({ onNext, onPrev }: { onNext: () => 
             <FormField control={control} name="enrollment.admissionDate" render={({ field: f }) => (
               <FormItem className="flex flex-col">
                 <FormLabel className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">ভর্তির তারিখ *</FormLabel>
-                <DatePicker 
-                  date={f.value ? new Date(f.value) : undefined} 
-                  setDate={(date) => f.onChange(date?.toISOString() || '')} 
+                <DatePicker
+                  date={f.value ? new Date(f.value) : undefined}
+                  setDate={(date) => f.onChange(date?.toISOString() || '')}
                   placeholder="তারিখ নির্বাচন"
                 />
                 <FormMessage />
@@ -582,120 +545,111 @@ export default function Step4EnrollmentInfo({ onNext, onPrev }: { onNext: () => 
             )} />
           </div>
 
-          <AnimatePresence mode="wait">
-            {showHallField && (
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="pt-2"
-              >
-                <FormField control={control} name="enrollment.hallName" render={({ field: f }) => (
-                  <FormItem>
-                    <FormLabel className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">হল / কক্ষ নির্বাচন</FormLabel>
-                    <Select
-                      onValueChange={(val) => {
-                        const opt = hallOptions.find((o: any) => o.value === val);
-                        f.onChange(opt?.label ?? val);
-                        setValue('enrollment.hallId', val);
-                      }}
-                      value={hallOptions.find((o: any) => o.label === f.value)?.value || f.value || ''}
-                    >
-                      <FormControl>
-                        <SelectTrigger className="h-11 rounded-xl bg-zinc-50/50 dark:bg-zinc-900/50 border-zinc-200 dark:border-zinc-800">
-                          <SelectValue placeholder="রুম নির্বাচন করুন" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent className="kalpurush-font max-h-72">
-                        {hallOptions.map((opt: any) => (
-                          <SelectItem key={opt.value} value={opt.value}>
-                            <div className="flex items-center justify-between gap-4 w-full">
-                              <span className="font-bold">{opt.hallName}</span>
-                              <span className="text-[10px] text-zinc-400">{opt.floorLabel}</span>
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormItem>
-                )} />
-              </motion.div>
-            )}
-          </AnimatePresence>
+          {showHallField && (
+            <div
+              className="pt-2"
+            >
+              <FormField control={control} name="enrollment.hallName" render={({ field: f }) => (
+                <FormItem>
+                  <FormLabel className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">হল / কক্ষ নির্বাচন</FormLabel>
+                  <Select
+                    onValueChange={(val) => {
+                      const opt = hallOptions.find((o: any) => o.value === val);
+                      f.onChange(opt?.label ?? val);
+                      setValue('enrollment.hallId', val);
+                    }}
+                    value={hallOptions.find((o: any) => o.label === f.value)?.value || f.value || ''}
+                  >
+                    <FormControl>
+                      <SelectTrigger className="h-11 rounded-xl bg-zinc-50/50 dark:bg-zinc-900/50 border-zinc-200 dark:border-zinc-800">
+                        <SelectValue placeholder="রুম নির্বাচন করুন" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent className="kalpurush-font max-h-72">
+                      {hallOptions.map((opt: any) => (
+                        <SelectItem key={opt.value} value={opt.value}>
+                          <div className="flex items-center justify-between gap-4 w-full">
+                            <span className="font-bold">{opt.hallName}</span>
+                            <span className="text-[10px] text-zinc-400">{opt.floorLabel}</span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormItem>
+              )} />
+            </div>
+          )}
 
           <div className="pt-2">
             <div className="flex items-center justify-between p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800">
-               <div className="space-y-0.5">
-                  <p className="text-[13px] font-bold text-zinc-900 dark:text-zinc-100">অ্যাডমিশন আইডি</p>
-                  <p className="text-[10px] text-zinc-400 font-medium tracking-tight">ম্যানুয়ালি আইডি সেট করতে চাইলে সুইচ অন করুন।</p>
-               </div>
-               <div className="flex items-center gap-3">
-                  <AnimatePresence>
-                     {watch('enrollment.useManualIDs') && (
-                       <motion.div initial={{ width: 0, opacity: 0 }} animate={{ width: 140, opacity: 1 }} exit={{ width: 0, opacity: 0 }} className="overflow-hidden">
-                          <VoiceInputEn
-                            component={Input}
-                            className="h-9 text-xs font-mono font-bold uppercase tracking-wider text-[#00AEEF] border-[#00AEEF]/20"
-                            value={watch('enrollment.customStudentId') || ''}
-                            onChange={(e: any) => setValue('enrollment.customStudentId', e.target.value)}
-                            placeholder="MII-XXXX"
-                          />
-                       </motion.div>
-                     )}
-                  </AnimatePresence>
-                  <Checkbox
-                      checked={watch('enrollment.useManualIDs')}
-                      onCheckedChange={(c) => {
-                        setValue('enrollment.useManualIDs', c === true);
-                        if (c === true && !watch('enrollment.customStudentId')) {
-                          getNextStudentId().then(id => setValue('enrollment.customStudentId', id));
-                        }
-                      }}
-                      className="h-5 w-5 data-[state=checked]:bg-[#00AEEF] border-[#00AEEF]/20"
+              <div className="space-y-0.5">
+                <p className="text-[13px] font-bold text-zinc-900 dark:text-zinc-100">অ্যাডমিশন আইডি</p>
+                <p className="text-[10px] text-zinc-400 font-medium tracking-tight">ম্যানুয়ালি আইডি সেট করতে চাইলে সুইচ অন করুন।</p>
+              </div>
+              <div className="flex items-center gap-3">
+                {watch('enrollment.useManualIDs') && (
+                  <div className="overflow-hidden">
+                    <VoiceInputEn
+                      component={Input}
+                      className="h-9 text-xs font-mono font-bold uppercase tracking-wider text-[#00AEEF] border-[#00AEEF]/20"
+                      value={watch('enrollment.customStudentId') || ''}
+                      onChange={(e: any) => setValue('enrollment.customStudentId', e.target.value)}
+                      placeholder="MII-XXXX"
                     />
-               </div>
+                  </div>
+                )}
+                <Checkbox
+                  checked={watch('enrollment.useManualIDs')}
+                  onCheckedChange={(c) => {
+                    setValue('enrollment.useManualIDs', c === true);
+                    if (c === true && !watch('enrollment.customStudentId')) {
+                      getNextStudentId().then(id => setValue('enrollment.customStudentId', id));
+                    }
+                  }}
+                  className="h-5 w-5 data-[state=checked]:bg-[#00AEEF] border-[#00AEEF]/20"
+                />
+              </div>
             </div>
           </div>
         </SectionCard>
 
         {/* ── Section 2: Enrollments ────────────────────────── */}
         <div className="space-y-5">
-           <div className="flex items-center justify-between px-2">
-              <div className="flex items-center gap-3">
-                 <div className="h-8 w-8 rounded-xl bg-[#00AEEF]/10 flex items-center justify-center text-[#00AEEF]">
-                    <GraduationCap className="h-4.5 w-4.5" />
-                 </div>
-                 <div>
-                    <h3 className="text-sm font-black text-zinc-900 dark:text-zinc-50 uppercase tracking-widest">বিভাগ ও শ্রেণী</h3>
-                    <p className="text-[10px] text-zinc-400 font-medium">একাধিক বিভাগে ভর্তি করাতে টেক যোগ করুন</p>
-                 </div>
+          <div className="flex items-center justify-between px-2">
+            <div className="flex items-center gap-3">
+              <div className="h-8 w-8 rounded-xl bg-[#00AEEF]/10 flex items-center justify-center text-[#00AEEF]">
+                <GraduationCap className="h-4.5 w-4.5" />
               </div>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={addEnrollment}
-                disabled={fields.length >= 3}
-                className="h-9 px-4 rounded-xl border-[#00AEEF]/20 text-[#00AEEF] hover:bg-[#00AEEF]/5 gap-2 font-bold transition-all active:scale-95"
-              >
-                <Plus className="h-3.5 w-3.5" /> বিভাগ যোগ
-              </Button>
-           </div>
+              <div>
+                <h3 className="text-sm font-black text-zinc-900 dark:text-zinc-50 uppercase tracking-widest">বিভাগ ও শ্রেণী</h3>
+                <p className="text-[10px] text-zinc-400 font-medium">একাধিক বিভাগে ভর্তি করাতে টেক যোগ করুন</p>
+              </div>
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={addEnrollment}
+              disabled={fields.length >= 3}
+              className="h-9 px-4 rounded-xl border-[#00AEEF]/20 text-[#00AEEF] hover:bg-[#00AEEF]/5 gap-2 font-bold transition-all active:scale-95"
+            >
+              <Plus className="h-3.5 w-3.5" /> বিভাগ যোগ
+            </Button>
+          </div>
 
-           <AnimatePresence mode="popLayout">
-              {fields.map((field, index) => (
-                <EnrollmentCard
-                  key={field.id}
-                  index={index}
-                  remove={handleRemove}
-                  departments={departments}
-                  sessions={sessions}
-                  sessionsRes={sessionQuery.data}
-                  sections={sections}
-                  canRemove={fields.length > 1}
-                />
-              ))}
-           </AnimatePresence>
+          {fields.map((field, index) => (
+            <EnrollmentCard
+              key={field.id}
+              index={index}
+              remove={handleRemove}
+              departments={departments}
+              sessions={sessions}
+              sessionsRes={sessionQuery.data}
+              sections={sections}
+              canRemove={fields.length > 1}
+            />
+          ))}
         </div>
 
         {/* ── Section 3: Previous School ────────────────────── */}
@@ -723,7 +677,7 @@ export default function Step4EnrollmentInfo({ onNext, onPrev }: { onNext: () => 
                 </FormControl>
               </FormItem>
             )} />
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <FormField control={control} name="enrollment.previousClassName" render={({ field }) => (
                 <FormItem>
@@ -754,48 +708,48 @@ export default function Step4EnrollmentInfo({ onNext, onPrev }: { onNext: () => 
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-5">
             <FormField control={control} name="enrollment.admissionTestMarks" render={({ field }) => (
-               <FormItem>
-                 <FormLabel className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">প্রাপ্ত নম্বর</FormLabel>
-                 <FormControl>
-                   <Input placeholder="উদাঃ ৮০" className="h-11 rounded-xl" {...field} value={field.value ?? ''} />
-                 </FormControl>
-               </FormItem>
+              <FormItem>
+                <FormLabel className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">প্রাপ্ত নম্বর</FormLabel>
+                <FormControl>
+                  <Input placeholder="উদাঃ ৮০" className="h-11 rounded-xl" {...field} value={field.value ?? ''} />
+                </FormControl>
+              </FormItem>
             )} />
 
             <FormField control={control} name="enrollment.admissionTestResult" render={({ field }) => (
-               <FormItem>
-                 <FormLabel className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">ফলাফল</FormLabel>
-                 <Select onValueChange={field.onChange} value={field.value || 'passed'}>
-                   <FormControl>
-                     <SelectTrigger className="h-11 rounded-xl">
-                       <SelectValue />
-                     </SelectTrigger>
-                   </FormControl>
-                   <SelectContent className="kalpurush-font">
-                     <SelectItem value="passed">উত্তীর্ণ (Pass)</SelectItem>
-                     <SelectItem value="waiting">অপেক্ষমান</SelectItem>
-                     <SelectItem value="failed">অকৃতকার্য</SelectItem>
-                   </SelectContent>
-                 </Select>
-               </FormItem>
+              <FormItem>
+                <FormLabel className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">ফলাফল</FormLabel>
+                <Select onValueChange={field.onChange} value={field.value || 'passed'}>
+                  <FormControl>
+                    <SelectTrigger className="h-11 rounded-xl">
+                      <SelectValue />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent className="kalpurush-font">
+                    <SelectItem value="passed">উত্তীর্ণ (Pass)</SelectItem>
+                    <SelectItem value="waiting">অপেক্ষমান</SelectItem>
+                    <SelectItem value="failed">অকৃতকার্য</SelectItem>
+                  </SelectContent>
+                </Select>
+              </FormItem>
             )} />
 
             <FormField control={control} name="enrollment.examinerName" render={({ field }) => (
-               <FormItem>
-                 <FormLabel className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">পরীক্ষক (উস্তাদ)</FormLabel>
-                 <FormControl>
-                   <VoiceInputBn {...field} component={Input} placeholder="পরীক্ষকের নাম" className="h-11 rounded-xl" value={field.value ?? ''} />
-                 </FormControl>
-               </FormItem>
+              <FormItem>
+                <FormLabel className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">পরীক্ষক (উস্তাদ)</FormLabel>
+                <FormControl>
+                  <VoiceInputBn {...field} component={Input} placeholder="পরীক্ষকের নাম" className="h-11 rounded-xl" value={field.value ?? ''} />
+                </FormControl>
+              </FormItem>
             )} />
 
             <FormField control={control} name="enrollment.admissionTestRemarks" render={({ field }) => (
-               <FormItem>
-                 <FormLabel className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">বিশেষ মন্তব্য</FormLabel>
-                 <FormControl>
-                   <VoiceInputBn {...field} component={Input} placeholder="..." className="h-11 rounded-xl" value={field.value ?? ''} />
-                 </FormControl>
-               </FormItem>
+              <FormItem>
+                <FormLabel className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">বিশেষ মন্তব্য</FormLabel>
+                <FormControl>
+                  <VoiceInputBn {...field} component={Input} placeholder="..." className="h-11 rounded-xl" value={field.value ?? ''} />
+                </FormControl>
+              </FormItem>
             )} />
           </div>
         </SectionCard>
@@ -828,7 +782,7 @@ export default function Step4EnrollmentInfo({ onNext, onPrev }: { onNext: () => 
         </SectionCard>
 
         {/* ── Navigation ─────────────────────────────────── */}
-        <motion.div variants={fadeUp} className="flex gap-4 pt-4">
+        <div className="flex gap-4 pt-4">
           <Button
             type="button"
             variant="ghost"
@@ -843,13 +797,13 @@ export default function Step4EnrollmentInfo({ onNext, onPrev }: { onNext: () => 
             onClick={handleNextWithCleanup}
             className="flex-[2] h-14 rounded-2xl bg-primary text-primary-foreground text-base font-bold shadow-xl shadow-primary/20 transition-all hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 group"
           >
-            পরবর্তী তথ্য প্রদান করুন
-            <ChevronRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+            ভর্তি সম্পন্ন করুন
+            <Check className="h-5 w-5 ml-1" />
           </Button>
-        </motion.div>
+        </div>
 
       </div>
-    </motion.div>
+    </div>
   );
 }
 

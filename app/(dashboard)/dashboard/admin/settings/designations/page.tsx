@@ -24,7 +24,6 @@ import {
   Monitor,
   LayoutDashboard
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import {
   Dialog,
@@ -283,11 +282,8 @@ export default function DesignationsManagementPage() {
           [...Array(3)].map((_, i) => <Skeleton key={i} className="h-40 w-full rounded-2xl" />)
         ) : (
           Object.entries(filteredGroups).map(([key, group], groupIdx) => (
-            <motion.div
+            <div
               key={key}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: groupIdx * 0.1 }}
               className="space-y-4"
             >
               <div className="flex items-center gap-3 px-1">
@@ -336,7 +332,7 @@ export default function DesignationsManagementPage() {
                   </Card>
                 ))}
               </div>
-            </motion.div>
+            </div>
           ))
         )}
       </div>

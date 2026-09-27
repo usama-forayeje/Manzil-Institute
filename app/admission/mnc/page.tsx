@@ -614,7 +614,7 @@ export default function MNCAdmissionPage() {
     ],
   };
 
-  const periodNames = {
+  const periodNames: Record<string, { bn: string; en: string }> = {
     morning: { bn: 'সকাল', en: 'Morning' },
     afternoon: { bn: 'দুপুর', en: 'Afternoon' },
     evening: { bn: 'সন্ধ্যা', en: 'Evening' },
@@ -626,8 +626,8 @@ export default function MNCAdmissionPage() {
     window.scrollTo(0, 0);
   }, []);
 
-  const getColorClasses = color => {
-    const colorMap = {
+  const getColorClasses = (color: string) => {
+    const colorMap: Record<string, { bg100: string; bg500: string; text500: string }> = {
       blue: {
         bg100: 'bg-[#00AEEF]/20 dark:bg-[#00AEEF]/10',
         bg500: 'bg-[#00AEEF]',
@@ -777,7 +777,7 @@ export default function MNCAdmissionPage() {
 
   // --- Sub Components ---
 
-  const SectionHeader = ({ title, subtitle }) => (
+  const SectionHeader = ({ title, subtitle }: { title: string; subtitle: string }) => (
     <div className="text-center mb-12">
       <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-3">
         {title}
@@ -943,7 +943,7 @@ export default function MNCAdmissionPage() {
                           </p>
 
                           <div className="grid gap-1 sm:gap-2">
-                            {step.requirements.map((requirement, reqIndex) => (
+                            {step.requirements.map((requirement: string, reqIndex: number) => (
                               <div
                                 key={reqIndex}
                                 className="flex items-center gap-2"
@@ -1305,7 +1305,7 @@ export default function MNCAdmissionPage() {
                     ([period, activities], pIdx) => (
                       <div key={pIdx} className="relative pl-8 md:pl-0">
                         <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 border-b pb-2 dark:border-gray-700">
-                          {periodNames[period][language === 'bn' ? 'bn' : 'en']}
+                          {periodNames[period]?.[language === 'bn' ? 'bn' : 'en'] || period}
                         </h3>
                         <div className="grid md:grid-cols-2 gap-4">
                           {activities.map((activity, aIdx) => {
@@ -1538,7 +1538,7 @@ export default function MNCAdmissionPage() {
                             {language === 'bn' ? 'ফোন নম্বর' : 'Phone Numbers'}
                           </h4>
                           <div className="space-y-1">
-                            {safeData.contact.phone.map((number, idx) => (
+                            {safeData.contact.phone.map((number: string, idx: number) => (
                               <p
                                 key={idx}
                                 className={cn(

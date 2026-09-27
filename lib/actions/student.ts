@@ -57,15 +57,16 @@ export interface AdmissionResult {
 	error?: string;
 }
 
+import { getAllClasses, getAllSections, getAllDepartments } from '@/lib/actions/academic';
+
 export async function getClasses() {
 	try {
-		const { databases } = await createAdminClient();
-		const response = await databases.listDocuments(
-        DATABASE_ID,
-		 COLLECTIONS.CLASSES,
-        [Query.equal("isActive",true), Query.orderAsc("level"), Query.limit(100)]
-		);
-		return { success: true, classes: JSON.parse(JSON.stringify(response.documents)) };
+		const result = await getAllClasses();
+		if (result.success) {
+			const activeClasses = (result.classes || []).filter((c: any) => c.isActive !== false);
+			return { success: true, classes: activeClasses };
+		}
+		return result;
 	} catch (error) {
 		console.error("Error fetching classes", error);
 		return { success: false, classes: [], error: String(error) };
@@ -89,73 +90,91 @@ export async function getStudents(filters: { limit?: number; offset?: number; se
 	try {
 		const { databases } = await createAdminClient();
 		
-		const queries = [];
+		const queries: string[] = [];
     if (filters.limit) queries.push(Query.limit(filters.limit));
     if (filters.offset) queries.push(Query.offset(filters.offset));
     queries.push(Query.orderDesc('$createdAt'));
+    // Select only fields needed for list view � reduces data transfer
 
-    // Handle search if provided
-    if (filters.search) {
-      // In Appwrite we usually search in specific fields
-      // For now, let's keep it simple or implement search if DB supports it
+    if (filters.search?.trim()) {
+      queries.push(Query.search('name', filters.search.trim()));
     }
-		
-		const response = await databases.listDocuments(
-      DATABASE_ID,
-		  COLLECTIONS.STUDENTS,
-		  queries
-		);
+
+    // Round-trip 1: fetch students + cached reference data in parallel
+    const [response, classesRes, sectionsRes, departmentsRes] = await Promise.all([
+      databases.listDocuments(DATABASE_ID, COLLECTIONS.STUDENTS, queries),
+      getAllClasses(),
+      getAllSections(),
+      getAllDepartments(),
+    ]);
 
     const students = response.documents;
-    if (students.length === 0) return { success: true, total: 0, students: [] };
-
-    // Fetch batch data for classes, sections, and departments to avoid N+1 problem
-    const [classesRes, sectionsRes, departmentsRes] = await Promise.all([
-      databases.listDocuments(DATABASE_ID, COLLECTIONS.CLASSES, [Query.limit(100)]),
-      databases.listDocuments(DATABASE_ID, COLLECTIONS.SECTIONS, [Query.limit(100)]),
-      databases.listDocuments(DATABASE_ID, COLLECTIONS.DEPARTMENTS, [Query.limit(100)])
-    ]);
+    if (students.length === 0) return { success: true, total: response.total, students: [] };
 
     const classMap: Record<string, any> = {};
     const sectionMap: Record<string, any> = {};
     const deptMap: Record<string, any> = {};
+    (classesRes.classes || []).forEach((c: any) => { classMap[c.$id] = c; });
+    (sectionsRes.sections || []).forEach((s: any) => { sectionMap[s.$id] = s; });
+    (departmentsRes.departments || []).forEach((d: any) => { deptMap[d.$id] = d; deptMap[d.code] = d; });
 
-    classesRes.documents.forEach(c => { classMap[c.$id] = c; });
-    sectionsRes.documents.forEach(s => { sectionMap[s.$id] = s; });
-    departmentsRes.documents.forEach(d => { deptMap[d.$id] = d; deptMap[d.code] = d; });
+    // Round-trip 2: fetch active enrollments for the fetched students
+    const studentDocIds = students.map(s => s.$id);
+    const businessStudentIds = students.map(s => s.studentId).filter(Boolean);
+    const allLookupIds = Array.from(new Set([...studentDocIds, ...businessStudentIds]));
 
-    // Fetch enrollments for these students to get current class/section
-    const studentIds = students.map(s => s.$id);
-    const enrollmentsRes = await databases.listDocuments(
-      DATABASE_ID,
-      COLLECTIONS.STUDENT_ENROLLMENTS,
-      [Query.equal('studentId', studentIds), Query.limit(100)]
-    );
+    let enrollmentDocs: any[] = [];
+    if (allLookupIds.length > 0) {
+      try {
+        const enrollmentsRes = await databases.listDocuments(
+          DATABASE_ID,
+          COLLECTIONS.STUDENT_ENROLLMENTS,
+          [
+            Query.equal('studentId', allLookupIds),
+            Query.limit(Math.min(allLookupIds.length * 5, 200)),
+          ]
+        );
+        enrollmentDocs = enrollmentsRes.documents;
+      } catch (enrErr: any) {
+        console.warn('[Enrollments query warning]', enrErr?.message);
+      }
+    }
+
+    // Group enrollments by studentId for O(1) lookup
+    const enrollmentsByStudent = new Map<string, any[]>();
+    for (const enr of enrollmentDocs) {
+      if (!enr.studentId) continue;
+      const list = enrollmentsByStudent.get(enr.studentId) ?? [];
+      list.push(enr);
+      enrollmentsByStudent.set(enr.studentId, list);
+    }
 
     const enrichedStudents = students.map(student => {
-      // Find all enrollments for this student
-      const studentEnrs = enrollmentsRes.documents.filter(e => e.studentId === student.$id);
-      
+      const studentEnrs = enrollmentsByStudent.get(student.$id) || (student.studentId ? enrollmentsByStudent.get(student.studentId) : null) || [];
       const activeEnrollments = studentEnrs.map(enr => {
         const cls = classMap[enr.classId];
         const sec = sectionMap[enr.section];
-        const dept = deptMap[enr.departmentId] || deptMap[enr.departmentCode];
-
+        const dept = deptMap[enr.departmentId] || (enr.departmentCode ? deptMap[enr.departmentCode] : undefined);
         return {
           ...enr,
           className: cls?.nameBn || cls?.name || enr.className || enr.admissionClass || 'অনির্ধারিত',
           sectionName: sec?.sectionNameBn || sec?.sectionName || enr.sectionName || enr.section || 'নেই',
-          departmentName: dept?.nameBn || dept?.name || enr.departmentName || enr.departmentCode || 'সাধারণ'
+          departmentName: dept?.nameBn || dept?.name || enr.departmentName || enr.departmentCode || 'নেই'
         };
       });
-
       return {
         ...student,
+        name: student.name || student.nameBn || student.nameEn || '',
+        nameBn: student.nameBn || student.name || '',
+        nameEn: student.nameEn || student.name || '',
+        photo: student.photo || student.photoUrl || '',
+        photoUrl: student.photo || student.photoUrl || '',
+        fatherName: student.fatherName || student.fatherNameBn || student.fatherNameEn || '',
+        fatherPhone: student.fatherPhone || student.guardianPhone || '',
         activeEnrollments,
-        // Keep these for backward compatibility or filtering if needed
         currentClass: activeEnrollments[0]?.className || 'অনির্ধারিত',
         currentSection: activeEnrollments[0]?.sectionName || 'নেই',
-        departmentName: activeEnrollments[0]?.departmentName || 'সাধারণ'
+        departmentName: activeEnrollments[0]?.departmentName || 'নেই'
       };
     });
 

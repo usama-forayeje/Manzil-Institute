@@ -82,9 +82,15 @@ export async function getSession() {
       userDoc,
       userAvatar: userDoc?.avatarUrl || null,
     }));
-  } catch (e) {
-    // NoSessionError is expected for unauthenticated users - return null silently
-    if (e instanceof NoSessionError) {
+  } catch (e: any) {
+    // Expected when user is unauthenticated or session expired on Appwrite
+    if (
+      e instanceof NoSessionError ||
+      e?.code === 401 ||
+      e?.type === 'general_unauthorized_scope' ||
+      e?.type === 'user_unauthorized' ||
+      e?.message?.includes('missing scopes')
+    ) {
       return null;
     }
     // Log unexpected errors for debugging

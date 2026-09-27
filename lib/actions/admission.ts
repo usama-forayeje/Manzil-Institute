@@ -22,7 +22,7 @@ export async function getAdmissionData(language: string = 'en'): Promise<Admissi
       COLLECTIONS.ADMISSION_DATA || "",
       [Query.equal("language", language)]
     );
-    return response.documents as AdmissionData[];
+    return response.documents as unknown as AdmissionData[];
   } catch (error) {
     console.error("Error fetching admission data:", error);
     // Return mock data for development

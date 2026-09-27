@@ -81,7 +81,7 @@ interface FileSlotProps {
   isNew: boolean; // just uploaded this session
   onPick: () => void;
   onRemove: () => void;
-  inputRef: React.RefObject<HTMLInputElement>;
+  inputRef: React.RefObject<HTMLInputElement | null>;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   icon: React.ReactNode;
   color: 'rose' | 'amber';
@@ -261,7 +261,7 @@ export default function Step4ExperienceSkills({ onNext, onPrev }: StepProps) {
           experienceLetterFile: expFile,
           cvUrl: cvPreview,
           experienceLetterUrl: expPreview,
-        });
+        } as any);
       }, 800);
     });
     return () => {
@@ -316,7 +316,7 @@ export default function Step4ExperienceSkills({ onNext, onPrev }: StepProps) {
       cvFile,
       experienceLetterFile: expFile,
       cvUrl: cvPreview,
-      experienceLetterUrl: expPreview,
+      experienceLetterUrl: expPreview ?? undefined,
     });
     onNext();
   };
@@ -555,22 +555,22 @@ export default function Step4ExperienceSkills({ onNext, onPrev }: StepProps) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-5 rounded-2xl bg-primary/5 dark:bg-primary/20 border border-primary/20">
               {[
                 {
-                  name: 'socialLinks.facebook',
+                  name: 'socialLinks.facebook' as const,
                   icon: <FaFacebook className="h-4 w-4 text-[#1877F2]" />,
                   placeholder: 'facebook.com/username',
                 },
                 {
-                  name: 'socialLinks.linkedin',
+                  name: 'socialLinks.linkedin' as const,
                   icon: <FaLinkedinIn className="h-4 w-4 text-[#0A66C2]" />,
                   placeholder: 'linkedin.com/in/username',
                 },
                 {
-                  name: 'socialLinks.twitter',
+                  name: 'socialLinks.twitter' as const,
                   icon: <FaXTwitter className="h-4 w-4" />,
                   placeholder: 'x.com/username',
                 },
                 {
-                  name: 'socialLinks.instagram',
+                  name: 'socialLinks.instagram' as const,
                   icon: <FaInstagram className="h-4 w-4 text-[#E4405F]" />,
                   placeholder: 'instagram.com/username',
                 },
@@ -578,7 +578,7 @@ export default function Step4ExperienceSkills({ onNext, onPrev }: StepProps) {
                 <FormField
                   key={name}
                   control={form.control}
-                  name={name}
+                  name={name as any}
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="flex items-center gap-2 text-zinc-700 dark:text-zinc-300">
@@ -589,6 +589,7 @@ export default function Step4ExperienceSkills({ onNext, onPrev }: StepProps) {
                           placeholder={placeholder}
                           className="bg-background/80 backdrop-blur-sm h-11"
                           {...field}
+                          value={String(field.value ?? '')}
                         />
                       </FormControl>
                     </FormItem>
@@ -608,6 +609,7 @@ export default function Step4ExperienceSkills({ onNext, onPrev }: StepProps) {
                         placeholder="https://yourwebsite.com"
                         className="bg-background/80 backdrop-blur-sm h-11"
                         {...field}
+                        value={String(field.value ?? '')}
                       />
                     </FormControl>
                   </FormItem>

@@ -99,7 +99,7 @@ export default function Step5ContactReference({ onNext, onPrev }: StepProps) {
   const [isCompressing, setIsCompressing] = useState(false);
 
   const form = useForm<ContactReferenceData>({
-    resolver: zodResolver(contactReferenceSchema),
+    resolver: zodResolver(contactReferenceSchema) as any,
     defaultValues: {
       phonePrimary: savedData?.phonePrimary ?? '',
       phoneSecondary: savedData?.phoneSecondary ?? '',
@@ -137,7 +137,7 @@ export default function Step5ContactReference({ onNext, onPrev }: StepProps) {
     const subscription = form.watch(value => {
       if (timerRef.current) clearTimeout(timerRef.current);
       timerRef.current = setTimeout(() => {
-        patchStep5Data(value);
+        patchStep5Data(value as any);
       }, 500);
     });
     return () => {

@@ -12,12 +12,13 @@ interface BaseVoiceInputProps {
   className?: string;
   placeholder?: string;
   component?: any;
+  isTextarea?: boolean;
   [key: string]: any;
 }
 
 /**
- * Internal base component for Voice Inputs (Bn/En).
- * Handles the logic for both languages while allowing style and behavioral overrides.
+ * Internal base component for Voice Inputs (Bn/En/Ar).
+ * Handles the logic for voice recognition while allowing style and behavioral overrides.
  */
 function BaseVoiceInput({
   value = "",
@@ -26,6 +27,7 @@ function BaseVoiceInput({
   className,
   placeholder,
   component: Component = "input",
+  isTextarea = false,
   ...props
 }: BaseVoiceInputProps) {
   const [mounted, setMounted] = useState(false);
@@ -102,7 +104,7 @@ function BaseVoiceInput({
       <Component
         value={controlledValue}
         onChange={(e: any) => onChange?.(e)}
-        className={cn("w-full rounded-md border px-3 py-2 text-sm", className)}
+        className={cn("w-full rounded-md border bg-background text-foreground px-3 py-2 text-sm", className)}
         placeholder={placeholder}
         {...props}
       />
@@ -115,7 +117,7 @@ function BaseVoiceInput({
         <Component
           value={localVal}
           onChange={handleChange}
-          className={cn("w-full rounded-md border px-3 py-2 text-sm", className)}
+          className={cn("w-full rounded-md border bg-background text-foreground px-3 py-2 text-sm", className)}
           placeholder={placeholder}
           {...props}
         />
@@ -139,14 +141,19 @@ function BaseVoiceInput({
         onChange={handleChange}
         placeholder={placeholder}
         className={cn(
-          "w-full rounded-lg border bg-background px-3 py-2 pr-20 text-sm transition-all duration-200 outline-none",
+          "w-full rounded-lg border bg-background text-foreground px-3 py-2 pr-20 text-sm transition-all duration-200 outline-none placeholder:text-zinc-400 dark:placeholder:text-zinc-500",
           "focus:ring-2 focus:ring-cyan-500/30 focus:border-cyan-500/50",
           isListening && "ring-2 ring-green-500/30 border-green-500/50 bg-green-50/10 dark:bg-green-900/5",
           className
         )}
       />
 
-      <div className="absolute inset-y-0 right-2 flex items-center gap-1.5 overflow-hidden">
+      <div
+        className={cn(
+          "absolute right-2 flex items-center gap-1.5 z-10",
+          isTextarea ? "top-2.5" : "inset-y-0"
+        )}
+      >
         {localVal.length > 0 && (
           <button
             type="button"
@@ -216,4 +223,16 @@ export function VoiceInputEn(props: any) {
 
 export function VoiceInputAr(props: any) {
   return <BaseVoiceInput language="ar-SA" placeholder="এখানে টাইপ করুন অথবা আরবী ভয়েস ব্যবহার করুন..." {...props} />;
+}
+
+export function VoiceTextareaBn({ component, ...props }: any) {
+  return (
+    <BaseVoiceInput
+      language="bn-BD"
+      isTextarea
+      component={component || "textarea"}
+      placeholder="গ্রাম / মহল্লা / বাড়ি নং, ডাকঘর ও পোস্ট কোড লিখুন অথবা মাইক চেপে মুখে বলুন..."
+      {...props}
+    />
+  );
 }

@@ -66,7 +66,7 @@ export function DatePicker({
           className={cn(
             "w-full justify-start text-left font-normal h-11 rounded-xl transition-all shadow-sm px-4 kalpurush-font",
             "bg-background border-input hover:bg-accent hover:text-accent-foreground",
-            !date && "text-muted-foreground"
+            date ? "text-foreground" : "text-muted-foreground"
           )}
         >
           <CalendarIcon className="mr-2 h-4 w-4 text-cyan-500 shrink-0" />

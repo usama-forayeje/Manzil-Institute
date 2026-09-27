@@ -9,12 +9,20 @@ import {
   type DepartmentParams 
 } from '@/lib/actions/academic';
 import { departmentsQueryOptions, academicKeys } from '@/features/academic/api/queries';
+import { useRealtimeTable } from '@/lib/appwrite/realtime';
+import { COLLECTIONS } from '@/config/appwrite';
 
 export function useDepartments() {
   const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [globalFilter, setGlobalFilter] = useState('');
+
+  // Realtime updates (docs/appwrite.md §3.7)
+  useRealtimeTable({
+    tableId: COLLECTIONS.DEPARTMENTS,
+    queryKey: academicKeys.departments(),
+  });
 
   const [formData, setFormData] = useState({
     code: '',
@@ -25,6 +33,7 @@ export function useDepartments() {
 
   const deptQuery = useQuery(departmentsQueryOptions);
   const departments = deptQuery.data?.success ? (deptQuery.data.departments as any[]) : [];
+
 
   const upsertMutation = useMutation({
     mutationFn: async (payload: DepartmentParams) => {

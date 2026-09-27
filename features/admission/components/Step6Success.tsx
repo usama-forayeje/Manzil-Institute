@@ -20,11 +20,10 @@
 
 import { useRef, useState, useEffect } from 'react';
 import Link from 'next/link';
-import { 
-  CheckCircle2, Printer, Download, User, Home, 
-  ArrowRight, RefreshCw, Smartphone, CreditCard, Calendar, Building2, Loader2 
-} from 'lucide-react';
-import { motion, Variants } from 'framer-motion';
+import {
+  CheckCircle2, Printer, Download, User, Home,
+  ArrowRight, RefreshCw, Smartphone, CreditCard, Calendar, Building2, Loader2
+} from "lucide-react"
 import { Button } from '@/components/ui/button';
 import { useStep5Data, useAdmissionUIStore } from '@/store/admissionFormStore';
 import { AdmissionReceipt } from './AdmissionReceipt';
@@ -124,7 +123,7 @@ export default function Step6Success() {
           if (result.success && result.data) {
             hasHydrated.current = true;
             const { student, enrollments, invoice, payment } = result.data;
-            
+
             // 1. Map to Step5Data (Summary Store)
             setStep5Data({
               studentId: student.studentId,
@@ -171,7 +170,7 @@ export default function Step6Success() {
                 phonePrimary: student.phonePrimary || '',
                 whatsappNo: student.whatsappNo || '',
                 email: student.email || '',
-                permanentSameAsCurrent: false, 
+                permanentSameAsCurrent: false,
                 presentAddress: {
                   division: student.presentDivision || '',
                   district: student.presentDistrict || '',
@@ -253,19 +252,6 @@ export default function Step6Success() {
     }
   }, [successId, setStep5Data, resetForm]);
 
-  const containerVariants: Variants = {
-    hidden: { opacity: 0, scale: 0.95 },
-    visible: { 
-      opacity: 1, scale: 1,
-      transition: { staggerChildren: 0.1, duration: 0.4, ease: "easeOut" }
-    }
-  };
-
-  const itemVariants: Variants = {
-    hidden: { opacity: 0, y: 15 },
-    visible: { opacity: 1, y: 0 }
-  };
-
   // Bug Fix: Uses native window.print() popup — no html2canvas, no lab() crash.
   const handleDownloadReceipt = () => {
     if (!receiptRef.current) return;
@@ -289,14 +275,11 @@ export default function Step6Success() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[500px] py-10 px-4 kalpurush-font max-w-2xl mx-auto overflow-hidden">
-      
+
       {/* Celebration Backdrop */}
       <div className="absolute inset-0 -z-10 bg-gradient-to-b from-transparent via-[#00AEEF]/5 to-transparent pointer-events-none" />
 
-      <motion.div 
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
+      <div
         className="w-full space-y-10 text-center relative"
       >
         {isFetchingDB ? (
@@ -307,109 +290,109 @@ export default function Step6Success() {
         ) : (
           <>
             {/* Lottie-like Check Animation Wrapper */}
-            <motion.div variants={itemVariants} className="relative inline-block">
-           <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full scale-150 animate-pulse" />
-           <div className="relative h-24 w-24 bg-gradient-to-tr from-primary to-primary/80 rounded-full flex items-center justify-center shadow-2xl shadow-primary/30 mx-auto border-4 border-white dark:border-zinc-800">
-              <CheckCircle2 className="h-12 w-12 text-white" />
-           </div>
-        </motion.div>
-
-        <motion.div variants={itemVariants} className="space-y-3">
-          <h2 className="text-3xl sm:text-4xl font-black text-zinc-900 dark:text-zinc-50 tracking-tighter">অভিনন্দন! ভর্তি সফল হয়েছে</h2>
-          <p className="text-zinc-500 font-bold uppercase tracking-widest text-[10px] bg-emerald-500/10 text-emerald-600 px-4 py-1 rounded-lg inline-block">Admission Confirmed Successfully</p>
-        </motion.div>
-
-        {/* Simplified Digital Success Card */}
-        <motion.div variants={itemVariants} className="bg-white/60 dark:bg-zinc-900/60 backdrop-blur-xl border border-white/20 dark:border-zinc-800/30 rounded-xl p-8 shadow-2xl shadow-zinc-200/50 dark:shadow-none overflow-hidden relative group">
-           <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 blur-2xl" />
-           
-           <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 text-left relative">
-              <div className="space-y-6">
-                 <InfoItem icon={User} label="ছাত্রের নাম" value={step5Data.studentNameBn || '---'} />
-                 <InfoItem icon={Smartphone} label="অ্যাডমিশন আইডি" value={step5Data.studentId || '---'} highlight />
-                 <InfoItem icon={Building2} label="হল / ফ্লোর" value={step5Data.hallName || 'হিসাব শাখা'} />
+            <div className="relative inline-block">
+              <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full scale-150 animate-pulse" />
+              <div className="relative h-24 w-24 bg-gradient-to-tr from-primary to-primary/80 rounded-full flex items-center justify-center shadow-2xl shadow-primary/30 mx-auto border-4 border-white dark:border-zinc-800">
+                <CheckCircle2 className="h-12 w-12 text-white" />
               </div>
+            </div>
 
-              <div className="space-y-6">
-                 <InfoItem icon={Calendar} label="ভর্তির তারিখ" value={step5Data.admissionDate ? new Date(step5Data.admissionDate).toLocaleDateString('bn-BD') : 'আজ'} />
-                 <InfoItem icon={CreditCard} label="রিসিট নম্বর" value={step5Data.receiptNo || '---'} highlight />
-                 <InfoItem icon={CreditCard} label="প্রদত্ত টাকা" value={`৳ ${(step5Data.paidAmount || 0).toLocaleString('bn-BD')}`} />
+            <div className="space-y-3">
+              <h2 className="text-3xl sm:text-4xl font-black text-zinc-900 dark:text-zinc-50 tracking-tighter">অভিনন্দন! ভর্তি সফল হয়েছে</h2>
+              <p className="text-zinc-500 font-bold uppercase tracking-widest text-[10px] bg-emerald-500/10 text-emerald-600 px-4 py-1 rounded-lg inline-block">Admission Confirmed Successfully</p>
+            </div>
+
+            {/* Simplified Digital Success Card */}
+            <div className="bg-white/60 dark:bg-zinc-900/60 backdrop-blur-xl border border-white/20 dark:border-zinc-800/30 rounded-xl p-8 shadow-2xl shadow-zinc-200/50 dark:shadow-none overflow-hidden relative group">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 blur-2xl" />
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 text-left relative">
+                <div className="space-y-6">
+                  <InfoItem icon={User} label="ছাত্রের নাম" value={step5Data.studentNameBn || '---'} />
+                  <InfoItem icon={Smartphone} label="অ্যাডমিশন আইডি" value={step5Data.studentId || '---'} highlight />
+                  <InfoItem icon={Building2} label="হল / ফ্লোর" value={step5Data.hallName || 'হিসাব শাখা'} />
+                </div>
+
+                <div className="space-y-6">
+                  <InfoItem icon={Calendar} label="ভর্তির তারিখ" value={step5Data.admissionDate ? new Date(step5Data.admissionDate).toLocaleDateString('bn-BD') : 'আজ'} />
+                  <InfoItem icon={CreditCard} label="রিসিট নম্বর" value={step5Data.receiptNo || '---'} highlight />
+                  <InfoItem icon={CreditCard} label="প্রদত্ত টাকা" value={`৳ ${(step5Data.paidAmount || 0).toLocaleString('bn-BD')}`} />
+                </div>
               </div>
-           </div>
-        </motion.div>
+            </div>
 
-        {/* Compact & Awesome Action Buttons */}
-        <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-4 items-center justify-center pt-4">
-          <Button
-            size="lg"
-            className="w-full sm:w-auto h-14 px-8 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-black text-sm shadow-xl shadow-primary/20 group transition-all"
-            onClick={handleDownloadApplication}
-            disabled={isExportingForm}
-          >
-            {isExportingForm ? <RefreshCw className="h-5 w-5 animate-spin mr-2" /> : <Printer className="w-5 h-5 mr-3 group-hover:scale-110 transition-transform" />}
-            ভর্তি ফরম প্রিন্ট করুন
-          </Button>
+            {/* Compact & Awesome Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 items-center justify-center pt-4">
+              <Button
+                size="lg"
+                className="w-full sm:w-auto h-14 px-8 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-black text-sm shadow-xl shadow-primary/20 group transition-all"
+                onClick={handleDownloadApplication}
+                disabled={isExportingForm}
+              >
+                {isExportingForm ? <RefreshCw className="h-5 w-5 animate-spin mr-2" /> : <Printer className="w-5 h-5 mr-3 group-hover:scale-110 transition-transform" />}
+                ভর্তি ফরম প্রিন্ট করুন
+              </Button>
 
-          <Button
-            size="lg"
-            variant="outline"
-            className="w-full sm:w-auto h-14 px-8 rounded-lg border-2 border-zinc-200 dark:border-zinc-800 font-bold text-zinc-900 dark:text-zinc-100 group hover:bg-zinc-50 dark:hover:bg-zinc-950 transition-all"
-            onClick={handleDownloadReceipt}
-            disabled={isExporting}
-          >
-            {isExporting ? <RefreshCw className="h-5 w-5 animate-spin mr-2" /> : <Download className="w-5 h-5 mr-3 group-hover:-translate-y-1 transition-transform" />}
-            রিসিট ডাউনলোড
-          </Button>
-        </motion.div>
+              <Button
+                size="lg"
+                variant="outline"
+                className="w-full sm:w-auto h-14 px-8 rounded-lg border-2 border-zinc-200 dark:border-zinc-800 font-bold text-zinc-900 dark:text-zinc-100 group hover:bg-zinc-50 dark:hover:bg-zinc-950 transition-all"
+                onClick={handleDownloadReceipt}
+                disabled={isExporting}
+              >
+                {isExporting ? <RefreshCw className="h-5 w-5 animate-spin mr-2" /> : <Download className="w-5 h-5 mr-3 group-hover:-translate-y-1 transition-transform" />}
+                রিসিট ডাউনলোড
+              </Button>
+            </div>
 
-        {/* Footer Navigation */}
-        <motion.div variants={itemVariants} className="pt-8 flex flex-wrap justify-center items-center gap-x-8 gap-y-4 border-t border-zinc-100 dark:border-zinc-800/50">
-           <Link 
-            href="/dashboard" 
-            onClick={() => reset()} 
-            className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-primary transition-all group"
-           >
-              <Home className="h-3.5 w-3.5" /> 
-              ড্যাশবোর্ড
-              <ArrowRight className="h-3 w-3 -translate-x-1 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all" />
-           </Link>
+            {/* Footer Navigation */}
+            <div className="pt-8 flex flex-wrap justify-center items-center gap-x-8 gap-y-4 border-t border-zinc-100 dark:border-zinc-800/50">
+              <Link
+                href="/dashboard"
+                onClick={() => reset()}
+                className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-primary transition-all group"
+              >
+                <Home className="h-3.5 w-3.5" />
+                ড্যাশবোর্ড
+                <ArrowRight className="h-3 w-3 -translate-x-1 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all" />
+              </Link>
 
-           <Link 
-            href={`/dashboard/admin/students/${step5Data.studentDocId || step5Data.studentId}`} 
-            onClick={() => reset()} 
-            className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-primary transition-all group"
-           >
-              <User className="h-3.5 w-3.5" /> 
-              ছাত্র প্রোফাইল
-              <ArrowRight className="h-3 w-3 -translate-x-1 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all" />
-           </Link>
+              <Link
+                href={`/dashboard/admin/students/${step5Data.studentDocId || step5Data.studentId}`}
+                onClick={() => reset()}
+                className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-primary transition-all group"
+              >
+                <User className="h-3.5 w-3.5" />
+                ছাত্র প্রোফাইল
+                <ArrowRight className="h-3 w-3 -translate-x-1 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all" />
+              </Link>
 
-           <Link 
-            href={`/dashboard/admin/id-cards?search=${step5Data.studentId}`} 
-            onClick={() => reset()} 
-            className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-primary transition-all group"
-           >
-              <CreditCard className="h-3.5 w-3.5" /> 
-              আইডি কার্ড
-              <ArrowRight className="h-3 w-3 -translate-x-1 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all" />
-           </Link>
+              <Link
+                href={`/dashboard/admin/id-cards?search=${step5Data.studentId}`}
+                onClick={() => reset()}
+                className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-primary transition-all group"
+              >
+                <CreditCard className="h-3.5 w-3.5" />
+                আইডি কার্ড
+                <ArrowRight className="h-3 w-3 -translate-x-1 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all" />
+              </Link>
 
-           <button 
-            onClick={() => {
-              reset();
-              resetForm();
-              // Navigate to step 1 or reload/refresh
-              window.location.href = '/dashboard/admin/settings/academics/admission';
-            }} 
-            className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-[#00AEEF] hover:brightness-110 transition-all group bg-[#00AEEF]/5 px-3 py-1.5 rounded-md border border-[#00AEEF]/10"
-           >
-              <RefreshCw className="h-3.5 w-3.5" /> 
-              নতুন ভর্তি
-           </button>
-        </motion.div>
+              <button
+                onClick={() => {
+                  reset();
+                  resetForm();
+                  // Navigate to step 1 or reload/refresh
+                  window.location.href = '/dashboard/admin/settings/academics/admission';
+                }}
+                className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-[#00AEEF] hover:brightness-110 transition-all group bg-[#00AEEF]/5 px-3 py-1.5 rounded-md border border-[#00AEEF]/10"
+              >
+                <RefreshCw className="h-3.5 w-3.5" />
+                নতুন ভর্তি
+              </button>
+            </div>
           </>
         )}
-      </motion.div>
+      </div>
 
       {/* Hidden Templates for PDF Engine */}
       <div className="fixed top-[-9999px] left-[-9999px] pointer-events-none select-none overflow-hidden">

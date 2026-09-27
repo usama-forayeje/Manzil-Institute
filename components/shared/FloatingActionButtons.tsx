@@ -3,7 +3,7 @@
 import React from 'react';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { ArrowUp } from 'lucide-react';
-import { Button } from './ui/button';
+import { Button } from '@/components/ui/button';
 
 const FloatingActionButtons = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -59,11 +59,10 @@ const FloatingActionButtons = () => {
       {/* Back to Top Button */}
       <button
         onClick={scrollToTop}
-        className={`bg-[#00AEEF] hover:bg-[#00AEEF]/90 text-white p-3 rounded-full shadow-lg transition-all duration-600 transform hover:scale-110 relative overflow-hidden ${
-          isVisible
-            ? 'opacity-100 translate-y-0'
-            : 'opacity-0 translate-y-full pointer-events-none'
-        }`}
+        className={`bg-[#00AEEF] hover:bg-[#00AEEF]/90 text-white p-3 rounded-full shadow-lg transition-all duration-600 transform hover:scale-110 relative overflow-hidden ${isVisible
+          ? 'opacity-100 translate-y-0'
+          : 'opacity-0 translate-y-full pointer-events-none'
+          }`}
         style={{
           transitionTimingFunction: 'cubic-bezier(0.68, -0.55, 0.265, 1.55)',
         }}
@@ -102,9 +101,8 @@ const FloatingActionButtons = () => {
         href={whatsappUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className={`bg-green-600 hover:bg-green-700 text-white p-3 rounded-full shadow-lg transition-all duration-600 transform hover:scale-110 ${
-          isVisible ? '-translate-y-[20px]' : 'translate-y-full'
-        }`}
+        className={`bg-green-600 hover:bg-green-700 text-white p-3 rounded-full shadow-lg transition-all duration-600 transform hover:scale-110 ${isVisible ? '-translate-y-[20px]' : 'translate-y-full'
+          }`}
         style={{
           transitionTimingFunction: 'cubic-bezier(0.68, -0.55, 0.265, 1.55)',
         }}

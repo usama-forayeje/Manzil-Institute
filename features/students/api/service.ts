@@ -103,18 +103,23 @@ export async function getStudentsInfinite({
       let deptsMap: Record<string, string> = {};
       let boardingTypesMap: Record<string, string> = {};
 
-      if (classIds.length > 0) {
-        const cRes = await databases.listDocuments(DATABASE_ID, COLLECTIONS.CLASSES, [Query.equal('$id', classIds as string[])]).catch((e) => { console.error('Class fetch err:', e); return { documents: [] }; });
-        cRes.documents.forEach(c => classesMap[c.$id] = c.nameBn || c.name);
-      }
-      if (deptIds.length > 0) {
-        const dRes = await databases.listDocuments(DATABASE_ID, COLLECTIONS.DEPARTMENTS, [Query.equal('$id', deptIds as string[])]).catch((e) => { console.error('Dept fetch err:', e); return { documents: [] }; });
-        dRes.documents.forEach(d => deptsMap[d.$id] = d.nameBn || d.name);
-      }
-      if (boardingTypeIds.length > 0) {
-        const bRes = await databases.listDocuments(DATABASE_ID, COLLECTIONS.BOARDING_TYPES, [Query.equal('$id', boardingTypeIds as string[])]).catch((e) => { console.error('Boarding fetch err:', e); return { documents: [] }; });
-        bRes.documents.forEach(b => boardingTypesMap[b.$id] = b.nameBn || b.name);
-      }
+      // Fetch classes, departments, and boarding types concurrently (eliminates sequential waterfall)
+      const [cRes, dRes, bRes] = await Promise.all([
+        classIds.length > 0
+          ? databases.listDocuments(DATABASE_ID, COLLECTIONS.CLASSES, [Query.equal('$id', classIds as string[])]).catch((e) => { console.error('Class fetch err:', e); return { documents: [] }; })
+          : Promise.resolve({ documents: [] }),
+        deptIds.length > 0
+          ? databases.listDocuments(DATABASE_ID, COLLECTIONS.DEPARTMENTS, [Query.equal('$id', deptIds as string[])]).catch((e) => { console.error('Dept fetch err:', e); return { documents: [] }; })
+          : Promise.resolve({ documents: [] }),
+        boardingTypeIds.length > 0
+          ? databases.listDocuments(DATABASE_ID, COLLECTIONS.BOARDING_TYPES, [Query.equal('$id', boardingTypeIds as string[])]).catch((e) => { console.error('Boarding fetch err:', e); return { documents: [] }; })
+          : Promise.resolve({ documents: [] }),
+      ]);
+
+      cRes.documents.forEach((c: any) => classesMap[c.$id] = c.nameBn || c.name);
+      dRes.documents.forEach((d: any) => deptsMap[d.$id] = d.nameBn || d.name);
+      bRes.documents.forEach((b: any) => boardingTypesMap[b.$id] = b.nameBn || b.name);
+
 
       // 3. Attach metadata mapped by studentId
       for (const student of students) {

@@ -7,17 +7,21 @@ import { DATABASE_ID, COLLECTIONS } from '@/config/appwrite';
 // ─── Types ──────────────────────────────────────────────────
 export interface ProcessNfcScanParams {
   cardUid: string;
-  terminalId: string;
-  gateMode: 'entry' | 'exit' | 'auto';
+  terminalId?: string;
+  gateMode?: 'entry' | 'exit' | 'auto';
 }
 
 export interface MarkManualAttendanceParams {
-  studentDocId: string;
-  studentId: string;
-  date: string;
-  status: 'present' | 'absent' | 'late' | 'leave';
+  studentDocId?: string;
+  studentId?: string;
+  entityId?: string;
+  entityType?: 'student' | 'staff';
+  date?: string;
+  status?: 'present' | 'absent' | 'late' | 'leave';
+  action?: 'entry' | 'exit';
+  manuallyMarkedBy?: string;
   notes?: string;
-  recordedBy: string;
+  recordedBy?: string;
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -27,8 +31,12 @@ export interface MarkManualAttendanceParams {
 /**
  * Process NFC Card Scan
  */
-export async function processNfcScan(params: ProcessNfcScanParams) {
+export async function processNfcScan(params: ProcessNfcScanParams | string) {
   try {
+    const cardUid = typeof params === 'string' ? params : params.cardUid;
+    const terminalId = typeof params === 'string' ? 'main-gate' : (params.terminalId || 'main-gate');
+    const gateMode = typeof params === 'string' ? 'auto' : (params.gateMode || 'auto');
+
     const { databases } = await createAdminClient();
 
     // 1. Find NFC Card
@@ -36,7 +44,7 @@ export async function processNfcScan(params: ProcessNfcScanParams) {
       DATABASE_ID,
       COLLECTIONS.NFC_CARDS,
       [
-        Query.equal('cardUid', params.cardUid),
+        Query.equal('cardUid', cardUid),
         Query.equal('isActive', true),
       ]
     );
@@ -59,7 +67,7 @@ export async function processNfcScan(params: ProcessNfcScanParams) {
     }
 
     const todayDateStr = now.toISOString().split('T')[0];
-    let actionType = params.gateMode;
+    let actionType = gateMode;
 
     // Default 'auto' logic:
     // If not checked in today, it's 'entry'
@@ -90,7 +98,7 @@ export async function processNfcScan(params: ProcessNfcScanParams) {
           date: todayDateStr,
           status: actualStatus,
           checkIn: timeStr,
-          terminalId: params.terminalId,
+          terminalId,
           recordedBy: 'system_nfc',
         }
       );
@@ -127,17 +135,37 @@ export async function processNfcScan(params: ProcessNfcScanParams) {
             date: todayDateStr,
             status: 'leave', // or present depending on rules
             checkOut: timeStr,
-            terminalId: params.terminalId,
+            terminalId,
             recordedBy: 'system_nfc',
           }
         );
       }
     }
 
+    // Lookup user information for feedback
+    let user: { name?: string; nameBn?: string } = { name: card.assignedToId };
+    try {
+      const student = await databases.getDocument(DATABASE_ID, COLLECTIONS.STUDENTS, card.assignedToId);
+      user = { name: (student as any).nameEn || (student as any).name, nameBn: (student as any).nameBn };
+    } catch {
+      try {
+        const studentList = await databases.listDocuments(DATABASE_ID, COLLECTIONS.STUDENTS, [
+          Query.equal('studentId', card.assignedToId),
+          Query.limit(1)
+        ]);
+        if (studentList.documents.length > 0) {
+          const s = studentList.documents[0] as any;
+          user = { name: s.nameEn || s.name, nameBn: s.nameBn };
+        }
+      } catch {}
+    }
+
     return { 
       success: true, 
       studentId: card.assignedToId, 
+      action: actionType,
       actionType,
+      user,
       status: actualStatus 
     };
   } catch (err: any) {
@@ -152,14 +180,36 @@ export async function processNfcScan(params: ProcessNfcScanParams) {
 export async function markManualAttendance(params: MarkManualAttendanceParams) {
   try {
     const { databases } = await createAdminClient();
+    const targetStudentId = params.studentId || params.entityId || '';
+    const date = params.date || new Date().toISOString().split('T')[0];
+    const recordedBy = params.recordedBy || params.manuallyMarkedBy || 'admin';
+    const status = params.status || 'present';
+    const docId = params.studentDocId || targetStudentId;
+
+    let userName = targetStudentId;
+    try {
+      const student = await databases.getDocument(DATABASE_ID, COLLECTIONS.STUDENTS, targetStudentId);
+      userName = (student as any).nameBn || (student as any).nameEn || (student as any).name || targetStudentId;
+    } catch {
+      try {
+        const list = await databases.listDocuments(DATABASE_ID, COLLECTIONS.STUDENTS, [
+          Query.equal('studentId', targetStudentId),
+          Query.limit(1)
+        ]);
+        if (list.documents.length > 0) {
+          const s = list.documents[0] as any;
+          userName = s.nameBn || s.nameEn || s.name || targetStudentId;
+        }
+      } catch {}
+    }
     
     // Check if record exists for date
     const { documents: exactRecords } = await databases.listDocuments(
       DATABASE_ID,
       COLLECTIONS.ATTENDANCE_STUDENTS,
       [
-        Query.equal('studentId', params.studentId),
-        Query.equal('date', params.date),
+        Query.equal('studentId', targetStudentId),
+        Query.equal('date', date),
       ]
     );
 
@@ -169,9 +219,9 @@ export async function markManualAttendance(params: MarkManualAttendanceParams) {
         COLLECTIONS.ATTENDANCE_STUDENTS,
         exactRecords[0].$id,
         {
-          status: params.status,
+          status,
           notes: params.notes || exactRecords[0].notes,
-          recordedBy: params.recordedBy,
+          recordedBy,
           updatedAt: new Date().toISOString()
         }
       );
@@ -181,17 +231,17 @@ export async function markManualAttendance(params: MarkManualAttendanceParams) {
         COLLECTIONS.ATTENDANCE_STUDENTS,
         ID.unique(),
         {
-          studentDocId: params.studentDocId,
-          studentId: params.studentId,
-          date: params.date,
-          status: params.status,
+          studentDocId: docId,
+          studentId: targetStudentId,
+          date,
+          status,
           notes: params.notes || '',
-          recordedBy: params.recordedBy,
+          recordedBy,
         }
       );
     }
 
-    return { success: true };
+    return { success: true, userName };
   } catch (err: any) {
     console.error('Manual attendance failed:', err);
     return { success: false, error: err.message };

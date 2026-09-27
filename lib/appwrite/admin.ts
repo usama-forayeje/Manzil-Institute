@@ -10,11 +10,15 @@ export const databases = new Databases(client);
 export const storage = new Storage(client);
 export const users = new Users(client);
 
+// Modern TablesDB vocabulary compliance (docs/appwrite.md §1)
+export const tablesDB = databases;
+
 export function createAdminClient() {
   return {
     client,
     account,
     databases,
+    tablesDB,
     storage,
     users,
   };

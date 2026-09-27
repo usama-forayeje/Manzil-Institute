@@ -7,18 +7,17 @@
 
 import { useMemo } from 'react';
 import { useFormContext } from 'react-hook-form';
-import { 
-  User, 
-  Users, 
+import {
+  User,
+  Users,
   UserCheck,
-  Heart, 
-  Sparkles, 
-  Check, 
+  Heart,
+  Sparkles,
+  Check,
   ChevronRight,
   Globe,
   Briefcase
 } from 'lucide-react';
-import { motion } from 'framer-motion';
 import { differenceInYears, differenceInMonths } from 'date-fns';
 
 import {
@@ -66,8 +65,8 @@ import { cn } from '@/lib/utils';
 
 const fadeUp: any = {
   hidden: { opacity: 0, y: 15 },
-  visible: { 
-    opacity: 1, 
+  visible: {
+    opacity: 1,
     y: 0,
     transition: { duration: 0.5, ease: "easeOut" as any }
   }
@@ -95,8 +94,7 @@ function SectionCard({
   className?: string;
 }) {
   return (
-    <motion.div
-      variants={fadeUp}
+    <div
       className={cn(
         'rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 transition-all duration-500 overflow-hidden shadow-sm hover:shadow-md',
         className
@@ -126,7 +124,7 @@ function SectionCard({
           {children}
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }
 
@@ -141,8 +139,8 @@ function StepDots({ current, total }: { current: number; total: number }) {
             i + 1 === current
               ? 'w-6 bg-[#00AEEF]'
               : i + 1 < current
-              ? 'w-1.5 bg-zinc-900 dark:bg-zinc-100'
-              : 'w-1.5 bg-zinc-200 dark:bg-zinc-700'
+                ? 'w-1.5 bg-zinc-900 dark:bg-zinc-100'
+                : 'w-1.5 bg-zinc-200 dark:bg-zinc-700'
           )}
         />
       ))}
@@ -172,16 +170,13 @@ export default function Step1PersonalInfo({ onNext, isEditMode }: { onNext: () =
   }, [dob]);
 
   return (
-    <motion.div
-      initial="hidden"
-      animate="visible"
-      variants={stagger}
+    <div
       className="kalpurush-font max-w-3xl mx-auto px-4 pb-24 pt-8"
     >
       <div className="space-y-8">
 
         {/* ── Page Header ──────────────────────────────────── */}
-        <motion.div variants={fadeUp} className="space-y-1">
+        <div className="space-y-1">
           <div className="flex items-center gap-2 mb-3">
             <StepDots current={1} total={5} />
             <span className="text-xs font-semibold text-zinc-400 dark:text-zinc-500 tracking-wide ml-1">
@@ -194,7 +189,7 @@ export default function Step1PersonalInfo({ onNext, isEditMode }: { onNext: () =
           <p className="text-sm text-zinc-400 dark:text-zinc-500 font-medium max-w-lg leading-relaxed">
             ছাত্রের প্রাথমিক পরিচয়, অভিভাবক এবং অন্যান্য ব্যক্তিগত বিবরণ নির্ভুলভাবে প্রদান করুন।
           </p>
-        </motion.div>
+        </div>
 
         {/* ── Section 1.1: Core Identity ───────────────────── */}
         <SectionCard
@@ -213,12 +208,12 @@ export default function Step1PersonalInfo({ onNext, isEditMode }: { onNext: () =
                     পূর্ণ নাম (বাংলায়) *
                   </FormLabel>
                   <FormControl>
-                    <VoiceInputBn 
-                      {...field} 
+                    <VoiceInputBn
+                      {...field}
                       component={Input}
-                      placeholder="নাম বাংলায় লিখুন" 
-                      className="h-11 rounded-xl bg-zinc-50/50 border-zinc-200 dark:bg-zinc-900/50 dark:border-zinc-800 focus:ring-2 focus:ring-[#00AEEF]/20" 
-                      value={field.value ?? ''} 
+                      placeholder="নাম বাংলায় লিখুন"
+                      className="h-11 rounded-xl bg-zinc-50/50 border-zinc-200 dark:bg-zinc-900/50 dark:border-zinc-800 focus:ring-2 focus:ring-[#00AEEF]/20"
+                      value={field.value ?? ''}
                     />
                   </FormControl>
                   <FormMessage />
@@ -234,12 +229,12 @@ export default function Step1PersonalInfo({ onNext, isEditMode }: { onNext: () =
                     Full Name (English) *
                   </FormLabel>
                   <FormControl>
-                    <VoiceInputEn 
+                    <VoiceInputEn
                       {...field}
                       component={Input}
-                      placeholder="Full Name and Title" 
-                      className="h-11 rounded-xl bg-zinc-50/50 border-zinc-200 dark:bg-zinc-900/50 dark:border-zinc-800 focus:ring-2 focus:ring-[#00AEEF]/20 english-text" 
-                      value={field.value ?? ''} 
+                      placeholder="Full Name and Title"
+                      className="h-11 rounded-xl bg-zinc-50/50 border-zinc-200 dark:bg-zinc-900/50 dark:border-zinc-800 focus:ring-2 focus:ring-[#00AEEF]/20 english-text"
+                      value={field.value ?? ''}
                     />
                   </FormControl>
                   <FormMessage />
@@ -282,7 +277,7 @@ export default function Step1PersonalInfo({ onNext, isEditMode }: { onNext: () =
               <div className="h-1.5 w-1.5 rounded-full bg-blue-500" />
               <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest">পিতার তথ্য</span>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-x-5 gap-y-4">
               <FormField control={control} name="personal.fatherNameBn" render={({ field }) => (
                 <FormItem><FormLabel className="text-xs text-zinc-500">নাম (বাংলা)</FormLabel>
                   <FormControl><VoiceInputBn {...field} component={Input} placeholder="পিতার বাংলা নাম" className="h-11 rounded-xl" value={field.value ?? ''} /></FormControl>
@@ -293,14 +288,21 @@ export default function Step1PersonalInfo({ onNext, isEditMode }: { onNext: () =
                   <FormControl><VoiceInputEn {...field} component={Input} placeholder="Father's English Name" className="h-11 rounded-xl english-text" value={field.value ?? ''} /></FormControl>
                 </FormItem>
               )} />
+              <FormField control={control} name="personal.fatherNameAr" render={({ field }) => (
+                <FormItem><FormLabel className="text-xs text-zinc-500">নাম (আরবি)</FormLabel>
+                  <FormControl><VoiceInputAr {...field} component={Input} placeholder="اسم الأب بالعربية" className="h-11 rounded-xl text-right" value={field.value ?? ''} /></FormControl>
+                </FormItem>
+              )} />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-4">
               <FormField control={control} name="personal.fatherOccupation" render={({ field }) => (
                 <FormItem><FormLabel className="text-xs text-zinc-500">পেশা</FormLabel>
-                   <FormControl><VoiceInputBn {...field} component={Input} placeholder="পেশা" className="h-11 rounded-xl" value={field.value ?? ''} /></FormControl>
+                  <FormControl><VoiceInputBn {...field} component={Input} placeholder="পেশা" className="h-11 rounded-xl" value={field.value ?? ''} /></FormControl>
                 </FormItem>
               )} />
               <FormField control={control} name="personal.fatherWorkplace" render={({ field }) => (
                 <FormItem><FormLabel className="text-xs text-zinc-500">কর্মস্থল / ঠিকানা</FormLabel>
-                   <FormControl><VoiceInputBn {...field} component={Input} placeholder="পেশার স্থান" className="h-11 rounded-xl" value={field.value ?? ''} /></FormControl>
+                  <FormControl><VoiceInputBn {...field} component={Input} placeholder="পেশার স্থান" className="h-11 rounded-xl" value={field.value ?? ''} /></FormControl>
                 </FormItem>
               )} />
             </div>
@@ -314,7 +316,7 @@ export default function Step1PersonalInfo({ onNext, isEditMode }: { onNext: () =
               <div className="h-1.5 w-1.5 rounded-full bg-rose-500" />
               <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest">মাতার তথ্য</span>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-x-5 gap-y-4">
               <FormField control={control} name="personal.motherNameBn" render={({ field }) => (
                 <FormItem><FormLabel className="text-xs text-zinc-500">নাম (বাংলা)</FormLabel>
                   <FormControl><VoiceInputBn {...field} component={Input} placeholder="মাতার বাংলা নাম" className="h-11 rounded-xl" value={field.value ?? ''} /></FormControl>
@@ -325,6 +327,13 @@ export default function Step1PersonalInfo({ onNext, isEditMode }: { onNext: () =
                   <FormControl><VoiceInputEn {...field} component={Input} placeholder="Mother's English Name" className="h-11 rounded-xl english-text" value={field.value ?? ''} /></FormControl>
                 </FormItem>
               )} />
+              <FormField control={control} name="personal.motherNameAr" render={({ field }) => (
+                <FormItem><FormLabel className="text-xs text-zinc-500">নাম (আরবি)</FormLabel>
+                  <FormControl><VoiceInputAr {...field} component={Input} placeholder="اسم الأم بالعربية" className="h-11 rounded-xl text-right" value={field.value ?? ''} /></FormControl>
+                </FormItem>
+              )} />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-4">
               <FormField control={control} name="personal.motherOccupation" render={({ field }) => (
                 <FormItem><FormLabel className="text-xs text-zinc-500">পেশা</FormLabel>
                   <FormControl><VoiceInputBn {...field} component={Input} placeholder="পেশা" className="h-11 rounded-xl" value={field.value ?? ''} /></FormControl>
@@ -443,32 +452,7 @@ export default function Step1PersonalInfo({ onNext, isEditMode }: { onNext: () =
 
           {/* Special Toggle */}
           <div className="pt-2">
-            <FormField
-              control={control}
-              name="personal.isHafiz"
-              render={({ field }) => (
-                <label className="group flex items-center gap-3 p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 cursor-pointer transition-all hover:border-[#00AEEF]/30 overflow-hidden">
-                  <div className={cn(
-                    "flex h-5 w-5 items-center justify-center rounded-md border transition-all",
-                    field.value ? "bg-[#00AEEF] border-[#00AEEF]" : "bg-white dark:bg-zinc-950 border-zinc-300 dark:border-zinc-700"
-                  )}>
-                    <Checkbox
-                      checked={field.value ?? false}
-                      onCheckedChange={field.onChange}
-                      className="hidden"
-                    />
-                    {field.value && <Check className="h-3 w-3 text-white" strokeWidth={4} />}
-                  </div>
-                  <div className="flex-1 space-y-0.5">
-                    <p className="text-[13px] font-bold text-zinc-900 dark:text-zinc-100">হাফিজে কুরআন</p>
-                    <p className="text-[10px] text-zinc-400 font-medium tracking-tight">ছাত্র কি কুরআন মাজিদ হিফজ করেছে?</p>
-                  </div>
-                  <div className="h-8 w-8 flex items-center justify-center rounded-lg bg-amber-50 dark:bg-amber-500/10 text-amber-500">
-                    <Sparkles className="h-4 w-4" />
-                  </div>
-                </label>
-              )}
-            />
+
           </div>
         </SectionCard>
 
@@ -551,7 +535,7 @@ export default function Step1PersonalInfo({ onNext, isEditMode }: { onNext: () =
               </>
             )}
           </div>
-          { (applicantRelation === 'father' || applicantRelation === 'mother') && (
+          {(applicantRelation === 'father' || applicantRelation === 'mother') && (
             <p className="text-[10px] text-zinc-400 font-medium italic">
               * পিতা বা মাতা হলে উপরের সেকশনে তাদের তথ্য থেকেই রেকর্ড আপডেট করা হবে।
             </p>
@@ -594,7 +578,7 @@ export default function Step1PersonalInfo({ onNext, isEditMode }: { onNext: () =
         )}
 
         {/* ── Navigation ─────────────────────────────────── */}
-        <motion.div variants={fadeUp} className="pt-4">
+        <div className="pt-4">
           <Button
             type="button"
             onClick={onNext}
@@ -603,9 +587,9 @@ export default function Step1PersonalInfo({ onNext, isEditMode }: { onNext: () =
             পরবর্তী তথ্য প্রদান করুন
             <ChevronRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
           </Button>
-        </motion.div>
+        </div>
 
       </div>
-    </motion.div>
+    </div>
   );
 }

@@ -65,6 +65,21 @@ declare global {
     const src: string;
     export default src;
   }
+
+  namespace JSX {
+    interface Element extends React.ReactElement<any, any> {}
+    interface IntrinsicElements extends React.JSX.IntrinsicElements {}
+  }
+}
+
+declare module 'swiper/css' {
+  const content: any;
+  export default content;
+}
+
+declare module 'swiper/css/*' {
+  const content: any;
+  export default content;
 }
 
 export {};

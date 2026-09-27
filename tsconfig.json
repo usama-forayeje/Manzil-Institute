@@ -1,11 +1,12 @@
 {
   "compilerOptions": {
-    "target": "ES2017",
+    "target": "ES2022",
     "lib": [
       "dom",
       "dom.iterable",
-      "es6"
+      "esnext"
     ],
+
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -51,6 +52,11 @@
     "hooks/useVoiceTyping.js"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "tests",
+    "vitest.config.ts",
+    "vitest.workspace.ts",
+    "playwright.config.ts"
   ]
 }
+

@@ -20,7 +20,7 @@ import {
   ArrowRight, ArrowLeft,
   Copy, CheckCircle2, Check
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+
 
 import {
   FormControl,
@@ -31,6 +31,7 @@ import {
 } from '@/components/ui/form';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Select,
   SelectContent,
@@ -40,7 +41,7 @@ import {
 } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 import type { AdmissionFormValues } from '../schemas/form';
-import { VoiceInputBn, VoiceInputEn } from '@/components/ui/voice-input';
+import { VoiceInputBn, VoiceInputEn, VoiceTextareaBn } from '@/components/ui/voice-input';
 
 import {
   DIVISIONS_LIST_BN,
@@ -174,7 +175,7 @@ function AddressSelect({
                   'h-10 rounded-lg border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-sm font-medium transition-all',
                   'focus:ring-1 focus:ring-[#00AEEF] focus:border-[#00AEEF]',
                   (disabled || options.length === 0) &&
-                    'opacity-40 cursor-not-allowed'
+                  'opacity-40 cursor-not-allowed'
                 )}
               >
                 <SelectValue placeholder={placeholder} />
@@ -253,8 +254,8 @@ function StepDots({ current, total }: { current: number; total: number }) {
             i + 1 === current
               ? 'w-6 bg-[#00AEEF]'
               : i + 1 < current
-              ? 'w-1.5 bg-zinc-900 dark:bg-zinc-100'
-              : 'w-1.5 bg-zinc-200 dark:bg-zinc-700'
+                ? 'w-1.5 bg-zinc-900 dark:bg-zinc-100'
+                : 'w-1.5 bg-zinc-200 dark:bg-zinc-700'
           )}
         />
       ))}
@@ -276,11 +277,11 @@ export default function Step2ContactAddress({
 
   const presentDivision = watch('contact.presentAddress.division');
   const presentDistrict = watch('contact.presentAddress.district');
-  const presentThana    = watch('contact.presentAddress.thana');
+  const presentThana = watch('contact.presentAddress.thana');
 
   const permanentDivision = watch('contact.permanentAddress.division');
   const permanentDistrict = watch('contact.permanentAddress.district');
-  const permanentThana    = watch('contact.permanentAddress.thana');
+  const permanentThana = watch('contact.permanentAddress.thana');
 
   const isPermanentSame = watch('contact.permanentSameAsCurrent');
 
@@ -326,16 +327,13 @@ export default function Step2ContactAddress({
   };
 
   return (
-    <motion.div
-      initial="hidden"
-      animate="visible"
-      variants={stagger}
+    <div
       className="kalpurush-font max-w-3xl mx-auto px-4 pb-24 pt-8"
     >
       <div className="space-y-8">
 
         {/* ── Page Header ──────────────────────────────────── */}
-        <motion.div variants={fadeUp} className="space-y-1">
+        <div className="space-y-1">
           <div className="flex items-center gap-2 mb-3">
             <StepDots current={2} total={5} />
             <span className="text-xs font-semibold text-zinc-400 dark:text-zinc-500 tracking-wide ml-1">
@@ -348,10 +346,10 @@ export default function Step2ContactAddress({
           <p className="text-sm text-zinc-400 dark:text-zinc-500 font-medium max-w-lg leading-relaxed">
             সঠিক যোগাযোগের তথ্য এবং বর্তমান ও স্থায়ী ঠিকানা প্রদান করুন।
           </p>
-        </motion.div>
+        </div>
 
         {/* ── Section 1: Contact Numbers ───────────────────── */}
-        <motion.div variants={fadeUp}>
+        <div >
           <SectionCard number="২.১" title="যোগাযোগের তথ্য" subtitle="ফোন, হোয়াটসঅ্যাপ ও ইমেইল" icon={Phone}>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-5 gap-y-5">
 
@@ -423,10 +421,10 @@ export default function Step2ContactAddress({
 
             </div>
           </SectionCard>
-        </motion.div>
+        </div>
 
         {/* ── Section 2: Present Address ───────────────────── */}
-        <motion.div variants={fadeUp}>
+        <div >
           <SectionCard number="২.২" title="বর্তমান ঠিকানা" subtitle="এখন যেখানে থাকছেন" icon={MapPin}>
             <div className="space-y-5">
 
@@ -470,65 +468,34 @@ export default function Step2ContactAddress({
                 />
               </div>
 
-              {/* Village + Post Office */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              {/* Combined Detailed Address (Village / Post Office / Post Code) with Voice Typing */}
+              <div>
                 <FormField control={control} name="contact.presentAddress.village" render={({ field }) => (
                   <FormItem className="space-y-1.5">
-                    <FieldLabel required>গ্রাম / মহল্লা / বাড়ি নং</FieldLabel>
+                    <FieldLabel required>গ্রাম / মহল্লা / বাড়ি নং, ডাকঘর ও পোস্ট কোড</FieldLabel>
                     <FormControl>
-                      <VoiceInputBn
+                      <VoiceTextareaBn
                         {...field}
-                        component={Input}
-                        placeholder="বাংলায় লিখুন"
-                        className={inputClass}
+                        component={Textarea}
+                        placeholder="গ্রাম / মহল্লা / বাড়ি নং, ডাকঘর ও পোস্ট কোড বাংলায় লিখুন অথবা মাইক চেপে মুখে বলুন..."
+                        className="min-h-[90px] rounded-xl border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-sm font-medium text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus-visible:ring-1 focus-visible:ring-[#00AEEF] focus-visible:border-[#00AEEF] transition-all resize-y p-3.5 pr-20"
                         value={field.value ?? ''}
                       />
                     </FormControl>
+                    <p className="text-[11px] text-zinc-400 dark:text-zinc-500">
+                      💡 আপনি মুখে বললেও সরাসরি টেক্সট আকারে লেখা হয়ে যাবে।
+                    </p>
                     <FormMessage />
-                  </FormItem>
-                )} />
-
-                <FormField control={control} name="contact.presentAddress.postOffice" render={({ field }) => (
-                  <FormItem className="space-y-1.5">
-                    <FieldLabel required>ডাকঘর</FieldLabel>
-                    <FormControl>
-                      <VoiceInputBn
-                        {...field}
-                        component={Input}
-                        placeholder="পোস্ট অফিসের নাম"
-                        className={inputClass}
-                        value={field.value ?? ''}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-              </div>
-
-              {/* Post Code — half width */}
-              <div className="w-full sm:w-1/2">
-                <FormField control={control} name="contact.presentAddress.postCode" render={({ field }) => (
-                  <FormItem className="space-y-1.5">
-                    <FieldLabel>পোস্ট কোড</FieldLabel>
-                    <FormControl>
-                      <VoiceInputEn
-                        {...field}
-                        component={Input}
-                        placeholder="XXXX"
-                        className={cn(inputClass, 'english-text')}
-                        value={field.value ?? ''}
-                      />
-                    </FormControl>
                   </FormItem>
                 )} />
               </div>
 
             </div>
           </SectionCard>
-        </motion.div>
+        </div>
 
         {/* ── Section 3: Permanent Address ─────────────────── */}
-        <motion.div variants={fadeUp}>
+        <div >
           <SectionCard
             number="২.৩"
             title="স্থায়ী ঠিকানা"
@@ -542,124 +509,86 @@ export default function Step2ContactAddress({
               <SyncToggle checked={!!isPermanentSame} onToggle={syncAddress} />
             </div>
 
-            <AnimatePresence>
-              {!isPermanentSame && (
-                <motion.div
-                  initial={{ opacity: 0, y: -8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -8 }}
-                  transition={{ duration: 0.2 }}
-                  className="space-y-5"
-                >
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                    <AddressSelect
-                      control={control}
-                      name="contact.permanentAddress.division"
-                      label="বিভাগ"
-                      options={DIVISIONS_LIST_BN}
-                    />
-                    <AddressSelect
-                      control={control}
-                      name="contact.permanentAddress.district"
-                      label="জেলা"
-                      options={permanentDistricts}
-                      disabled={!permanentDivision}
-                    />
-                  </div>
+            {!isPermanentSame && (
+              <div
+                className="space-y-5"
+              >
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  <AddressSelect
+                    control={control}
+                    name="contact.permanentAddress.division"
+                    label="বিভাগ"
+                    options={DIVISIONS_LIST_BN}
+                  />
+                  <AddressSelect
+                    control={control}
+                    name="contact.permanentAddress.district"
+                    label="জেলা"
+                    options={permanentDistricts}
+                    disabled={!permanentDivision}
+                  />
+                </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                    <AddressSelect
-                      control={control}
-                      name="contact.permanentAddress.thana"
-                      label="থানা / উপজেলা"
-                      options={permanentThanas}
-                      disabled={!permanentDistrict}
-                    />
-                    <AddressSelect
-                      control={control}
-                      name="contact.permanentAddress.union"
-                      label={isDhakaMetroDistrict(permanentDistrict || '') ? 'ওয়ার্ড নম্বর' : 'ইউনিয়ন / ওয়ার্ড'}
-                      options={permanentUnions}
-                      disabled={!permanentThana && !isDhakaMetroDistrict(permanentDistrict || '')}
-                    />
-                  </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  <AddressSelect
+                    control={control}
+                    name="contact.permanentAddress.thana"
+                    label="থানা / উপজেলা"
+                    options={permanentThanas}
+                    disabled={!permanentDistrict}
+                  />
+                  <AddressSelect
+                    control={control}
+                    name="contact.permanentAddress.union"
+                    label={isDhakaMetroDistrict(permanentDistrict || '') ? 'ওয়ার্ড নম্বর' : 'ইউনিয়ন / ওয়ার্ড'}
+                    options={permanentUnions}
+                    disabled={!permanentThana && !isDhakaMetroDistrict(permanentDistrict || '')}
+                  />
+                </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                    <FormField control={control} name="contact.permanentAddress.village" render={({ field }) => (
-                      <FormItem className="space-y-1.5">
-                        <FieldLabel>গ্রাম / মহল্লা / বাড়ি নং</FieldLabel>
-                        <FormControl>
-                          <VoiceInputBn
-                            {...field}
-                            component={Input}
-                            placeholder="বাংলায় লিখুন"
-                            className={inputClass}
-                            value={field.value ?? ''}
-                          />
-                        </FormControl>
-                      </FormItem>
-                    )} />
-
-                    <FormField control={control} name="contact.permanentAddress.postOffice" render={({ field }) => (
-                      <FormItem className="space-y-1.5">
-                        <FieldLabel>ডাকঘর</FieldLabel>
-                        <FormControl>
-                          <VoiceInputBn
-                            {...field}
-                            component={Input}
-                            placeholder="পোস্ট অফিসের নাম"
-                            className={inputClass}
-                            value={field.value ?? ''}
-                          />
-                        </FormControl>
-                      </FormItem>
-                    )} />
-                  </div>
-
-                  <div className="w-full sm:w-1/2">
-                    <FormField control={control} name="contact.permanentAddress.postCode" render={({ field }) => (
-                      <FormItem className="space-y-1.5">
-                        <FieldLabel>পোস্ট কোড</FieldLabel>
-                        <FormControl>
-                          <VoiceInputEn
-                            {...field}
-                            component={Input}
-                            placeholder="XXXX"
-                            className={cn(inputClass, 'english-text')}
-                            value={field.value ?? ''}
-                          />
-                        </FormControl>
-                      </FormItem>
-                    )} />
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+                {/* Combined Detailed Address (Village / Post Office / Post Code) with Voice Typing */}
+                <div>
+                  <FormField control={control} name="contact.permanentAddress.village" render={({ field }) => (
+                    <FormItem className="space-y-1.5">
+                      <FieldLabel>গ্রাম / মহল্লা / বাড়ি নং, ডাকঘর ও পোস্ট কোড</FieldLabel>
+                      <FormControl>
+                        <VoiceTextareaBn
+                          {...field}
+                          component={Textarea}
+                          placeholder="গ্রাম / মহল্লা / বাড়ি নং, ডাকঘর ও পোস্ট কোড বাংলায় লিখুন অথবা মাইক চেপে মুখে বলুন..."
+                          className="min-h-[90px] rounded-xl border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-sm font-medium text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus-visible:ring-1 focus-visible:ring-[#00AEEF] focus-visible:border-[#00AEEF] transition-all resize-y p-3.5 pr-20"
+                          value={field.value ?? ''}
+                        />
+                      </FormControl>
+                      <p className="text-[11px] text-zinc-400 dark:text-zinc-500">
+                        💡 আপনি মুখে বললেও সরাসরি টেক্সট আকারে লেখা হয়ে যাবে।
+                      </p>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                </div>
+              </div>
+            )}
 
             {/* Synced state — visual confirmation */}
-            <AnimatePresence>
-              {isPermanentSame && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.96 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.96 }}
-                  className="flex items-center gap-3 p-4 rounded-lg border border-dashed border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900/60"
-                >
-                  <CheckCircle2 className="h-4 w-4 text-[#00AEEF] shrink-0" />
-                  <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
-                    স্থায়ী ঠিকানা বর্তমান ঠিকানার সাথে একই হিসেবে সংরক্ষিত হবে।
-                  </p>
-                </motion.div>
-              )}
-            </AnimatePresence>
+            {isPermanentSame && (
+              <div
+                className="flex items-center gap-3 p-4 rounded-lg border border-dashed border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900/60"
+              >
+                <CheckCircle2 className="h-4 w-4 text-[#00AEEF] shrink-0" />
+                <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
+                  স্থায়ী ঠিকানা বর্তমান ঠিকানার সাথে একই হিসেবে সংরক্ষিত হবে।
+                </p>
+              </div>
+            )}
 
           </SectionCard>
-        </motion.div>
+        </div>
 
         {/* ── Navigation Bar ───────────────────────────────── */}
-        <motion.div variants={fadeUp}>
+        <div>
           <div className="flex items-center justify-between gap-4 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 px-5 py-4">
-            
+
             <Button
               type="button"
               variant="ghost"
@@ -688,9 +617,9 @@ export default function Step2ContactAddress({
             </Button>
 
           </div>
-        </motion.div>
+        </div>
 
       </div>
-    </motion.div>
+    </div>
   );
 }

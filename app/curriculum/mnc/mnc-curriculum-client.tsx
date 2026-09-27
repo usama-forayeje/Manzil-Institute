@@ -54,8 +54,8 @@ const stageColors = [
 ];
 
 // Subject details for modal
-const getSubjectDetails = (subjectName, type, language) => {
-  const subjectData = {
+const getSubjectDetails = (subjectName: string, type: string, language: Language) => {
+  const subjectData: Record<string, { name: string; description: string; objectives: string[] }> = {
     // Madrasa subjects
     'Qaida & Nazira': {
       name: language === 'bn' ? 'কায়েদা ও নাজেরা' : 'Qaida & Nazira',
@@ -237,7 +237,7 @@ export default function MNCCurriculumClientPage() {
   const [selectedSubject, setSelectedSubject] = useState<any>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  const scroll = (direction) => {
+  const scroll = (direction: 'left' | 'right') => {
     if (scrollContainerRef.current) {
       const scrollAmount = 380;
       scrollContainerRef.current.scrollBy({
@@ -426,8 +426,8 @@ export default function MNCCurriculumClientPage() {
                 {/* Connecting Line */}
                 <div className="absolute top-[90px] left-0 right-0 h-1 bg-gradient-to-r from-[#00AEEF] via-[#00AEEF]/50 to-[#00AEEF] opacity-20 dark:opacity-10 pointer-events-none" />
 
-                {curriculumData.levels.map((level, idx) => {
-                  const IconComponent = stageIcons[level.level] || Star;
+                {curriculumData.levels.map((level: any, idx: number) => {
+                  const IconComponent = (stageIcons as Record<string, any>)[level.level] || Star;
                   const stageColor = stageColors[idx % stageColors.length];
 
                   return (
@@ -525,7 +525,7 @@ export default function MNCCurriculumClientPage() {
                               </span>
                             </div>
                             <div className="flex flex-wrap gap-2">
-                              {level.subjects.madrasa.slice(0, 3).map((subject, sIdx) => (
+                              {level.subjects.madrasa.slice(0, 3).map((subject: string, sIdx: number) => (
                                 <button
                                   key={sIdx}
                                   onClick={() => setSelectedSubject(getSubjectDetails(subject, 'madrasa', language))}
@@ -546,7 +546,7 @@ export default function MNCCurriculumClientPage() {
                               </span>
                             </div>
                             <div className="flex flex-wrap gap-2">
-                              {level.subjects.general.slice(0, 3).map((subject, sIdx) => (
+                              {level.subjects.general.slice(0, 3).map((subject: string, sIdx: number) => (
                                 <button
                                   key={sIdx}
                                   onClick={() => setSelectedSubject(getSubjectDetails(subject, 'general', language))}
@@ -567,7 +567,7 @@ export default function MNCCurriculumClientPage() {
                               </span>
                             </div>
                             <div className="flex flex-wrap gap-2">
-                              {level.subjects.technical.slice(0, 3).map((subject, sIdx) => (
+                              {level.subjects.technical.slice(0, 3).map((subject: string, sIdx: number) => (
                                 <button
                                   key={sIdx}
                                   onClick={() => setSelectedSubject(getSubjectDetails(subject, 'technical', language))}

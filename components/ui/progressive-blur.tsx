@@ -1,7 +1,6 @@
 'use client';
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { motion } from 'motion/react';
 import { useDeferredValue, useMemo } from 'react';
 
 export const GRADIENT_ANGLES = {
@@ -50,7 +49,7 @@ export function ProgressiveBlur({
       )})`;
 
       return (
-        <motion.div
+        <div
           key={index}
           className="pointer-events-none absolute inset-0 rounded-[inherit]"
           style={{

@@ -29,6 +29,31 @@ body {
     @apply bg-background text-foreground;
   }
 
+  /* Crisp, legible input/textarea/select placeholders in both Light and Dark modes */
+  input::placeholder,
+  textarea::placeholder {
+    color: #94a3b8;
+    opacity: 0.85;
+  }
+
+  .dark input::placeholder,
+  .dark textarea::placeholder,
+  [data-theme].dark input::placeholder,
+  [data-theme].dark textarea::placeholder {
+    color: #9ca3af !important;
+    opacity: 0.9 !important;
+  }
+
+  [data-placeholder] {
+    color: #94a3b8;
+  }
+
+  .dark [data-placeholder],
+  [data-theme].dark [data-placeholder] {
+    color: #9ca3af !important;
+    opacity: 0.9 !important;
+  }
+
   /* Global scrollbar styling to match ScrollArea */
   * {
     scrollbar-width: thin;
@@ -176,6 +201,18 @@ body {
   }
   button, input, select, textarea {
     font-family: 'SolaimanLipi', 'Inter', sans-serif !important;
+  }
+
+  /* Ensure input/textarea typed text is always visible in dark & light mode */
+  input,
+  textarea,
+  select {
+    color: inherit;
+  }
+  .dark input,
+  .dark textarea,
+  .dark select {
+    color: var(--foreground, #f4f4f5);
   }
 }
 

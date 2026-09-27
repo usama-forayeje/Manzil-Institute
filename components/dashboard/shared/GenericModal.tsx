@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
-import { LucideIcon } from 'lucide-react';
+import { LucideIcon, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface GenericModalProps {
@@ -98,7 +98,7 @@ export function GenericModal({
                     disabled={isPending}
                     className="bg-[#00AEEF] hover:bg-[#0081B1] text-white rounded-md px-10 h-12 font-black uppercase text-[10px] tracking-[0.1em] shadow-xl shadow-cyan-500/10 active:scale-95 transition-all flex items-center gap-2 border-0"
                   >
-                    {isPending && <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1 }}><Icon className="h-4 w-4" /></motion.div>}
+                    {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
                     {confirmLabel}
                   </Button>
                 )}

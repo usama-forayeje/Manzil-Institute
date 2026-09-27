@@ -92,12 +92,11 @@ export type PaymentValues       = z.infer<typeof paymentSectionSchema>;
 
 // ── Per-step field lists (for form.trigger()) ────────────────
 // RHF accepts dotted paths; passing the section key validates ALL sub-fields.
-export const STEP_FIELDS: Record<1 | 2 | 3 | 4 | 5, (keyof AdmissionFormValues)[]> = {
+export const STEP_FIELDS: Record<1 | 2 | 3 | 4, (keyof AdmissionFormValues)[]> = {
   1: ['personal'],
   2: ['contact'],
   3: ['documents'],
   4: ['enrollment'],
-  5: ['payment'],
 };
 
 // ── Default values (keeps all inputs controlled from the start) ──
@@ -108,8 +107,10 @@ export const ADMISSION_DEFAULT_VALUES: AdmissionFormValues = {
     nameAr:       '',
     fatherNameBn: '',
     fatherNameEn: '',
+    fatherNameAr: '',
     motherNameBn: '',
     motherNameEn: '',
+    motherNameAr: '',
     fatherOccupation: '',
     motherOccupation: '',
     fatherWorkplace: '',

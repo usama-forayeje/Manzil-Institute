@@ -13,21 +13,22 @@ import { Query } from 'node-appwrite';
  * Redirects the user to Google's consent screen.
  */
 export async function signInWithGoogle() {
+  let baseUrl = '';
   try {
     const { account } = await createAdminClient();
 
-    let baseUrl = process.env.NEXT_PUBLIC_APP_URL?.trim();
-    if (!baseUrl) {
-      const headerList = await headers();
-      const host = headerList.get('x-forwarded-host') || headerList.get('host');
-      const proto =
-        headerList.get('x-forwarded-proto') ||
-        (process.env.NODE_ENV === 'production' ? 'https' : 'http');
-      if (host) {
-        baseUrl = `${proto}://${host}`;
-      } else {
-        baseUrl = 'https://institute.manzil.group';
-      }
+    const headerList = await headers();
+    const host = headerList.get('x-forwarded-host') || headerList.get('host');
+    const proto =
+      headerList.get('x-forwarded-proto') ||
+      (process.env.NODE_ENV === 'production' ? 'https' : 'http');
+
+    if (host) {
+      baseUrl = `${proto}://${host}`;
+    } else if (process.env.NEXT_PUBLIC_APP_URL?.trim()) {
+      baseUrl = process.env.NEXT_PUBLIC_APP_URL.trim();
+    } else {
+      baseUrl = 'https://institute.manzil.group';
     }
     baseUrl = baseUrl.replace(/\/$/, '');
 
@@ -42,7 +43,7 @@ export async function signInWithGoogle() {
     console.error('Failed to create OAuth2 token:', error);
     return {
       success: false,
-      error: error?.message || 'OAuth2 টোকেন তৈরি করতে ব্যর্থ হয়েছে',
+      error: `${error?.message || 'OAuth2 টোকেন তৈরি করতে ব্যর্থ হয়েছে'} (Target: ${baseUrl})`,
     };
   }
 }

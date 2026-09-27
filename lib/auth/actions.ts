@@ -13,7 +13,6 @@ import { Query } from 'node-appwrite';
  * Redirects the user to Google's consent screen.
  */
 export async function signInWithGoogle() {
-  let redirectUrl: string;
   try {
     const { account } = await createAdminClient();
 
@@ -27,22 +26,25 @@ export async function signInWithGoogle() {
       if (host) {
         baseUrl = `${proto}://${host}`;
       } else {
-        baseUrl = 'http://localhost:3000';
+        baseUrl = 'https://institute.manzil.group';
       }
     }
     baseUrl = baseUrl.replace(/\/$/, '');
 
-    redirectUrl = await account.createOAuth2Token(
+    const redirectUrl = await account.createOAuth2Token(
       OAuthProvider.Google,
       `${baseUrl}/api/auth/callback`,
       `${baseUrl}/login`
     );
+
+    return { success: true, url: redirectUrl };
   } catch (error: any) {
     console.error('Failed to create OAuth2 token:', error);
-    throw error;
+    return {
+      success: false,
+      error: error?.message || 'OAuth2 টোকেন তৈরি করতে ব্যর্থ হয়েছে',
+    };
   }
-
-  redirect(redirectUrl);
 }
 
 /**

@@ -46,9 +46,19 @@ export default function LoginPage() {
     setIsLoading(true);
     setError(null); // Clear any previous errors
     try {
-      await signInWithGoogle();
-    } catch (error) {
-      setError('লগইন প্রক্রিয়া শুরু করা যায়নি। অনুগ্রহ করে আবার চেষ্টা করুন।');
+      const res = await signInWithGoogle();
+      if (res?.success && res.url) {
+        window.location.href = res.url;
+      } else {
+        setError(
+          res?.error || 'লগইন প্রক্রিয়া শুরু করা যায়নি। অনুগ্রহ করে আবার চেষ্টা করুন।'
+        );
+        setIsLoading(false);
+      }
+    } catch (error: any) {
+      setError(
+        error?.message || 'লগইন প্রক্রিয়া শুরু করা যায়নি। অনুগ্রহ করে আবার চেষ্টা করুন।'
+      );
       setIsLoading(false);
     }
   };

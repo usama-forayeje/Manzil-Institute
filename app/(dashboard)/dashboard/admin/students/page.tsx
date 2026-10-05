@@ -5,6 +5,7 @@ import {
   getCoreRowModel,
   useReactTable,
   getFilteredRowModel,
+  getPaginationRowModel,
   type ColumnDef
 } from '@tanstack/react-table';
 import { 
@@ -204,6 +205,13 @@ export default function StudentsListPage() {
     onGlobalFilterChange: setGlobalFilter,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    initialState: {
+      pagination: {
+        pageIndex: 0,
+        pageSize: 15,
+      },
+    },
   });
 
   return (

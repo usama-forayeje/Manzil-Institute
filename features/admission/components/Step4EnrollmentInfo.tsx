@@ -23,8 +23,10 @@ import {
   ChevronLeft,
   Briefcase,
   CheckCheck,
-  Check
+  Check,
+  Loader2
 } from 'lucide-react';
+import { useIsSubmitting } from '@/store/admissionFormStore';
 import { toast } from 'sonner';
 import { DatePicker } from '@/components/ui/DatePicker';
 import { convertEnglishToBengali } from '@/lib/utils';
@@ -335,6 +337,7 @@ function EnrollmentCard({
 // ── Main Component ─────────────────────────────────────────────────────────
 
 export default function Step4EnrollmentInfo({ onNext, onPrev }: { onNext: () => void; onPrev: () => void }) {
+  const isSubmitting = useIsSubmitting();
   const form = useFormContext<AdmissionFormValues>();
   const { control, watch, setValue, trigger } = form;
 
@@ -794,11 +797,21 @@ export default function Step4EnrollmentInfo({ onNext, onPrev }: { onNext: () => 
           </Button>
           <Button
             type="button"
+            disabled={isSubmitting}
             onClick={handleNextWithCleanup}
-            className="flex-[2] h-14 rounded-2xl bg-primary text-primary-foreground text-base font-bold shadow-xl shadow-primary/20 transition-all hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 group"
+            className="flex-[2] h-14 rounded-2xl bg-primary text-primary-foreground text-base font-bold shadow-xl shadow-primary/20 transition-all hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 group disabled:opacity-75 disabled:pointer-events-none"
           >
-            ভর্তি সম্পন্ন করুন
-            <Check className="h-5 w-5 ml-1" />
+            {isSubmitting ? (
+              <>
+                <Loader2 className="h-5 w-5 animate-spin mr-1" />
+                ভর্তি সম্পন্ন হচ্ছে...
+              </>
+            ) : (
+              <>
+                ভর্তি সম্পন্ন করুন
+                <Check className="h-5 w-5 ml-1" />
+              </>
+            )}
           </Button>
         </div>
 

@@ -31,28 +31,25 @@ function BaseVoiceInput({
   ...props
 }: BaseVoiceInputProps) {
   const [mounted, setMounted] = useState(false);
-  const [localVal, setLocalVal] = useState(value ?? "");
-  const committedRef = useRef(value ?? "");
-
-  useEffect(() => setMounted(true), []);
+  const controlledValue = value ?? "";
+  const committedRef = useRef(controlledValue);
 
   useEffect(() => {
-    if (value !== undefined && value !== committedRef.current) {
-      setLocalVal(value ?? "");
-      committedRef.current = value ?? "";
-    }
-  }, [value]);
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    committedRef.current = controlledValue;
+  }, [controlledValue]);
 
   const handleFinal = useCallback(
     (spoken: string) => {
       const base = committedRef.current ?? "";
       const sep = base && !base.endsWith(" ") ? " " : "";
       const updated = base + sep + spoken;
-      setLocalVal(updated);
       committedRef.current = updated;
       if (onChange) {
-        const mockEvent = { target: { value: updated } };
-        onChange(mockEvent);
+        onChange({ target: { value: updated } });
       }
     },
     [onChange]
@@ -63,12 +60,8 @@ function BaseVoiceInput({
 
   const handleChange = useCallback(
     (e: any) => {
-      const v = e?.target?.value ?? "";
-      setLocalVal(v);
-      committedRef.current = v;
-      if (typeof onChange === "function") {
-        onChange(e);
-      }
+      committedRef.current = e?.target?.value ?? "";
+      onChange?.(e);
     },
     [onChange]
   );
@@ -79,7 +72,7 @@ function BaseVoiceInput({
     if (isListening) {
       stopListening();
     } else {
-      committedRef.current = localVal;
+      committedRef.current = controlledValue;
       startListening();
     }
   };
@@ -88,16 +81,9 @@ function BaseVoiceInput({
     e.preventDefault();
     e.stopPropagation();
     if (isListening) stopListening();
-    setLocalVal("");
     committedRef.current = "";
-    if (onChange) {
-      const mockEvent = { target: { value: "" } };
-      onChange(mockEvent);
-    }
+    onChange?.({ target: { value: "" } });
   };
-
-  // Use a stable controlled value to prevent React warnings
-  const controlledValue = value ?? "";
 
   if (!mounted) {
     return (
@@ -115,7 +101,7 @@ function BaseVoiceInput({
     return (
       <div className="space-y-1">
         <Component
-          value={localVal}
+          value={controlledValue}
           onChange={handleChange}
           className={cn("w-full rounded-md border bg-background text-foreground px-3 py-2 text-sm", className)}
           placeholder={placeholder}
@@ -130,8 +116,8 @@ function BaseVoiceInput({
 
   const displayValue =
     isListening && interimText
-      ? localVal + (localVal && !localVal.endsWith(" ") ? " " : "") + interimText
-      : localVal;
+      ? controlledValue + (controlledValue && !controlledValue.endsWith(" ") ? " " : "") + interimText
+      : controlledValue;
 
   return (
     <div className="relative w-full group">
@@ -154,7 +140,7 @@ function BaseVoiceInput({
           isTextarea ? "top-2.5" : "inset-y-0"
         )}
       >
-        {localVal.length > 0 && (
+        {controlledValue.length > 0 && (
           <button
             type="button"
             onClick={handleClear}

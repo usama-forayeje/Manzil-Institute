@@ -1,5 +1,6 @@
 'use server';
 
+import { revalidatePath } from 'next/cache';
 import { ID, Query } from 'node-appwrite';
 import {
   PutObjectCommand,
@@ -544,6 +545,13 @@ export async function createAdmission(
       }
     } catch {
       // Audit log failure should not block admission
+    }
+
+    try {
+      revalidatePath('/dashboard/admin/students');
+      revalidatePath('/dashboard/admin/students/admission');
+    } catch (e) {
+      // Non-fatal if cache revalidation fails in certain contexts
     }
 
     return {
@@ -1392,6 +1400,13 @@ export async function updateStudentAdmission(
            }
         }
       }
+    }
+
+    try {
+      revalidatePath('/dashboard/admin/students');
+      revalidatePath('/dashboard/admin/students/admission');
+    } catch (e) {
+      // Non-fatal if cache revalidation fails
     }
 
     return {

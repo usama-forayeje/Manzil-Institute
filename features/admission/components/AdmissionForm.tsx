@@ -433,7 +433,8 @@ export default function AdmissionForm({ initialData, isEditMode = false, student
         if (result.success && result.student) {
           if (typeof window !== 'undefined') localStorage.removeItem(DRAFT_KEY);
           store.reset();
-          await queryClient.invalidateQueries({ queryKey: studentKeys.all });
+          queryClient.removeQueries({ queryKey: studentKeys.all });
+          await queryClient.invalidateQueries({ queryKey: studentKeys.all, refetchType: 'all' });
           toast.success('🎉 শিক্ষার্থীর তথ্য সফলভাবে আপডেট করা হয়েছে!');
           router.push('/dashboard/admin/students');
           router.refresh();
@@ -448,7 +449,8 @@ export default function AdmissionForm({ initialData, isEditMode = false, student
           if (typeof window !== 'undefined') localStorage.removeItem(DRAFT_KEY);
           store.reset();
           form.reset(ADMISSION_DEFAULT_VALUES);
-          await queryClient.invalidateQueries({ queryKey: studentKeys.all });
+          queryClient.removeQueries({ queryKey: studentKeys.all });
+          await queryClient.invalidateQueries({ queryKey: studentKeys.all, refetchType: 'all' });
           toast.success('🎉 শিক্ষার্থী ভর্তি সফলভাবে সম্পন্ন হয়েছে!');
           router.push('/dashboard/admin/students');
           router.refresh();
@@ -552,9 +554,11 @@ export default function AdmissionForm({ initialData, isEditMode = false, student
           )}
 
           <div className="fixed top-[-9999px] left-[-9999px] pointer-events-none select-none overflow-hidden">
-            <div ref={applicationRef} className="bg-white">
-              <AdmissionApplicationForm />
-            </div>
+            {isEditMode && (
+              <div ref={applicationRef} className="bg-white">
+                <AdmissionApplicationForm />
+              </div>
+            )}
             <div ref={blankFormRef} className="bg-white">
               <BlankAdmissionApplicationForm />
             </div>

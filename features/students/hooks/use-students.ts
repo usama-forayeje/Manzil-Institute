@@ -33,7 +33,8 @@ export function useStudents() {
       }
       return undefined;
     },
-    staleTime: 30 * 1000,
+    staleTime: 5 * 1000,
+    refetchOnMount: 'always',
     refetchOnWindowFocus: false,
   });
 
@@ -45,10 +46,7 @@ export function useStudents() {
     );
   }, [infiniteQuery.data]);
 
-  const students = useMemo(() => {
-    const start = pagination.pageIndex * pagination.pageSize;
-    return allStudents.slice(start, start + pagination.pageSize);
-  }, [allStudents, pagination]);
+  const students = allStudents;
 
   const total = useMemo(() => {
     const pages = infiniteQuery.data?.pages;

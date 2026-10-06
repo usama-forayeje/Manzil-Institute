@@ -7,7 +7,7 @@
  * Fully Responsive – Next‑Level Text & Layout Scaling
  */
 
-import { useState, useRef, useEffect, memo, useCallback } from 'react';
+import { useState, useRef, useEffect, memo, useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { useFormContext } from 'react-hook-form';
 
@@ -157,6 +157,16 @@ const CropModal = memo(({
   const [aspect, setAspect] = useState(initialAspect);
   const [mounted, setMounted] = useState(false);
 
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const displayImage = useMemo(() => {
+    if (!image) return '';
+    if (image.startsWith('http://') || image.startsWith('https://')) {
+      return `/api/image-proxy?url=${encodeURIComponent(image)}`;
+    }
+    return image;
+  }, [image]);
+
   useEffect(() => {
     setMounted(true);
     document.body.style.overflow = 'hidden';
@@ -164,6 +174,8 @@ const CropModal = memo(({
   }, []);
 
   if (!mounted) return null;
+
+  const currentCropShape = isProfileImage && aspect === 1 ? 'round' : 'rect';
 
   return createPortal(
     <div className="fixed inset-0 z-[999999] bg-zinc-950/80 backdrop-blur-xl flex items-center justify-center p-2 sm:p-4">
@@ -176,8 +188,12 @@ const CropModal = memo(({
               <Crop className="h-4 w-4 sm:h-5 sm:w-5" />
             </div>
             <div>
-              <h3 className="text-xs sm:text-sm font-black text-zinc-900 dark:text-zinc-100 uppercase tracking-widest">ছবি ক্রপ করুন</h3>
-              <p className="text-[8px] sm:text-[10px] text-zinc-400 font-bold uppercase tracking-tight">Image Adjustment & Refinement</p>
+              <h3 className="text-xs sm:text-sm font-black text-zinc-900 dark:text-zinc-100 uppercase tracking-widest">
+                {isProfileImage ? 'ছবি এডজাস্ট ও সাইজ নির্ধারণ' : 'ছবি ক্রপ করুন'}
+              </h3>
+              <p className="text-[8px] sm:text-[10px] text-zinc-400 font-bold uppercase tracking-tight">
+                {isProfileImage ? 'টিপস: মাথা ফ্রেমের মাঝখানে রাখুন এবং ওপরে সামান্য ফাঁকা রাখুন' : 'Image Adjustment & Refinement'}
+              </p>
             </div>
           </div>
           <button onClick={onCancel} className="h-9 w-9 sm:h-10 sm:w-10 rounded-full hover:bg-rose-50 dark:hover:bg-rose-500/10 text-zinc-400 hover:text-rose-500 transition-all flex items-center justify-center">
@@ -187,11 +203,13 @@ const CropModal = memo(({
 
         <div className="relative flex-1 bg-zinc-100 dark:bg-zinc-950/50">
           <Cropper
-            image={image}
+            image={displayImage}
             crop={crop}
             zoom={zoom}
             rotation={rotation}
             aspect={aspect}
+            cropShape={currentCropShape}
+            showGrid={true}
             onCropChange={setCrop}
             onRotationChange={setRotation}
             onZoomChange={setZoom}
@@ -199,10 +217,10 @@ const CropModal = memo(({
           />
         </div>
 
-        <div className="p-4 sm:p-8 bg-white dark:bg-zinc-900 border-t border-zinc-100 dark:border-zinc-800 space-y-4 sm:space-y-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8">
-            <div className="space-y-3 sm:space-y-6">
-              <div className="space-y-2 sm:space-y-3">
+        <div className="p-4 sm:p-8 bg-white dark:bg-zinc-900 border-t border-zinc-100 dark:border-zinc-800 space-y-4 sm:space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+            <div className="space-y-3 sm:space-y-4">
+              <div className="space-y-2">
                 <div className="flex justify-between items-center px-1">
                   <span className="text-[9px] sm:text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Zoom Level</span>
                   <span className="text-[9px] sm:text-[10px] font-black text-[#00AEEF] bg-[#00AEEF]/10 px-2 py-0.5 rounded-md">{Math.round(zoom * 100)}%</span>
@@ -218,32 +236,79 @@ const CropModal = memo(({
                 />
               </div>
 
-              <div className="flex items-center gap-2 sm:gap-4">
-                <Button variant="outline" size="sm" onClick={() => setRotation(r => r - 90)} className="flex-1 h-8 sm:h-10 rounded-xl border-zinc-200 dark:border-zinc-700 hover:text-[#00AEEF] font-bold text-[10px] sm:text-xs"><RefreshCw className="h-3 w-3 sm:h-3.5 sm:w-3.5 mr-1 sm:mr-2 scale-x-[-1]" /> Rotate Left</Button>
-                <Button variant="outline" size="sm" onClick={() => setRotation(r => r + 90)} className="flex-1 h-8 sm:h-10 rounded-xl border-zinc-200 dark:border-zinc-700 hover:text-[#00AEEF] font-bold text-[10px] sm:text-xs"><RefreshCw className="h-3 w-3 sm:h-3.5 sm:w-3.5 mr-1 sm:mr-2" /> Rotate Right</Button>
+              <div className="flex items-center gap-2 sm:gap-3">
+                <Button variant="outline" size="sm" onClick={() => setRotation(r => r - 90)} className="flex-1 h-8 sm:h-9 rounded-xl border-zinc-200 dark:border-zinc-700 hover:text-[#00AEEF] font-bold text-[10px] sm:text-xs"><RefreshCw className="h-3 w-3 sm:h-3.5 sm:w-3.5 mr-1 sm:mr-1.5 scale-x-[-1]" /> Rotate Left</Button>
+                <Button variant="outline" size="sm" onClick={() => setRotation(r => r + 90)} className="flex-1 h-8 sm:h-9 rounded-xl border-zinc-200 dark:border-zinc-700 hover:text-[#00AEEF] font-bold text-[10px] sm:text-xs"><RefreshCw className="h-3 w-3 sm:h-3.5 sm:w-3.5 mr-1 sm:mr-1.5" /> Rotate Right</Button>
               </div>
             </div>
 
             <div className="space-y-2 sm:space-y-3">
-              <span className="text-[9px] sm:text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] px-1">Orientation Mode</span>
+              <span className="text-[9px] sm:text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] px-1">
+                {isProfileImage ? 'ক্রপ সাইজ নির্ধারণ' : 'Orientation Mode'}
+              </span>
               <div className="flex gap-2">
-                {[
-                  { label: 'Portrait', val: 3 / 4, icon: <div className="h-3 w-2.5 border-2 border-current rounded-sm mb-0.5" /> },
-                  { label: 'Landscape', val: 4 / 3, icon: <div className="h-2.5 w-3.5 border-2 border-current rounded-sm mb-0.5" /> },
-                  { label: 'Square', val: 1, icon: <div className="h-3 w-3 border-2 border-current rounded-sm mb-0.5" /> }
-                ].map((mode) => (
-                  <button key={mode.label} onClick={() => setAspect(mode.val)} className={cn("flex-1 flex flex-col items-center justify-center p-2 sm:p-3 rounded-xl sm:rounded-2xl border-2 transition-all", aspect === mode.val ? "bg-[#00AEEF] border-[#00AEEF] text-white shadow-lg shadow-[#00AEEF]/20" : "bg-zinc-50 dark:bg-zinc-800 border-zinc-100 dark:border-zinc-700 text-zinc-400 hover:border-zinc-200")}>
+                {(isProfileImage ? [
+                  { label: 'আইডি কার্ড (১:১)', sub: '৬০০×৬০০ px', val: 1, icon: <div className="h-3.5 w-3.5 rounded-full border-2 border-current mb-0.5" /> },
+                  { label: 'পাসপোর্ট (৩৫×৪৫)', sub: '৩৫×৪৫ মিমি', val: 35 / 45, icon: <div className="h-4 w-3 border-2 border-current rounded-sm mb-0.5" /> },
+                  { label: 'পোর্ট্রেট (৩:৪)', sub: '৩:৪ রেশিও', val: 3 / 4, icon: <div className="h-3.5 w-2.5 border-2 border-current rounded-sm mb-0.5" /> }
+                ] : [
+                  { label: 'Portrait', sub: '', val: 3 / 4, icon: <div className="h-3 w-2.5 border-2 border-current rounded-sm mb-0.5" /> },
+                  { label: 'Landscape', sub: '', val: 4 / 3, icon: <div className="h-2.5 w-3.5 border-2 border-current rounded-sm mb-0.5" /> },
+                  { label: 'Square', sub: '', val: 1, icon: <div className="h-3 w-3 border-2 border-current rounded-sm mb-0.5" /> }
+                ]).map((mode) => (
+                  <button
+                    key={mode.label}
+                    type="button"
+                    onClick={() => setAspect(mode.val)}
+                    className={cn(
+                      "flex-1 flex flex-col items-center justify-center p-2 rounded-xl sm:rounded-2xl border-2 transition-all",
+                      aspect === mode.val
+                        ? "bg-[#00AEEF] border-[#00AEEF] text-white shadow-lg shadow-[#00AEEF]/20"
+                        : "bg-zinc-50 dark:bg-zinc-800 border-zinc-100 dark:border-zinc-700 text-zinc-400 hover:border-zinc-200"
+                    )}
+                  >
                     {mode.icon}
-                    <span className="text-[8px] sm:text-[9px] font-black uppercase tracking-widest mt-0.5">{mode.label}</span>
+                    <span className="text-[8px] sm:text-[9px] font-black tracking-tight mt-0.5">{mode.label}</span>
+                    {mode.sub && <span className="text-[7px] opacity-75 font-medium">{mode.sub}</span>}
                   </button>
                 ))}
               </div>
             </div>
           </div>
 
-          <div className="flex gap-3 sm:gap-4 pt-1 sm:pt-2">
-            <Button type="button" variant="ghost" onClick={onCancel} className="flex-1 h-10 sm:h-14 rounded-xl sm:rounded-2xl font-bold text-zinc-500 text-xs sm:text-sm hover:bg-rose-50 hover:text-rose-500">বাতিল</Button>
-            <Button type="button" onClick={async () => onCropComplete(await getCroppedImg(image, pixels, rotation, isProfileImage))} className="flex-[2] h-10 sm:h-14 rounded-xl sm:rounded-2xl font-black bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-950 shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all group gap-1 sm:gap-2 text-xs sm:text-sm">নিশ্চিত করুন <ArrowIcon className="h-4 w-4 sm:h-5 sm:w-5 group-hover:translate-x-1 transition-transform" /></Button>
+          <div className="flex gap-3 sm:gap-4 pt-1">
+            <Button type="button" variant="ghost" onClick={onCancel} disabled={isProcessing} className="flex-1 h-10 sm:h-12 rounded-xl sm:rounded-2xl font-bold text-zinc-500 text-xs sm:text-sm hover:bg-rose-50 hover:text-rose-500">বাতিল</Button>
+            <Button
+              type="button"
+              disabled={isProcessing}
+              onClick={async () => {
+                if (isProcessing) return;
+                try {
+                  setIsProcessing(true);
+                  const cropped = await getCroppedImg(displayImage, pixels, rotation, isProfileImage);
+                  if (cropped) {
+                    onCropComplete(cropped);
+                  }
+                } catch (err: any) {
+                  console.error('Crop processing failed:', err);
+                  toast.error('ছবি প্রসেস করতে সমস্যা হয়েছে');
+                } finally {
+                  setIsProcessing(false);
+                }
+              }}
+              className="flex-[2] h-10 sm:h-12 rounded-xl sm:rounded-2xl font-black bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-950 shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all group gap-1 sm:gap-2 text-xs sm:text-sm disabled:opacity-50"
+            >
+              {isProcessing ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin mr-1" />
+                  প্রসেস হচ্ছে...
+                </>
+              ) : (
+                <>
+                  নিশ্চিত করুন <ArrowIcon className="h-4 w-4 sm:h-5 sm:w-5 group-hover:translate-x-1 transition-transform" />
+                </>
+              )}
+            </Button>
           </div>
         </div>
       </div>
@@ -394,7 +459,7 @@ function PhotoUploadCard({ value, onChange }: { value?: string; onChange: (val: 
   return (
     <>
       {showWebcam && <WebcamModal mode="user" onCapture={(b64) => { setTempCrop(b64); setShowWebcam(false); }} onClose={() => setShowWebcam(false)} />}
-      {tempCrop && <CropModal image={tempCrop} aspect={35 / 45} onCropComplete={(cropped) => { onChange(cropped); setTempCrop(null); }} onCancel={() => setTempCrop(null)} isProfileImage />}
+      {tempCrop && <CropModal image={tempCrop} aspect={1} onCropComplete={(cropped) => { onChange(cropped); setTempCrop(null); }} onCancel={() => setTempCrop(null)} isProfileImage />}
 
       <SectionCard number="৩.১" title="ছাত্রের ছবি" subtitle="অফিসিয়াল পাসপোর্ট সাইজ" icon={User}>
         <div className="flex flex-col lg:flex-row items-center lg:items-start gap-6 sm:gap-8 lg:gap-16 py-2 sm:py-4 px-1 sm:px-4">
@@ -484,9 +549,9 @@ function PhotoUploadCard({ value, onChange }: { value?: string; onChange: (val: 
 
             <div className="flex flex-wrap gap-2 sm:gap-2.5 justify-center lg:justify-start">
               {[
-                { text: 'JPG / PNG / WEBP', icon: ImageIcon },
-                { text: 'Maximum 5MB', icon: ShieldCheck },
-                { text: '35x45 MM Size', icon: Crop }
+                { text: '১:১ স্কয়ার বা ৩৫×৪৫ মিমি', icon: Crop },
+                { text: '৬০০ × ৬০০ PX বেস্ট', icon: ImageIcon },
+                { text: 'JPG / PNG / WEBP', icon: ShieldCheck }
               ].map((spec, i) => (
                 <div key={i} className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-800/80">
                   <spec.icon className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-[#00AEEF]" />
@@ -500,7 +565,25 @@ function PhotoUploadCard({ value, onChange }: { value?: string; onChange: (val: 
               <p className="text-[9px] font-bold uppercase tracking-[0.2em]">Live Validation Active</p>
             </div>
           </div>
-          <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={async (e) => { const f = e.target.files?.[0]; if (f) setTempCrop(await fileToBase64(f)); e.target.value = ''; }} />
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={async (e) => {
+              const f = e.target.files?.[0];
+              if (f) {
+                try {
+                  const b64 = await fileToBase64(f);
+                  setTempCrop(b64);
+                } catch (err) {
+                  console.error('File read error:', err);
+                  toast.error('ফাইল পড়তে সমস্যা হয়েছে');
+                }
+              }
+              e.target.value = '';
+            }}
+          />
         </div>
       </SectionCard>
     </>
@@ -692,7 +775,15 @@ function FileUploadCard({
             className="hidden"
             onChange={async (e) => {
               const f = e.target.files?.[0];
-              if (f) setTempCrop(await fileToBase64(f));
+              if (f) {
+                try {
+                  const b64 = await fileToBase64(f);
+                  setTempCrop(b64);
+                } catch (err) {
+                  console.error('File read error:', err);
+                  toast.error('ফাইল পড়তে সমস্যা হয়েছে');
+                }
+              }
               e.target.value = '';
             }}
           />

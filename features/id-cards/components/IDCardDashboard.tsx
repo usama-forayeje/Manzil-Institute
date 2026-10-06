@@ -202,7 +202,10 @@ export default function IDCardDashboard() {
             sx = (img.width - sw) / 2;
           } else {
             sh = img.width;
-            sy = (img.height - sh) / 2;
+            // For portrait/passport photos, face is in the upper portion.
+            // An 18% top offset keeps the head, cap, and hair intact instead of slicing in half.
+            const maxOffset = img.height - sh;
+            sy = Math.max(0, Math.min(maxOffset, maxOffset * 0.18));
           }
           ctx.drawImage(img, sx, sy, sw, sh, pX, pY, pW, pH);
           ctx.restore();

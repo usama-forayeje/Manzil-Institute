@@ -1,4 +1,4 @@
-﻿import { convertBengaliToEnglish, compressImage } from '../utils';
+import { convertBengaliToEnglish, compressImage } from '../utils';
 export { compressImage };
 
 // --- File to Base64 Conversion -----------------------------
@@ -6,7 +6,7 @@ export async function fileToBase64(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(reader.result as string);
-    reader.onerror = reject;
+    reader.onerror = () => reject(new Error('Failed to read file'));
     reader.readAsDataURL(file);
   });
 }

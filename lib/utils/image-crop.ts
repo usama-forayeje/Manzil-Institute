@@ -1,10 +1,17 @@
 export const createImage = (url: string): Promise<HTMLImageElement> =>
   new Promise((resolve, reject) => {
     const image = new Image();
-    image.addEventListener('load', () => resolve(image));
-    image.addEventListener('error', (error) => reject(error));
-    image.setAttribute('crossOrigin', 'anonymous');
-    image.src = url;
+    image.onload = () => resolve(image);
+    image.onerror = () => {
+      reject(new Error(`Failed to load image: ${typeof url === 'string' ? url.slice(0, 100) : 'unknown'}`));
+    };
+
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      image.crossOrigin = 'anonymous';
+      image.src = `/api/image-proxy?url=${encodeURIComponent(url)}`;
+    } else {
+      image.src = url;
+    }
   });
 
 export function getRadianAngle(degreeValue: number) {
@@ -66,10 +73,9 @@ export const getCroppedImg = async (
   canvas.height = pixelCrop.height;
   ctx.putImageData(data, 0, 0);
 
-  // --- Compression & Formatting Logic (Requested by USER) ---
-  // isProfileImage: 50% compress (0.5 quality)
-  // Others: 70% compress (0.7 quality)
-  const quality = isProfileImage ? 0.5 : 0.7;
+  // --- Compression & Formatting Logic ---
+  // High fidelity export for print & ID card clarity: 0.85 quality
+  const quality = 0.85;
 
   // Final export as WebP for best compression ratio
   return canvas.toDataURL('image/webp', quality);

@@ -75,7 +75,7 @@ export function IDCardPreview({ student }: IDCardPreviewProps) {
           <Avatar className="w-full h-full rounded-full border border-zinc-100 relative overflow-hidden">
             <AvatarImage
               src={proxyPhotoSrc}
-              className="w-full h-full object-cover bg-white"
+              className="w-full h-full object-cover object-[center_18%] bg-white"
               crossOrigin="anonymous"
             />
             <AvatarFallback className="bg-[#F4F4F5] text-[#A1A1AA] rounded-full flex items-center justify-center">

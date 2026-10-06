@@ -150,7 +150,7 @@ async function uploadStudentFile(
   const safeFolderName = folderName.replace(/[^a-z0-9]/g, '_').toLowerCase();
   const safeFileName = fileName.replace(/[^a-z0-9]/g, '_').toLowerCase();
   
-  const fileKey = `${safeFolderName}/${safeFileName}.${ext}`;
+  const fileKey = `${safeFolderName}/${safeFileName}-${Date.now()}.${ext}`;
   const r2Key = buildR2Key(BUCKETS.STUDENT_PHOTOS, fileKey);
 
   const binary = atob(base64Data);
@@ -1150,13 +1150,37 @@ export async function getAdmissionFullDetails(idOrBusId: string) {
           const dept = await databases.getDocument(DATABASE_ID, COLLECTIONS.DEPARTMENTS, enr.departmentId);
           const cls = await databases.getDocument(DATABASE_ID, COLLECTIONS.CLASSES, enr.classId);
           
+          const BOARDING_TYPE_NAMES: Record<string, string> = {
+            day: 'অনাবাসিক (ডে)',
+            non_residential: 'অনাবাসিক',
+            residential: 'আবাসিক',
+            boarding: 'আবাসিক',
+            semi_residential: 'অর্ধ-আবাসিক',
+            day_care: 'ডে-কেয়ার',
+          };
+
           let boardingTypeName = enr.boardingType || '---';
           if (enr.boardingType) {
-            try {
-               const bt = await databases.getDocument(DATABASE_ID, COLLECTIONS.BOARDING_TYPES, enr.boardingType);
-               boardingTypeName = bt.nameBn || bt.name;
-            } catch (e) {
-               console.warn('Boarding type fetch failed:', enr.boardingType, e);
+            const staticName = BOARDING_TYPE_NAMES[enr.boardingType.toLowerCase()];
+            if (staticName) {
+              boardingTypeName = staticName;
+            } else {
+              try {
+                if (enr.boardingType.length > 10) {
+                  const bt = await databases.getDocument(DATABASE_ID, COLLECTIONS.BOARDING_TYPES, enr.boardingType);
+                  boardingTypeName = bt.nameBn || bt.name || enr.boardingType;
+                } else {
+                  const list = await databases.listDocuments(DATABASE_ID, COLLECTIONS.BOARDING_TYPES, [
+                    Query.equal('code', enr.boardingType),
+                    Query.limit(1)
+                  ]);
+                  if (list.documents.length > 0) {
+                    boardingTypeName = list.documents[0].nameBn || list.documents[0].name;
+                  }
+                }
+              } catch {
+                // Non-fatal fallback
+              }
             }
           }
 

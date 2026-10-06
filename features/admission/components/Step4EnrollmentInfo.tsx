@@ -528,24 +528,34 @@ export default function Step4EnrollmentInfo({ onNext, onPrev }: { onNext: () => 
               </FormItem>
             )} />
 
-            <FormField control={control} name="enrollment.boardingType" render={({ field: f }) => (
-              <FormItem>
-                <FormLabel className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">আবাসন ধরণ *</FormLabel>
-                <Select onValueChange={(v) => { f.onChange(v); handleBoardingTypeChange(v); }} value={f.value || ''}>
-                  <FormControl>
-                    <SelectTrigger className="h-11 rounded-xl bg-zinc-50/50 dark:bg-zinc-900/50 border-zinc-200 dark:border-zinc-800">
-                      <SelectValue placeholder="নির্বাচন করুন" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent className="kalpurush-font">
-                    {boardingTypes.map((bt: any) => (
-                      <SelectItem key={bt.$id ?? bt.id} value={bt.$id ?? bt.id}>{bt.nameBn ?? bt.name}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )} />
+            <FormField control={control} name="enrollment.boardingType" render={({ field: f }) => {
+              const matchedBt = boardingTypes.find((bt: any) => (bt.$id ?? bt.id) === f.value || bt.code?.toLowerCase() === f.value?.toLowerCase());
+              const selectValue = matchedBt ? (matchedBt.$id ?? matchedBt.id) : (f.value || '');
+
+              return (
+                <FormItem>
+                  <FormLabel className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">আবাসন ধরণ *</FormLabel>
+                  <Select onValueChange={(v) => { f.onChange(v); handleBoardingTypeChange(v); }} value={selectValue}>
+                    <FormControl>
+                      <SelectTrigger className="h-11 rounded-xl bg-zinc-50/50 dark:bg-zinc-900/50 border-zinc-200 dark:border-zinc-800">
+                        <SelectValue placeholder="নির্বাচন করুন" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent className="kalpurush-font">
+                      {boardingTypes.map((bt: any) => (
+                        <SelectItem key={bt.$id ?? bt.id} value={bt.$id ?? bt.id}>{bt.nameBn ?? bt.name}</SelectItem>
+                      ))}
+                      {selectValue && !boardingTypes.some((bt: any) => (bt.$id ?? bt.id) === selectValue) && (
+                        <SelectItem value={selectValue}>
+                          {selectValue === 'day' ? 'অনাবাসিক (ডে)' : selectValue === 'residential' ? 'আবাসিক' : selectValue}
+                        </SelectItem>
+                      )}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              );
+            }} />
           </div>
 
           {showHallField && (

@@ -1225,31 +1225,96 @@ export async function updateStudentAdmission(
     const folderId = step1.identificationNo || docId.toLowerCase().replace(/[^a-z0-9]/g, '_');
     const folderName = `${folderBaseName}-${folderId}`;
 
-    // 2. Helper to handle uploads (only if data is base64)
-    const handleFileUpload = async (currentUrl: string | undefined, newVal: string | undefined, fileName: string) => {
-      if (!newVal) return currentUrl || '';
-      if (newVal.startsWith('data:')) {
-        return await uploadStudentFile(newVal, folderName, fileName);
+    // 2. Helper: extract R2 key from a public URL
+    const getR2KeyFromUrl = (url: string | undefined): string | null => {
+      if (!url || !url.startsWith('http')) return null;
+      try {
+        const urlObj = new URL(url);
+        // Strip leading slash
+        return urlObj.pathname.replace(/^\//, '');
+      } catch {
+        return null;
       }
-      return newVal; // Existing URL
     };
 
-    const photoUrl = await handleFileUpload(step1.photoUrl, documents?.studentPhoto || step1.photoBase64, 'profile-photo');
-    const studentDocFrontUrl = await handleFileUpload('', documents?.studentDocFront, 'birth-certificate-front');
-    const studentDocBackUrl = await handleFileUpload('', documents?.studentDocBack, 'birth-certificate-back');
-    const fatherNidFrontUrl = await handleFileUpload('', documents?.fatherNidFront, 'father-nid-front');
-    const fatherNidBackUrl = await handleFileUpload('', documents?.fatherNidBack, 'father-nid-back');
-    const motherNidFrontUrl = await handleFileUpload('', documents?.motherNidFront, 'mother-nid-front');
-    const motherNidBackUrl = await handleFileUpload('', documents?.motherNidBack, 'mother-nid-back');
-    const transferCertificateUrl = await handleFileUpload('', documents?.transferCertificate, 'transfer-certificate');
+    // Helper: delete a file from R2 by its public URL (non-fatal)
+    const deleteR2FileByUrl = async (url: string | undefined) => {
+      if (!url) return;
+      const key = getR2KeyFromUrl(url);
+      if (!key) return;
+      try {
+        await r2Client.send(new DeleteObjectCommand({ Bucket: R2_BUCKET, Key: key }));
+      } catch (e) {
+        console.warn('R2 delete failed (non-fatal):', key, e);
+      }
+    };
+
+    // Helper to handle uploads: 
+    //   - newVal is base64 → upload to R2, then delete old URL from R2
+    //   - newVal is an existing URL or empty → keep it (use as-is or fallback to currentUrl)
+    //   - newVal is explicitly undefined/null → keep currentUrl (no change intended)
+    const handleFileUpload = async (
+      currentUrl: string | undefined,
+      newVal: string | undefined,
+      fileName: string
+    ): Promise<string> => {
+      // No new value at all — keep existing
+      if (newVal === undefined || newVal === null) return currentUrl || '';
+      // New value is an existing URL (not base64) — user kept/changed URL directly
+      if (newVal && !newVal.startsWith('data:')) return newVal;
+      // New value is base64 — upload it
+      if (newVal.startsWith('data:')) {
+        const uploadedUrl = await uploadStudentFile(newVal, folderName, fileName);
+        if (uploadedUrl) {
+          // Delete the old file from R2 if it's different
+          if (currentUrl && currentUrl !== uploadedUrl) {
+            await deleteR2FileByUrl(currentUrl);
+          }
+          return uploadedUrl;
+        }
+        // Upload failed — keep existing
+        return currentUrl || '';
+      }
+      // Empty string — user cleared the field
+      return '';
+    };
+
+    // Fetch current student to get existing file URLs for fallback/cleanup
+    let existingStudent: any = {};
+    try {
+      existingStudent = await databases.getDocument(DATABASE_ID, COLLECTIONS.STUDENTS, docId);
+    } catch (e) {
+      console.warn('Could not fetch existing student for file fallback:', e);
+    }
+
+    const existingPhotoUrl         = existingStudent.photo               || '';
+    const existingDocFrontUrl      = existingStudent.studentDocFrontUrl  || '';
+    const existingDocBackUrl       = existingStudent.studentDocBackUrl   || '';
+    const existingFatherNidFront   = existingStudent.fatherNidFrontUrl   || '';
+    const existingFatherNidBack    = existingStudent.fatherNidBackUrl    || '';
+    const existingMotherNidFront   = existingStudent.motherNidFrontUrl   || '';
+    const existingMotherNidBack    = existingStudent.motherNidBackUrl    || '';
+    const existingTransferCert     = existingStudent.transferCertificateUrl || '';
+
+    const photoUrl              = await handleFileUpload(existingPhotoUrl,       documents?.studentPhoto || step1.photoBase64,  'profile-photo');
+    const studentDocFrontUrl    = await handleFileUpload(existingDocFrontUrl,    documents?.studentDocFront,                    'birth-certificate-front');
+    const studentDocBackUrl     = await handleFileUpload(existingDocBackUrl,     documents?.studentDocBack,                     'birth-certificate-back');
+    const fatherNidFrontUrl     = await handleFileUpload(existingFatherNidFront, documents?.fatherNidFront,                     'father-nid-front');
+    const fatherNidBackUrl      = await handleFileUpload(existingFatherNidBack,  documents?.fatherNidBack,                      'father-nid-back');
+    const motherNidFrontUrl     = await handleFileUpload(existingMotherNidFront, documents?.motherNidFront,                     'mother-nid-front');
+    const motherNidBackUrl      = await handleFileUpload(existingMotherNidBack,  documents?.motherNidBack,                      'mother-nid-back');
+    const transferCertificateUrl = await handleFileUpload(existingTransferCert,  documents?.transferCertificate,                'transfer-certificate');
 
     // Handle Additional Documents (Loop through array)
     const processedDocs: string[] = [];
     if (documents?.additionalDocuments && Array.isArray(documents.additionalDocuments)) {
+      const existingAdditional: string[] = Array.isArray(existingStudent.additionalDocuments)
+        ? existingStudent.additionalDocuments.map((d: any) => String(d))
+        : [];
       for (let i = 0; i < documents.additionalDocuments.length; i++) {
         const item = documents.additionalDocuments[i];
         if (item) {
-          const url = await handleFileUpload('', item, `additional-doc-${i}`);
+          const url = await handleFileUpload(existingAdditional[i], item, `additional-doc-${i}`);
           if (url) processedDocs.push(url);
         }
       }

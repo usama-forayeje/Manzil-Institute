@@ -5,7 +5,6 @@ import {
   getCoreRowModel,
   useReactTable,
   getFilteredRowModel,
-  getPaginationRowModel,
   type ColumnDef
 } from '@tanstack/react-table';
 import { 
@@ -37,6 +36,9 @@ export default function StudentsListPage() {
     students,
     total,
     isLoading,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
     globalFilter,
     setGlobalFilter,
     handleDelete,
@@ -205,13 +207,6 @@ export default function StudentsListPage() {
     onGlobalFilterChange: setGlobalFilter,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    initialState: {
-      pagination: {
-        pageIndex: 0,
-        pageSize: 15,
-      },
-    },
   });
 
   return (
@@ -279,6 +274,11 @@ export default function StudentsListPage() {
         emptyText="কোনো শিক্ষার্থীর তথ্য পাওয়া যায়নি"
         emptySubtext="শিক্ষার্থী ভর্তি করতে 'ভর্তি ফরম' বাটনে ক্লিক করুন"
         columnCount={4}
+        infiniteScroll={true}
+        hasNextPage={hasNextPage}
+        isFetchingNextPage={isFetchingNextPage}
+        onLoadMore={fetchNextPage}
+        totalCount={total}
       />
     </div>
   );

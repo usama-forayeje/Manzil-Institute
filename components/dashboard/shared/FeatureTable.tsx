@@ -19,7 +19,8 @@ import {
   ChevronRight, 
   ChevronsLeft, 
   ChevronsRight, 
-  LucideIcon 
+  LucideIcon,
+  Loader2 
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { convertEnglishToBengali } from '@/lib/utils';
@@ -39,6 +40,11 @@ interface FeatureTableProps {
   emptySubtext?: string;
   columnCount: number;
   showPagination?: boolean;
+  infiniteScroll?: boolean;
+  hasNextPage?: boolean;
+  isFetchingNextPage?: boolean;
+  onLoadMore?: () => void;
+  totalCount?: number;
 }
 
 export function FeatureTable({
@@ -48,15 +54,43 @@ export function FeatureTable({
   emptyText,
   emptySubtext,
   columnCount,
-  showPagination
+  showPagination,
+  infiniteScroll = false,
+  hasNextPage = false,
+  isFetchingNextPage = false,
+  onLoadMore,
+  totalCount,
 }: FeatureTableProps) {
+  const sentinelRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    if (!infiniteScroll || !hasNextPage || isFetchingNextPage || !onLoadMore) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          onLoadMore();
+        }
+      },
+      { rootMargin: '300px' }
+    );
+
+    const el = sentinelRef.current;
+    if (el) observer.observe(el);
+
+    return () => {
+      if (el) observer.unobserve(el);
+      observer.disconnect();
+    };
+  }, [infiniteScroll, hasNextPage, isFetchingNextPage, onLoadMore]);
+
   const pageIndex = table.getState().pagination?.pageIndex ?? 0;
   const pageSize = table.getState().pagination?.pageSize ?? 15;
   const totalRows = table.getFilteredRowModel().rows.length;
   const startRow = totalRows === 0 ? 0 : pageIndex * pageSize + 1;
   const endRow = Math.min((pageIndex + 1) * pageSize, totalRows);
   const pageCount = Math.max(1, table.getPageCount());
-  const hasPagination = showPagination ?? (table.getPageCount() > 1 || totalRows > pageSize);
+  const hasPagination = !infiniteScroll && (showPagination ?? (table.getPageCount() > 1 || totalRows > pageSize));
 
   return (
     <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white/40 dark:bg-zinc-950/40 backdrop-blur-xl overflow-hidden shadow-2xl shadow-zinc-200/50 dark:shadow-none min-h-[400px]">
@@ -171,6 +205,46 @@ export function FeatureTable({
                 >
                   <ChevronsRight className="h-4 w-4" />
                 </Button>
+              </div>
+            </div>
+          )}
+
+          {infiniteScroll && (
+            <div className="border-t border-zinc-200/50 dark:border-zinc-800/50 bg-zinc-50/30 dark:bg-zinc-900/30">
+              {/* Invisible sentinel element for auto-fetch on scroll */}
+              <div ref={sentinelRef} className="h-4 w-full pointer-events-none" />
+
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-6 py-4 text-xs text-zinc-500">
+                <div className="flex items-center gap-2 kalpurush-font font-medium">
+                  <span>
+                    প্রদর্শিত হচ্ছে: <strong className="text-zinc-800 dark:text-zinc-200">{convertEnglishToBengali(totalRows)}</strong> জন
+                    {totalCount != null && (
+                      <span className="text-zinc-400"> (সর্বমোট {convertEnglishToBengali(totalCount)} জনের মধ্যে)</span>
+                    )}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  {isFetchingNextPage ? (
+                    <div className="flex items-center gap-2 text-[#00AEEF] font-bold kalpurush-font">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <span>আরও শিক্ষার্থী লোড হচ্ছে...</span>
+                    </div>
+                  ) : hasNextPage ? (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={onLoadMore}
+                      className="h-8 text-xs font-bold text-zinc-700 dark:text-zinc-200 border-zinc-200 dark:border-zinc-800 hover:bg-[#00AEEF]/10 hover:text-[#00AEEF] kalpurush-font"
+                    >
+                      আরও লোড করুন ↓
+                    </Button>
+                  ) : (
+                    <span className="text-emerald-600 dark:text-emerald-400 font-bold text-xs kalpurush-font flex items-center gap-1.5">
+                      ✓ সকল তথ্য সম্পূর্ণ লোড করা হয়েছে
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
           )}

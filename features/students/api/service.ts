@@ -77,7 +77,7 @@ export async function getStudentsInfinite({
         COLLECTIONS.STUDENT_ENROLLMENTS,
         [
           Query.equal('studentId', studentIds),
-          Query.limit(100) // fetch enough for batch
+          Query.limit(Math.max(100, studentIds.length * 3)) // fetch enough for batch
         ]
       ).catch((e) => {
         console.error('Failed to fetch enrollments for students:', e);

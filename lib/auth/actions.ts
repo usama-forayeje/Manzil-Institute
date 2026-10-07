@@ -61,12 +61,18 @@ export async function createSessionFromToken(userId: string, secret: string) {
 
     const cookieStore = await cookies();
     const isProduction = process.env.NODE_ENV === 'production';
+    const THIRTY_DAYS_IN_SECONDS = 30 * 24 * 60 * 60;
+    const expires = session.expire
+      ? new Date(session.expire)
+      : new Date(Date.now() + THIRTY_DAYS_IN_SECONDS * 1000);
 
     cookieStore.set('appwrite-session', session.secret, {
       httpOnly: true,
       secure: isProduction,
       sameSite: 'lax',
       path: '/',
+      maxAge: THIRTY_DAYS_IN_SECONDS,
+      expires,
     });
 
     return session;
@@ -101,10 +107,12 @@ export async function getSession() {
     const authUser = await account.get();
 
     const userDoc = await getUserDocument(databases, authUser);
+    const cookieStore = await cookies();
+    const fallbackRole = cookieStore.get('appwrite-user-role')?.value;
 
     return JSON.parse(JSON.stringify({
       user: authUser,
-      role: userDoc?.role ?? 'student',
+      role: userDoc?.role ?? fallbackRole ?? 'student',
       userDoc,
       userAvatar: userDoc?.avatarUrl || null,
     }));
@@ -142,25 +150,33 @@ async function getUserDocument(databases: any, authUser: any) {
 
   // Strategy 2: Query by email
   if (authUser.email) {
-    const result = await databases.listDocuments(
-      DATABASE_ID,
-      USERS_COLLECTION_ID,
-      [Query.equal('email', authUser.email)]
-    );
-    if (result.documents?.length) {
-      return result.documents[0];
+    try {
+      const result = await databases.listDocuments(
+        DATABASE_ID,
+        USERS_COLLECTION_ID,
+        [Query.equal('email', authUser.email)]
+      );
+      if (result.documents?.length) {
+        return result.documents[0];
+      }
+    } catch (e) {
+      console.warn('Failed to query user by email:', e);
     }
   }
 
   // Strategy 3: Query by name
   if (authUser.name) {
-    const result = await databases.listDocuments(
-      DATABASE_ID,
-      USERS_COLLECTION_ID,
-      [Query.equal('name', authUser.name)]
-    );
-    if (result.documents?.length) {
-      return result.documents[0];
+    try {
+      const result = await databases.listDocuments(
+        DATABASE_ID,
+        USERS_COLLECTION_ID,
+        [Query.equal('name', authUser.name)]
+      );
+      if (result.documents?.length) {
+        return result.documents[0];
+      }
+    } catch (e) {
+      console.warn('Failed to query user by name:', e);
     }
   }
 
@@ -185,6 +201,6 @@ export async function refreshUserRoleCookie(userId: string) {
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
     path: '/',
-    maxAge: 60 * 60 * 24 * 7,
+    maxAge: 30 * 24 * 60 * 60, // 30 days
   });
 }

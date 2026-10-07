@@ -121,9 +121,23 @@ export async function GET(request: NextRequest) {
     //    const roleToken = await createRoleToken(userId, role);
     //    (await cookies()).set('user-role-token', roleToken, { httpOnly: true, ... });
 
-    // 7. Set role cookie for middleware and subsequent requests
+    // 7. Set cookies for middleware and subsequent requests
     const cookieStore = await cookies();
     const isProduction = process.env.NODE_ENV === 'production';
+    const THIRTY_DAYS_IN_SECONDS = 30 * 24 * 60 * 60; // 30 days
+    const sessionExpires = session?.expire
+      ? new Date(session.expire)
+      : new Date(Date.now() + THIRTY_DAYS_IN_SECONDS * 1000);
+
+    // Ensure session token cookie is persisted across browser restarts
+    cookieStore.set('appwrite-session', session.secret, {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: 'lax',
+      path: '/',
+      maxAge: THIRTY_DAYS_IN_SECONDS,
+      expires: sessionExpires,
+    });
 
     // Set Role Cookie - Crucial for proxy.ts/middleware
     cookieStore.set('appwrite-user-role', role, {
@@ -131,16 +145,18 @@ export async function GET(request: NextRequest) {
       secure: isProduction,
       sameSite: 'lax',
       path: '/',
-      maxAge: 60 * 60 * 24 * 7, // 7 days
+      maxAge: THIRTY_DAYS_IN_SECONDS,
+      expires: sessionExpires,
     });
 
-    // Set User Session Cookie (Already handled in createSessionFromToken, but good to ensure consistency)
+    // Set User Profile Cookies
     cookieStore.set('appwrite-user-name', appwriteUser.name || '', {
       httpOnly: false,
       secure: isProduction,
       sameSite: 'lax',
       path: '/',
-      maxAge: 60 * 60 * 24 * 7,
+      maxAge: THIRTY_DAYS_IN_SECONDS,
+      expires: sessionExpires,
     });
 
     cookieStore.set('appwrite-user-email', appwriteUser.email || '', {
@@ -148,7 +164,8 @@ export async function GET(request: NextRequest) {
       secure: isProduction,
       sameSite: 'lax',
       path: '/',
-      maxAge: 60 * 60 * 24 * 7,
+      maxAge: THIRTY_DAYS_IN_SECONDS,
+      expires: sessionExpires,
     });
 
     // 8. Redirect based on role with absolute URL to avoid potential relative path issues

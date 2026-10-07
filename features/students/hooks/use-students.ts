@@ -24,11 +24,15 @@ export function useStudents() {
       pageParam: pageParam as string | undefined,
       search: globalFilter || undefined,
       status: 'active',
-      limit: 100, // fetch generous batch upfront
+      limit: 50, // 50 students per page for smooth infinite scroll
     }),
     initialPageParam: undefined,
-    getNextPageParam: (lastPage) => {
-      if (lastPage.success && lastPage.data && lastPage.data.documents.length === 100) {
+    getNextPageParam: (lastPage, allPages) => {
+      if (!lastPage.success || !lastPage.data) return undefined;
+      if (!lastPage.data.documents || lastPage.data.documents.length === 0) return undefined;
+      const totalCount = lastPage.data.total ?? 0;
+      const loadedCount = allPages.flatMap((p) => p.data?.documents ?? []).length;
+      if (loadedCount < totalCount && lastPage.data.nextCursor) {
         return lastPage.data.nextCursor;
       }
       return undefined;
@@ -77,6 +81,9 @@ export function useStudents() {
     total,
     isLoading: infiniteQuery.isLoading,
     isFetching: infiniteQuery.isFetching,
+    fetchNextPage: infiniteQuery.fetchNextPage,
+    hasNextPage: Boolean(infiniteQuery.hasNextPage),
+    isFetchingNextPage: infiniteQuery.isFetchingNextPage,
     globalFilter,
     setGlobalFilter,
     pagination,

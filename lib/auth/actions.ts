@@ -18,10 +18,17 @@ export async function signInWithGoogle() {
     const { account } = await createAdminClient();
 
     const headerList = await headers();
-    const host = headerList.get('x-forwarded-host') || headerList.get('host');
+    let host = headerList.get('x-forwarded-host') || headerList.get('host') || '';
     const proto =
       headerList.get('x-forwarded-proto') ||
       (process.env.NODE_ENV === 'production' ? 'https' : 'http');
+
+    // Canonical host normalization:
+    // If incoming request is 'www.institute.manzil.group', strip 'www.'
+    // because Appwrite Web Platform is registered as 'institute.manzil.group'.
+    if (host.toLowerCase().startsWith('www.')) {
+      host = host.replace(/^www\./i, '');
+    }
 
     if (host) {
       baseUrl = `${proto}://${host}`;

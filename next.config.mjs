@@ -15,6 +15,23 @@ const nextConfig = {
     },
   },
 
+  // Canonical domain redirect: ensure www.institute.manzil.group always routes to https://institute.manzil.group
+  async redirects() {
+    return [
+      {
+        source: '/:path*',
+        has: [
+          {
+            type: 'host',
+            value: 'www.institute.manzil.group',
+          },
+        ],
+        destination: 'https://institute.manzil.group/:path*',
+        permanent: true,
+      },
+    ];
+  },
+
   // Enable compression
   compress: true,
   // TypeScript check settings - ignore during build

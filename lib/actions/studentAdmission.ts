@@ -417,7 +417,7 @@ export async function createAdmission(
     if (step4?.feeItems && step4.feeItems.length > 0 && (Number(step4.totalAmount || 0) > 0 || Number(step4.paidAmount || 0) > 0)) {
       receiptNo = await generateSequentialId(
         databases,
-        COLLECTIONS.FEE_INVOICES,
+        COLLECTIONS.FEE_PAYMENTS,
         'receiptNo',
         'RCT',
         5

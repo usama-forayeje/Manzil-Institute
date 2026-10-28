@@ -151,7 +151,7 @@ export async function promoteStudent(payload: PromotionPayload) {
       
       const receiptNo = await generateSequentialId(
         databases,
-        COLLECTIONS.FEE_INVOICES,
+        COLLECTIONS.FEE_PAYMENTS,
         'receiptNo',
         'RCT',
         5

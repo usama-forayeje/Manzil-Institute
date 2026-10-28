@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import {
   Search,
   LayoutTemplate,
@@ -27,9 +27,43 @@ import { FeatureHeader } from '@/components/dashboard/shared/FeatureHeader';
 export default function IDCardDashboard() {
   const params = useSearchParams();
   const [searchTerm, setSearchTerm] = useState(params.get('search') || '');
+  const [debouncedSearch, setDebouncedSearch] = useState(searchTerm);
+  const [idStatusFilter, setIdStatusFilter] = useState<'all' | 'active' | 'residential' | 'non_residential' | 'departed'>('active');
   const [selectedStudents, setSelectedStudents] = useState<StudentListItem[]>([]);
+  const sentinelRef = useRef<HTMLDivElement>(null);
 
-  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteStudents({ search: searchTerm });
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchTerm.trim());
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteStudents({
+    search: debouncedSearch || undefined,
+    status: idStatusFilter,
+  });
+
+  useEffect(() => {
+    if (!hasNextPage || isFetchingNextPage || !fetchNextPage) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          fetchNextPage();
+        }
+      },
+      { rootMargin: '300px' }
+    );
+
+    const el = sentinelRef.current;
+    if (el) observer.observe(el);
+
+    return () => {
+      if (el) observer.unobserve(el);
+      observer.disconnect();
+    };
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const allStudents = useMemo(() => {
     const docs = data?.pages.flatMap((page) => page.data?.documents ?? []) ?? [];
@@ -366,34 +400,111 @@ export default function IDCardDashboard() {
                 className="pl-9 h-11 bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 rounded-md"
               />
             </div>
-            <Button variant="ghost" size="sm" onClick={selectAll} className="w-full mt-4 h-9 text-[10px] font-black uppercase tracking-widest text-[#00AEEF] hover:bg-[#00AEEF]/10 rounded-md">
-              {selectedStudents.length === filteredStudents.length ? 'সব ফিল্টার মুছুন' : 'সবাইকে নির্বাচন করুন'}
+
+            {/* Quick Status Filter Tabs */}
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 mt-3 custom-scrollbar">
+              {[
+                { key: 'all', label: 'সকল' },
+                { key: 'active', label: 'সক্রিয়' },
+                { key: 'residential', label: 'আবাসিক' },
+                { key: 'non_residential', label: 'অনাবাসিক' },
+                { key: 'departed', label: 'বিদায়ী' },
+              ].map((f) => (
+                <button
+                  key={f.key}
+                  type="button"
+                  onClick={() => {
+                    setIdStatusFilter(f.key as any);
+                    setSelectedStudents([]);
+                  }}
+                  className={cn(
+                    'px-2.5 py-1 rounded-md text-[11px] font-bold transition-all cursor-pointer whitespace-nowrap kalpurush-font',
+                    idStatusFilter === f.key
+                      ? 'bg-[#00AEEF] text-white shadow-xs'
+                      : 'bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100'
+                  )}
+                >
+                  {f.label}
+                </button>
+              ))}
+            </div>
+
+            <Button variant="ghost" size="sm" onClick={selectAll} className="w-full mt-3 h-8 text-[10px] font-black uppercase tracking-widest text-[#00AEEF] hover:bg-[#00AEEF]/10 rounded-md">
+              {selectedStudents.length === filteredStudents.length && filteredStudents.length > 0 ? 'সব নির্বাচন মুছুন' : 'সবাইকে নির্বাচন করুন'}
             </Button>
           </div>
 
           <div className="flex-1 overflow-y-auto p-4 space-y-2 custom-scrollbar">
-            {isLoading ? <Skeleton className="h-full w-full rounded-md" /> : filteredStudents.map(student => {
-              const isSelected = selectedStudents.some(s => s.$id === student.$id);
-              return (
-                <div key={student.$id} onClick={() => toggleStudent(student)} className={cn("flex items-center gap-4 p-3 rounded-md cursor-pointer transition-all border", isSelected ? "bg-[#00AEEF]/5 border-[#00AEEF]/20" : "bg-white dark:bg-zinc-900 border-zinc-100 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700")}>
-                  <div className="relative">
-                    <Avatar className="h-10 w-10 border border-zinc-200 dark:border-zinc-800 rounded-md">
-                      <AvatarImage src={student.photo} className="object-cover" />
-                      <AvatarFallback className="bg-zinc-100 dark:bg-zinc-800 text-[10px] font-black">{student.nameEn?.charAt(0)}</AvatarFallback>
-                    </Avatar>
-                    {isSelected && <div className="absolute -top-1 -right-1 h-4 w-4 bg-[#00AEEF] rounded-full border-2 border-white dark:border-zinc-900" />}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-black text-sm kalpurush-font truncate">{student.nameBn}</p>
-                    <p className="text-[10px] uppercase font-bold text-zinc-400 tracking-tighter">{student.studentId}</p>
+            {isLoading ? (
+              Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="flex items-center gap-4 p-3 rounded-md border border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900">
+                  <Skeleton className="h-10 w-10 rounded-md shrink-0" />
+                  <div className="space-y-1.5 flex-1 min-w-0">
+                    <Skeleton className="h-3.5 w-28 rounded-md" />
+                    <Skeleton className="h-2.5 w-16 rounded-md" />
                   </div>
                 </div>
-              );
-            })}
-            {hasNextPage && (
-              <Button variant="outline" className="w-full h-10 rounded-md border-dashed text-[10px] font-black uppercase tracking-widest" onClick={() => fetchNextPage()} disabled={isFetchingNextPage}>
-                {isFetchingNextPage ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <RefreshCw className="h-4 w-4 mr-2" />} আরও লোড করুন
-              </Button>
+              ))
+            ) : filteredStudents.length === 0 ? (
+              <div className="py-12 text-center text-zinc-400 text-xs kalpurush-font">কোনো শিক্ষার্থী পাওয়া যায়নি</div>
+            ) : (
+              <>
+                {filteredStudents.map(student => {
+                  const isSelected = selectedStudents.some(s => s.$id === student.$id);
+                  return (
+                    <div key={student.$id} onClick={() => toggleStudent(student)} className={cn("flex items-center gap-4 p-3 rounded-md cursor-pointer transition-all border", isSelected ? "bg-[#00AEEF]/5 border-[#00AEEF]/20" : "bg-white dark:bg-zinc-900 border-zinc-100 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700")}>
+                      <div className="relative">
+                        <Avatar className="h-10 w-10 border border-zinc-200 dark:border-zinc-800 rounded-md">
+                          <AvatarImage src={student.photo} className="object-cover" />
+                          <AvatarFallback className="bg-zinc-100 dark:bg-zinc-800 text-[10px] font-black">{student.nameEn?.charAt(0)}</AvatarFallback>
+                        </Avatar>
+                        {isSelected && <div className="absolute -top-1 -right-1 h-4 w-4 bg-[#00AEEF] rounded-full border-2 border-white dark:border-zinc-900" />}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between gap-1">
+                          <p className="font-black text-sm kalpurush-font truncate">{student.nameBn || student.nameEn}</p>
+                          {student.status !== 'active' ? (
+                            <span className="text-[9px] font-bold bg-rose-50 text-rose-600 dark:bg-rose-950/40 px-1.5 py-0.2 rounded border border-rose-200 dark:border-rose-800">
+                              বিদায়ী
+                            </span>
+                          ) : student.boardingType?.includes('আবাসিক') || student.hallName ? (
+                            <span className="text-[9px] font-bold bg-amber-50 text-amber-700 dark:bg-amber-950/40 px-1.5 py-0.2 rounded border border-amber-200 dark:border-amber-800">
+                              আবাসিক
+                            </span>
+                          ) : null}
+                        </div>
+                        <p className="text-[10px] uppercase font-bold text-zinc-400 tracking-tighter truncate">
+                          {student.studentId} {student.className ? `• ${student.className}` : ''}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+
+                {/* Skeletons while fetching next page */}
+                {isFetchingNextPage && (
+                  <>
+                    {Array.from({ length: 3 }).map((_, i) => (
+                      <div key={`next-id-${i}`} className="flex items-center gap-4 p-3 rounded-md border border-zinc-100 dark:border-zinc-800 bg-white/50 dark:bg-zinc-900/50">
+                        <Skeleton className="h-10 w-10 rounded-md shrink-0" />
+                        <div className="space-y-1.5 flex-1 min-w-0">
+                          <Skeleton className="h-3.5 w-28 rounded-md" />
+                          <Skeleton className="h-2.5 w-16 rounded-md" />
+                        </div>
+                      </div>
+                    ))}
+                  </>
+                )}
+
+                {/* Sentinel for infinite scroll */}
+                <div ref={sentinelRef} className="h-4 w-full pointer-events-none" />
+
+                {hasNextPage && !isFetchingNextPage && (
+                  <Button variant="outline" className="w-full h-8 rounded-md border-dashed text-[10px] font-black uppercase tracking-widest cursor-pointer" onClick={() => fetchNextPage()}>
+                    আরও লোড করুন
+                  </Button>
+                )}
+              </>
             )}
           </div>
         </div>

@@ -1,7 +1,25 @@
 import { Student } from '@/types/database';
 
-export interface StudentListItem extends Student {
-  // Add any extra fields if needed from joins
+export interface StudentDischargeInfo {
+  reason: 'graduated' | 'transferred' | 'personal' | 'financial' | 'health' | 'expelled' | 'other';
+  reasonBn: string;
+  date: string;
+  tcNo?: string;
+  remarks?: string;
+  clearance?: 'cleared' | 'due_pending' | 'waived';
+  dischargedAt?: string;
+  dischargedBy?: string;
+}
+
+export interface StudentListItem extends Omit<Student, 'status' | 'boardingType' | 'fatherNameBn' | 'motherName'> {
+  status?: string;
+  boardingType?: any;
+  fatherNameBn?: string;
+  fatherNameEn?: string;
+  motherNameBn?: string;
+  motherNameEn?: string;
+  motherName?: string;
+  photoUrl?: string;
   departmentName?: string;
   className?: string;
   session?: string;
@@ -29,7 +47,31 @@ export interface StudentListItem extends Student {
   presentUnion?: string;
   presentThana?: string;
   presentDistrict?: string;
+  permanentVillage?: string;
+  permanentThana?: string;
+  permanentDistrict?: string;
   bloodGroup?: string;
+  dischargeInfo?: StudentDischargeInfo;
+}
+
+export interface StudentStatsResponse {
+  total: number;
+  active: number;
+  departed: number;
+  residential: number;
+  nonResidential: number;
+}
+
+export interface DischargeStudentPayload {
+  studentDocId: string;
+  studentId: string;
+  reason: 'graduated' | 'transferred' | 'personal' | 'financial' | 'health' | 'expelled' | 'other';
+  reasonBn: string;
+  date: string;
+  tcNo?: string;
+  remarks?: string;
+  operatorName?: string;
+  waiveDues?: boolean;
 }
 
 export interface StudentTableResponse {

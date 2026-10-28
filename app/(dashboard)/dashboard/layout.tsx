@@ -33,6 +33,11 @@ export default async function DashboardLayout({
 
   const allowedDashboard = roleDashboardMap[role];
 
+  // Random / unapproved user accounts with role 'user' have no dashboard access
+  if (!allowedDashboard || role === 'user') {
+    redirect('/login?error=unauthorized');
+  }
+
   if (pathname.startsWith('/dashboard/') && pathname !== allowedDashboard) {
     if (role === 'student' && pathname.startsWith('/dashboard/admin')) {
       redirect('/dashboard/student');
@@ -70,14 +75,14 @@ export default async function DashboardLayout({
 
   return (
     <ThemeProvider defaultTheme="dark" storageKey="manzil-theme">
-      <SidebarProvider defaultOpen={defaultOpen}>
+      <SidebarProvider defaultOpen={defaultOpen} className="w-full min-w-0 overflow-x-hidden">
         <AppSidebar
           navItems={navItems}
           userName={userName}
           userEmail={userEmail}
           userAvatar={userAvatar}
         />
-        <SidebarInset>
+        <SidebarInset className="min-w-0 flex-1 overflow-x-hidden w-full">
           <HeaderDashboard
             userName={userName}
             userEmail={userEmail}
@@ -85,7 +90,7 @@ export default async function DashboardLayout({
             role={role}
           />
           <Separator className="bg-border" />
-          <main className="p-6">
+          <main className="p-3 sm:p-5 lg:p-6 min-w-0 flex-1 overflow-x-hidden w-full">
             {children}
           </main>
         </SidebarInset>

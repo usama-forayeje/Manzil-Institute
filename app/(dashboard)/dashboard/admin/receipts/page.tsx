@@ -282,8 +282,18 @@ export default function ReceiptsPage() {
                placeholder="রসিদ নম্বর, স্টুডেন্ট আইডি বা নাম লিখুন..."
                value={searchTerm}
                onChange={(e) => setSearchTerm(e.target.value)}
-               className="h-16 pl-14 pr-6 rounded-2xl bg-zinc-50/50 dark:bg-zinc-950/50 border-2 border-transparent focus:border-[#00AEEF]/30 focus:bg-white dark:focus:bg-zinc-900 shadow-inner kalpurush-font font-bold text-base transition-all duration-300"
+               className="h-16 pl-14 pr-12 rounded-2xl bg-zinc-50/50 dark:bg-zinc-950/50 border-2 border-transparent focus:border-[#00AEEF]/30 focus:bg-white dark:focus:bg-zinc-900 shadow-inner kalpurush-font font-bold text-base transition-all duration-300"
              />
+             {searchTerm && (
+               <button
+                 type="button"
+                 onClick={() => setSearchTerm('')}
+                 className="absolute right-4 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full flex items-center justify-center text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+                 title="মুছে ফেলুন"
+               >
+                 <X className="h-4 w-4" />
+               </button>
+             )}
           </div>
         </div>
       </div>
@@ -356,8 +366,17 @@ export default function ReceiptsPage() {
                               <Receipt className="h-5 w-5 text-zinc-400 group-hover:text-white transition-colors" />
                            </div>
                            <div>
-                              <span className="text-base font-mono font-black text-zinc-800 dark:text-zinc-100 block mb-1 group-hover:text-[#00AEEF] transition-colors">{payment.paymentId}</span>
-                              <div className="flex items-center gap-3">
+                              <div className="flex items-center gap-2">
+                                 <span className="text-base font-mono font-black text-zinc-800 dark:text-zinc-100 block group-hover:text-[#00AEEF] transition-colors">
+                                   {payment.receiptNo || payment.paymentId}
+                                 </span>
+                                 {payment.receiptNo && payment.paymentId && payment.receiptNo !== payment.paymentId && (
+                                   <Badge variant="outline" className="text-[10px] font-mono text-zinc-400 py-0 px-1.5 h-4 border-zinc-200 dark:border-zinc-700">
+                                     {payment.paymentId}
+                                   </Badge>
+                                 )}
+                              </div>
+                              <div className="flex items-center gap-3 mt-1">
                                  <span className="text-[11px] font-bold text-zinc-500 flex items-center gap-1.5"><Calendar className="h-3 w-3 text-zinc-300" /> {dt.date}</span>
                                  <span className="text-[11px] font-bold text-zinc-400 flex items-center gap-1.5"><Clock className="h-3 w-3 text-zinc-300" /> {dt.time}</span>
                               </div>
@@ -397,7 +416,7 @@ export default function ReceiptsPage() {
                       <td className="py-8 pr-10 pl-4 align-middle text-right">
                          <div className="flex items-center justify-end gap-3">
                            <Button
-                             onClick={() => handlePreview(payment.paymentId)}
+                             onClick={() => handlePreview(payment.$id || payment.paymentId)}
                              variant="outline"
                              className="h-12 w-12 p-0 rounded-2xl border-2 border-zinc-100 hover:border-[#00AEEF] hover:bg-[#00AEEF]/5 text-zinc-400 hover:text-[#00AEEF] transition-all active:scale-95 shadow-sm"
                              title="প্রিভিউ দেখুন"
@@ -405,14 +424,14 @@ export default function ReceiptsPage() {
                              <Eye className="h-5 w-5" />
                            </Button>
                            <Button
-                             onClick={() => handlePrint(payment.paymentId)}
-                             disabled={isPrinting === payment.paymentId}
+                             onClick={() => handlePrint(payment.$id || payment.paymentId)}
+                             disabled={isPrinting === payment.$id || isPrinting === payment.paymentId}
                              className={cn(
                                "h-12 px-6 rounded-2xl font-black text-xs uppercase tracking-[0.15em] gap-3 shadow-xl transition-all active:scale-95 group/btn overflow-hidden relative",
-                               isPrinting === payment.paymentId ? 'bg-zinc-100 text-zinc-400' : 'bg-[#00AEEF] hover:bg-[#0081B1] text-white shadow-[#00AEEF]/20'
+                               (isPrinting === payment.$id || isPrinting === payment.paymentId) ? 'bg-zinc-100 text-zinc-400' : 'bg-[#00AEEF] hover:bg-[#0081B1] text-white shadow-[#00AEEF]/20'
                              )}
                            >
-                              {isPrinting === payment.paymentId ? (
+                              {(isPrinting === payment.$id || isPrinting === payment.paymentId) ? (
                                 <Loader2 className="h-4 w-4 animate-spin" />
                               ) : (
                                  <>

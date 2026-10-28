@@ -50,9 +50,9 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
-import { User, Search, GraduationCap, CheckCircle2, RefreshCw, Repeat2, Activity, Wallet, Plus, Trash2, ArrowLeft, Calendar, TrendingUp } from 'lucide-react';
+import { User, Search, GraduationCap, CheckCircle2, RefreshCw, Repeat2, Activity, Wallet, Plus, Trash2, ArrowLeft, Calendar, TrendingUp, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
-import { cn } from '@/lib/utils';
+import { cn, convertEnglishToBengali } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useStudentTableStore } from '@/features/students/store/useStudentTableStore';
 
@@ -269,7 +269,7 @@ export default function StudentPromotionClient() {
     isFetchingNextPage
   } = useInfiniteStudents();
 
-  const { ref, inView } = useInView();
+  const { ref, inView } = useInView({ rootMargin: '400px' });
   React.useEffect(() => {
     if (inView && hasNextPage && !isFetchingNextPage) fetchNextPage();
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
@@ -278,6 +278,8 @@ export default function StudentPromotionClient() {
     () => data?.pages.flatMap((page) => page.data?.documents ?? []) ?? [],
     [data]
   );
+
+  const totalCount = data?.pages[0]?.data?.total ?? students.length;
 
   const [activeStudent, setActiveStudent] = useState<StudentListItem | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -623,19 +625,78 @@ export default function StudentPromotionClient() {
                   </td>
                 </TableRow>
               )}
-              {/* Infinite scroll trigger */}
+              {/* Next page skeleton rows */}
+              {isFetchingNextPage && (
+                <>
+                  {Array.from({ length: 3 }).map((_, idx) => (
+                    <TableRow key={`promo-fetch-${idx}`} className="border-b border-zinc-100/50 dark:border-zinc-900/50 bg-zinc-50/10 dark:bg-zinc-900/10">
+                      <TableCell className="py-5 px-6">
+                        <div className="flex items-center gap-3">
+                          <Skeleton className="h-10 w-10 rounded-full shrink-0" />
+                          <div className="space-y-1.5 flex-1 min-w-0">
+                            <Skeleton className="h-4 w-32 rounded-md" />
+                            <Skeleton className="h-3 w-20 rounded-md" />
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell className="py-5 px-6">
+                        <div className="space-y-1.5">
+                          <Skeleton className="h-4 w-28 rounded-md" />
+                          <Skeleton className="h-3 w-16 rounded-md" />
+                        </div>
+                      </TableCell>
+                      <TableCell className="py-5 px-6">
+                        <Skeleton className="h-5 w-20 rounded-full" />
+                      </TableCell>
+                      <TableCell className="py-5 px-6">
+                        <Skeleton className="h-4 w-28 rounded-md" />
+                      </TableCell>
+                      <TableCell className="py-5 px-6 text-right pr-4">
+                        <Skeleton className="h-9 w-32 rounded-md ml-auto" />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </>
+              )}
+
+              {/* Invisible sentinel */}
               <TableRow>
                 <td colSpan={columns.length} className="p-0 border-0 h-0">
-                  <div ref={ref} className="h-2 w-full" />
-                  {isFetchingNextPage && (
-                    <div className="flex justify-center py-4">
-                      <RefreshCw className="h-5 w-5 text-[#00AEEF] animate-spin" />
-                    </div>
-                  )}
+                  <div ref={ref} className="h-4 w-full pointer-events-none" />
                 </td>
               </TableRow>
             </TableBody>
           </Table>
+
+          {/* Bottom status bar */}
+          <div className="rounded-b-2xl border-t border-zinc-200/50 dark:border-zinc-800/50 bg-zinc-50/50 dark:bg-zinc-900/30 px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-zinc-500">
+            <span className="kalpurush-font font-medium">
+              প্রদর্শিত হচ্ছে: <strong className="text-zinc-800 dark:text-zinc-200">{convertEnglishToBengali(students.length)}</strong> জন
+              <span className="text-zinc-400"> (সর্বমোট {convertEnglishToBengali(totalCount)} জনের মধ্যে)</span>
+            </span>
+
+            <div className="flex items-center gap-3">
+              {isFetchingNextPage ? (
+                <div className="flex items-center gap-2 text-[#00AEEF] font-bold kalpurush-font">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span>আরও শিক্ষার্থী লোড হচ্ছে...</span>
+                </div>
+              ) : hasNextPage ? (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => fetchNextPage()}
+                  className="h-8 text-xs font-bold text-zinc-700 dark:text-zinc-200 border-zinc-200 dark:border-zinc-800 hover:bg-[#00AEEF]/10 hover:text-[#00AEEF] kalpurush-font cursor-pointer"
+                >
+                  আরও লোড করুন ↓
+                </Button>
+              ) : (
+                <span className="text-emerald-600 dark:text-emerald-400 font-bold text-xs kalpurush-font flex items-center gap-1.5">
+                  ✓ সকল শিক্ষার্থী লোড করা হয়েছে
+                </span>
+              )}
+            </div>
+          </div>
         </div>
       </div>
 

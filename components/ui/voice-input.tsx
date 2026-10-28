@@ -1,13 +1,42 @@
 "use client";
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Mic, MicOff, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useVoiceTyping } from "@/hooks/useVoiceTyping";
 
+/**
+ * Universal string extractor for Voice Inputs.
+ * Safely handles strings, numbers, React SyntheticEvents, { target: { value } } wrappers,
+ * and completely prevents "[object Object]" from ever appearing in the UI.
+ */
+export function extractStringValue(val: any): string {
+  if (val === null || val === undefined) return "";
+  if (typeof val === "string") {
+    return val === "[object Object]" ? "" : val;
+  }
+  if (typeof val === "number") return String(val);
+  if (typeof val === "object") {
+    // If it's an event or object with target.value
+    if ("target" in val && val.target && typeof val.target.value === "string") {
+      const targetVal = val.target.value;
+      return targetVal === "[object Object]" ? "" : targetVal;
+    }
+    // If it has custom toString that isn't "[object Object]"
+    if (typeof val.toString === "function") {
+      try {
+        const str = val.toString();
+        if (str && str !== "[object Object]") return str;
+      } catch {}
+    }
+    return "";
+  }
+  return String(val);
+}
+
 interface BaseVoiceInputProps {
-  value?: string;
-  onChange?: (e: any) => void;
+  value?: any;
+  onChange?: (e: any, value?: string) => void;
   language: string;
   className?: string;
   placeholder?: string;
@@ -31,7 +60,7 @@ function BaseVoiceInput({
   ...props
 }: BaseVoiceInputProps) {
   const [mounted, setMounted] = useState(false);
-  const controlledValue = value ?? "";
+  const controlledValue = useMemo(() => extractStringValue(value), [value]);
   const committedRef = useRef(controlledValue);
 
   useEffect(() => {
@@ -42,17 +71,53 @@ function BaseVoiceInput({
     committedRef.current = controlledValue;
   }, [controlledValue]);
 
+  /**
+   * Universal change emitter.
+   * Dispatches a polymorphic event that satisfies both:
+   * 1. React Hook Form / standard HTML event handlers expecting `e.target.value`
+   * 2. Custom value setters expecting string `(val: string) => setVal(val)`
+   */
+  const emitChange = useCallback(
+    (newVal: string, originalEvent?: any) => {
+      const cleanVal = extractStringValue(newVal);
+      committedRef.current = cleanVal;
+      if (!onChange) return;
+
+      const syntheticEvent: any =
+        originalEvent && typeof originalEvent === "object" ? originalEvent : {};
+
+      if (!syntheticEvent.target) {
+        syntheticEvent.target = { value: cleanVal };
+      } else {
+        try {
+          syntheticEvent.target.value = cleanVal;
+        } catch {
+          syntheticEvent.target = { ...syntheticEvent.target, value: cleanVal };
+        }
+      }
+
+      if (!syntheticEvent.currentTarget) {
+        syntheticEvent.currentTarget = syntheticEvent.target;
+      }
+
+      // Polyfill primitive string coercion so naive `(v) => setState(v)` never yields "[object Object]"
+      syntheticEvent.toString = () => cleanVal;
+      syntheticEvent.valueOf = () => cleanVal;
+      syntheticEvent[Symbol.toPrimitive] = () => cleanVal;
+
+      onChange(syntheticEvent, cleanVal);
+    },
+    [onChange]
+  );
+
   const handleFinal = useCallback(
     (spoken: string) => {
       const base = committedRef.current ?? "";
       const sep = base && !base.endsWith(" ") ? " " : "";
       const updated = base + sep + spoken;
-      committedRef.current = updated;
-      if (onChange) {
-        onChange({ target: { value: updated } });
-      }
+      emitChange(updated);
     },
-    [onChange]
+    [emitChange]
   );
 
   const { isListening, interimText, error, isSupported, startListening, stopListening } =
@@ -60,10 +125,11 @@ function BaseVoiceInput({
 
   const handleChange = useCallback(
     (e: any) => {
-      committedRef.current = e?.target?.value ?? "";
-      onChange?.(e);
+      const raw = e?.target?.value ?? (typeof e === "string" ? e : "");
+      const clean = extractStringValue(raw);
+      emitChange(clean, e);
     },
-    [onChange]
+    [emitChange]
   );
 
   const handleMic = (e: any) => {
@@ -81,18 +147,17 @@ function BaseVoiceInput({
     e.preventDefault();
     e.stopPropagation();
     if (isListening) stopListening();
-    committedRef.current = "";
-    onChange?.({ target: { value: "" } });
+    emitChange("");
   };
 
   if (!mounted) {
     return (
       <Component
-        value={controlledValue}
-        onChange={(e: any) => onChange?.(e)}
-        className={cn("w-full rounded-md border bg-background text-foreground px-3 py-2 text-sm", className)}
         placeholder={placeholder}
         {...props}
+        value={controlledValue}
+        onChange={handleChange}
+        className={cn("w-full rounded-md border bg-background text-foreground px-3 py-2 text-sm", className)}
       />
     );
   }
@@ -101,11 +166,11 @@ function BaseVoiceInput({
     return (
       <div className="space-y-1">
         <Component
+          placeholder={placeholder}
+          {...props}
           value={controlledValue}
           onChange={handleChange}
           className={cn("w-full rounded-md border bg-background text-foreground px-3 py-2 text-sm", className)}
-          placeholder={placeholder}
-          {...props}
         />
         <p className="text-[10px] text-destructive font-bold">
           {language === "bn-BD" ? "ভয়েস টাইপিং সাপোর্টেড নয়।" : "Voice typing is not supported."}
@@ -122,10 +187,10 @@ function BaseVoiceInput({
   return (
     <div className="relative w-full group">
       <Component
+        placeholder={placeholder}
         {...props}
         value={displayValue}
         onChange={handleChange}
-        placeholder={placeholder}
         className={cn(
           "w-full rounded-lg border bg-background text-foreground px-3 py-2 pr-20 text-sm transition-all duration-200 outline-none placeholder:text-zinc-400 dark:placeholder:text-zinc-500",
           "focus:ring-2 focus:ring-cyan-500/30 focus:border-cyan-500/50",
@@ -144,7 +209,7 @@ function BaseVoiceInput({
           <button
             type="button"
             onClick={handleClear}
-            className="flex h-6 w-6 items-center justify-center rounded-full text-muted-foreground transition-all duration-200 hover:bg-red-50 dark:hover:bg-red-950/30 hover:text-red-500 hover:scale-110"
+            className="flex h-6 w-6 items-center justify-center rounded-full text-muted-foreground transition-all duration-200 hover:bg-red-50 dark:hover:bg-red-950/30 hover:text-red-500 hover:scale-110 cursor-pointer"
             aria-label="Clear"
           >
             <X className="h-3.5 w-3.5" />
@@ -155,7 +220,7 @@ function BaseVoiceInput({
           type="button"
           onClick={handleMic}
           className={cn(
-            "flex h-8 w-8 items-center justify-center rounded-full transition-all duration-200",
+            "flex h-8 w-8 items-center justify-center rounded-full transition-all duration-200 cursor-pointer",
             isListening
               ? "bg-[#11a311] text-white shadow-lg shadow-green-500/30 scale-110"
               : "text-muted-foreground hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-950/20 hover:scale-110"

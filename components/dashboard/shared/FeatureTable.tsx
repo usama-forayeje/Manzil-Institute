@@ -72,7 +72,7 @@ export function FeatureTable({
           onLoadMore();
         }
       },
-      { rootMargin: '300px' }
+      { rootMargin: '400px' }
     );
 
     const el = sentinelRef.current;
@@ -84,6 +84,7 @@ export function FeatureTable({
     };
   }, [infiniteScroll, hasNextPage, isFetchingNextPage, onLoadMore]);
 
+  const effectiveColumnCount = columnCount || table.getAllColumns().length || 5;
   const pageIndex = table.getState().pagination?.pageIndex ?? 0;
   const pageSize = table.getState().pagination?.pageSize ?? 15;
   const totalRows = table.getFilteredRowModel().rows.length;
@@ -93,10 +94,59 @@ export function FeatureTable({
   const hasPagination = !infiniteScroll && (showPagination ?? (table.getPageCount() > 1 || totalRows > pageSize));
 
   return (
-    <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white/40 dark:bg-zinc-950/40 backdrop-blur-xl overflow-hidden shadow-2xl shadow-zinc-200/50 dark:shadow-none min-h-[400px]">
+    <div className="w-full min-w-0 max-w-full rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white/40 dark:bg-zinc-950/40 backdrop-blur-xl overflow-hidden shadow-2xl shadow-zinc-200/50 dark:shadow-none min-h-[400px]">
       {isLoading ? (
-        <div className="p-8 space-y-4">
-          {[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-14 w-full rounded-xl shadow-sm" />)}
+        <div className="w-full min-w-0 max-w-full overflow-x-auto custom-scrollbar">
+          <Table>
+            <TableHeader className="bg-zinc-50/50 dark:bg-zinc-900/50">
+              <TableRow className="border-zinc-200/50 dark:border-zinc-800/50">
+                {Array.from({ length: effectiveColumnCount }).map((_, i) => (
+                  <TableHead key={i} className="h-12 px-3 sm:px-5">
+                    <Skeleton className="h-3.5 w-24 rounded-md" />
+                  </TableHead>
+                ))}
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {Array.from({ length: 7 }).map((_, rowIdx) => (
+                <TableRow key={rowIdx} className="border-zinc-100/50 dark:border-zinc-900/50">
+                  <TableCell className="py-3.5 px-3 sm:px-5">
+                    <div className="flex items-center gap-3">
+                      <Skeleton className="h-10 w-10 sm:h-11 sm:w-11 rounded-xl shrink-0" />
+                      <div className="space-y-2 flex-1 min-w-0">
+                        <Skeleton className="h-4 w-32 rounded-md" />
+                        <Skeleton className="h-3 w-20 rounded-md" />
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell className="py-3.5 px-3 sm:px-5">
+                    <div className="space-y-2">
+                      <Skeleton className="h-4 w-36 rounded-md" />
+                      <Skeleton className="h-3 w-24 rounded-md" />
+                    </div>
+                  </TableCell>
+                  <TableCell className="py-3.5 px-3 sm:px-5">
+                    <div className="space-y-2">
+                      <Skeleton className="h-4 w-28 rounded-md" />
+                      <Skeleton className="h-3 w-16 rounded-md" />
+                    </div>
+                  </TableCell>
+                  <TableCell className="py-3.5 px-3 sm:px-5 text-center">
+                    <Skeleton className="h-6 w-16 rounded-md mx-auto" />
+                  </TableCell>
+                  {effectiveColumnCount > 4 && (
+                    <TableCell className="py-3.5 px-3 sm:px-5 text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <Skeleton className="h-8 w-8 rounded-md" />
+                        <Skeleton className="h-8 w-8 rounded-md" />
+                        <Skeleton className="h-8 w-8 rounded-md" />
+                      </div>
+                    </TableCell>
+                  )}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </div>
       ) : table.getRowModel().rows.length === 0 ? (
         <div className="flex flex-col items-center justify-center p-24 text-center space-y-6">
@@ -109,13 +159,13 @@ export function FeatureTable({
           </div>
         </div>
       ) : (
-        <div className="overflow-x-auto">
+        <div className="w-full min-w-0 max-w-full overflow-x-auto custom-scrollbar">
           <Table>
             <TableHeader className="bg-zinc-50/50 dark:bg-zinc-900/50">
               {table.getHeaderGroups().map(headerGroup => (
                 <TableRow key={headerGroup.id} className="border-zinc-200/50 dark:border-zinc-800/50 hover:bg-transparent">
                   {headerGroup.headers.map(header => (
-                    <TableHead key={header.id} className="h-14 px-6 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 kalpurush-font">
+                    <TableHead key={header.id} className="h-12 px-3 sm:px-5 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 kalpurush-font">
                       {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                     </TableHead>
                   ))}
@@ -126,12 +176,54 @@ export function FeatureTable({
               {table.getRowModel().rows.map(row => (
                 <TableRow key={row.id} className="border-zinc-100/50 dark:border-zinc-900/50 hover:bg-[#00AEEF]/[0.03] transition-all group">
                   {row.getVisibleCells().map(cell => (
-                    <TableCell key={cell.id} className="py-5 px-6 align-middle">
+                    <TableCell key={cell.id} className="py-3.5 px-3 sm:px-5 align-middle">
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
                 </TableRow>
               ))}
+
+              {infiniteScroll && isFetchingNextPage && (
+                <>
+                  {Array.from({ length: 3 }).map((_, idx) => (
+                    <TableRow key={`fetching-next-${idx}`} className="border-zinc-100/50 dark:border-zinc-900/50 bg-zinc-50/10 dark:bg-zinc-900/10">
+                      <TableCell className="py-3.5 px-3 sm:px-5">
+                        <div className="flex items-center gap-3">
+                          <Skeleton className="h-10 w-10 sm:h-11 sm:w-11 rounded-xl shrink-0" />
+                          <div className="space-y-2 flex-1 min-w-0">
+                            <Skeleton className="h-4 w-32 rounded-md" />
+                            <Skeleton className="h-3 w-20 rounded-md" />
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell className="py-3.5 px-3 sm:px-5">
+                        <div className="space-y-2">
+                          <Skeleton className="h-4 w-36 rounded-md" />
+                          <Skeleton className="h-3 w-24 rounded-md" />
+                        </div>
+                      </TableCell>
+                      <TableCell className="py-3.5 px-3 sm:px-5">
+                        <div className="space-y-2">
+                          <Skeleton className="h-4 w-28 rounded-md" />
+                          <Skeleton className="h-3 w-16 rounded-md" />
+                        </div>
+                      </TableCell>
+                      <TableCell className="py-3.5 px-3 sm:px-5 text-center">
+                        <Skeleton className="h-6 w-16 rounded-md mx-auto" />
+                      </TableCell>
+                      {effectiveColumnCount > 4 && (
+                        <TableCell className="py-3.5 px-3 sm:px-5 text-right">
+                          <div className="flex items-center justify-end gap-2">
+                            <Skeleton className="h-8 w-8 rounded-md" />
+                            <Skeleton className="h-8 w-8 rounded-md" />
+                            <Skeleton className="h-8 w-8 rounded-md" />
+                          </div>
+                        </TableCell>
+                      )}
+                    </TableRow>
+                  ))}
+                </>
+              )}
             </TableBody>
           </Table>
 

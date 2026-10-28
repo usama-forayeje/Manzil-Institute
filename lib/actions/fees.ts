@@ -52,23 +52,58 @@ async function generateSequentialId(
       collectionId,
       [
         Query.startsWith(fieldName, fullPrefix),
-        Query.orderDesc(fieldName),
-        Query.limit(1),
+        Query.limit(50),
       ]
     );
 
-    let next = 1;
-    if (existing.total > 0) {
-      const lastId = existing.documents[0][fieldName] as string;
-      const parts = lastId.split('-');
-      const lastNum = parseInt(parts[parts.length - 1] ?? '0', 10);
-      next = lastNum + 1;
+    let maxNum = 0;
+    for (const doc of existing.documents) {
+      const val = String(doc[fieldName] || '');
+      if (val.startsWith(fullPrefix)) {
+        const suffix = val.substring(fullPrefix.length);
+        const num = parseInt(suffix, 10);
+        // Only consider valid sequential numbers within padLength range (ignore random timestamp anomalies)
+        if (!isNaN(num) && suffix.length <= padLength && num < 50000) {
+          if (num > maxNum) maxNum = num;
+        }
+      }
     }
 
-    return `${fullPrefix}${String(next).padStart(padLength, '0')}`;
-  } catch {
-    const ts = Date.now().toString().slice(-6);
+    let next = maxNum + 1;
+    let proposedId = `${fullPrefix}${String(next).padStart(padLength, '0')}`;
+
+    // Collision check: verify proposedId is unique
+    let attempts = 0;
+    while (attempts < 5) {
+      const collisionCheck = await databases.listDocuments(
+        DATABASE_ID,
+        collectionId,
+        [Query.equal(fieldName, proposedId), Query.limit(1)]
+      );
+      if (collisionCheck.total === 0) {
+        return proposedId;
+      }
+      next++;
+      proposedId = `${fullPrefix}${String(next).padStart(padLength, '0')}`;
+      attempts++;
+    }
+
+    return proposedId;
+  } catch (err: any) {
+    console.error(`generateSequentialId error for ${prefix}:`, err?.message || err);
+    const ts = Date.now().toString().slice(-padLength);
     return `${fullPrefix}${ts}`;
+  }
+}
+
+// 0.1 GET NEXT RECEIPT NUMBER
+export async function getNextReceiptNo() {
+  try {
+    const { databases } = await createAdminClient();
+    const receiptNo = await generateSequentialId(databases, COLLECTIONS.FEE_PAYMENTS, 'receiptNo', 'RCT', 5);
+    return { success: true, receiptNo };
+  } catch (err: any) {
+    return { success: false, receiptNo: '' };
   }
 }
 
@@ -132,6 +167,7 @@ async function fetchStudentMap(databases: any, studentDocIds: string[]): Promise
           class: classesMap[rawClassId] || rawClassId,
           section: sectionsMap[rawSectionId] || rawSectionId,
           boardingType: boardingMap[rawBoardingId] || rawBoardingId,
+          photo: doc.photo || doc.photoUrl || doc.avatar || doc.imageUrl || '',
         };
       }
     } catch {
@@ -541,23 +577,11 @@ export async function fetchPaymentHistory(filter: any) {
 
     const { documents: paymentsResponse, total } = await databases.listDocuments(DATABASE_ID, COLLECTIONS.FEE_PAYMENTS, queries);
 
-    let rawPayments = paymentsResponse;
-    if (filter.searchTerm) {
-      const term = filter.searchTerm.toLowerCase();
-      rawPayments = rawPayments.filter(p =>
-        (p.receiptNo || '').toLowerCase().includes(term) ||
-        (p.studentId || '').toLowerCase().includes(term) ||
-        (p.paymentId || '').toLowerCase().includes(term) ||
-        (p.transactionRef || '').toLowerCase().includes(term)
-      );
-      // Pagination locally after filter
-      rawPayments = rawPayments.slice((page - 1) * limit, page * limit);
-    }
-
+    const rawPayments = paymentsResponse;
     const studentIds = [...new Set(rawPayments.map((p: any) => p.studentId))].filter(Boolean);
     const studentMap = await fetchStudentMap(databases, studentIds);
 
-    const payments = rawPayments.map((p: any) => {
+    let payments = rawPayments.map((p: any) => {
       const student = studentMap[p.studentId];
       return {
         ...p,
@@ -569,12 +593,25 @@ export async function fetchPaymentHistory(filter: any) {
       };
     });
 
+    if (filter.searchTerm) {
+      const term = filter.searchTerm.toLowerCase().trim();
+      payments = payments.filter(p =>
+        (p.receiptNo || '').toLowerCase().includes(term) ||
+        (p.paymentId || '').toLowerCase().includes(term) ||
+        (p.studentId || '').toLowerCase().includes(term) ||
+        (p.studentName || '').toLowerCase().includes(term) ||
+        (p.transactionRef || '').toLowerCase().includes(term)
+      );
+      // Pagination locally after filter
+      payments = payments.slice((page - 1) * limit, page * limit);
+    }
+
     const totalAmount = payments.reduce((sum: number, p: any) => sum + p.amount, 0);
 
     return {
       success: true,
-      payments,
-      total: filter.searchTerm ? rawPayments.length : total,
+      payments: JSON.parse(JSON.stringify(payments)),
+      total: filter.searchTerm ? payments.length : total,
       totalAmount
     };
   } catch (error: any) {
@@ -714,31 +751,173 @@ export async function fetchFeeFilterOptions() {
   }
 }
 
-// 6. SEARCH STUDENTS
+function normalizeSearchTerm(raw: string): string {
+  const bnToEnMap: Record<string, string> = {
+    '০': '0', '১': '1', '২': '2', '৩': '3', '৪': '4',
+    '৫': '5', '৬': '6', '৭': '7', '৮': '8', '৯': '9'
+  };
+  let s = (raw || '').trim();
+  s = s.replace(/[০-৯]/g, d => bnToEnMap[d] || d);
+  return s;
+}
+
+// 5.9. GET FEE COLLECT METADATA (Dynamic Sessions & Fee Types)
+export async function getFeeCollectMetadata() {
+  try {
+    const { databases } = await createAdminClient();
+    const [sessionsRes, feeTypesRes] = await Promise.all([
+      databases.listDocuments(DATABASE_ID, COLLECTIONS.SESSIONS, [
+        Query.orderDesc('$createdAt'),
+        Query.limit(50),
+      ]).catch(() => ({ documents: [] })),
+      databases.listDocuments(DATABASE_ID, COLLECTIONS.FEE_TYPES, [
+        Query.orderDesc('$createdAt'),
+        Query.limit(50),
+      ]).catch(() => ({ documents: [] })),
+    ]);
+
+    const sessions = sessionsRes.documents.map((s: any) => ({
+      name: s.sessionName || s.name || s.year || '',
+      isCurrent: Boolean(s.isCurrent),
+    })).filter((s: any) => Boolean(s.name));
+
+    const feeTypes = feeTypesRes.documents.map((ft: any) => ({
+      id: ft.$id,
+      code: ft.code || ft.name?.toLowerCase().replace(/\s+/g, '_'),
+      title: ft.nameBn || ft.name || '',
+      defaultAmount: ft.defaultAmount || 0,
+      breakdown: ft.breakdown ? (typeof ft.breakdown === 'string' ? JSON.parse(ft.breakdown) : ft.breakdown) : null,
+    }));
+
+    return {
+      success: true,
+      sessions: JSON.parse(JSON.stringify(sessions)),
+      feeTypes: JSON.parse(JSON.stringify(feeTypes)),
+    };
+  } catch (err: any) {
+    return { success: false, sessions: [], feeTypes: [], error: err.message };
+  }
+}
+
+// 6. SEARCH STUDENTS (Supports exact suffix like 10, 12, 20, 103, Bengali numbers, full ID, Name, Phone, and Barcodes)
 export async function searchStudentsForFee(term: string) {
   try {
     const { databases } = await createAdminClient();
-    const cleanTerm = term.trim();
+    const cleanTerm = normalizeSearchTerm(term);
     if (!cleanTerm) return { success: true, students: [] };
 
-    const { documents } = await databases.listDocuments(DATABASE_ID, COLLECTIONS.STUDENTS, [
-      Query.limit(50),
-      Query.orderDesc('$createdAt')
-    ]);
+    const isDigitsOnly = /^\d+$/.test(cleanTerm);
+    const currentYear = new Date().getFullYear();
 
-    // Simple client-side search across multiple fields for safety
+    const orConditions: any[] = [];
+
+    // General string contains (studentId, nameEn, nameBn, admissionNo)
+    orConditions.push(Query.contains('studentId', cleanTerm));
+    orConditions.push(Query.contains('admissionNo', cleanTerm));
+    orConditions.push(Query.contains('nameEn', cleanTerm));
+    orConditions.push(Query.contains('nameBn', cleanTerm));
+
+    // Phone search (only if at least 4 digits to avoid false positives)
+    if (cleanTerm.length >= 4) {
+      orConditions.push(Query.contains('guardianPhone', cleanTerm));
+    }
+
+    // Number matching: e.g. "10", "12", "20", "103", "1"
+    let targetPad4 = '';
+    if (isDigitsOnly) {
+      const num = parseInt(cleanTerm, 10);
+      targetPad4 = String(num).padStart(4, '0');
+
+      // Exact matches for recent years
+      orConditions.push(Query.equal('studentId', `MI-${currentYear}-${targetPad4}`));
+      orConditions.push(Query.equal('studentId', `MI-${currentYear - 1}-${targetPad4}`));
+      orConditions.push(Query.equal('studentId', `MI-${currentYear + 1}-${targetPad4}`));
+      orConditions.push(Query.contains('studentId', `-${targetPad4}`));
+      orConditions.push(Query.equal('admissionNo', `ADM-${currentYear}-${targetPad4}`));
+    }
+
+    let documents: any[] = [];
+    try {
+      const res = await databases.listDocuments(DATABASE_ID, COLLECTIONS.STUDENTS, [
+        Query.or(orConditions),
+        Query.limit(50),
+      ]);
+      documents = res.documents;
+    } catch (queryErr) {
+      console.warn('Query.or fallback to listDocuments:', queryErr);
+      const fallback = await databases.listDocuments(DATABASE_ID, COLLECTIONS.STUDENTS, [
+        Query.limit(100),
+        Query.orderDesc('$createdAt'),
+      ]);
+      documents = fallback.documents;
+    }
+
+    // Client-side filter & sort to prioritize exact suffix / exact ID matches
     const lowerTerm = cleanTerm.toLowerCase();
-    const matchedDocs = documents.filter(d =>
-      (d.studentId || '').toLowerCase().includes(lowerTerm) ||
-      (d.nameEn || '').toLowerCase().includes(lowerTerm) ||
-      (d.nameBn || '').toLowerCase().includes(lowerTerm) ||
-      (d.phonePrimary || '').includes(lowerTerm) ||
-      (d.guardianPhone || '').includes(lowerTerm)
-    );
+    const matchedDocs = documents.filter(d => {
+      const sId = (d.studentId || '').toLowerCase();
+      const nEn = (d.nameEn || '').toLowerCase();
+      const nBn = (d.nameBn || '').toLowerCase();
+      const adm = (d.admissionNo || '').toLowerCase();
+      const p1 = (d.phonePrimary || '');
+      const p2 = (d.guardianPhone || '');
 
-    const studentMap = await fetchStudentMap(databases, matchedDocs.map(d => d.$id));
-    // Serialize to plain objects to prevent Client Component serialization errors
-    return { success: true, students: JSON.parse(JSON.stringify(Object.values(studentMap))) };
+      if (sId.includes(lowerTerm) || nEn.includes(lowerTerm) || nBn.includes(lowerTerm) || adm.includes(lowerTerm)) {
+        return true;
+      }
+      if (cleanTerm.length >= 4 && (p1.includes(cleanTerm) || p2.includes(cleanTerm))) {
+        return true;
+      }
+      if (isDigitsOnly && targetPad4) {
+        if (sId.endsWith(`-${targetPad4}`) || sId.includes(targetPad4) || adm.endsWith(`-${targetPad4}`)) {
+          return true;
+        }
+      }
+      return false;
+    });
+
+    // Rank matched docs:
+    // 1. Exact match with studentId (e.g. MI-2026-0010)
+    // 2. Suffix match with targetPad4 (e.g. MI-2026-0010 for "10")
+    // 3. Name or phone
+    const sortedDocs = matchedDocs.sort((a, b) => {
+      const aId = (a.studentId || '').toUpperCase();
+      const bId = (b.studentId || '').toUpperCase();
+      const upper = cleanTerm.toUpperCase();
+
+      if (aId === upper && bId !== upper) return -1;
+      if (bId === upper && aId !== upper) return 1;
+
+      if (isDigitsOnly && targetPad4) {
+        const aEnds = aId.endsWith(`-${targetPad4}`);
+        const bEnds = bId.endsWith(`-${targetPad4}`);
+        if (aEnds && !bEnds) return -1;
+        if (bEnds && !aEnds) return 1;
+      }
+
+      return 0;
+    });
+
+    const studentMap = await fetchStudentMap(databases, sortedDocs.map(d => d.$id));
+
+    // Maintain sorted order from sortedDocs with complete photo and detail safety
+    const orderedStudents = sortedDocs
+      .map(d => {
+        const mapped = studentMap[d.$id] || {};
+        const plainD = JSON.parse(JSON.stringify(d));
+        return {
+          ...plainD,
+          ...mapped,
+          name: mapped.name || d.nameBn || d.nameEn || d.nameAr || '---',
+          photo: mapped.photo || d.photo || d.photoUrl || d.avatar || d.imageUrl || '',
+        };
+      })
+      .filter(Boolean);
+
+    return {
+      success: true,
+      students: JSON.parse(JSON.stringify(orderedStudents))
+    };
   } catch (error: any) {
     console.error('search error', error);
     return { success: false, students: [] };
@@ -762,10 +941,118 @@ export async function fetchUnpaidInvoices({ studentDocId, studentId }: { student
   }
 }
 
+// 7.1. CREATE ON-THE-SPOT / AD-HOC INVOICE
+export async function createAdHocInvoice(params: {
+  studentDocId: string;
+  studentId?: string;
+  feeType: string;
+  feeTitle: string;
+  amount: number;
+  session?: string;
+  month?: string;
+  recordedBy?: string;
+  items?: Array<{ name: string; amount: number }>;
+}) {
+  try {
+    const { databases } = await createAdminClient();
+
+    // 1. Fetch student's active enrollment if available
+    let enrollmentId = '';
+    let departmentCode = '';
+    let currentSession = params.session || `${new Date().getFullYear()}`;
+
+    try {
+      const { documents: enrs } = await databases.listDocuments(
+        DATABASE_ID,
+        COLLECTIONS.STUDENT_ENROLLMENTS,
+        [Query.equal('studentId', params.studentDocId), Query.limit(1)]
+      );
+      if (enrs.length > 0) {
+        enrollmentId = enrs[0].$id;
+        departmentCode = enrs[0].departmentId || '';
+        if (!params.session && enrs[0].session) {
+          currentSession = enrs[0].session;
+        }
+      }
+    } catch (e) {
+      console.warn('Could not fetch enrollment for student:', e);
+    }
+
+    // 2. Generate sequential invoice ID
+    const invoiceIdStr = await generateSequentialId(
+      databases,
+      COLLECTIONS.FEE_INVOICES,
+      'invoiceId',
+      'INV'
+    );
+
+    // Support itemized breakdown (e.g. Tour fee breakdown: bus, food, entry ticket)
+    const validItems = (params.items && Array.isArray(params.items))
+      ? params.items.filter(i => (i.name && i.name.trim() !== '') && Number(i.amount) > 0)
+      : [];
+
+    const feeItemObj = validItems.length > 0
+      ? validItems.map(item => ({
+          feeTypeCode: params.feeType || 'other',
+          feeTypeName: item.name.trim(),
+          amount: Number(item.amount) || 0
+        }))
+      : [{
+          feeTypeCode: params.feeType || 'other',
+          feeTypeName: params.feeTitle || 'অন্যান্য ফি',
+          amount: Number(params.amount) || 0
+        }];
+
+    const finalTotalAmount = validItems.length > 0
+      ? feeItemObj.reduce((sum, item) => sum + item.amount, 0)
+      : (Number(params.amount) || 0);
+
+    // 3. Create document in FEE_INVOICES
+    const newDoc = await databases.createDocument(
+      DATABASE_ID,
+      COLLECTIONS.FEE_INVOICES,
+      ID.unique(),
+      {
+        invoiceId: invoiceIdStr,
+        studentId: params.studentDocId,
+        enrollmentId: enrollmentId,
+        departmentCode: departmentCode,
+        invoiceType: params.feeType || 'other',
+        month: params.month || '',
+        session: currentSession,
+        totalAmount: finalTotalAmount,
+        paidAmount: 0,
+        discount: 0,
+        dueAmount: finalTotalAmount,
+        status: 'unpaid',
+        createdBy: params.recordedBy || 'admin',
+        feeItems: JSON.stringify(feeItemObj)
+      }
+    );
+
+    return {
+      success: true,
+      invoice: JSON.parse(JSON.stringify(newDoc))
+    };
+  } catch (error: any) {
+    console.error('createAdHocInvoice error:', error);
+    return {
+      success: false,
+      error: error.message || 'নতুন ফি ইনভয়েস তৈরি করতে ব্যর্থ হয়েছে'
+    };
+  }
+}
+
 // 8. COLLECT FEE PAYMENT
 export async function collectFeePayment({
-  invoiceId, studentId, studentDocId, amount, discount = 0, paymentMethod, transactionRef, notes, recordedBy
-}: any) {
+  invoiceId, studentId, studentDocId, amount, discount = 0, paymentMethod, transactionRef, notes, recordedBy, receiptNo
+}: any): Promise<{
+  success: boolean;
+  paymentDocId?: string;
+  paymentId?: string;
+  receiptNo?: string;
+  error?: string;
+}> {
   try {
     const { databases } = await createAdminClient();
 
@@ -785,11 +1072,12 @@ export async function collectFeePayment({
       status: newStatus
     });
 
-    // 3. Create payment record
-    const paymentIdStr = await generateSequentialId(databases, COLLECTIONS.FEE_PAYMENTS, 'receiptNo', 'PAY');
+    // 3. Create payment record with dedicated sequential paymentId (PAY-YYYY-XXXXX) & receiptNo (RCT-YYYY-XXXXX)
+    const paymentIdStr = await generateSequentialId(databases, COLLECTIONS.FEE_PAYMENTS, 'paymentId', 'PAY', 5);
+    const receiptNoStr = receiptNo || (await generateSequentialId(databases, COLLECTIONS.FEE_PAYMENTS, 'receiptNo', 'RCT', 5));
     const payment = await databases.createDocument(DATABASE_ID, COLLECTIONS.FEE_PAYMENTS, ID.unique(), {
       paymentId: paymentIdStr,
-      receiptNo: paymentIdStr,
+      receiptNo: receiptNoStr,
       invoiceId: invoiceId,
       studentId: studentDocId || studentId || '',
       enrollmentId: inv.enrollmentId || '',
@@ -802,7 +1090,12 @@ export async function collectFeePayment({
       notes: notes || ''
     });
 
-    return { success: true, paymentId: payment.$id, receiptNo: paymentIdStr };
+    return {
+      success: true,
+      paymentDocId: payment.$id,
+      paymentId: paymentIdStr,
+      receiptNo: receiptNoStr
+    };
   } catch (error: any) {
     console.error('Payment error', error);
     return { success: false, error: 'Payment failed' };
@@ -810,56 +1103,105 @@ export async function collectFeePayment({
 }
 
 // 9. GENERATE RECEIPT DATA
-export async function generateReceiptData(paymentDocId: string) {
+export async function generateReceiptData(paymentDocId: string | string[]) {
   try {
     const { databases } = await createAdminClient();
 
-    let payment;
-    try {
-      // First try as direct document ID
-      payment = await databases.getDocument(DATABASE_ID, COLLECTIONS.FEE_PAYMENTS, paymentDocId);
-    } catch (e) {
-      // If not found, try searching by paymentId/receiptNo field
-      const { documents } = await databases.listDocuments(DATABASE_ID, COLLECTIONS.FEE_PAYMENTS, [
-        Query.equal('paymentId', paymentDocId),
-        Query.limit(1)
-      ]);
-      if (documents.length > 0) {
-        payment = documents[0];
-      } else {
-        const { documents: docsByReceipt } = await databases.listDocuments(DATABASE_ID, COLLECTIONS.FEE_PAYMENTS, [
-          Query.equal('receiptNo', paymentDocId),
-          Query.limit(1)
-        ]);
-        if (docsByReceipt.length > 0) payment = docsByReceipt[0];
+    const ids = Array.isArray(paymentDocId) ? paymentDocId : [paymentDocId];
+    if (ids.length === 0) return { success: false, error: 'কোনো পেমেন্ট আইডি পাওয়া যায়নি' };
+
+    const payments: any[] = [];
+    for (const id of ids) {
+      if (!id) continue;
+      let p: any = null;
+      try {
+        p = await databases.getDocument(DATABASE_ID, COLLECTIONS.FEE_PAYMENTS, id);
+      } catch (e) {
+        try {
+          const { documents } = await databases.listDocuments(DATABASE_ID, COLLECTIONS.FEE_PAYMENTS, [
+            Query.equal('paymentId', id),
+            Query.limit(1)
+          ]);
+          if (documents.length > 0) p = documents[0];
+          else {
+            const { documents: docsByReceipt } = await databases.listDocuments(DATABASE_ID, COLLECTIONS.FEE_PAYMENTS, [
+              Query.equal('receiptNo', id),
+              Query.limit(1)
+            ]);
+            if (docsByReceipt.length > 0) p = docsByReceipt[0];
+          }
+        } catch { /* continue */ }
       }
+      if (p) payments.push(p);
     }
 
-    if (!payment) {
-      console.error('Payment record not found for ID:', paymentDocId);
+    if (payments.length === 0) {
+      console.error('Payment record not found for IDs:', ids);
       return { success: false, error: 'রসিদ পাওয়া যায়নি' };
     }
 
-    // Fetch related docs with fallbacks
-    let inv: any = {};
-    try { inv = await databases.getDocument(DATABASE_ID, COLLECTIONS.FEE_INVOICES, payment.invoiceId); } catch (e) { console.warn('Invoice not found'); }
+    const firstPayment = payments[0];
+    const invoiceIds = [...new Set(payments.map(p => p.invoiceId))].filter(Boolean);
+    const invoices: any[] = [];
+    for (const invId of invoiceIds) {
+      try {
+        const inv = await databases.getDocument(DATABASE_ID, COLLECTIONS.FEE_INVOICES, invId);
+        invoices.push(inv);
+      } catch (e) {
+        console.warn('Invoice fetch failed:', invId);
+      }
+    }
 
     let student: any = {};
-    try { student = await databases.getDocument(DATABASE_ID, COLLECTIONS.STUDENTS, payment.studentId); } catch (e) { console.warn('Student not found'); }
-
-    let items = [];
-    try { items = JSON.parse(inv.feeItems || '[]'); } catch (e) { }
-    if (items.length === 0) {
-      items = [{ name: inv.invoiceType || 'ফি', amount: inv.totalAmount || payment.amountPaid }];
-    } else {
-      items = items.map((i: any) => ({ name: i.feeTypeName || i.name, amount: i.amount }));
+    try {
+      student = await databases.getDocument(DATABASE_ID, COLLECTIONS.STUDENTS, firstPayment.studentId);
+    } catch (e) {
+      console.warn('Student not found');
     }
+
+    // Build consolidated items list
+    let allItems: Array<{ name: string; amount: number }> = [];
+    let totalAmount = 0;
+    let totalDiscount = 0;
+    let totalPaid = 0;
+    let totalDueAfterPayment = 0;
+
+    for (const inv of invoices) {
+      totalAmount += (inv.totalAmount || 0);
+      totalDiscount += (inv.discount || 0);
+      totalDueAfterPayment += (inv.dueAmount || 0);
+
+      let items: any[] = [];
+      try { items = JSON.parse(inv.feeItems || '[]'); } catch (e) { }
+      if (items.length === 0) {
+        allItems.push({ name: inv.invoiceType || 'ফি', amount: inv.totalAmount || 0 });
+      } else {
+        items.forEach((i: any) => {
+          allItems.push({ name: i.feeTypeName || i.name || 'ফি', amount: i.amount || 0 });
+        });
+      }
+    }
+
+    for (const p of payments) {
+      totalPaid += (p.amountPaid || 0);
+    }
+
+    // Calculate previous payments for these invoices (for partial payment & due balance transparency)
+    let totalInvoicePaid = 0;
+    for (const inv of invoices) {
+      totalInvoicePaid += (inv.paidAmount || 0);
+    }
+    const previouslyPaid = Math.max(0, totalInvoicePaid - totalPaid);
+    const totalPaidCumulative = previouslyPaid + totalPaid;
+
+    // Fallback if invoice was not found or missing
+    if (totalAmount === 0) totalAmount = totalPaid;
 
     let className = '---';
     let sectionName = '---';
     try {
       const { documents: enrs } = await databases.listDocuments(DATABASE_ID, COLLECTIONS.STUDENT_ENROLLMENTS, [
-        Query.equal('studentId', student.$id || payment.studentId),
+        Query.equal('studentId', student.$id || firstPayment.studentId),
         Query.limit(1)
       ]);
       if (enrs.length > 0) {
@@ -875,26 +1217,32 @@ export async function generateReceiptData(paymentDocId: string) {
       }
     } catch (e) { }
 
+    const receiptNo = payments.map(p => p.receiptNo || p.paymentId).filter(Boolean).join(', ');
+    const months = [...new Set(invoices.map(i => i.month).filter(Boolean))].join(', ');
+    const sessions = [...new Set(invoices.map(i => i.session).filter(Boolean))].join(', ');
+
     const receiptData = {
-      receiptNo: payment.receiptNo || payment.paymentId || '---',
-      paymentId: payment.paymentId || payment.$id,
-      date: payment.paymentDate || payment.$createdAt,
+      receiptNo: receiptNo || firstPayment.receiptNo || firstPayment.paymentId || '---',
+      paymentId: firstPayment.paymentId || firstPayment.$id,
+      date: firstPayment.paymentDate || firstPayment.$createdAt,
       studentName: student.nameBn || student.nameEn || student.name || 'শিক্ষার্থীর নাম নেই',
       studentId: student.studentId || '---',
       studentClass: className,
       studentSection: sectionName,
       fatherName: student.fatherNameBn || student.fatherNameEn || '',
-      month: inv.month || '',
-      session: inv.session || '',
-      items: items,
-      totalAmount: inv.totalAmount || payment.amountPaid,
-      discount: inv.discount || 0,
-      netAmount: (inv.totalAmount || payment.amountPaid) - (inv.discount || 0),
-      paidAmount: payment.amountPaid,
-      dueAfterPayment: inv.dueAmount || 0,
-      paymentMethod: payment.paymentMethod,
-      transactionRef: payment.transactionRef || '',
-      collectedBy: payment.collectedBy || '',
+      month: months || (invoices[0]?.month || ''),
+      session: sessions || (invoices[0]?.session || ''),
+      items: allItems.length > 0 ? allItems : [{ name: 'ফি আদায়', amount: totalPaid }],
+      totalAmount: totalAmount,
+      discount: totalDiscount,
+      netAmount: Math.max(0, totalAmount - totalDiscount),
+      paidAmount: totalPaid,
+      previouslyPaid: previouslyPaid,
+      totalPaidCumulative: totalPaidCumulative,
+      dueAfterPayment: totalDueAfterPayment,
+      paymentMethod: firstPayment.paymentMethod,
+      transactionRef: firstPayment.transactionRef || '',
+      collectedBy: firstPayment.collectedBy || '',
       instituteName: "Manzil International Institute",
       instituteNameBn: "মানজিল ইন্টারন্যাশনাল ইনস্টিটিউট",
       instituteAddress: "Dhaka, Bangladesh",
@@ -1060,12 +1408,19 @@ export async function generateBulkInvoices(params: {
   try {
     const { databases } = await createAdminClient();
 
-    // Resolve default amount
+    // Resolve default amount & breakdown
     let defaultAmount = 0;
+    let defaultBreakdown: any[] = [];
     if (params.feeTypeId) {
       try {
         const ftDoc = await databases.getDocument(DATABASE_ID, COLLECTIONS.FEE_TYPES, params.feeTypeId);
         defaultAmount = ftDoc.defaultAmount || 0;
+        if (ftDoc.breakdown) {
+          try {
+            const parsed = JSON.parse(ftDoc.breakdown);
+            if (Array.isArray(parsed) && parsed.length > 0) defaultBreakdown = parsed;
+          } catch {}
+        }
       } catch { /* use 0 */ }
     }
 
@@ -1135,11 +1490,17 @@ export async function generateBulkInvoices(params: {
           dueAmount: amount,
           status: 'unpaid',
           createdBy: params.recordedBy || 'admin',
-          feeItems: JSON.stringify([{
-            feeTypeCode: params.feeTypeCode,
-            feeTypeName: params.feeTypeBn || params.feeTypeName,
-            amount,
-          }]),
+          feeItems: defaultBreakdown.length > 0
+            ? JSON.stringify(defaultBreakdown.map(b => ({
+                feeTypeCode: params.feeTypeCode,
+                feeTypeName: b.name || b.title || params.feeTypeBn || params.feeTypeName,
+                amount: Number(b.amount) || 0,
+              })))
+            : JSON.stringify([{
+                feeTypeCode: params.feeTypeCode,
+                feeTypeName: params.feeTypeBn || params.feeTypeName,
+                amount,
+              }]),
         });
 
         generatedCount++;

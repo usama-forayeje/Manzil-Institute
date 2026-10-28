@@ -35,6 +35,7 @@ interface DatePickerProps {
   placeholder?: string
   startYear?: number
   endYear?: number
+  className?: string
 }
 
 export function DatePicker({
@@ -43,6 +44,7 @@ export function DatePicker({
   placeholder = "তারিখ নির্বাচন করুন",
   startYear = 1950,
   endYear = new Date().getFullYear() + 2,
+  className,
 }: DatePickerProps) {
   const [open, setOpen] = React.useState(false)
 
@@ -64,9 +66,10 @@ export function DatePicker({
         <Button
           variant="outline"
           className={cn(
-            "w-full justify-start text-left font-normal h-11 rounded-xl transition-all shadow-sm px-4 kalpurush-font",
+            "w-full justify-start text-left font-normal h-11 rounded-xl transition-all shadow-sm px-4 kalpurush-font cursor-pointer",
             "bg-background border-input hover:bg-accent hover:text-accent-foreground",
-            date ? "text-foreground" : "text-muted-foreground"
+            date ? "text-foreground font-bold" : "text-muted-foreground",
+            className
           )}
         >
           <CalendarIcon className="mr-2 h-4 w-4 text-cyan-500 shrink-0" />
@@ -74,7 +77,7 @@ export function DatePicker({
         </Button>
       </PopoverTrigger>
       <PopoverContent
-        className="w-auto p-0 rounded-2xl border-border shadow-2xl overflow-hidden kalpurush-font"
+        className="w-auto p-0 rounded-2xl border-border shadow-2xl overflow-hidden kalpurush-font z-[70]"
         align="start"
       >
         <Calendar

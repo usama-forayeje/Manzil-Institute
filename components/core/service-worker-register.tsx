@@ -4,29 +4,22 @@ import { useEffect } from 'react';
 
 export default function ServiceWorkerRegister() {
   useEffect(() => {
-    if (!('serviceWorker' in navigator)) return;
+    if (typeof window === 'undefined' || !('serviceWorker' in navigator)) return;
 
-    // Standard dev behavior: ensure stale service workers don't interfere with HMR/navigation
+    // In development: ensure stale service workers don't interfere with HMR or cause reload loops
     if (process.env.NODE_ENV !== 'production') {
       navigator.serviceWorker
         .getRegistrations()
         .then(registrations => {
           registrations.forEach(registration => registration.unregister());
         })
-        .catch(() => {
-          // Silent failure - non-critical in development
-        });
+        .catch(() => {});
       return;
     }
 
-    navigator.serviceWorker.register('/sw.js').catch(() => {
-      // Silent failure - SW is optional
-    });
-
-    navigator.serviceWorker.addEventListener('controllerchange', () => {
-      window.location.reload();
-    });
+    // In production: register service worker safely without reload loops
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
   }, []);
 
-  return null; // This component doesn't render anything
+  return null;
 }

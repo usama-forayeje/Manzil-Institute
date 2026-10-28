@@ -36,9 +36,12 @@ export function useInfiniteStudents(overrides?: { search?: string; status?: stri
       ...filters 
     }),
     initialPageParam: undefined,
-    getNextPageParam: (lastPage) => {
-      // Small fix: Ensure we only return nextCursor if we actually have data
-      if (lastPage.success && lastPage.data && lastPage.data.documents.length === 20) {
+    getNextPageParam: (lastPage, allPages) => {
+      if (!lastPage.success || !lastPage.data) return undefined;
+      if (!lastPage.data.documents || lastPage.data.documents.length === 0) return undefined;
+      const totalCount = lastPage.data.total ?? 0;
+      const loadedCount = allPages.flatMap((p) => p.data?.documents ?? []).length;
+      if (loadedCount < totalCount && lastPage.data.nextCursor) {
         return lastPage.data.nextCursor;
       }
       return undefined;

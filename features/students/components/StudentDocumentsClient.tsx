@@ -24,7 +24,9 @@ import {
   Baby,
   ArrowUpRight,
   Filter,
+  Loader2,
 } from 'lucide-react';
+import { convertEnglishToBengali } from '@/lib/utils';
 
 // ── Document field definitions ──────────────────────────────────
 const DOC_FIELDS = [
@@ -231,14 +233,52 @@ type FilterMode = 'all' | 'complete' | 'incomplete' | 'missing';
 // ── Main Page Component ─────────────────────────────────────────
 export default function StudentDocumentsClient() {
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [filterMode, setFilterMode] = useState<FilterMode>('all');
+  const sentinelRef = React.useRef<HTMLDivElement>(null);
 
-  const { data, isLoading } = useInfiniteStudents();
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search.trim());
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  const {
+    data,
+    isLoading,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage
+  } = useInfiniteStudents({ search: debouncedSearch || undefined });
+
+  React.useEffect(() => {
+    if (!hasNextPage || isFetchingNextPage || !fetchNextPage) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          fetchNextPage();
+        }
+      },
+      { rootMargin: '400px' }
+    );
+
+    const el = sentinelRef.current;
+    if (el) observer.observe(el);
+
+    return () => {
+      if (el) observer.unobserve(el);
+      observer.disconnect();
+    };
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const allStudents = useMemo(
     () => data?.pages.flatMap((p: any) => p.data?.documents ?? []) ?? [],
     [data]
   );
+
+  const totalCount = data?.pages[0]?.data?.total ?? allStudents.length;
 
   const filteredStudents = useMemo(() => {
     let result = allStudents;
@@ -319,7 +359,7 @@ export default function StudentDocumentsClient() {
             key={tab.key}
             onClick={() => setFilterMode(tab.key)}
             className={cn(
-              'px-3 py-1.5 rounded-xl text-xs font-bold kalpurush-font transition-all border',
+              'px-3 py-1.5 rounded-xl text-xs font-bold kalpurush-font transition-all border cursor-pointer',
               filterMode === tab.key
                 ? 'bg-[#00AEEF] text-white border-[#00AEEF]'
                 : 'bg-white dark:bg-zinc-900 text-zinc-500 dark:text-zinc-400 border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-800/50'
@@ -336,7 +376,7 @@ export default function StudentDocumentsClient() {
       {/* Cards grid */}
       {isLoading ? (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-          {Array.from({ length: 4 }).map((_, i) => <CardSkeleton key={i} />)}
+          {Array.from({ length: 6 }).map((_, i) => <CardSkeleton key={i} />)}
         </div>
       ) : filteredStudents.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-24 text-zinc-400 dark:text-zinc-600 gap-3 opacity-60">
@@ -344,11 +384,54 @@ export default function StudentDocumentsClient() {
           <p className="kalpurush-font text-base font-bold">কোনো শিক্ষার্থী পাওয়া যায়নি</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-          {filteredStudents.map((student: StudentListItem) => (
-            <StudentDocCard key={student.$id} student={student} />
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            {filteredStudents.map((student: StudentListItem) => (
+              <StudentDocCard key={student.$id} student={student} />
+            ))}
+
+            {/* Skeletons while fetching next page */}
+            {isFetchingNextPage && (
+              <>
+                <CardSkeleton />
+                <CardSkeleton />
+              </>
+            )}
+          </div>
+
+          {/* Infinite scroll sentinel */}
+          <div ref={sentinelRef} className="h-6 w-full pointer-events-none" />
+
+          {/* Bottom status bar */}
+          <div className="rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 bg-zinc-50/50 dark:bg-zinc-900/30 px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-zinc-500">
+            <span className="kalpurush-font font-medium">
+              প্রদর্শিত হচ্ছে: <strong className="text-zinc-800 dark:text-zinc-200">{convertEnglishToBengali(filteredStudents.length)}</strong> জন
+              <span className="text-zinc-400"> (সর্বমোট {convertEnglishToBengali(totalCount)} জনের মধ্যে)</span>
+            </span>
+
+            <div className="flex items-center gap-3">
+              {isFetchingNextPage ? (
+                <div className="flex items-center gap-2 text-[#00AEEF] font-bold kalpurush-font">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span>আরও ডকুমেন্টস লোড হচ্ছে...</span>
+                </div>
+              ) : hasNextPage ? (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => fetchNextPage()}
+                  className="h-8 text-xs font-bold text-zinc-700 dark:text-zinc-200 border-zinc-200 dark:border-zinc-800 hover:bg-[#00AEEF]/10 hover:text-[#00AEEF] kalpurush-font cursor-pointer"
+                >
+                  আরও লোড করুন ↓
+                </Button>
+              ) : (
+                <span className="text-emerald-600 dark:text-emerald-400 font-bold text-xs kalpurush-font flex items-center gap-1.5">
+                  ✓ সকল শিক্ষার্থীর ডকুমেন্টস লোড করা হয়েছে
+                </span>
+              )}
+            </div>
+          </div>
+        </>
       )}
     </div>
   );

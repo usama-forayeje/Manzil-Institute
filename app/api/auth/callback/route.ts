@@ -73,10 +73,10 @@ export async function GET(request: NextRequest) {
       [Query.equal('email', appwriteUser.email)]
     );
 
-    let role = 'student';
+    let role = 'user';
 
     if (existing.total === 0) {
-      // New user – create document
+      // New user from Google OAuth — assign default 'user' role
       await databases.createDocument(
         DATABASE_ID,
         USERS_COLLECTION_ID,
@@ -85,14 +85,14 @@ export async function GET(request: NextRequest) {
           email: appwriteUser.email,
           name: appwriteUser.name || '',
           avatarUrl: avatarUrl || '', // store avatar URL
-          role: 'student',
-          isActive: true,
+          role: 'user',
+          isActive: false,
         }
       );
     } else {
       // Existing user – update fields that might have changed (name, avatar)
       const doc = existing.documents[0];
-      role = doc.role;
+      role = doc.role || 'user';
 
       // Prepare update data (only if values have changed)
       const updateData: {
@@ -168,8 +168,15 @@ export async function GET(request: NextRequest) {
       expires: sessionExpires,
     });
 
-    // 8. Redirect based on role with absolute URL to avoid potential relative path issues
-    const dashboardBase = (ROLE_DASHBOARD[role as UserRole] || '/dashboard/student');
+    // 8. Redirect based on role
+    // Random user accounts with role 'user' are NOT allowed into any dashboard
+    if (role === 'user' || !ROLE_DASHBOARD[role as UserRole]) {
+      return NextResponse.redirect(
+        new URL('/login?error=unauthorized', request.url)
+      );
+    }
+
+    const dashboardBase = ROLE_DASHBOARD[role as UserRole];
     const redirectUrl = new URL(dashboardBase, request.url);
     
     return NextResponse.redirect(redirectUrl);

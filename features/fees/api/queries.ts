@@ -1,5 +1,5 @@
 import { queryOptions } from '@tanstack/react-query';
-import { getFeeTypes } from './service';
+import { getFeeTypes, getFeeCategories } from './service';
 import {
   fetchFeeDashboardStats,
   fetchInvoicesWithStudents,
@@ -13,6 +13,7 @@ import type { FeeFilter } from '@/features/fees/types';
 export const feeKeys = {
   all: ['fees'] as const,
   structures: () => [...feeKeys.all, 'structures'] as const,
+  categories: () => [...feeKeys.all, 'categories'] as const,
   filterOptions: () => [...feeKeys.all, 'filter-options'] as const,
   dashboard: (session: string, feeType?: string, dateFrom?: string, dateTo?: string) =>
     [...feeKeys.all, 'dashboard', session, feeType || 'all', dateFrom || '', dateTo || ''] as const,
@@ -25,6 +26,13 @@ export const feeKeys = {
 export const feeTypesQueryOptions = queryOptions({
   queryKey: feeKeys.structures(),
   queryFn: () => getFeeTypes(),
+  staleTime: 5 * 60 * 1000,
+});
+
+// ─── Fee Categories ─────────────────────────────────────────
+export const feeCategoriesQueryOptions = queryOptions({
+  queryKey: feeKeys.categories(),
+  queryFn: () => getFeeCategories(),
   staleTime: 5 * 60 * 1000,
 });
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import {
   Users,
   Search,
@@ -99,6 +99,15 @@ export default function BoardingStudentsPage() {
   const [targetType, setTargetType] = useState('');
   const [projectedFee, setProjectedFee] = useState<number | null>(null);
   const [isSyncingFee, setIsSyncingFee] = useState(false);
+  const [debouncedSearch, setDebouncedSearch] = useState(search);
+  const sentinelRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search.trim());
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [search]);
 
   // Infinite Query for Students
   const {
@@ -111,10 +120,31 @@ export default function BoardingStudentsPage() {
     refetch,
     isRefetching
   } = useInfiniteStudents({
-    search: search.length >= 3 ? search : undefined,
+    search: debouncedSearch.length >= 2 ? debouncedSearch : undefined,
     status: statusFilter,
     boardingType: boardingTypeFilter !== 'all' ? boardingTypeFilter : undefined,
   });
+
+  useEffect(() => {
+    if (!hasNextPage || isFetchingNextPage || !fetchNextPage) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          fetchNextPage();
+        }
+      },
+      { rootMargin: '400px' }
+    );
+
+    const el = sentinelRef.current;
+    if (el) observer.observe(el);
+
+    return () => {
+      if (el) observer.unobserve(el);
+      observer.disconnect();
+    };
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const students = useMemo(() =>
     data?.pages.flatMap(page => page.data?.documents || []) || [],
@@ -497,13 +527,35 @@ export default function BoardingStudentsPage() {
             </thead>
             <tbody className="divide-y divide-zinc-100/50 dark:divide-zinc-800/50">
               {isLoading ? (
-                Array.from({ length: 6 }).map((_, i) => (
-                  <tr key={i}>
-                    {columns.map((_, j) => (
-                      <td key={j} className="px-6 py-5">
-                        <Skeleton className="h-4 w-3/4 rounded-full bg-zinc-100 dark:bg-zinc-800" />
-                      </td>
-                    ))}
+                Array.from({ length: 7 }).map((_, i) => (
+                  <tr key={i} className="border-b border-zinc-100 dark:border-zinc-800/50">
+                    <td className="px-6 py-5">
+                      <div className="flex items-center gap-3">
+                        <Skeleton className="h-10 w-10 rounded-md shrink-0" />
+                        <div className="space-y-1.5 flex-1 min-w-0">
+                          <Skeleton className="h-4 w-32 rounded-md" />
+                          <Skeleton className="h-3 w-20 rounded-md" />
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-5">
+                      <div className="space-y-1.5">
+                        <Skeleton className="h-4 w-28 rounded-md" />
+                        <Skeleton className="h-3 w-16 rounded-md" />
+                      </div>
+                    </td>
+                    <td className="px-6 py-5">
+                      <Skeleton className="h-6 w-20 rounded-md" />
+                    </td>
+                    <td className="px-6 py-5">
+                      <Skeleton className="h-6 w-24 rounded-md" />
+                    </td>
+                    <td className="px-6 py-5">
+                      <Skeleton className="h-4 w-16 rounded-md" />
+                    </td>
+                    <td className="px-6 py-5 text-right">
+                      <Skeleton className="h-8 w-8 rounded-md ml-auto" />
+                    </td>
                   </tr>
                 ))
               ) : students.length === 0 ? (
@@ -531,33 +583,79 @@ export default function BoardingStudentsPage() {
                   </tr>
                 ))
               )}
-            </tbody>
-          </table>
-        </div>
 
-        {/* Load More Trigger */}
-        {hasNextPage && (
-          <div className="p-8 border-t border-zinc-100 dark:border-zinc-800 flex justify-center bg-zinc-50/30">
-            <Button
-              onClick={() => fetchNextPage()}
-              disabled={isFetchingNextPage}
-              variant="outline"
-              className="h-12 px-10 rounded-md font-bold border-zinc-200 dark:border-zinc-800 shadow-sm gap-2 hover:bg-zinc-100 transition-all"
-            >
-              {isFetchingNextPage ? (
+              {/* Skeletons while fetching next page */}
+              {isFetchingNextPage && (
                 <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  নতুন ডাটা আসছে...
-                </>
-              ) : (
-                <>
-                  <RefreshCw className="h-4 w-4" />
-                  আরও দেখুন
+                  {Array.from({ length: 3 }).map((_, i) => (
+                    <tr key={`boarding-next-${i}`} className="border-b border-zinc-100/50 dark:border-zinc-800/50 bg-zinc-50/10 dark:bg-zinc-900/10">
+                      <td className="px-6 py-5">
+                        <div className="flex items-center gap-3">
+                          <Skeleton className="h-10 w-10 rounded-md shrink-0" />
+                          <div className="space-y-1.5 flex-1 min-w-0">
+                            <Skeleton className="h-4 w-32 rounded-md" />
+                            <Skeleton className="h-3 w-20 rounded-md" />
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-5">
+                        <div className="space-y-1.5">
+                          <Skeleton className="h-4 w-28 rounded-md" />
+                          <Skeleton className="h-3 w-16 rounded-md" />
+                        </div>
+                      </td>
+                      <td className="px-6 py-5">
+                        <Skeleton className="h-6 w-20 rounded-md" />
+                      </td>
+                      <td className="px-6 py-5">
+                        <Skeleton className="h-6 w-24 rounded-md" />
+                      </td>
+                      <td className="px-6 py-5">
+                        <Skeleton className="h-4 w-16 rounded-md" />
+                      </td>
+                      <td className="px-6 py-5 text-right">
+                        <Skeleton className="h-8 w-8 rounded-md ml-auto" />
+                      </td>
+                    </tr>
+                  ))}
                 </>
               )}
-            </Button>
+            </tbody>
+          </table>
+
+          {/* Sentinel for auto scroll */}
+          <div ref={sentinelRef} className="h-4 w-full pointer-events-none" />
+        </div>
+
+        {/* Bottom status bar */}
+        <div className="border-t border-zinc-200/50 dark:border-zinc-800/50 bg-zinc-50/30 dark:bg-zinc-900/30 px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-zinc-500">
+          <span className="kalpurush-font font-medium">
+            প্রদর্শিত হচ্ছে: <strong className="text-zinc-800 dark:text-zinc-200">{convertEnglishToBengali(students.length)}</strong> জন
+            <span className="text-zinc-400"> (সর্বমোট {convertEnglishToBengali(totalCount)} জনের মধ্যে)</span>
+          </span>
+
+          <div className="flex items-center gap-3">
+            {isFetchingNextPage ? (
+              <div className="flex items-center gap-2 text-[#00AEEF] font-bold kalpurush-font">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span>আরও শিক্ষার্থী লোড হচ্ছে...</span>
+              </div>
+            ) : hasNextPage ? (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => fetchNextPage()}
+                className="h-8 text-xs font-bold text-zinc-700 dark:text-zinc-200 border-zinc-200 dark:border-zinc-800 hover:bg-[#00AEEF]/10 hover:text-[#00AEEF] kalpurush-font cursor-pointer"
+              >
+                আরও লোড করুন ↓
+              </Button>
+            ) : (
+              <span className="text-emerald-600 dark:text-emerald-400 font-bold text-xs kalpurush-font flex items-center gap-1.5">
+                ✓ সকল আবাসিক শিক্ষার্থী লোড করা হয়েছে
+              </span>
+            )}
           </div>
-        )}
+        </div>
       </Card>
 
       {/* Mobile Responsive Hints */}

@@ -94,7 +94,15 @@ export async function signOut() {
   }
 
   const cookieStore = await cookies();
+  const cookieOptions = { path: '/', maxAge: 0, expires: new Date(0) };
+  cookieStore.set('appwrite-session', '', cookieOptions);
+  cookieStore.set('appwrite-user-role', '', cookieOptions);
+  cookieStore.set('appwrite-user-name', '', cookieOptions);
+  cookieStore.set('appwrite-user-email', '', cookieOptions);
   cookieStore.delete('appwrite-session');
+  cookieStore.delete('appwrite-user-role');
+  cookieStore.delete('appwrite-user-name');
+  cookieStore.delete('appwrite-user-email');
 }
 
 /**

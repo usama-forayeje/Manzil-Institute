@@ -18,6 +18,9 @@ export default function LoginPage() {
 
     if (errorParam) {
       switch (errorParam) {
+        case 'unauthorized':
+          setError('আপনার এই অ্যাকাউন্টটি এখনো অনুমোদিত নয়। অনুগ্রহ করে অ্যাডমিনের সাথে যোগাযোগ করুন।');
+          break;
         case 'invalid_grant':
           setError(retryParam === 'true'
             ? 'আপনার লগইন অনুরোধের সময় অতিরিক্ত দেরি হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।'

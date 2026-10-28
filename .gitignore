@@ -35,6 +35,9 @@ yarn-error.log*
 
 # vercel
 .vercel
+.vscode/
+.mcp.json
+
 
 # typescript
 *.tsbuildinfo
@@ -52,3 +55,6 @@ dev.log
 .kilo/skills/changelog-generator/SKILL.md
 
 .vercel
+.vscode/
+.mcp.json
+

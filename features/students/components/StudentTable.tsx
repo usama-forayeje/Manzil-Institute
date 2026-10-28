@@ -49,7 +49,7 @@ import { useInfiniteStudents, studentKeys } from '../api/queries';
 import { useInView } from 'react-intersection-observer';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
-import { cn } from '@/lib/utils';
+import { cn, convertEnglishToBengali } from '@/lib/utils';
 import { StudentListItem } from '../types';
 import { deleteStudent } from '../api/service';
 import { toast } from 'sonner';
@@ -68,7 +68,7 @@ export default function StudentTable() {
     isFetchingNextPage 
   } = useInfiniteStudents();
 
-  const { ref, inView } = useInView();
+  const { ref, inView } = useInView({ rootMargin: '400px' });
 
   React.useEffect(() => {
     if (inView && hasNextPage && !isFetchingNextPage) {
@@ -79,6 +79,8 @@ export default function StudentTable() {
   const students = useMemo(() => {
     return data?.pages.flatMap((page) => page.data?.documents ?? []) ?? [];
   }, [data]);
+
+  const totalCount = data?.pages[0]?.data?.total ?? students.length;
 
   const handleDelete = async (id: string) => {
     if (!window.confirm('আপনি কি নিশ্চিত যে এই শিক্ষার্থীকে নিষ্ক্রিয় করতে চান?')) return;
@@ -316,18 +318,79 @@ export default function StudentTable() {
                 </TableCell>
               </TableRow>
             )}
+
+            {/* Next page skeleton rows */}
+            {isFetchingNextPage && (
+              <>
+                {Array.from({ length: 3 }).map((_, idx) => (
+                  <TableRow key={`next-table-${idx}`} className="border-b border-zinc-100/50 dark:border-zinc-900/50 bg-zinc-50/10 dark:bg-zinc-900/10">
+                    <TableCell className="py-5 px-6">
+                      <div className="flex items-center gap-3">
+                        <Skeleton className="h-10 w-10 rounded-full shrink-0" />
+                        <div className="space-y-1.5 flex-1 min-w-0">
+                          <Skeleton className="h-4 w-32 rounded-md" />
+                          <Skeleton className="h-3 w-20 rounded-md" />
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell className="py-5 px-6">
+                      <div className="space-y-1.5">
+                        <Skeleton className="h-4 w-28 rounded-md" />
+                        <Skeleton className="h-3 w-16 rounded-md" />
+                      </div>
+                    </TableCell>
+                    <TableCell className="py-5 px-6">
+                      <Skeleton className="h-5 w-20 rounded-full" />
+                    </TableCell>
+                    <TableCell className="py-5 px-6">
+                      <Skeleton className="h-5 w-16 rounded-full" />
+                    </TableCell>
+                    <TableCell className="py-5 px-6">
+                      <Skeleton className="h-4 w-24 rounded-md" />
+                    </TableCell>
+                    <TableCell className="py-5 px-6 text-right">
+                      <Skeleton className="h-8 w-8 rounded-md ml-auto" />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </>
+            )}
           </TableBody>
         </Table>
-      </div>
 
-      {hasNextPage && (
-        <div ref={ref} className="py-12 flex justify-center w-full">
-           <div className="flex items-center gap-3 px-6 py-3 rounded-full bg-white dark:bg-zinc-900 shadow-xl border border-zinc-100 dark:border-zinc-800">
-                <Loader2 className="h-5 w-5 animate-spin text-[#00AEEF]" />
-                <span className="text-xs font-bold text-zinc-500 kalpurush-font">লোড হচ্ছে...</span>
-           </div>
+        {/* Infinite scroll sentinel */}
+        <div ref={ref} className="h-4 w-full pointer-events-none" />
+
+        {/* Bottom status bar */}
+        <div className="border-t border-zinc-200/50 dark:border-zinc-800/50 bg-zinc-50/30 dark:bg-zinc-900/30 px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-zinc-500">
+          <span className="kalpurush-font font-medium">
+            প্রদর্শিত হচ্ছে: <strong className="text-zinc-800 dark:text-zinc-200">{convertEnglishToBengali(students.length)}</strong> জন
+            <span className="text-zinc-400"> (সর্বমোট {convertEnglishToBengali(totalCount)} জনের মধ্যে)</span>
+          </span>
+
+          <div className="flex items-center gap-3">
+            {isFetchingNextPage ? (
+              <div className="flex items-center gap-2 text-[#00AEEF] font-bold kalpurush-font">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span>আরও শিক্ষার্থী লোড হচ্ছে...</span>
+              </div>
+            ) : hasNextPage ? (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => fetchNextPage()}
+                className="h-8 text-xs font-bold text-zinc-700 dark:text-zinc-200 border-zinc-200 dark:border-zinc-800 hover:bg-[#00AEEF]/10 hover:text-[#00AEEF] kalpurush-font cursor-pointer"
+              >
+                আরও লোড করুন ↓
+              </Button>
+            ) : (
+              <span className="text-emerald-600 dark:text-emerald-400 font-bold text-xs kalpurush-font flex items-center gap-1.5">
+                ✓ সকল শিক্ষার্থী লোড করা হয়েছে
+              </span>
+            )}
+          </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }

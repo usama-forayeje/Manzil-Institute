@@ -3,14 +3,129 @@
 // Production-grade TypeScript interfaces for fee management
 // ============================================================
 
+// ─── Fee Category (ফি ক্যাটাগরি / বিভাগ) ────────────────────
+export interface FeeCategory {
+  id: string;
+  nameBn: string;
+  nameEn: string;
+  code: string;
+  color: string;
+  billingCycle: 'monthly' | 'one-time' | 'term' | 'yearly';
+  description?: string;
+  isSystem?: boolean;
+}
+
+export const DEFAULT_FEE_CATEGORIES: FeeCategory[] = [
+  {
+    id: 'monthly',
+    nameBn: 'মাসিক বেতন',
+    nameEn: 'Monthly Tuition',
+    code: 'MONTHLY',
+    color: 'blue',
+    billingCycle: 'monthly',
+    description: 'শিক্ষার্থীদের নিয়মিত মাসিক পড়াশোনা ও বেতন ফি',
+    isSystem: true,
+  },
+  {
+    id: 'admission',
+    nameBn: 'ভর্তি ফি',
+    nameEn: 'Admission Fee',
+    code: 'ADMISSION',
+    color: 'cyan',
+    billingCycle: 'one-time',
+    description: 'নতুন ও পুরাতন শিক্ষার্থীর ভর্তি ও পুনর্ভর্তি ফি',
+    isSystem: true,
+  },
+  {
+    id: 'session',
+    nameBn: 'সেশন / বাৎসরিক ফি',
+    nameEn: 'Session Fee',
+    code: 'SESSION',
+    color: 'indigo',
+    billingCycle: 'yearly',
+    description: 'নতুন শিক্ষাবর্ষের সেশন চার্জ ও প্রাতিষ্ঠানিক উন্নয়ন ফি',
+    isSystem: true,
+  },
+  {
+    id: 'exam',
+    nameBn: 'পরীক্ষার ফি',
+    nameEn: 'Exam Fee',
+    code: 'EXAM',
+    color: 'amber',
+    billingCycle: 'term',
+    description: 'ত্রৈমাসিক, ষাণ্মাসিক ও বার্ষিক পরীক্ষার ফি',
+    isSystem: true,
+  },
+  {
+    id: 'boarding',
+    nameBn: 'বোর্ডিং ও খানা ফি',
+    nameEn: 'Boarding & Food Fee',
+    code: 'BOARDING',
+    color: 'orange',
+    billingCycle: 'monthly',
+    description: 'আবাসিক ও ডে-কেয়ার শিক্ষার্থীদের খাবার ও কিচেন চার্জ',
+    isSystem: true,
+  },
+  {
+    id: 'hall',
+    nameBn: 'আবাসিক হল ও সিট ফি',
+    nameEn: 'Hall & Bed Fee',
+    code: 'HALL',
+    color: 'purple',
+    billingCycle: 'monthly',
+    description: 'দারুল ইকামা / আবাসিক হলে সিট ও রুম ভাড়া চার্জ',
+    isSystem: true,
+  },
+  {
+    id: 'books',
+    nameBn: 'বই ও কিতাব ফি',
+    nameEn: 'Books & Supplies',
+    code: 'BOOKS',
+    color: 'emerald',
+    billingCycle: 'one-time',
+    description: 'পাঠ্যবই, খাতা, ডায়েরি ও শিক্ষা উপকরণ ফি',
+    isSystem: true,
+  },
+  {
+    id: 'dress',
+    nameBn: 'পোশাক ও ইউনিফর্ম',
+    nameEn: 'Dress & Uniform',
+    code: 'DRESS',
+    color: 'teal',
+    billingCycle: 'one-time',
+    description: 'মাদ্রাসার নির্ধারিত পোশাক, টুপি ও ব্যাজ',
+    isSystem: true,
+  },
+  {
+    id: 'tour',
+    nameBn: 'সফর ও কাফেলা ফি',
+    nameEn: 'Tour & Event',
+    code: 'TOUR',
+    color: 'rose',
+    billingCycle: 'one-time',
+    description: 'বার্ষিক শিক্ষা সফর, কাফেলা বা ইসলামিক সাংস্কৃতিক অনুষ্ঠান',
+    isSystem: true,
+  },
+  {
+    id: 'other',
+    nameBn: 'অন্যান্য ফি',
+    nameEn: 'Other Miscellaneous',
+    code: 'OTHER',
+    color: 'zinc',
+    billingCycle: 'one-time',
+    description: 'বিবিধ বিশেষ ফি ও অপ্রত্যাশিত প্রাতিষ্ঠানিক চার্জ',
+    isSystem: true,
+  },
+];
+
 // ─── Fee Type (কাঠামো সংজ্ঞা) ──────────────────────────────
 export interface FeeType {
   $id: string;
   name: string;
   nameBn: string;
   code: string;
-  category: 'monthly' | 'admission' | 'session' | 'other';
-  billingCycle: 'monthly' | 'one-time' | 'yearly';
+  category: string;
+  billingCycle: 'monthly' | 'one-time' | 'term' | 'yearly';
   applicableTo: 'student' | 'staff';
   description?: string;
   defaultAmount: number;
@@ -20,6 +135,7 @@ export interface FeeType {
   departmentIds?: string[];
   boardingTypes?: string[];
   sortOrder?: number;
+  breakdown?: string | Array<{ name: string; amount: number }>;
 }
 
 // ─── Fee Structure (ফি কাঠামো) ──────────────────────────────
@@ -177,6 +293,8 @@ export interface ReceiptData {
   instituteAddress: string;
   institutePhone: string;
   instituteLogo: string;
+  previouslyPaid?: number;
+  totalPaidCumulative?: number;
 }
 
 // ─── Filter Types ───────────────────────────────────────────

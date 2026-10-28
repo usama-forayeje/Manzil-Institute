@@ -155,17 +155,43 @@ export default function ReceiptTemplate({ receipt }: ReceiptTemplateProps) {
               
               <tfoot style={{ borderTop: '2px solid #000' }}>
                 <tr style={{ background: '#fcfcfc' }}>
-                  <td style={{ padding: '6px 12px', textAlign: 'right', fontSize: 10, color: '#000', fontWeight: 'bold' }}>সর্বমোট (Sub-total):</td>
+                  <td style={{ padding: '6px 12px', textAlign: 'right', fontSize: 10, color: '#000', fontWeight: 'bold' }}>সর্বমোট ফি (Sub-total):</td>
                   <td style={{ padding: '6px 12px', textAlign: 'right', fontWeight: 'bold', color: '#000' }}>৳{toBn(receipt.totalAmount)}</td>
                 </tr>
-                <tr style={{ background: '#f5f5f5' }}>
-                  <td style={{ padding: '6px 12px', textAlign: 'right', fontSize: 10, color: '#000', fontWeight: 'bold' }}>পরিশোধ্য পরিমাণ (Payable):</td>
-                  <td style={{ padding: '6px 12px', textAlign: 'right', fontWeight: 'bold', color: '#000' }}>৳{toBn(receipt.netAmount)}</td>
-                </tr>
+                {Boolean(receipt.discount && receipt.discount > 0) && (
+                  <tr style={{ background: '#fcfcfc' }}>
+                    <td style={{ padding: '6px 12px', textAlign: 'right', fontSize: 10, color: '#000', fontWeight: 'bold' }}>ছাড় / রিবেট (Discount):</td>
+                    <td style={{ padding: '6px 12px', textAlign: 'right', fontWeight: 'bold', color: '#000' }}>-৳{toBn(receipt.discount)}</td>
+                  </tr>
+                )}
+                {Boolean(receipt.previouslyPaid && receipt.previouslyPaid > 0) && (
+                  <tr style={{ background: '#f5f5f5', borderTop: '1px dashed #bbb' }}>
+                    <td style={{ padding: '6px 12px', textAlign: 'right', fontSize: 10, color: '#333', fontWeight: 'bold' }}>
+                      পূর্বে পরিশোধিত (Previously Paid):
+                    </td>
+                    <td style={{ padding: '6px 12px', textAlign: 'right', fontWeight: 'bold', color: '#333' }}>
+                      ৳{toBn(receipt.previouslyPaid)}
+                    </td>
+                  </tr>
+                )}
                 <tr style={{ background: '#fcfcfc', borderTop: '1px solid #000' }}>
-                  <td style={{ padding: '8px 12px', textAlign: 'right', fontSize: 12, color: '#000', fontWeight: 'bold' }}>জমা (Paid Amount):</td>
-                  <td style={{ padding: '8px 12px', textAlign: 'right', fontWeight: 'bold', color: '#000', fontSize: 14 }}>৳{toBn(receipt.paidAmount)}</td>
+                  <td style={{ padding: '8px 12px', textAlign: 'right', fontSize: 12, color: '#000', fontWeight: 'bold' }}>
+                    {Boolean(receipt.previouslyPaid && receipt.previouslyPaid > 0) ? 'বর্তমান জমা (Paid This Receipt):' : 'জমা (Paid Amount):'}
+                  </td>
+                  <td style={{ padding: '8px 12px', textAlign: 'right', fontWeight: 'bold', color: '#000', fontSize: 14 }}>
+                    ৳{toBn(receipt.paidAmount)}
+                  </td>
                 </tr>
+                {Boolean(receipt.previouslyPaid && receipt.previouslyPaid > 0) && (
+                  <tr style={{ background: '#fcfcfc' }}>
+                    <td style={{ padding: '5px 12px', textAlign: 'right', fontSize: 10, color: '#555', fontWeight: 'bold' }}>
+                      সর্বমোট পরিশোধ (Total Paid so far):
+                    </td>
+                    <td style={{ padding: '5px 12px', textAlign: 'right', fontWeight: 'bold', color: '#555', fontSize: 11 }}>
+                      ৳{toBn((receipt.previouslyPaid || 0) + receipt.paidAmount)}
+                    </td>
+                  </tr>
+                )}
                 <tr style={{ borderTop: '1px solid #000' }}>
                   <td style={{ padding: '6px 12px', textAlign: 'right', fontSize: 11, color: '#000', fontWeight: 'bold' }}>
                     {receipt.dueAfterPayment > 0 ? 'অবশিষ্ট বকেয়া (Current Due):' : 'সার্বিক বকেয়া (Total Due):'}
@@ -201,17 +227,13 @@ export default function ReceiptTemplate({ receipt }: ReceiptTemplateProps) {
         </div>
 
         <div>
-          {/* ── Signatures ── */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 30 }}>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ width: 110, borderTop: '1px solid #000', marginBottom: 4 }}></div>
-              <div style={{ fontSize: 10, color: '#000', fontWeight: 'bold' }}>অভিভাবকের স্বাক্ষর</div>
-              <div style={{ fontSize: 8, color: '#555' }}>Guardian Signature</div>
+          {/* ── System Generated Receipt Note ── */}
+          <div style={{ textAlign: 'center', marginTop: 24, padding: '8px 12px', border: '1px dashed #555', borderRadius: 4, background: '#fafafa' }}>
+            <div style={{ fontSize: 11, fontWeight: 'bold', color: '#000' }}>
+              এটি সিস্টেম জেনারেটেড রসিদ, কোনো স্বাক্ষরের প্রয়োজন নেই।
             </div>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ width: 110, borderTop: '1px solid #000', marginBottom: 4 }}></div>
-              <div style={{ fontSize: 10, color: '#000', fontWeight: 'bold' }}>কর্তৃপক্ষের স্বাক্ষর ও সিল</div>
-              <div style={{ fontSize: 8, color: '#555' }}>Authority Signature &amp; Seal</div>
+            <div style={{ fontSize: 8.5, color: '#555', marginTop: 2 }}>
+              This is a system generated receipt, no signature required.
             </div>
           </div>
 
